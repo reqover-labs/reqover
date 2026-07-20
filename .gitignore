@@ -1,0 +1,29 @@
+# Gradle
+.gradle/
+build/
+out/
+
+# Java
+*.class
+*.jar
+*.war
+*.ear
+hs_err_pid*
+
+# IDE
+.idea/
+*.iml
+.vscode/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Reqover generated artifacts
+reqover-report/
+coverage-buckets/
+tmp/
+

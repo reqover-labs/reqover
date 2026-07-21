@@ -10,8 +10,25 @@ Reqover는 실행 중인 Spring 애플리케이션에서 코드 커버리지를 
 
 - 백서 원본: `C:\OpenSourceCompetition\docs\Reqover_기술백서.pdf`
 - 작업 폴더: `C:\OpenSourceCompetition\reqover`
-- 구현 상태: Phase 0 PoC 준비 전
-- 우선순위: 요청별 probe routing 가능성 검증
+- 구현 상태: Phase 0 core skeleton 작성
+- 우선순위: Spring MVC adapter와 수동 probe 기반 요청별 bucket routing 검증
+
+## Build
+
+요구사항:
+
+- JDK 21 권장
+- 컴파일 target은 Java 17
+
+테스트 실행:
+
+```powershell
+.\gradlew.bat test
+```
+
+현재 포함된 모듈:
+
+- `reqover-core`: coverage bucket, ThreadLocal context, probe entry point, in-memory snapshot store
 
 ## 핵심 가치
 

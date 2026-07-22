@@ -16,7 +16,7 @@ import java.util.concurrent.atomic.AtomicReference;
 public final class CoverageBucket {
     private static final int UNFINISHED_STATUS = -1;
 
-    private final UnitInfo unitInfo;
+    private final AtomicReference<UnitInfo> unitInfo;
     private final Instant startedAt;
     private final ConcurrentMap<Integer, Set<Integer>> hitsByClass = new ConcurrentHashMap<>();
     private final Set<String> threadNames = ConcurrentHashMap.newKeySet();
@@ -28,7 +28,7 @@ public final class CoverageBucket {
     }
 
     CoverageBucket(UnitInfo unitInfo, Clock clock) {
-        this.unitInfo = java.util.Objects.requireNonNull(unitInfo, "unitInfo");
+        this.unitInfo = new AtomicReference<>(java.util.Objects.requireNonNull(unitInfo, "unitInfo"));
         this.startedAt = Instant.now(clock);
     }
 
@@ -37,7 +37,11 @@ public final class CoverageBucket {
     }
 
     public UnitInfo unitInfo() {
-        return unitInfo;
+        return unitInfo.get();
+    }
+
+    public void updateUnitInfo(UnitInfo unitInfo) {
+        this.unitInfo.set(java.util.Objects.requireNonNull(unitInfo, "unitInfo"));
     }
 
     public Instant startedAt() {
@@ -74,7 +78,7 @@ public final class CoverageBucket {
         hitsByClass.forEach((classId, probes) -> hitCopy.put(classId, Set.copyOf(probes)));
 
         return new CoverageBucketSnapshot(
-                unitInfo,
+                unitInfo.get(),
                 startedAt,
                 endedAt.get(),
                 statusCode.get(),
@@ -83,4 +87,3 @@ public final class CoverageBucket {
         );
     }
 }
-

@@ -26,3 +26,8 @@ subprojects {
     }
 }
 
+val springBootVersion = "3.3.5"
+val springFrameworkVersion = "6.1.14"
+val reactorVersion = "3.6.11"
+val micrometerContextPropagationVersion = "1.1.2"
+val asmVersion = "9.7.1"

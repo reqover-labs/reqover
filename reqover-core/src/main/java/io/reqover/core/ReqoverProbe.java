@@ -38,6 +38,6 @@ public final class ReqoverProbe {
         GLOBAL_BUCKET.set(CoverageBucket.global());
         droppedHits.set(0);
         CoverageContext.clear();
+        ProbeRegistry.clear();
     }
 }
-

@@ -6,12 +6,12 @@ Reqover는 실행 중인 Spring 애플리케이션에서 코드 커버리지를 
 
 ## 현재 상태
 
-이 저장소는 2026 오픈소스 개발자대회 제출을 목표로 하는 초기 기획 단계입니다.
+이 저장소는 2026 오픈소스 개발자대회 제출을 목표로 하는 Phase 0 MVP 단계입니다.
 
 - 백서 원본: `C:\OpenSourceCompetition\docs\Reqover_기술백서.pdf`
 - 작업 폴더: `C:\OpenSourceCompetition\reqover`
-- 구현 상태: Phase 0 core skeleton 작성
-- 우선순위: Spring MVC adapter와 수동 probe 기반 요청별 bucket routing 검증
+- 구현 상태: 요청별 bucket routing, MVC/WebFlux sample, ASM method-entry instrumentation, Java agent smoke test 구현
+- 우선순위: HTML report, JaCoCo 분석 연동 spike, 제출용 데모 정리
 
 ## Build
 
@@ -29,6 +29,42 @@ Reqover는 실행 중인 Spring 애플리케이션에서 코드 커버리지를 
 현재 포함된 모듈:
 
 - `reqover-core`: coverage bucket, ThreadLocal context, probe entry point, in-memory snapshot store
+- `reqover-report`: endpoint-level coverage report model
+- `reqover-spring-mvc`: Spring MVC request bucket adapter
+- `reqover-spring-webflux`: WebFlux/Reactor Context request bucket adapter
+- `reqover-instrumentation`: ASM method-entry instrumentation
+- `reqover-agent`: Java agent packaging and class transformer
+- `examples/mvc-sample`: MVC demo application
+- `examples/webflux-sample`: WebFlux thread-hop demo application
+
+## Quick Demo
+
+MVC sample:
+
+```powershell
+.\gradlew.bat :examples:mvc-sample:bootRun
+```
+
+Then call:
+
+```text
+GET  http://localhost:8080/orders/1
+POST http://localhost:8080/payments
+GET  http://localhost:8080/reqover/report
+```
+
+WebFlux sample:
+
+```powershell
+.\gradlew.bat :examples:webflux-sample:bootRun
+```
+
+Then call:
+
+```text
+GET http://localhost:8080/reactive/orders/1
+GET http://localhost:8080/reqover/report
+```
 
 ## 핵심 가치
 
@@ -54,6 +90,7 @@ Reqover는 실행 중인 Spring 애플리케이션에서 코드 커버리지를 
 - [05. Repository setup](docs/05_repository_setup.md)
 - [06. 제출 요구사항 정리](docs/06_submission_requirements.md)
 - [07. 결과보고서 작성 초안](docs/07_result_report_outline.md)
+- [08. Phase 0 MVP Status](docs/08_phase0_mvp_status.md)
 
 ## 초기 구현 방향
 
@@ -79,4 +116,6 @@ Reqover는 실행 중인 Spring 애플리케이션에서 코드 커버리지를 
 
 ## License
 
-미정입니다. Phase 0에서 JaCoCo fork 또는 내부 수정 여부를 결정한 뒤 모듈별 라이선스를 확정합니다.
+Reqover 자체 작성 코드는 Apache License 2.0을 적용합니다.
+
+JaCoCo fork 또는 내부 수정 파일이 생기는 경우 해당 모듈의 EPL-2.0 영향은 별도 검토합니다.

@@ -38,6 +38,12 @@ class WebFluxSampleIntegrationTest {
         assertTrue(endpoint.classes().stream().anyMatch(value -> value.className().equals("ReactiveOrderService")));
         assertTrue(endpoint.classes().stream().anyMatch(value -> value.className().equals("ReactiveOrderMapper")));
         assertTrue(endpoint.classes().stream().anyMatch(value -> value.className().equals("ReactiveValidator")));
+
+        webTestClient.get()
+                .uri("/reqover/report.html")
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(String.class)
+                .value(html -> assertTrue(html.contains("Reqover Coverage Report")));
     }
 }
-

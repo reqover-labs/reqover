@@ -2,6 +2,7 @@ dependencies {
     api(project(":reqover-core"))
     implementation("io.micrometer:context-propagation:1.1.2")
     implementation("io.projectreactor:reactor-core:3.6.11")
+    compileOnly("org.springframework.boot:spring-boot-autoconfigure:3.3.5")
     compileOnly("org.springframework:spring-context:6.1.14")
     compileOnly("org.springframework:spring-webflux:6.1.14")
 

@@ -49,6 +49,10 @@ class MvcSampleIntegrationTest {
         assertTrue(hasClass(orders, "SharedValidator"));
         assertTrue(hasClass(payments, "PaymentService"));
         assertTrue(hasClass(payments, "SharedValidator"));
+
+        String html = rest.getForEntity("/reqover/report.html", String.class).getBody();
+        assertTrue(html.contains("Reqover Coverage Report"));
+        assertTrue(html.contains("GET /orders/{id}"));
     }
 
     @Test

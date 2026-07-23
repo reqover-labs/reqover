@@ -12,8 +12,10 @@ Implemented:
 - Probe metadata registry
 - In-memory completed bucket store
 - Endpoint-level report model
+- HTML report renderer
 - Spring MVC interceptor adapter
 - Spring WebFlux WebFilter adapter
+- Spring Boot auto-configuration metadata for MVC and WebFlux adapters
 - Reactor Context to ThreadLocal bridge using Micrometer Context Propagation
 - MVC sample app
 - WebFlux sample app
@@ -37,6 +39,7 @@ Implemented:
 - Buckets are flushed after request completion.
 - ThreadLocal context is cleared after completion.
 - Concurrent `GET /orders/{id}` and `POST /payments` requests remain separated.
+- JSON and HTML report endpoints are available in the sample app.
 
 ### Spring WebFlux
 
@@ -44,6 +47,7 @@ Implemented:
 - Reactor Context carries the bucket across thread hops.
 - Micrometer Context Propagation restores the bucket into ThreadLocal for `ReqoverProbe.hit`.
 - The WebFlux sample records hits from multiple Reactor threads in one request bucket.
+- JSON and HTML report endpoints are available in the sample app.
 
 ### Instrumentation
 
@@ -66,9 +70,8 @@ This does not yet claim JaCoCo-level line or branch coverage. The MVP proves req
 - JaCoCo analysis/report integration is not implemented yet.
 - WebFlux support is validated for standard Reactor chains, not arbitrary raw threads or fire-and-forget tasks.
 - Storage is in-memory only.
-- HTML report is not implemented yet.
 - Agent include/exclude configuration is intentionally minimal.
-- Spring auto-configuration metadata is not packaged yet; sample apps import configuration explicitly.
+- Spring auto-configuration is present, but advanced conditional customization is minimal.
 
 ## Commands
 
@@ -116,6 +119,7 @@ MVC sample:
 GET  /orders/{id}
 POST /payments
 GET  /reqover/report
+GET  /reqover/report.html
 ```
 
 WebFlux sample:
@@ -123,14 +127,13 @@ WebFlux sample:
 ```text
 GET /reactive/orders/{id}
 GET /reqover/report
+GET /reqover/report.html
 ```
 
 ## Next Engineering Steps
 
-1. Add Spring Boot auto-configuration metadata.
-2. Add HTML report output.
-3. Add source line metadata where feasible.
-4. Add JaCoCo analysis integration spike.
-5. Add Gradle plugin or documented agent-based run task.
-6. Add performance measurement for baseline vs Reqover-enabled requests.
-
+1. Add source line metadata where feasible.
+2. Add JaCoCo analysis integration spike.
+3. Add Gradle plugin or documented agent-based run task.
+4. Add performance measurement for baseline vs Reqover-enabled requests.
+5. Improve HTML report navigation and code-to-endpoint reverse lookup.

@@ -38,6 +38,9 @@ class WebFluxSampleIntegrationTest {
         assertTrue(endpoint.classes().stream().anyMatch(value -> value.className().equals("ReactiveOrderService")));
         assertTrue(endpoint.classes().stream().anyMatch(value -> value.className().equals("ReactiveOrderMapper")));
         assertTrue(endpoint.classes().stream().anyMatch(value -> value.className().equals("ReactiveValidator")));
+        assertTrue(report.reverseIndex().stream()
+                .anyMatch(item -> item.className().equals("ReactiveOrderService")
+                        && item.endpoints().contains("GET /reactive/orders/{id}")));
 
         webTestClient.get()
                 .uri("/reqover/report.html")

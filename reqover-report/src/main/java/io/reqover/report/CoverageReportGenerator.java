@@ -41,7 +41,45 @@ public final class CoverageReportGenerator {
                 .sorted(Comparator.comparing(EndpointCoverage::endpoint))
                 .toList();
 
-        return new CoverageReport(Instant.now(clock), snapshots.size(), endpointCoverages);
+        return new CoverageReport(
+                Instant.now(clock),
+                snapshots.size(),
+                endpointCoverages,
+                reverseIndex(endpointCoverages)
+        );
+    }
+
+    private static List<CodeEndpointCoverage> reverseIndex(List<EndpointCoverage> endpoints) {
+        Map<CodeLocation, Set<String>> endpointNamesByCode = new HashMap<>();
+        for (EndpointCoverage endpoint : endpoints) {
+            for (ClassCoverage classCoverage : endpoint.classes()) {
+                for (MethodCoverage method : classCoverage.methods()) {
+                    CodeLocation location = new CodeLocation(
+                            classCoverage.className(),
+                            method.methodName(),
+                            method.descriptor()
+                    );
+                    endpointNamesByCode.computeIfAbsent(location, ignored -> new HashSet<>())
+                            .add(endpoint.endpoint());
+                }
+            }
+        }
+
+        return endpointNamesByCode.entrySet().stream()
+                .map(entry -> new CodeEndpointCoverage(
+                        entry.getKey().className(),
+                        entry.getKey().methodName(),
+                        entry.getKey().descriptor(),
+                        entry.getValue().stream().sorted().toList()
+                ))
+                .sorted(Comparator
+                        .comparing(CodeEndpointCoverage::className)
+                        .thenComparing(CodeEndpointCoverage::methodName)
+                        .thenComparing(CodeEndpointCoverage::descriptor))
+                .toList();
+    }
+
+    private record CodeLocation(String className, String methodName, String descriptor) {
     }
 
     private static final class EndpointAccumulator {
@@ -103,4 +141,3 @@ public final class CoverageReportGenerator {
         }
     }
 }
-

@@ -28,6 +28,7 @@ class CoverageReportGeneratorTest {
         assertEquals(1, report.completedRequestCount());
         assertEquals("GET /orders/{id}", report.endpoints().get(0).endpoint());
         assertEquals("sample.OrderService", report.endpoints().get(0).classes().get(0).className());
+        assertEquals("sample.OrderService", report.reverseIndex().get(0).className());
+        assertEquals(List.of("GET /orders/{id}"), report.reverseIndex().get(0).endpoints());
     }
 }
-

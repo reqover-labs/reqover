@@ -10,7 +10,7 @@ Reqover는 실행 중인 Spring 애플리케이션에서 코드 커버리지를 
 
 - 백서 원본: `C:\OpenSourceCompetition\docs\Reqover_기술백서.pdf`
 - 작업 폴더: `C:\OpenSourceCompetition\reqover`
-- 구현 상태: 요청별 bucket routing, MVC/WebFlux sample, JSON/HTML report, Spring Boot auto-configuration, ASM method-entry instrumentation, Java agent smoke test 구현
+- 구현 상태: 요청별 bucket routing, MVC/WebFlux sample, JSON/HTML report, code-to-endpoint reverse index, Spring Boot auto-configuration, ASM method-entry instrumentation, Java agent smoke test 구현
 - 우선순위: HTML report, JaCoCo 분석 연동 spike, 제출용 데모 정리
 
 ## Build
@@ -67,6 +67,8 @@ GET http://localhost:8080/reactive/orders/1
 GET http://localhost:8080/reqover/report
 GET http://localhost:8080/reqover/report.html
 ```
+
+Reports include both endpoint-to-code coverage and code-to-endpoint reverse lookup.
 
 ## 핵심 가치
 

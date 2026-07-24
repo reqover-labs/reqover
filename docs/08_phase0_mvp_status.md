@@ -12,6 +12,7 @@ Implemented:
 - Probe metadata registry
 - In-memory completed bucket store
 - Endpoint-level report model
+- Code-to-endpoint reverse index
 - HTML report renderer
 - Spring MVC interceptor adapter
 - Spring WebFlux WebFilter adapter
@@ -40,6 +41,7 @@ Implemented:
 - ThreadLocal context is cleared after completion.
 - Concurrent `GET /orders/{id}` and `POST /payments` requests remain separated.
 - JSON and HTML report endpoints are available in the sample app.
+- Reports include code-to-endpoint reverse lookup for change impact demos.
 
 ### Spring WebFlux
 
@@ -48,6 +50,7 @@ Implemented:
 - Micrometer Context Propagation restores the bucket into ThreadLocal for `ReqoverProbe.hit`.
 - The WebFlux sample records hits from multiple Reactor threads in one request bucket.
 - JSON and HTML report endpoints are available in the sample app.
+- Reports include code-to-endpoint reverse lookup for change impact demos.
 
 ### Instrumentation
 
@@ -136,4 +139,4 @@ GET /reqover/report.html
 2. Add JaCoCo analysis integration spike.
 3. Add Gradle plugin or documented agent-based run task.
 4. Add performance measurement for baseline vs Reqover-enabled requests.
-5. Improve HTML report navigation and code-to-endpoint reverse lookup.
+5. Improve HTML report navigation and filtering.

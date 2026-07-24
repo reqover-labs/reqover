@@ -49,10 +49,13 @@ class MvcSampleIntegrationTest {
         assertTrue(hasClass(orders, "SharedValidator"));
         assertTrue(hasClass(payments, "PaymentService"));
         assertTrue(hasClass(payments, "SharedValidator"));
+        assertTrue(report.reverseIndex().stream()
+                .anyMatch(item -> item.className().equals("SharedValidator") && item.endpoints().size() == 2));
 
         String html = rest.getForEntity("/reqover/report.html", String.class).getBody();
         assertTrue(html.contains("Reqover Coverage Report"));
         assertTrue(html.contains("GET /orders/{id}"));
+        assertTrue(html.contains("Code to Endpoint Index"));
     }
 
     @Test

@@ -59,6 +59,24 @@ public final class HtmlCoverageReportRenderer {
             html.append("</section>\n");
         }
 
+        html.append("<section class=\"endpoint\">\n");
+        html.append("<h2>Code to Endpoint Index</h2>\n");
+        html.append("<table><thead><tr><th>Code</th><th>Observed endpoints</th></tr></thead><tbody>\n");
+        for (CodeEndpointCoverage item : report.reverseIndex()) {
+            html.append("<tr><td><code>")
+                    .append(escape(item.className()))
+                    .append("#")
+                    .append(escape(item.methodName()))
+                    .append(escape(item.descriptor()))
+                    .append("</code></td><td>");
+            for (String endpoint : item.endpoints()) {
+                html.append("<div><code>").append(escape(endpoint)).append("</code></div>");
+            }
+            html.append("</td></tr>\n");
+        }
+        html.append("</tbody></table>\n");
+        html.append("</section>\n");
+
         html.append("</body></html>\n");
         return html.toString();
     }
@@ -71,4 +89,3 @@ public final class HtmlCoverageReportRenderer {
                 .replace("\"", "&quot;");
     }
 }
-

@@ -23,6 +23,8 @@ Implemented:
 - ASM method-entry bytecode instrumenter
 - Java agent with `premain`
 - Separate JVM smoke test for `-javaagent`
+- Agent-based Spring MVC E2E test without manual probes
+- Agent-based Spring WebFlux E2E test without manual probes
 
 ## Verified Behaviors
 
@@ -58,6 +60,9 @@ Implemented:
 - Constructors, class initializers, abstract, native, and synthetic methods are skipped.
 - Probe metadata is generated during instrumentation.
 - A separate JVM smoke test confirms the packaged Java agent instruments a target class through `-javaagent`.
+- Spring MVC and WebFlux sample boot jars are started in separate JVMs with `-javaagent`.
+- Auto-instrumented sample endpoints are verified through `/reqover/report`.
+- The WebFlux auto-instrumentation E2E test verifies attribution after a Reactor thread hop.
 
 ## What This Proves
 
@@ -75,6 +80,7 @@ This does not yet claim JaCoCo-level line or branch coverage. The MVP proves req
 - Storage is in-memory only.
 - Agent include/exclude configuration is intentionally minimal.
 - Spring auto-configuration is present, but advanced conditional customization is minimal.
+- Agent instrumentation currently records method entry, not exact line hit ranges.
 
 ## Commands
 
@@ -114,6 +120,12 @@ Example agent usage:
 java -javaagent:reqover-agent\build\libs\reqover-agent-0.1.0-SNAPSHOT.jar=include=io.reqover.example.mvc -jar examples\mvc-sample\build\libs\mvc-sample-0.1.0-SNAPSHOT.jar
 ```
 
+Run the Spring agent E2E tests:
+
+```powershell
+.\gradlew.bat :reqover-agent:test --tests io.reqover.agent.AgentSpringE2ETest
+```
+
 ## Demo Endpoints
 
 MVC sample:
@@ -121,6 +133,7 @@ MVC sample:
 ```text
 GET  /orders/{id}
 POST /payments
+GET  /auto/orders/{id}
 GET  /reqover/report
 GET  /reqover/report.html
 ```
@@ -129,6 +142,7 @@ WebFlux sample:
 
 ```text
 GET /reactive/orders/{id}
+GET /auto/reactive/orders/{id}
 GET /reqover/report
 GET /reqover/report.html
 ```

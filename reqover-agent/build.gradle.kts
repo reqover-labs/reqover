@@ -25,5 +25,15 @@ tasks.jar {
 
 tasks.test {
     dependsOn(tasks.jar)
+    dependsOn(":examples:mvc-sample:bootJar")
+    dependsOn(":examples:webflux-sample:bootJar")
     systemProperty("reqover.agent.jar", tasks.jar.get().archiveFile.get().asFile.absolutePath)
+    systemProperty(
+        "reqover.mvc.sample.jar",
+        rootProject.layout.projectDirectory.file("examples/mvc-sample/build/libs/mvc-sample-${project.version}.jar").asFile.absolutePath
+    )
+    systemProperty(
+        "reqover.webflux.sample.jar",
+        rootProject.layout.projectDirectory.file("examples/webflux-sample/build/libs/webflux-sample-${project.version}.jar").asFile.absolutePath
+    )
 }

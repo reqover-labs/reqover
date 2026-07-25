@@ -10,8 +10,8 @@ Reqover는 실행 중인 Spring 애플리케이션에서 코드 커버리지를 
 
 - 백서 원본: `C:\OpenSourceCompetition\docs\Reqover_기술백서.pdf`
 - 작업 폴더: `C:\OpenSourceCompetition\reqover`
-- 구현 상태: 요청별 bucket routing, MVC/WebFlux sample, JSON/HTML report, code-to-endpoint reverse index, Spring Boot auto-configuration, ASM method-entry instrumentation, Java agent smoke test 구현
-- 우선순위: HTML report, JaCoCo 분석 연동 spike, 제출용 데모 정리
+- 구현 상태: 요청별 bucket routing, MVC/WebFlux sample, JSON/HTML report, code-to-endpoint reverse index, Spring Boot auto-configuration, ASM method-entry instrumentation, Java agent smoke test, agent 기반 Spring E2E 테스트 구현
+- 우선순위: JaCoCo 분석 연동 spike, 제출용 데모 정리, 성능 측정
 
 ## Build
 
@@ -37,7 +37,7 @@ Reqover는 실행 중인 Spring 애플리케이션에서 코드 커버리지를 
 - `examples/mvc-sample`: MVC demo application
 - `examples/webflux-sample`: WebFlux thread-hop demo application
 
-## Quick Demo
+## Quick Demo: Manual Probe
 
 MVC sample:
 
@@ -70,6 +70,44 @@ GET http://localhost:8080/reqover/report.html
 
 Reports include both endpoint-to-code coverage and code-to-endpoint reverse lookup.
 
+## Quick Demo: Java Agent Auto Instrumentation
+
+아래 데모는 샘플 컨트롤러/서비스 코드에 `ReqoverProbe.hit(...)`를 직접 넣지 않고, `-javaagent`가 method entry probe를 삽입하는 흐름입니다.
+
+Build agent and sample jars:
+
+```powershell
+.\gradlew.bat :reqover-agent:jar :examples:mvc-sample:bootJar :examples:webflux-sample:bootJar
+```
+
+Run MVC sample with the agent:
+
+```powershell
+java -javaagent:reqover-agent\build\libs\reqover-agent-0.1.0-SNAPSHOT.jar=include=io.reqover.example.mvc.auto -jar examples\mvc-sample\build\libs\mvc-sample-0.1.0-SNAPSHOT.jar
+```
+
+Then call:
+
+```text
+GET http://localhost:8080/auto/orders/42
+GET http://localhost:8080/reqover/report
+GET http://localhost:8080/reqover/report.html
+```
+
+Run WebFlux sample with the agent:
+
+```powershell
+java -javaagent:reqover-agent\build\libs\reqover-agent-0.1.0-SNAPSHOT.jar=include=io.reqover.example.webflux.auto -jar examples\webflux-sample\build\libs\webflux-sample-0.1.0-SNAPSHOT.jar
+```
+
+Then call:
+
+```text
+GET http://localhost:8080/auto/reactive/orders/42
+GET http://localhost:8080/reqover/report
+GET http://localhost:8080/reqover/report.html
+```
+
 ## 핵심 가치
 
 - 코드 변경 영향 범위를 정적 추측이 아니라 실제 실행 기록으로 확인합니다.
@@ -95,6 +133,7 @@ Reports include both endpoint-to-code coverage and code-to-endpoint reverse look
 - [06. 제출 요구사항 정리](docs/06_submission_requirements.md)
 - [07. 결과보고서 작성 초안](docs/07_result_report_outline.md)
 - [08. Phase 0 MVP Status](docs/08_phase0_mvp_status.md)
+- [09. Agent E2E Demo](docs/09_agent_e2e_demo.md)
 
 ## 초기 구현 방향
 

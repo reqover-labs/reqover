@@ -18,7 +18,11 @@ public record AgentOptions(
             "reactor.",
             "io.micrometer.",
             "org.objectweb.asm.",
-            "io.reqover."
+            "io.reqover.core.",
+            "io.reqover.agent.",
+            "io.reqover.instrumentation.",
+            "io.reqover.report.",
+            "io.reqover.spring."
     );
 
     public AgentOptions {
@@ -82,4 +86,3 @@ public record AgentOptions(
         return prefixes;
     }
 }
-

@@ -15,5 +15,13 @@ class AgentOptionsTest {
         assertFalse(options.shouldInstrument("com.example.generated.GeneratedType"));
         assertFalse(options.shouldInstrument("java.lang.String"));
     }
-}
 
+    @Test
+    void defaultExcludesDoNotBlockReqoverExamples() {
+        AgentOptions options = AgentOptions.parse("include=io.reqover.example");
+
+        assertTrue(options.shouldInstrument("io.reqover.example.mvc.auto.AutoOrderService"));
+        assertFalse(options.shouldInstrument("io.reqover.core.ReqoverProbe"));
+        assertFalse(options.shouldInstrument("io.reqover.agent.ReqoverAgent"));
+    }
+}

@@ -25,6 +25,9 @@ Implemented:
 - Separate JVM smoke test for `-javaagent`
 - Agent-based Spring MVC E2E test without manual probes
 - Agent-based Spring WebFlux E2E test without manual probes
+- First source line metadata for instrumented methods when debug line information is available
+- CycloneDX SBOM generation
+- Demo, performance measurement, release, and result-report draft documents
 
 ## Verified Behaviors
 
@@ -63,6 +66,7 @@ Implemented:
 - Spring MVC and WebFlux sample boot jars are started in separate JVMs with `-javaagent`.
 - Auto-instrumented sample endpoints are verified through `/reqover/report`.
 - The WebFlux auto-instrumentation E2E test verifies attribution after a Reactor thread hop.
+- Instrumented method metadata includes first source line numbers when class debug information is present.
 
 ## What This Proves
 
@@ -76,11 +80,12 @@ This does not yet claim JaCoCo-level line or branch coverage. The MVP proves req
 
 - Coverage precision is method-entry level for the custom instrumentation path.
 - JaCoCo analysis/report integration is not implemented yet.
+- Branch coverage is not implemented yet.
 - WebFlux support is validated for standard Reactor chains, not arbitrary raw threads or fire-and-forget tasks.
 - Storage is in-memory only.
 - Agent include/exclude configuration is intentionally minimal.
 - Spring auto-configuration is present, but advanced conditional customization is minimal.
-- Agent instrumentation currently records method entry, not exact line hit ranges.
+- Agent instrumentation currently records method entry and first method line metadata, not exact line hit ranges.
 
 ## Commands
 
@@ -94,6 +99,12 @@ Build all artifacts:
 
 ```powershell
 .\gradlew.bat build
+```
+
+Generate SBOM:
+
+```powershell
+.\gradlew.bat cyclonedxBom
 ```
 
 Run MVC sample:
@@ -149,8 +160,8 @@ GET /reqover/report.html
 
 ## Next Engineering Steps
 
-1. Add source line metadata where feasible.
-2. Add JaCoCo analysis integration spike.
-3. Add Gradle plugin or documented agent-based run task.
-4. Add performance measurement for baseline vs Reqover-enabled requests.
-5. Improve HTML report navigation and filtering.
+1. Fill competition registration number, team name, and YouTube URL in the result report draft.
+2. Record demo video using `docs/10_demo_script.md`.
+3. Run local performance measurement and paste numbers into the result report.
+4. Create release tag after final submission verification.
+5. Start JaCoCo interoperability spike after MVP submission.

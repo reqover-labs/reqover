@@ -13,4 +13,3 @@ This file tracks the main third-party dependencies used by the Phase 0 MVP.
 | Gradle | 9.5.1 | Apache-2.0 | https://github.com/gradle/gradle | Build system |
 
 JaCoCo is not yet linked into the implementation. If a future phase modifies or forks JaCoCo internals, EPL-2.0 obligations must be reviewed separately.
-

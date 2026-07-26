@@ -14,6 +14,7 @@ import java.lang.reflect.Method;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class ReqoverClassInstrumenterTest {
@@ -45,6 +46,7 @@ class ReqoverClassInstrumenterTest {
         assertTrue(result.instrumented());
         assertEquals(1, metadata.size());
         ProbeMetadata probe = metadata.get(0);
+        assertNotNull(probe.lineNumber());
         assertTrue(ReqoverProbe.globalSnapshot().hasHit(probe.classId(), probe.probeId()));
     }
 
@@ -84,4 +86,3 @@ class ReqoverClassInstrumenterTest {
         }
     }
 }
-

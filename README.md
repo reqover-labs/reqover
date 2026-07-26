@@ -6,12 +6,12 @@ Reqover는 실행 중인 Spring 애플리케이션에서 코드 커버리지를 
 
 ## 현재 상태
 
-이 저장소는 2026 오픈소스 개발자대회 제출을 목표로 하는 Phase 0 MVP 단계입니다.
+이 저장소는 2026 오픈소스 개발자대회 제출을 목표로 하는 Reqover MVP입니다.
 
 - 백서 원본: `C:\OpenSourceCompetition\docs\Reqover_기술백서.pdf`
 - 작업 폴더: `C:\OpenSourceCompetition\reqover`
-- 구현 상태: 요청별 bucket routing, MVC/WebFlux sample, JSON/HTML report, code-to-endpoint reverse index, Spring Boot auto-configuration, ASM method-entry instrumentation, Java agent smoke test, agent 기반 Spring E2E 테스트 구현
-- 우선순위: JaCoCo 분석 연동 spike, 제출용 데모 정리, 성능 측정
+- 구현 상태: 요청별 bucket routing, MVC/WebFlux sample, JSON/HTML report, code-to-endpoint reverse index, Spring Boot auto-configuration, ASM method-entry instrumentation, Java agent smoke test, agent 기반 Spring E2E 테스트, SBOM 생성, 제출용 데모 문서 구현
+- 우선순위: 결과보고서 최종 값 입력, YouTube 시연영상 URL 입력, release tag 생성
 
 ## Build
 
@@ -94,6 +94,35 @@ GET http://localhost:8080/reqover/report
 GET http://localhost:8080/reqover/report.html
 ```
 
+PowerShell demo runner:
+
+```powershell
+.\scripts\run-agent-demo.ps1 -App mvc -Port 8080
+.\scripts\run-agent-demo.ps1 -App webflux -Port 8080
+```
+
+## SBOM
+
+Generate CycloneDX SBOM:
+
+```powershell
+.\gradlew.bat cyclonedxBom
+```
+
+Expected output:
+
+```text
+build/reports/bom/reqover-sbom.json
+```
+
+## Performance Measurement
+
+Sequential local latency measurement helper:
+
+```powershell
+.\scripts\measure-demo-latency.ps1 -Url http://localhost:8080/auto/orders/1 -WarmupRequests 30 -MeasuredRequests 300
+```
+
 Run WebFlux sample with the agent:
 
 ```powershell
@@ -134,6 +163,11 @@ GET http://localhost:8080/reqover/report.html
 - [07. 결과보고서 작성 초안](docs/07_result_report_outline.md)
 - [08. Phase 0 MVP Status](docs/08_phase0_mvp_status.md)
 - [09. Agent E2E Demo](docs/09_agent_e2e_demo.md)
+- [10. Demo Script](docs/10_demo_script.md)
+- [11. Performance Measurement](docs/11_performance_measurement.md)
+- [12. Release Checklist](docs/12_release_checklist.md)
+- [13. Result Report Draft](docs/13_result_report_draft.md)
+- [14. JaCoCo Interop Decision](docs/14_jacoco_interop_decision.md)
 
 ## 초기 구현 방향
 

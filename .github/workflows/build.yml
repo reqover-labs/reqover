@@ -25,3 +25,5 @@ jobs:
           chmod +x gradlew
           ./gradlew test
 
+      - name: Generate SBOM
+        run: ./gradlew cyclonedxBom

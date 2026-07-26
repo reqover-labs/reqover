@@ -4,6 +4,7 @@ import io.reqover.core.ProbeMetadata;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.ClassWriter;
+import org.objectweb.asm.Label;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
 
@@ -68,8 +69,7 @@ public final class ReqoverClassInstrumenter {
             }
 
             int probeId = nextProbeId++;
-            metadata.add(new ProbeMetadata(classId, probeId, className, name, descriptor, null));
-            return new ProbeMethodVisitor(methodVisitor, classId, probeId);
+            return new ProbeMethodVisitor(methodVisitor, metadata, classId, probeId, className, name, descriptor);
         }
 
         private static boolean instrumentableMethod(int access, String name) {
@@ -81,13 +81,30 @@ public final class ReqoverClassInstrumenter {
     }
 
     private static final class ProbeMethodVisitor extends MethodVisitor {
+        private final List<ProbeMetadata> metadata;
         private final int classId;
         private final int probeId;
+        private final String className;
+        private final String methodName;
+        private final String descriptor;
+        private Integer firstLineNumber;
 
-        private ProbeMethodVisitor(MethodVisitor delegate, int classId, int probeId) {
+        private ProbeMethodVisitor(
+                MethodVisitor delegate,
+                List<ProbeMetadata> metadata,
+                int classId,
+                int probeId,
+                String className,
+                String methodName,
+                String descriptor
+        ) {
             super(Opcodes.ASM9, delegate);
+            this.metadata = metadata;
             this.classId = classId;
             this.probeId = probeId;
+            this.className = className;
+            this.methodName = methodName;
+            this.descriptor = descriptor;
         }
 
         @Override
@@ -103,6 +120,19 @@ public final class ReqoverClassInstrumenter {
                     false
             );
         }
+
+        @Override
+        public void visitLineNumber(int line, Label start) {
+            if (firstLineNumber == null) {
+                firstLineNumber = line;
+            }
+            super.visitLineNumber(line, start);
+        }
+
+        @Override
+        public void visitEnd() {
+            metadata.add(new ProbeMetadata(classId, probeId, className, methodName, descriptor, firstLineNumber));
+            super.visitEnd();
+        }
     }
 }
-

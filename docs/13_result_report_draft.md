@@ -90,6 +90,15 @@ Automated tests cover:
 - agent-based MVC sample E2E without manual probes
 - agent-based WebFlux sample E2E without manual probes
 
+Local WebFlux sequential latency reference:
+
+| Mode | Average ms | p50 ms | p95 ms | p99 ms |
+| --- | ---: | ---: | ---: | ---: |
+| Baseline, no agent | 18.58 | 17.88 | 26.77 | 31.44 |
+| Reqover agent enabled | 21.57 | 18.15 | 38.19 | 61.65 |
+
+This is a local demo sanity check, not a production benchmark. Details are in `docs/15_performance_results.md`.
+
 ## 6. Demo Scenario
 
 Demo 1 shows MVC endpoint-separated coverage.
@@ -157,4 +166,3 @@ If AI tools were used during development assistance, they are not part of the ru
 - richer report filtering and export
 - larger performance benchmark
 - authenticated report endpoint
-

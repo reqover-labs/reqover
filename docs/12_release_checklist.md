@@ -15,6 +15,7 @@ build/reports/bom/reqover-sbom.json
 reqover-agent/build/libs/reqover-agent-0.1.0-SNAPSHOT.jar
 examples/mvc-sample/build/libs/mvc-sample-0.1.0-SNAPSHOT.jar
 examples/webflux-sample/build/libs/webflux-sample-0.1.0-SNAPSHOT.jar
+docs/submission/Reqover_result_report_draft.docx
 ```
 
 ## Demo Verification
@@ -95,3 +96,13 @@ git push origin v0.1.0-mvp
 ```
 
 Only tag after the repository is in a reproducible state.
+
+## DOCX/PDF Note
+
+The draft DOCX can be regenerated with:
+
+```powershell
+& 'C:\Users\1043t\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\python.exe' scripts\build-result-report-docx.py
+```
+
+PDF conversion requires a working local Word or LibreOffice installation. In the current local run, LibreOffice was not installed and Word COM PDF export did not complete, so the DOCX draft is prepared but the final PDF should be exported manually from Word after team metadata and video URL are filled.

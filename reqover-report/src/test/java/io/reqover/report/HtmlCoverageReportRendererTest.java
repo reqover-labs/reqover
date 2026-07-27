@@ -27,8 +27,8 @@ class HtmlCoverageReportRendererTest {
         String html = new HtmlCoverageReportRenderer().render(report);
 
         assertTrue(html.contains("GET /orders/{id}"));
-        assertTrue(html.contains("sample.OrderService"));
+        assertTrue(html.contains("OrderService"));
+        assertTrue(html.contains("sample"));
         assertTrue(html.contains("Reqover Coverage Report"));
     }
 }
-

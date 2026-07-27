@@ -4,6 +4,8 @@ Reqover는 실행 중인 Spring 애플리케이션에서 코드 커버리지를 
 
 기존 커버리지 도구는 "어떤 코드가 실행되었는가"를 알려주지만, Reqover는 한 단계 더 들어가 "어느 요청이 그 코드를 실행했는가"를 보여주는 것을 목표로 합니다. 특히 Spring WebFlux처럼 요청 처리 중 thread가 바뀌는 reactive 환경에서도 귀속이 유지되는지를 핵심 차별점으로 둡니다.
 
+![Reqover WebFlux report screenshot](docs/assets/reqover-webflux-report.png)
+
 ## 현재 상태
 
 이 저장소는 2026 오픈소스 개발자대회 제출을 목표로 하는 Reqover MVP입니다.
@@ -123,6 +125,8 @@ Sequential local latency measurement helper:
 .\scripts\measure-demo-latency.ps1 -Url http://localhost:8080/auto/orders/1 -WarmupRequests 30 -MeasuredRequests 300
 ```
 
+Current local WebFlux reference result is documented in [15. Local Performance Results](docs/15_performance_results.md).
+
 Run WebFlux sample with the agent:
 
 ```powershell
@@ -168,6 +172,7 @@ GET http://localhost:8080/reqover/report.html
 - [12. Release Checklist](docs/12_release_checklist.md)
 - [13. Result Report Draft](docs/13_result_report_draft.md)
 - [14. JaCoCo Interop Decision](docs/14_jacoco_interop_decision.md)
+- [15. Local Performance Results](docs/15_performance_results.md)
 
 ## 초기 구현 방향
 

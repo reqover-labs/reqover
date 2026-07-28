@@ -2,8 +2,7 @@ package io.reqover.core;
 
 import java.time.Clock;
 import java.time.Instant;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -12,11 +11,15 @@ import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * Mutable hit store for one request or logical unit of work.
+ *
+ * <p>All methods are safe to call from multiple threads; a bucket may receive
+ * hits from several worker threads while a reactive request hops schedulers.
  */
 public final class CoverageBucket {
-    private static final int UNFINISHED_STATUS = -1;
+    private static final int UNFINISHED_STATUS = CoverageBucketSnapshot.UNFINISHED_STATUS;
 
     private final AtomicReference<UnitInfo> unitInfo;
+    private final Clock clock;
     private final Instant startedAt;
     private final ConcurrentMap<Integer, Set<Integer>> hitsByClass = new ConcurrentHashMap<>();
     private final Set<String> threadNames = ConcurrentHashMap.newKeySet();
@@ -28,7 +31,8 @@ public final class CoverageBucket {
     }
 
     CoverageBucket(UnitInfo unitInfo, Clock clock) {
-        this.unitInfo = new AtomicReference<>(java.util.Objects.requireNonNull(unitInfo, "unitInfo"));
+        this.unitInfo = new AtomicReference<>(Objects.requireNonNull(unitInfo, "unitInfo"));
+        this.clock = Objects.requireNonNull(clock, "clock");
         this.startedAt = Instant.now(clock);
     }
 
@@ -41,7 +45,7 @@ public final class CoverageBucket {
     }
 
     public void updateUnitInfo(UnitInfo unitInfo) {
-        this.unitInfo.set(java.util.Objects.requireNonNull(unitInfo, "unitInfo"));
+        this.unitInfo.set(Objects.requireNonNull(unitInfo, "unitInfo"));
     }
 
     public Instant startedAt() {
@@ -68,22 +72,24 @@ public final class CoverageBucket {
         return hitsByClass.isEmpty();
     }
 
+    /**
+     * Marks this bucket finished. Only the first call wins; later calls keep
+     * the original end time and status code.
+     */
     public void finish(int statusCode) {
-        this.statusCode.set(statusCode);
-        this.endedAt.compareAndSet(null, Instant.now());
+        if (endedAt.compareAndSet(null, Instant.now(clock))) {
+            this.statusCode.set(statusCode);
+        }
     }
 
     public CoverageBucketSnapshot snapshot() {
-        Map<Integer, Set<Integer>> hitCopy = new HashMap<>();
-        hitsByClass.forEach((classId, probes) -> hitCopy.put(classId, Set.copyOf(probes)));
-
         return new CoverageBucketSnapshot(
                 unitInfo.get(),
                 startedAt,
                 endedAt.get(),
                 statusCode.get(),
-                Map.copyOf(hitCopy),
-                Set.copyOf(threadNames)
+                hitsByClass,
+                threadNames
         );
     }
 }

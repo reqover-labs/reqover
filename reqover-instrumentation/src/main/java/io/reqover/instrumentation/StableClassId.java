@@ -1,5 +1,13 @@
 package io.reqover.instrumentation;
 
+/**
+ * Derives a stable, non-negative class id from a class name using a 31-bit
+ * FNV-1a hash.
+ *
+ * <p>The id is deterministic across JVM runs, but it is a hash: two distinct
+ * class names can collide, in which case their probes share an id space and
+ * {@code ProbeRegistry} reports the collision at registration time.
+ */
 public final class StableClassId {
     private StableClassId() {
     }
@@ -13,4 +21,3 @@ public final class StableClassId {
         return hash & 0x7fffffff;
     }
 }
-

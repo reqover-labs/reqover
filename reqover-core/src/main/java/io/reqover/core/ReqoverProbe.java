@@ -34,6 +34,12 @@ public final class ReqoverProbe {
         return droppedHits.get();
     }
 
+    /**
+     * Wipes the global bucket, the current thread's context, and all
+     * registered probe metadata. Intended for test isolation only; calling
+     * this in a running application permanently discards agent-registered
+     * metadata.
+     */
     public static void resetGlobalStateForTests() {
         GLOBAL_BUCKET.set(CoverageBucket.global());
         droppedHits.set(0);

@@ -6,6 +6,14 @@ import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
+/**
+ * Process-wide registry mapping {@code (classId, probeId)} pairs to the code
+ * location they were generated from.
+ *
+ * <p>Class ids are hashes of class names, so two distinct classes can collide;
+ * a collision is reported on standard error because the affected classes would
+ * otherwise silently merge their coverage.
+ */
 public final class ProbeRegistry {
     private static final ConcurrentMap<Key, ProbeMetadata> PROBES = new ConcurrentHashMap<>();
 
@@ -13,7 +21,12 @@ public final class ProbeRegistry {
     }
 
     public static void register(ProbeMetadata metadata) {
-        PROBES.put(new Key(metadata.classId(), metadata.probeId()), metadata);
+        ProbeMetadata previous = PROBES.put(new Key(metadata.classId(), metadata.probeId()), metadata);
+        if (previous != null && !previous.className().equals(metadata.className())) {
+            System.err.println("[reqover] classId collision: " + previous.className() + " and "
+                    + metadata.className() + " share classId " + metadata.classId()
+                    + "; coverage for these classes may be merged");
+        }
     }
 
     public static void registerAll(Collection<ProbeMetadata> metadata) {
@@ -35,4 +48,3 @@ public final class ProbeRegistry {
     private record Key(int classId, int probeId) {
     }
 }
-

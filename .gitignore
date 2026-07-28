@@ -29,6 +29,5 @@ Thumbs.db
 *.log
 
 # Reqover generated artifacts
-/build/reqover-report/
 coverage-buckets/
 tmp/

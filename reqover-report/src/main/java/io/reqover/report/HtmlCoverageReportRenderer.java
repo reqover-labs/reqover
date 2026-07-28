@@ -1,6 +1,14 @@
 package io.reqover.report;
 
+import java.util.Collection;
+
+/**
+ * Renders a {@link CoverageReport} as a standalone HTML page. All dynamic
+ * values are HTML-escaped.
+ */
 public final class HtmlCoverageReportRenderer {
+    private static final int MAX_CHIPS = 20;
+
     public String render(CoverageReport report) {
         StringBuilder html = new StringBuilder();
         html.append("""
@@ -142,12 +150,8 @@ public final class HtmlCoverageReportRenderer {
             }
             html.append("</span></div>\n");
             html.append("<div class=\"chips\">");
-            for (String requestId : endpoint.requestIds()) {
-                html.append("<span class=\"chip chip-muted\">").append(escape(requestId)).append("</span>");
-            }
-            for (String thread : endpoint.threadNames()) {
-                html.append("<span class=\"chip\">").append(escape(thread)).append("</span>");
-            }
+            appendChips(html, endpoint.requestIds(), "chip chip-muted");
+            appendChips(html, endpoint.threadNames(), "chip");
             html.append("</div>\n");
             html.append("<table><thead><tr><th>Class</th><th>Methods / Probes</th></tr></thead><tbody>\n");
             for (ClassCoverage classCoverage : endpoint.classes()) {
@@ -196,6 +200,20 @@ public final class HtmlCoverageReportRenderer {
         return html.toString();
     }
 
+    private static void appendChips(StringBuilder html, Collection<String> values, String cssClass) {
+        int shown = 0;
+        for (String value : values) {
+            if (shown == MAX_CHIPS) {
+                html.append("<span class=\"chip chip-muted\">+")
+                        .append(values.size() - MAX_CHIPS)
+                        .append(" more</span>");
+                break;
+            }
+            html.append("<span class=\"").append(cssClass).append("\">").append(escape(value)).append("</span>");
+            shown++;
+        }
+    }
+
     private static int methodCount(EndpointCoverage endpoint) {
         int count = 0;
         for (ClassCoverage classCoverage : endpoint.classes()) {
@@ -223,6 +241,7 @@ public final class HtmlCoverageReportRenderer {
                 .replace("&", "&amp;")
                 .replace("<", "&lt;")
                 .replace(">", "&gt;")
-                .replace("\"", "&quot;");
+                .replace("\"", "&quot;")
+                .replace("'", "&#39;");
     }
 }

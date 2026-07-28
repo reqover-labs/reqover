@@ -14,6 +14,11 @@ import reactor.core.publisher.Mono;
 
 import java.util.Objects;
 
+/**
+ * Binds a {@link CoverageBucket} to each WebFlux request through the Reactor
+ * {@code Context} and flushes it to the store when the request terminates,
+ * regardless of which scheduler thread completes it.
+ */
 public final class ReqoverWebFilter implements WebFilter {
     private final InMemoryCoverageStore coverageStore;
     private final RequestIdGenerator requestIdGenerator;
@@ -25,7 +30,8 @@ public final class ReqoverWebFilter implements WebFilter {
 
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, WebFilterChain chain) {
-        if (exchange.getRequest().getPath().pathWithinApplication().value().startsWith("/reqover/")) {
+        String path = exchange.getRequest().getPath().pathWithinApplication().value();
+        if (path.equals("/reqover") || path.startsWith("/reqover/")) {
             return chain.filter(exchange);
         }
 

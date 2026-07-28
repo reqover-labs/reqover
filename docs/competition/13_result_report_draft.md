@@ -3,7 +3,7 @@
 ## Project Information
 
 - Project name: Reqover
-- Repository: https://github.com/Open-Source-Competition/Reqover
+- Repository: https://github.com/reqover-labs/reqover
 - Team name: `<팀명 입력>`
 - Registration number: `<접수번호 입력>`
 - Demo video URL: `<YouTube URL 입력>`
@@ -72,10 +72,10 @@ The current MVP uses method-entry coverage. It does not claim JaCoCo-level branc
 
 Verified commands:
 
-```powershell
-.\gradlew.bat test
-.\gradlew.bat build --quiet
-.\gradlew.bat cyclonedxBom
+```bash
+./gradlew test
+./gradlew build --quiet
+./gradlew cyclonedxBom
 ```
 
 Automated tests cover:
@@ -130,8 +130,8 @@ Reqover source code is licensed under Apache License 2.0.
 
 The project generates a CycloneDX SBOM:
 
-```powershell
-.\gradlew.bat cyclonedxBom
+```bash
+./gradlew cyclonedxBom
 ```
 
 Expected output:

@@ -36,16 +36,16 @@ io.reqover.example.webflux.auto.AutoReactiveOrderService
 
 ## Build
 
-```powershell
-.\gradlew.bat :reqover-agent:jar :examples:mvc-sample:bootJar :examples:webflux-sample:bootJar
+```bash
+./gradlew :reqover-agent:jar :examples:mvc-sample:bootJar :examples:webflux-sample:bootJar
 ```
 
 ## MVC Demo
 
 Start the MVC sample with the agent:
 
-```powershell
-java -javaagent:reqover-agent\build\libs\reqover-agent-0.1.0-SNAPSHOT.jar=include=io.reqover.example.mvc.auto -jar examples\mvc-sample\build\libs\mvc-sample-0.1.0-SNAPSHOT.jar
+```bash
+java -javaagent:reqover-agent/build/libs/reqover-agent-0.1.0-SNAPSHOT.jar=include=io.reqover.example.mvc.auto -jar examples/mvc-sample/build/libs/mvc-sample-0.1.0-SNAPSHOT.jar
 ```
 
 Call the auto endpoint:
@@ -67,8 +67,8 @@ The report should include `GET /auto/orders/{id}` and the auto MVC controller/se
 
 Start the WebFlux sample with the agent:
 
-```powershell
-java -javaagent:reqover-agent\build\libs\reqover-agent-0.1.0-SNAPSHOT.jar=include=io.reqover.example.webflux.auto -jar examples\webflux-sample\build\libs\webflux-sample-0.1.0-SNAPSHOT.jar
+```bash
+java -javaagent:reqover-agent/build/libs/reqover-agent-0.1.0-SNAPSHOT.jar=include=io.reqover.example.webflux.auto -jar examples/webflux-sample/build/libs/webflux-sample-0.1.0-SNAPSHOT.jar
 ```
 
 Call the auto endpoint:
@@ -90,8 +90,8 @@ The report should include `GET /auto/reactive/orders/{id}` and the auto WebFlux 
 
 The automated E2E test starts the Spring Boot sample jars as separate JVM processes with `-javaagent`.
 
-```powershell
-.\gradlew.bat :reqover-agent:test --tests io.reqover.agent.AgentSpringE2ETest
+```bash
+./gradlew :reqover-agent:test --tests io.reqover.agent.AgentSpringE2ETest
 ```
 
 The test verifies:

@@ -1,10 +1,11 @@
 # 05. Repository setup
 
+> 이 문서는 초기 저장소 준비 과정의 기록입니다. 현재 저장소는
+> https://github.com/reqover-labs/reqover 에서 관리됩니다.
+
 ## 목적
 
-이 문서는 로컬 작업 폴더 `C:\OpenSourceCompetition\reqover`를 사용자가 만든 GitHub repository와 연결하기 위한 절차입니다.
-
-사용자가 GitHub repository URL을 알려주면 이 문서를 기준으로 remote를 붙이고 초기 커밋을 만들면 됩니다.
+이 문서는 로컬 작업 폴더를 GitHub repository와 연결하기 위한 초기 절차를 기록한 것입니다.
 
 ## 권장 repository 이름
 
@@ -28,8 +29,8 @@ spring-reqover
 
 GitHub repository가 만들어지면 다음 순서로 진행합니다.
 
-```powershell
-cd C:\OpenSourceCompetition\reqover
+```bash
+cd <repo-root>
 git init
 git branch -M main
 git remote add origin <GITHUB_REPOSITORY_URL>

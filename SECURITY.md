@@ -8,7 +8,7 @@ Reqover is currently in MVP development. Security fixes are handled on the `main
 
 Do not open a public issue for vulnerabilities that expose secrets, allow arbitrary code execution, or disclose private data.
 
-For now, contact the repository owner through GitHub and include:
+Report vulnerabilities privately through GitHub private vulnerability reporting: on the repository page, open the Security tab and choose "Report a vulnerability". Include:
 
 - affected version or commit
 - reproduction steps

@@ -4,8 +4,8 @@
 
 Run:
 
-```powershell
-.\gradlew.bat clean build cyclonedxBom
+```bash
+./gradlew clean build cyclonedxBom
 ```
 
 Required outputs:
@@ -15,16 +15,16 @@ build/reports/bom/reqover-sbom.json
 reqover-agent/build/libs/reqover-agent-0.1.0-SNAPSHOT.jar
 examples/mvc-sample/build/libs/mvc-sample-0.1.0-SNAPSHOT.jar
 examples/webflux-sample/build/libs/webflux-sample-0.1.0-SNAPSHOT.jar
-docs/submission/Reqover_result_report_draft.docx
+docs/competition/submission/Reqover_result_report_draft.docx
 ```
 
 ## Demo Verification
 
 Run:
 
-```powershell
-.\scripts\run-agent-demo.ps1 -App mvc -Port 8080 -StopAfterReport
-.\scripts\run-agent-demo.ps1 -App webflux -Port 8080 -StopAfterReport
+```bash
+./scripts/run-agent-demo.sh mvc 8080 --stop-after-report
+./scripts/run-agent-demo.sh webflux 8080 --stop-after-report
 ```
 
 Check:
@@ -39,7 +39,7 @@ Check:
 
 Run:
 
-```powershell
+```bash
 rg -n "(?i)(api[_-]?key|secret|password|token|\\.env)" -S --glob "!**/build/**" --glob "!**/.gradle/**"
 ```
 
@@ -90,7 +90,7 @@ Reqover does not embed an AI model in the submitted software. AI tools were used
 
 After all checks pass:
 
-```powershell
+```bash
 git tag v0.1.0-mvp
 git push origin v0.1.0-mvp
 ```
@@ -99,10 +99,10 @@ Only tag after the repository is in a reproducible state.
 
 ## DOCX/PDF Note
 
-The draft DOCX can be regenerated with:
+The draft DOCX can be regenerated with (requires the `python-docx` package):
 
-```powershell
-& 'C:\Users\1043t\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\python.exe' scripts\build-result-report-docx.py
+```bash
+python3 scripts/build-result-report-docx.py
 ```
 
 PDF conversion requires a working local Word or LibreOffice installation. In the current local run, LibreOffice was not installed and Word COM PDF export did not complete, so the DOCX draft is prepared but the final PDF should be exported manually from Word after team metadata and video URL are filled.

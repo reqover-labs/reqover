@@ -10,7 +10,7 @@ from docx.shared import Inches, Pt, RGBColor
 
 
 ROOT = Path(__file__).resolve().parents[1]
-OUT_DIR = ROOT / "docs" / "submission"
+OUT_DIR = ROOT / "docs" / "competition" / "submission"
 DOCX_PATH = OUT_DIR / "Reqover_result_report_draft.docx"
 SCREENSHOT = ROOT / "docs" / "assets" / "reqover-webflux-report.png"
 
@@ -121,7 +121,7 @@ def build_doc():
         doc,
         [
             ("프로젝트명", "Reqover"),
-            ("저장소", "https://github.com/Open-Source-Competition/Reqover"),
+            ("저장소", "https://github.com/reqover-labs/reqover"),
             ("팀명", "<팀명 입력>"),
             ("접수번호", "<접수번호 입력>"),
             ("시연영상", "<YouTube URL 입력>"),
@@ -176,9 +176,9 @@ def build_doc():
     add_bullets(
         doc,
         [
-            ".\\gradlew.bat test 통과",
-            ".\\gradlew.bat build --quiet 통과",
-            ".\\gradlew.bat cyclonedxBom 통과",
+            "./gradlew test 통과",
+            "./gradlew build --quiet 통과",
+            "./gradlew cyclonedxBom 통과",
             "MVC agent E2E: 수동 probe 없는 endpoint가 자동 계측되어 report에 표시됨",
             "WebFlux agent E2E: boundedElastic, parallel, reactor-http-nio thread hop 이후에도 같은 endpoint bucket에 귀속됨",
         ],

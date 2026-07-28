@@ -17,14 +17,14 @@ Use the same machine, same JVM, same endpoint, same request count, and no other 
 
 Start MVC sample without agent:
 
-```powershell
-.\gradlew.bat :examples:mvc-sample:bootRun
+```bash
+./gradlew :examples:mvc-sample:bootRun
 ```
 
 Measure:
 
-```powershell
-.\scripts\measure-demo-latency.ps1 -Url http://localhost:8080/orders/1 -WarmupRequests 30 -MeasuredRequests 300
+```bash
+pwsh scripts/measure-demo-latency.ps1 -Url http://localhost:8080/orders/1 -WarmupRequests 30 -MeasuredRequests 300
 ```
 
 Save the JSON output.
@@ -33,15 +33,15 @@ Save the JSON output.
 
 Start MVC sample with agent:
 
-```powershell
-.\gradlew.bat :reqover-agent:jar :examples:mvc-sample:bootJar
-java -javaagent:reqover-agent\build\libs\reqover-agent-0.1.0-SNAPSHOT.jar=include=io.reqover.example.mvc.auto -jar examples\mvc-sample\build\libs\mvc-sample-0.1.0-SNAPSHOT.jar
+```bash
+./gradlew :reqover-agent:jar :examples:mvc-sample:bootJar
+java -javaagent:reqover-agent/build/libs/reqover-agent-0.1.0-SNAPSHOT.jar=include=io.reqover.example.mvc.auto -jar examples/mvc-sample/build/libs/mvc-sample-0.1.0-SNAPSHOT.jar
 ```
 
 Measure the auto endpoint:
 
-```powershell
-.\scripts\measure-demo-latency.ps1 -Url http://localhost:8080/auto/orders/1 -WarmupRequests 30 -MeasuredRequests 300
+```bash
+pwsh scripts/measure-demo-latency.ps1 -Url http://localhost:8080/auto/orders/1 -WarmupRequests 30 -MeasuredRequests 300
 ```
 
 Save the JSON output.
@@ -50,15 +50,15 @@ Save the JSON output.
 
 Start WebFlux sample with agent:
 
-```powershell
-.\gradlew.bat :reqover-agent:jar :examples:webflux-sample:bootJar
-java -javaagent:reqover-agent\build\libs\reqover-agent-0.1.0-SNAPSHOT.jar=include=io.reqover.example.webflux.auto -jar examples\webflux-sample\build\libs\webflux-sample-0.1.0-SNAPSHOT.jar
+```bash
+./gradlew :reqover-agent:jar :examples:webflux-sample:bootJar
+java -javaagent:reqover-agent/build/libs/reqover-agent-0.1.0-SNAPSHOT.jar=include=io.reqover.example.webflux.auto -jar examples/webflux-sample/build/libs/webflux-sample-0.1.0-SNAPSHOT.jar
 ```
 
 Measure:
 
-```powershell
-.\scripts\measure-demo-latency.ps1 -Url http://localhost:8080/auto/reactive/orders/1 -WarmupRequests 30 -MeasuredRequests 300
+```bash
+pwsh scripts/measure-demo-latency.ps1 -Url http://localhost:8080/auto/reactive/orders/1 -WarmupRequests 30 -MeasuredRequests 300
 ```
 
 ## Interpreting Results

@@ -1,6 +1,6 @@
 ---
 name: Demo reproduction issue
-about: Report a problem reproducing the README or competition demo
+about: Report a problem reproducing the README demos
 title: "[Demo] "
 labels: demo
 assignees: ""

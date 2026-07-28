@@ -91,50 +91,50 @@ This does not yet claim JaCoCo-level line or branch coverage. The MVP proves req
 
 Run all tests:
 
-```powershell
-.\gradlew.bat test
+```bash
+./gradlew test
 ```
 
 Build all artifacts:
 
-```powershell
-.\gradlew.bat build
+```bash
+./gradlew build
 ```
 
 Generate SBOM:
 
-```powershell
-.\gradlew.bat cyclonedxBom
+```bash
+./gradlew cyclonedxBom
 ```
 
 Run MVC sample:
 
-```powershell
-.\gradlew.bat :examples:mvc-sample:bootRun
+```bash
+./gradlew :examples:mvc-sample:bootRun
 ```
 
 Run WebFlux sample:
 
-```powershell
-.\gradlew.bat :examples:webflux-sample:bootRun
+```bash
+./gradlew :examples:webflux-sample:bootRun
 ```
 
 Build the agent:
 
-```powershell
-.\gradlew.bat :reqover-agent:jar
+```bash
+./gradlew :reqover-agent:jar
 ```
 
 Example agent usage:
 
-```powershell
-java -javaagent:reqover-agent\build\libs\reqover-agent-0.1.0-SNAPSHOT.jar=include=io.reqover.example.mvc -jar examples\mvc-sample\build\libs\mvc-sample-0.1.0-SNAPSHOT.jar
+```bash
+java -javaagent:reqover-agent/build/libs/reqover-agent-0.1.0-SNAPSHOT.jar=include=io.reqover.example.mvc -jar examples/mvc-sample/build/libs/mvc-sample-0.1.0-SNAPSHOT.jar
 ```
 
 Run the Spring agent E2E tests:
 
-```powershell
-.\gradlew.bat :reqover-agent:test --tests io.reqover.agent.AgentSpringE2ETest
+```bash
+./gradlew :reqover-agent:test --tests io.reqover.agent.AgentSpringE2ETest
 ```
 
 ## Demo Endpoints

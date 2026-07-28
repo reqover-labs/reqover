@@ -2,17 +2,11 @@
 
 ## 근거 문서
 
-로컬 원본 문서:
+대회 공식 배포 문서 기준:
 
-- `C:\OpenSourceCompetition\docs\오픈소스 개발자대회 운영규정.pdf`
-- `C:\OpenSourceCompetition\docs\2026 오픈소스 개발자대회 결과보고서_접수번호(팀명)\2026 오픈소스 개발자대회 결과보고서_접수번호(팀명).docx`
-- `C:\OpenSourceCompetition\docs\2026 오픈소스 개발자대회 결과보고서_접수번호(팀명)\(해당시 제출) 출품작 중복수혜 여부 확인서_접수번호(팀명).docx`
-
-추출본:
-
-- `C:\OpenSourceCompetition\docs\competition_rules_extracted.txt`
-- `C:\OpenSourceCompetition\docs\result_report_docx_extracted.txt`
-- `C:\OpenSourceCompetition\docs\duplicate_benefit_docx_extracted.txt`
+- 2026 오픈소스 개발자대회 운영규정 PDF
+- 2026 오픈소스 개발자대회 결과보고서 양식 DOCX
+- (해당 시 제출) 출품작 중복수혜 여부 확인서 DOCX
 
 ## 제출 파일
 

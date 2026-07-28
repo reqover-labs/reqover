@@ -8,25 +8,26 @@ Requirements:
 
 - JDK 21
 - Git
-- PowerShell on Windows for demo scripts
 
 Run tests:
 
-```powershell
-.\gradlew.bat test
+```bash
+./gradlew test
 ```
 
 Build all artifacts:
 
-```powershell
-.\gradlew.bat build
+```bash
+./gradlew build
 ```
 
 Generate SBOM:
 
-```powershell
-.\gradlew.bat cyclonedxBom
+```bash
+./gradlew cyclonedxBom
 ```
+
+On Windows, use `.\gradlew.bat` instead of `./gradlew`.
 
 ## Project Structure
 
@@ -37,7 +38,7 @@ Generate SBOM:
 - `reqover-spring-webflux`: WebFlux request adapter
 - `reqover-report`: report aggregation and HTML rendering
 - `examples`: demo applications
-- `docs`: planning, architecture, troubleshooting, and submission notes
+- `docs`: planning, architecture, troubleshooting, and competition notes
 
 ## Coding Rules
 
@@ -50,8 +51,8 @@ Generate SBOM:
 
 ## Pull Request Checklist
 
-- `.\gradlew.bat test` passes.
-- `.\gradlew.bat build` passes.
+- `./gradlew test` passes.
+- `./gradlew build` passes.
 - New behavior is documented.
 - License or dependency changes are reflected in `THIRD_PARTY_NOTICES.md`.
 - No secrets are included.
@@ -66,4 +67,3 @@ When reporting a bug, include:
 - actual behavior
 - minimal reproduction steps
 - relevant logs
-

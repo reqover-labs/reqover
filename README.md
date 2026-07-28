@@ -8,27 +8,15 @@ Reqover는 실행 중인 Spring 애플리케이션에서 코드 커버리지를 
 
 ## 현재 상태
 
-이 저장소는 2026 오픈소스 개발자대회 제출을 목표로 하는 Reqover MVP입니다.
+2026 오픈소스 개발자대회 출품을 목표로 개발 중인 MVP입니다. 현재 다음이 동작합니다.
 
-- 백서 원본: `C:\OpenSourceCompetition\docs\Reqover_기술백서.pdf`
-- 작업 폴더: `C:\OpenSourceCompetition\reqover`
-- 구현 상태: 요청별 bucket routing, MVC/WebFlux sample, JSON/HTML report, code-to-endpoint reverse index, Spring Boot auto-configuration, ASM method-entry instrumentation, Java agent smoke test, agent 기반 Spring E2E 테스트, SBOM 생성, 제출용 데모 문서 구현
-- 우선순위: 결과보고서 최종 값 입력, YouTube 시연영상 URL 입력, release tag 생성
+- 요청별 coverage bucket routing (Spring MVC, WebFlux)
+- ASM method-entry instrumentation과 `-javaagent` 자동 계측
+- JSON/HTML coverage report와 code-to-endpoint 역조회 인덱스
+- Spring Boot auto-configuration
+- agent 기반 Spring E2E 테스트, CycloneDX SBOM 생성
 
-## Build
-
-요구사항:
-
-- JDK 21 권장
-- 컴파일 target은 Java 17
-
-테스트 실행:
-
-```powershell
-.\gradlew.bat test
-```
-
-현재 포함된 모듈:
+## 모듈 구성
 
 - `reqover-core`: coverage bucket, ThreadLocal context, probe entry point, in-memory snapshot store
 - `reqover-report`: endpoint-level coverage report model
@@ -39,12 +27,27 @@ Reqover는 실행 중인 Spring 애플리케이션에서 코드 커버리지를 
 - `examples/mvc-sample`: MVC demo application
 - `examples/webflux-sample`: WebFlux thread-hop demo application
 
+## Build
+
+요구사항:
+
+- JDK 21 권장
+- 컴파일 target은 Java 17
+
+테스트 실행:
+
+```bash
+./gradlew test
+```
+
+Windows에서는 `.\gradlew.bat`을 사용합니다.
+
 ## Quick Demo: Manual Probe
 
 MVC sample:
 
-```powershell
-.\gradlew.bat :examples:mvc-sample:bootRun
+```bash
+./gradlew :examples:mvc-sample:bootRun
 ```
 
 Then call:
@@ -58,8 +61,8 @@ GET  http://localhost:8080/reqover/report.html
 
 WebFlux sample:
 
-```powershell
-.\gradlew.bat :examples:webflux-sample:bootRun
+```bash
+./gradlew :examples:webflux-sample:bootRun
 ```
 
 Then call:
@@ -78,14 +81,14 @@ Reports include both endpoint-to-code coverage and code-to-endpoint reverse look
 
 Build agent and sample jars:
 
-```powershell
-.\gradlew.bat :reqover-agent:jar :examples:mvc-sample:bootJar :examples:webflux-sample:bootJar
+```bash
+./gradlew :reqover-agent:jar :examples:mvc-sample:bootJar :examples:webflux-sample:bootJar
 ```
 
 Run MVC sample with the agent:
 
-```powershell
-java -javaagent:reqover-agent\build\libs\reqover-agent-0.1.0-SNAPSHOT.jar=include=io.reqover.example.mvc.auto -jar examples\mvc-sample\build\libs\mvc-sample-0.1.0-SNAPSHOT.jar
+```bash
+java -javaagent:reqover-agent/build/libs/reqover-agent-0.1.0-SNAPSHOT.jar=include=io.reqover.example.mvc.auto -jar examples/mvc-sample/build/libs/mvc-sample-0.1.0-SNAPSHOT.jar
 ```
 
 Then call:
@@ -96,7 +99,28 @@ GET http://localhost:8080/reqover/report
 GET http://localhost:8080/reqover/report.html
 ```
 
-PowerShell demo runner:
+Run WebFlux sample with the agent:
+
+```bash
+java -javaagent:reqover-agent/build/libs/reqover-agent-0.1.0-SNAPSHOT.jar=include=io.reqover.example.webflux.auto -jar examples/webflux-sample/build/libs/webflux-sample-0.1.0-SNAPSHOT.jar
+```
+
+Then call:
+
+```text
+GET http://localhost:8080/auto/reactive/orders/42
+GET http://localhost:8080/reqover/report
+GET http://localhost:8080/reqover/report.html
+```
+
+Demo runner scripts:
+
+```bash
+./scripts/run-agent-demo.sh mvc 8080
+./scripts/run-agent-demo.sh webflux 8080
+```
+
+Windows PowerShell:
 
 ```powershell
 .\scripts\run-agent-demo.ps1 -App mvc -Port 8080
@@ -107,8 +131,8 @@ PowerShell demo runner:
 
 Generate CycloneDX SBOM:
 
-```powershell
-.\gradlew.bat cyclonedxBom
+```bash
+./gradlew cyclonedxBom
 ```
 
 Expected output:
@@ -119,27 +143,13 @@ build/reports/bom/reqover-sbom.json
 
 ## Performance Measurement
 
-Sequential local latency measurement helper:
+순차 로컬 지연 측정 도구는 PowerShell(pwsh) 스크립트로 제공되며 macOS/Linux/Windows에서 동일하게 동작합니다.
 
-```powershell
-.\scripts\measure-demo-latency.ps1 -Url http://localhost:8080/auto/orders/1 -WarmupRequests 30 -MeasuredRequests 300
+```bash
+pwsh scripts/measure-demo-latency.ps1 -Url http://localhost:8080/auto/orders/1 -WarmupRequests 30 -MeasuredRequests 300
 ```
 
-Current local WebFlux reference result is documented in [15. Local Performance Results](docs/15_performance_results.md).
-
-Run WebFlux sample with the agent:
-
-```powershell
-java -javaagent:reqover-agent\build\libs\reqover-agent-0.1.0-SNAPSHOT.jar=include=io.reqover.example.webflux.auto -jar examples\webflux-sample\build\libs\webflux-sample-0.1.0-SNAPSHOT.jar
-```
-
-Then call:
-
-```text
-GET http://localhost:8080/auto/reactive/orders/42
-GET http://localhost:8080/reqover/report
-GET http://localhost:8080/reqover/report.html
-```
+현재 로컬 WebFlux 기준 결과는 [15. Local Performance Results](docs/15_performance_results.md)에 정리되어 있습니다.
 
 ## 핵심 가치
 
@@ -161,43 +171,28 @@ GET http://localhost:8080/reqover/report.html
 - [01. 요구사항](docs/01_requirements.md)
 - [02. 시스템 아키텍처](docs/02_architecture.md)
 - [03. Phase 0 PoC 계획](docs/03_phase0_spike_plan.md)
-- [04. 대회 로드맵](docs/04_competition_roadmap.md)
-- [05. Repository setup](docs/05_repository_setup.md)
-- [06. 제출 요구사항 정리](docs/06_submission_requirements.md)
-- [07. 결과보고서 작성 초안](docs/07_result_report_outline.md)
 - [08. Phase 0 MVP Status](docs/08_phase0_mvp_status.md)
 - [09. Agent E2E Demo](docs/09_agent_e2e_demo.md)
 - [10. Demo Script](docs/10_demo_script.md)
 - [11. Performance Measurement](docs/11_performance_measurement.md)
-- [12. Release Checklist](docs/12_release_checklist.md)
-- [13. Result Report Draft](docs/13_result_report_draft.md)
 - [14. JaCoCo Interop Decision](docs/14_jacoco_interop_decision.md)
 - [15. Local Performance Results](docs/15_performance_results.md)
 
-## 초기 구현 방향
+대회 준비 관련 문서는 [docs/competition](docs/competition/README.md)에 별도로 정리되어 있습니다.
 
-대회용 MVP는 JaCoCo 내부를 처음부터 깊게 수정하기보다, 경량 bytecode instrumentation으로 `ReqoverProbe.hit(classId, probeId)` 호출을 삽입하고 이 호출을 현재 요청의 coverage bucket으로 routing하는 방식부터 검증합니다.
+## 구현 방향
 
-이후 Phase 0 결과에 따라 두 갈래 중 하나를 선택합니다.
+Reqover는 JaCoCo 내부를 수정하는 대신, 경량 bytecode instrumentation으로 `ReqoverProbe.hit(classId, probeId)` 호출을 method entry에 삽입하고 이 호출을 현재 요청의 coverage bucket으로 routing합니다. branch 정밀도보다 요청 단위 귀속을 우선한 결정이며, JaCoCo와의 관계에 대한 배경은 [14. JaCoCo Interop Decision](docs/14_jacoco_interop_decision.md)에 정리되어 있습니다.
 
-- JaCoCo probe strategy 확장: branch coverage와 리포팅 재사용성이 강하지만 내부 구조와 라이선스 관리가 어렵습니다.
-- 경량 자체 계측 유지: 요청별 routing을 설계하기 쉽고 라이선스가 단순하지만 branch 정밀도와 JVM edge case를 직접 책임져야 합니다.
+## 알려진 제한
 
-## 대회 제출물 목표
-
-- 동작하는 Java agent 또는 instrumentation PoC
-- Spring MVC 예제 앱
-- Spring WebFlux 예제 앱
-- 동시 요청 분리 데모
-- 엔드포인트별 coverage 리포트
-- README, 사용법, 아키텍처 문서
-- 라이선스와 오픈소스 의존성 정리
-- 결과보고서 DOCX/HWPX와 PDF
-- SBOM
-- YouTube 시연영상 URL
+- method entry 기준 계측이므로 branch/line 단위 세분화는 제공하지 않습니다.
+- synthetic method(lambda 본문 등)는 현재 계측 대상에서 제외됩니다.
+- coverage snapshot은 in-memory로 유지되며 기본 상한은 10,000건입니다(초과 시 오래된 것부터 제거).
+- report 엔드포인트는 sample 애플리케이션이 제공합니다. 인증 없이 공개 네트워크에 노출하지 마십시오.
 
 ## License
 
-Reqover 자체 작성 코드는 Apache License 2.0을 적용합니다.
+Reqover 자체 작성 코드는 Apache License 2.0을 적용합니다. 전문은 [LICENSE](LICENSE), 서드파티 고지는 [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md)를 참고하십시오.
 
 JaCoCo fork 또는 내부 수정 파일이 생기는 경우 해당 모듈의 EPL-2.0 영향은 별도 검토합니다.

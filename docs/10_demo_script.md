@@ -12,8 +12,8 @@ Avoid explaining bytecode instrumentation first. Show the report first, then exp
 
 Start MVC sample:
 
-```powershell
-.\gradlew.bat :examples:mvc-sample:bootRun
+```bash
+./gradlew :examples:mvc-sample:bootRun
 ```
 
 Call:
@@ -56,8 +56,8 @@ When a service method changes, the reverse index tells us which observed APIs sh
 
 Run:
 
-```powershell
-.\scripts\run-agent-demo.ps1 -App mvc -Port 8080
+```bash
+./scripts/run-agent-demo.sh mvc 8080
 ```
 
 Then open:
@@ -81,8 +81,8 @@ The application code does not need manual probe calls. The Java agent inserts me
 
 Run:
 
-```powershell
-.\scripts\run-agent-demo.ps1 -App webflux -Port 8080
+```bash
+./scripts/run-agent-demo.sh webflux 8080
 ```
 
 Then open:

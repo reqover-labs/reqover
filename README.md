@@ -1,5 +1,9 @@
 # Reqover
 
+[![build](https://github.com/reqover-labs/reqover/actions/workflows/build.yml/badge.svg)](https://github.com/reqover-labs/reqover/actions/workflows/build.yml)
+[![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
+[![Java](https://img.shields.io/badge/Java-17%2B-orange.svg)](build.gradle.kts)
+
 Reqover는 실행 중인 Spring 애플리케이션에서 코드 커버리지를 전역 값이 아니라 개별 HTTP 요청과 엔드포인트 단위로 귀속하는 개발자 도구입니다.
 
 기존 커버리지 도구는 "어떤 코드가 실행되었는가"를 알려주지만, Reqover는 한 단계 더 들어가 "어느 요청이 그 코드를 실행했는가"를 보여주는 것을 목표로 합니다. 특히 Spring WebFlux처럼 요청 처리 중 thread가 바뀌는 reactive 환경에서도 귀속이 유지되는지를 핵심 차별점으로 둡니다.
@@ -190,6 +194,17 @@ Reqover는 JaCoCo 내부를 수정하는 대신, 경량 bytecode instrumentation
 - synthetic method(lambda 본문 등)는 현재 계측 대상에서 제외됩니다.
 - coverage snapshot은 in-memory로 유지되며 기본 상한은 10,000건입니다(초과 시 오래된 것부터 제거).
 - report 엔드포인트는 sample 애플리케이션이 제공합니다. 인증 없이 공개 네트워크에 노출하지 마십시오.
+
+## 팀
+
+2026 오픈소스 개발자대회 참가 팀 [Reqover Labs](https://github.com/reqover-labs)입니다.
+
+| 이름 | GitHub | 주요 기여 |
+| --- | --- | --- |
+| 김태희 | [@TaeHuiKKIM](https://github.com/TaeHuiKKIM) | 코어 설계와 MVP 구현 (core·instrumentation·agent·report, 샘플 앱, 계획 문서) |
+| 이상민 | [@lsmin3388](https://github.com/lsmin3388) | 오픈소스 정비 (빌드·CI 안정화, 코어 하드닝, Spring 어댑터 개선, 문서·라이선스 체계) |
+
+기여 방법은 [CONTRIBUTING.md](CONTRIBUTING.md)를, 행동 강령은 [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md)를 참고하십시오.
 
 ## License
 

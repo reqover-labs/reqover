@@ -94,7 +94,7 @@ Reqover를 처음 방문한 개발자가 첫 화면에서 제품의 차별점과
 
 촬영 기준은 다음과 같다.
 
-- JDK: `C:\Program Files\Java\jdk-21.0.10`
+- JDK: `JAVA_HOME`으로 선택한 JDK 21
 - 브라우저 viewport: 1440px 너비
 - GitHub에서 읽기 쉬운 범위로 필요한 섹션만 촬영
 - 개인 정보, 로컬 절대경로, 토큰, 환경 변수 값은 화면에 포함하지 않음

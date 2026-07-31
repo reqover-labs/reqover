@@ -56,7 +56,7 @@
 Run:
 
 ```powershell
-$env:JAVA_HOME = 'C:\Program Files\Java\jdk-21.0.10'
+# Configure JAVA_HOME for an installed JDK 21 before running this command.
 $env:Path = "$env:JAVA_HOME\bin;$env:Path"
 .\gradlew.bat :reqover-agent:test --tests io.reqover.agent.AgentSpringE2ETest --no-daemon --console=plain
 ```
@@ -146,7 +146,7 @@ git commit -m "test: tolerate Windows E2E log cleanup delay"
 Run:
 
 ```powershell
-$env:JAVA_HOME = 'C:\Program Files\Java\jdk-21.0.10'
+# Configure JAVA_HOME for an installed JDK 21 before running this command.
 $env:Path = "$env:JAVA_HOME\bin;$env:Path"
 .\gradlew.bat :reqover-agent:jar :examples:mvc-sample:bootJar :examples:webflux-sample:bootJar cyclonedxBom --no-daemon --console=plain
 ```
@@ -219,7 +219,7 @@ if ($mvcReport.endpoints.endpoint -notcontains 'GET /orders/{id}') { throw 'Miss
 if ($mvcReport.endpoints.endpoint -notcontains 'POST /payments') { throw 'Missing payments endpoint.' }
 
 $shared = $mvcReport.reverseIndex | Where-Object {
-  $_.className -eq 'io.reqover.example.mvc.SharedValidator'
+  $_.className -eq 'SharedValidator'
 }
 if (@($shared.endpoints).Count -ne 2) { throw 'SharedValidator must map to two observed endpoints.' }
 ```
@@ -253,12 +253,12 @@ await page.locator('.index-panel').evaluate((element) => {
   element.style.display = 'none';
 });
 await page.locator('main').screenshot({
-  path: 'C:/Users/1043t/Documents/Codex/2026-07-31/new-chat/work/reqover/docs/assets/reqover-mvc-request-attribution.png',
+  path: 'docs/assets/reqover-mvc-request-attribution.png',
   animations: 'disabled',
 });
 await page.reload({ waitUntil: 'networkidle' });
 await page.locator('.index-panel').screenshot({
-  path: 'C:/Users/1043t/Documents/Codex/2026-07-31/new-chat/work/reqover/docs/assets/reqover-code-to-endpoint-index.png',
+  path: 'docs/assets/reqover-code-to-endpoint-index.png',
   animations: 'disabled',
 });
 await browser.close();
@@ -369,7 +369,7 @@ await page.locator('.index-panel').evaluate((element) => {
   element.style.display = 'none';
 });
 await page.locator('main').screenshot({
-  path: 'C:/Users/1043t/Documents/Codex/2026-07-31/new-chat/work/reqover/docs/assets/reqover-webflux-thread-hop.png',
+  path: 'docs/assets/reqover-webflux-thread-hop.png',
   animations: 'disabled',
 });
 await browser.close();
@@ -410,7 +410,7 @@ Reqover builds with JDK 21 and emits Java 17-compatible bytecode.
 ## Build
 
 ```powershell
-$env:JAVA_HOME = 'C:\Program Files\Java\jdk-21.0.10'
+# Configure JAVA_HOME for an installed JDK 21 before running this command.
 $env:Path = "$env:JAVA_HOME\bin;$env:Path"
 .\gradlew.bat clean test --no-daemon --console=plain
 .\gradlew.bat :reqover-agent:jar :examples:mvc-sample:bootJar :examples:webflux-sample:bootJar cyclonedxBom --no-daemon --console=plain
@@ -430,7 +430,7 @@ Verified results:
 
 - `completedRequestCount` is `2`.
 - `GET /orders/{id}` and `POST /payments` are separate endpoint entries.
-- `io.reqover.example.mvc.SharedValidator` maps back to both observed endpoints.
+- `SharedValidator` maps back to both observed endpoints.
 
 Assets:
 
@@ -589,7 +589,7 @@ Reqover가 생성하는 bytecode target은 Java 17입니다. 현재 CI는 JDK 21
 git clone https://github.com/reqover-labs/reqover.git
 Set-Location .\reqover
 
-$env:JAVA_HOME = 'C:\Program Files\Java\jdk-21'
+# Configure JAVA_HOME for your installed JDK 21.
 $env:Path = "$env:JAVA_HOME\bin;$env:Path"
 
 .\gradlew.bat test
@@ -932,7 +932,7 @@ git commit -m "docs: expand Reqover Labs organization profile"
 In `work/reqover`:
 
 ```powershell
-$env:JAVA_HOME = 'C:\Program Files\Java\jdk-21.0.10'
+# Configure JAVA_HOME for an installed JDK 21 before running this command.
 $env:Path = "$env:JAVA_HOME\bin;$env:Path"
 .\gradlew.bat clean test build cyclonedxBom --no-daemon --console=plain
 ```

@@ -135,8 +135,24 @@ class AgentSpringE2ETest {
                 app.process().waitFor(10, TimeUnit.SECONDS);
             }
         } finally {
-            Files.deleteIfExists(app.log());
+            deleteLogWithRetry(app.log());
         }
+    }
+
+    private static void deleteLogWithRetry(Path log) throws Exception {
+        java.nio.file.FileSystemException lastFailure = null;
+        for (int attempt = 1; attempt <= 20; attempt++) {
+            try {
+                Files.deleteIfExists(log);
+                return;
+            } catch (java.nio.file.FileSystemException error) {
+                lastFailure = error;
+                if (attempt < 20) {
+                    Thread.sleep(50);
+                }
+            }
+        }
+        throw lastFailure;
     }
 
     private static String appLog(SampleApp app) {

@@ -199,10 +199,10 @@ Reqover는 JaCoCo 내부를 수정하는 대신, 경량 bytecode instrumentation
 
 2026 오픈소스 개발자대회 참가 팀 [Reqover Labs](https://github.com/reqover-labs)입니다.
 
-| 이름 | GitHub | 주요 기여 |
-| --- | --- | --- |
-| 김태희 | [@TaeHuiKKIM](https://github.com/TaeHuiKKIM) | 코어 설계와 MVP 구현 (core·instrumentation·agent·report, 샘플 앱, 계획 문서) |
-| 이상민 | [@lsmin3388](https://github.com/lsmin3388) | 오픈소스 정비 (빌드·CI 안정화, 코어 하드닝, Spring 어댑터 개선, 문서·라이선스 체계) |
+| 이름 | GitHub | LinkedIn | 주요 기여 |
+| --- | --- | --- | --- |
+| 김태희 | [@TaeHuiKKIM](https://github.com/TaeHuiKKIM) | [🔗 TaeHui Kim](https://www.linkedin.com/in/taehui-kim-930713412/) | 코어 설계와 MVP 구현 (core·instrumentation·agent·report, 샘플 앱, 계획 문서) |
+| 이상민 | [@lsmin3388](https://github.com/lsmin3388) | [🔗 Sangmin Lee](https://www.linkedin.com/in/sangminn0) | 오픈소스 정비 (빌드·CI 안정화, 코어 하드닝, Spring 어댑터 개선, 문서·라이선스 체계) |
 
 기여 방법은 [CONTRIBUTING.md](CONTRIBUTING.md)를, 행동 강령은 [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md)를 참고하십시오.
 

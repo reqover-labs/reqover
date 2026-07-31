@@ -17,21 +17,24 @@ Reqover builds with JDK 21 and emits Java 17-compatible bytecode.
 
 ## Build
 
+Configure a JDK 21 installation through `JAVA_HOME` and ensure its `bin` directory is on `Path`, then run:
+
 ```powershell
-$env:JAVA_HOME = 'C:\Program Files\Java\jdk-21.0.10'
-$env:Path = "$env:JAVA_HOME\bin;$env:Path"
 .\gradlew.bat clean test --no-daemon --console=plain
 .\gradlew.bat :reqover-agent:jar :examples:mvc-sample:bootJar :examples:webflux-sample:bootJar cyclonedxBom --no-daemon --console=plain
 ```
 
 ## MVC Request Attribution
 
-Start `mvc-sample` on port `18082`, then call:
+> [!WARNING]
+> The sample HTML report has no authentication. Restrict it to loopback access and never expose its port to a public or untrusted network.
+
+Start `mvc-sample` on port `18082` with `--server.address=127.0.0.1`, then call:
 
 ```powershell
-Invoke-RestMethod 'http://localhost:18082/orders/1'
-Invoke-RestMethod -Method Post 'http://localhost:18082/payments'
-Invoke-RestMethod 'http://localhost:18082/reqover/report'
+Invoke-RestMethod 'http://127.0.0.1:18082/orders/1'
+Invoke-RestMethod -Method Post 'http://127.0.0.1:18082/payments'
+Invoke-RestMethod 'http://127.0.0.1:18082/reqover/report'
 ```
 
 Verified results:
@@ -47,11 +50,15 @@ Assets:
 
 ## WebFlux Java-Agent Attribution
 
+> [!WARNING]
+> Keep the unauthenticated report on `127.0.0.1`; do not publish port `18083` to a public or untrusted network.
+
 Run the WebFlux jar with:
 
 ```powershell
 java "-javaagent:reqover-agent/build/libs/reqover-agent-0.1.0-SNAPSHOT.jar=include=io.reqover.example.webflux.auto" `
   -jar examples/webflux-sample/build/libs/webflux-sample-0.1.0-SNAPSHOT.jar `
+  --server.address=127.0.0.1 `
   --server.port=18083 `
   --spring.main.banner-mode=off
 ```
@@ -59,8 +66,8 @@ java "-javaagent:reqover-agent/build/libs/reqover-agent-0.1.0-SNAPSHOT.jar=inclu
 Then call:
 
 ```powershell
-Invoke-RestMethod 'http://localhost:18083/auto/reactive/orders/42'
-Invoke-RestMethod 'http://localhost:18083/reqover/report'
+Invoke-RestMethod 'http://127.0.0.1:18083/auto/reactive/orders/42'
+Invoke-RestMethod 'http://127.0.0.1:18083/reqover/report'
 ```
 
 Verified results:
@@ -75,7 +82,9 @@ Asset:
 
 ## Interpretation Boundary
 
-Reqover reports execution relationships observed in these requests. An absent relationship does not prove that a code path can never affect an endpoint.
+Observed code-to-endpoint relationships are a lower bound: Reqover reports only execution relationships seen in the captured requests, so an absent relationship does not prove that a code path can never affect an endpoint.
+
+Reqover complements aggregate coverage tools such as JaCoCo by adding request attribution. It does not replace JaCoCo or aggregate coverage reporting.
 
 ## Troubleshooting
 

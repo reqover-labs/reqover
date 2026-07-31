@@ -19,6 +19,7 @@
 - Keep local absolute paths, environment values, temporary logs, `.env` files, API keys, tokens, and build outputs out of commits.
 - Use `agent/readme-product-refresh` in both repositories and publish two Draft PRs.
 - Preserve the existing GitHub and LinkedIn links for 김태희 and 이상민.
+- Author every new commit as `TaeHuiKKIM <1043tae@naver.com>` only; do not add `Claude`, `Anthropic`, an AI bot, or another automation identity as a contributor or `Co-authored-by` trailer.
 
 ---
 
@@ -828,6 +829,8 @@ From the parent `work` directory:
 git clone https://github.com/reqover-labs/.github.git reqover-org-profile
 Set-Location .\reqover-org-profile
 git switch -c agent/readme-product-refresh
+git config user.name 'TaeHuiKKIM'
+git config user.email '1043tae@naver.com'
 git status --short --branch
 ```
 
@@ -959,7 +962,25 @@ git status --short --untracked-files=all
 
 Expected: no sensitive path is part of the diff. Build directories and local logs remain ignored or outside the repository.
 
-- [ ] **Step 4: Verify the organization profile diff**
+- [ ] **Step 4: Verify commit authorship contains no AI contributor identity**
+
+In both repositories, run:
+
+```powershell
+git log main..HEAD --format='%h%x09%an%x09%ae%x09%s'
+$messages = git log main..HEAD --format='%B'
+if ($messages -match '(?i)claude|anthropic|co-authored-by:\s*.*(?:bot|ai)') {
+  throw 'AI contributor identity found in commit history.'
+}
+$authors = git log main..HEAD --format='%an <%ae>' | Sort-Object -Unique
+if (@($authors).Count -ne 1 -or $authors[0] -ne 'TaeHuiKKIM <1043tae@naver.com>') {
+  throw "Unexpected commit author: $($authors -join ', ')"
+}
+```
+
+Expected: every new commit has the single author `TaeHuiKKIM <1043tae@naver.com>` and no AI co-author trailer.
+
+- [ ] **Step 5: Verify the organization profile diff**
 
 In `work/reqover-org-profile`:
 
@@ -970,7 +991,7 @@ git diff --stat main...HEAD
 git diff main...HEAD -- profile/README.md
 ```
 
-- [ ] **Step 5: Push the main repository branch**
+- [ ] **Step 6: Push the main repository branch**
 
 Use the GitHub publication workflow and run:
 
@@ -978,7 +999,7 @@ Use the GitHub publication workflow and run:
 git push -u origin agent/readme-product-refresh
 ```
 
-- [ ] **Step 6: Create the main Draft PR**
+- [ ] **Step 7: Create the main Draft PR**
 
 ```powershell
 gh pr create `
@@ -1004,7 +1025,7 @@ gh pr create `
 - no .env, credentials, logs, or build outputs are included"
 ```
 
-- [ ] **Step 7: Push the organization branch**
+- [ ] **Step 8: Push the organization branch**
 
 In `work/reqover-org-profile`:
 
@@ -1012,7 +1033,7 @@ In `work/reqover-org-profile`:
 git push -u origin agent/readme-product-refresh
 ```
 
-- [ ] **Step 8: Create the organization Draft PR**
+- [ ] **Step 9: Create the organization Draft PR**
 
 ```powershell
 gh pr create `
@@ -1031,7 +1052,7 @@ gh pr create `
 Merge reqover-labs/reqover README PR first so the new section anchors resolve on main."
 ```
 
-- [ ] **Step 9: Inspect both Draft PRs**
+- [ ] **Step 10: Inspect both Draft PRs**
 
 Confirm:
 
@@ -1042,6 +1063,6 @@ Confirm:
 - CI starts on the main PR and reaches a terminal result;
 - no unexpected file appears in either PR.
 
-- [ ] **Step 10: Report the outcome**
+- [ ] **Step 11: Report the outcome**
 
 Return both Draft PR links, the final test command and result, the three evidence image names, and any remaining review note. Do not claim merge or release completion.

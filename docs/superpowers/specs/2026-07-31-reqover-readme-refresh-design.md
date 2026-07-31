@@ -168,3 +168,5 @@ README 완료를 검증하려면 이 정리 단계의 플랫폼 안정성 문제
 조직 프로필은 별도 저장소에서 하나의 문서 커밋으로 만든다.
 
 두 저장소 모두 `agent/readme-product-refresh` 브랜치를 사용하고, 검증 결과와 촬영 근거를 포함한 Draft PR을 생성한다. `.env`, API 키, 토큰, 로컬 로그와 빌드 산출물은 커밋하지 않는다.
+
+모든 새 커밋은 `TaeHuiKKIM <1043tae@naver.com>` 단독 저자로 기록한다. `Claude`, `Anthropic`, AI bot 또는 다른 자동화 도구를 `Co-authored-by` trailer나 contributor 문구로 추가하지 않는다.

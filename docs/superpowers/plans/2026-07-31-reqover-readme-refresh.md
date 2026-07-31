@@ -972,7 +972,7 @@ $messages = git log main..HEAD --format='%B'
 if ($messages -match '(?i)claude|anthropic|co-authored-by:\s*.*(?:bot|ai)') {
   throw 'AI contributor identity found in commit history.'
 }
-$authors = git log main..HEAD --format='%an <%ae>' | Sort-Object -Unique
+$authors = @(git log main..HEAD --format='%an <%ae>' | Sort-Object -Unique)
 if (@($authors).Count -ne 1 -or $authors[0] -ne 'TaeHuiKKIM <1043tae@naver.com>') {
   throw "Unexpected commit author: $($authors -join ', ')"
 }

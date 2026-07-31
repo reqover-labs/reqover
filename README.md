@@ -67,6 +67,9 @@ Java agent가 controller와 service의 method entry를 자동 계측합니다. r
 
 Reqover가 생성하는 bytecode target은 Java 17입니다. 현재 CI는 JDK 21에서 검증합니다.
 
+> [!WARNING]
+> Sample report endpoint에는 인증이 없습니다. 아래 Quickstart 명령은 `SERVER_ADDRESS`를 `127.0.0.1`로 명시해 loopback에만 바인딩합니다. 이 설정을 제거하거나 port를 public 또는 신뢰할 수 없는 네트워크에 노출하지 마십시오.
+
 ### Windows PowerShell
 
 ```powershell
@@ -75,6 +78,7 @@ Set-Location .\reqover
 
 # Configure JAVA_HOME for your installed JDK 21.
 $env:Path = "$env:JAVA_HOME\bin;$env:Path"
+$env:SERVER_ADDRESS = '127.0.0.1'
 
 .\gradlew.bat test
 .\scripts\run-agent-demo.ps1 -App mvc -Port 8080
@@ -93,6 +97,8 @@ http://localhost:8080/reqover/report.html
 ```bash
 git clone https://github.com/reqover-labs/reqover.git
 cd reqover
+
+export SERVER_ADDRESS=127.0.0.1
 
 ./gradlew test
 ./scripts/run-agent-demo.sh mvc 8080
@@ -212,7 +218,7 @@ build/reports/bom/reqover-sbom.json
 - snapshot은 in-memory로 유지되며 기본 상한 10,000건을 넘으면 오래된 항목부터 제거합니다.
 - report는 관측된 요청의 실행 관계만 보여줍니다. 보이지 않은 관계가 없다는 증거가 아닙니다.
 - code-to-endpoint index는 우선 재검증 대상을 좁히는 신호이며 완전한 변경 영향 분석을 보장하지 않습니다.
-- sample의 `/reqover/report`와 `/reqover/report.html`에는 인증이 없습니다. 공개 네트워크에 노출하지 마십시오.
+- sample의 `/reqover/report`와 `/reqover/report.html`에는 인증이 없습니다. Quickstart의 `SERVER_ADDRESS=127.0.0.1` loopback 설정을 유지하고 public 또는 신뢰할 수 없는 네트워크에 노출하지 마십시오.
 - 현재는 production always-on agent가 아니라 개발·QA·staging 관측을 우선합니다.
 
 ## Performance

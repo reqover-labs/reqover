@@ -29,7 +29,16 @@ Configure a JDK 21 installation through `JAVA_HOME` and ensure its `bin` directo
 > [!WARNING]
 > The sample HTML report has no authentication. Restrict it to loopback access and never expose its port to a public or untrusted network.
 
-Start `mvc-sample` on port `18082` with `--server.address=127.0.0.1`, then call:
+Start `mvc-sample` on loopback port `18082` with the built jar:
+
+```powershell
+java -jar examples/mvc-sample/build/libs/mvc-sample-0.1.0-SNAPSHOT.jar `
+  --server.address=127.0.0.1 `
+  --server.port=18082 `
+  --spring.main.banner-mode=off
+```
+
+While the sample keeps running, call it from another terminal:
 
 ```powershell
 Invoke-RestMethod 'http://127.0.0.1:18082/orders/1'
@@ -73,7 +82,7 @@ Invoke-RestMethod 'http://127.0.0.1:18083/reqover/report'
 Verified results:
 
 - `GET /auto/reactive/orders/{id}` is present.
-- `AutoReactiveOrderController` and `AutoReactiveOrderService` were inserted by the Java agent.
+- The Java agent automatically instruments method entry for `AutoReactiveOrderController` and `AutoReactiveOrderService`.
 - The request bucket contains multiple thread names from the reactive execution.
 
 Asset:

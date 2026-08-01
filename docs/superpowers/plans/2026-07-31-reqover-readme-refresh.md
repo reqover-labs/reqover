@@ -170,14 +170,20 @@ $mvcErrLog = Join-Path $env:TEMP 'reqover-readme-mvc.err.log'
 $mvcJar = (Resolve-Path '.\examples\mvc-sample\build\libs\mvc-sample-0.1.0-SNAPSHOT.jar').Path
 $mvcProcess = Start-Process `
   -FilePath "$env:JAVA_HOME\bin\java.exe" `
-  -ArgumentList @('-jar', $mvcJar, '--server.port=18082', '--spring.main.banner-mode=off') `
+  -ArgumentList @(
+    '-jar',
+    $mvcJar,
+    '--server.address=127.0.0.1',
+    '--server.port=18082',
+    '--spring.main.banner-mode=off'
+  ) `
   -RedirectStandardOutput $mvcOutLog `
   -RedirectStandardError $mvcErrLog `
   -WindowStyle Hidden `
   -PassThru
 ```
 
-Poll `http://localhost:18082/reqover/report` for up to 45 seconds. If the process exits or readiness does not succeed, print `$mvcOutLog` and `$mvcErrLog`, stop, and investigate before taking screenshots.
+Poll `http://127.0.0.1:18082/reqover/report` for up to 45 seconds. If the process exits or readiness does not succeed, print `$mvcOutLog` and `$mvcErrLog`, stop, and investigate before taking screenshots.
 
 Use this exact readiness check:
 
@@ -191,7 +197,7 @@ while ((Get-Date) -lt $mvcDeadline) {
     throw "MVC sample exited with code $($mvcProcess.ExitCode)."
   }
   try {
-    Invoke-RestMethod 'http://localhost:18082/reqover/report' -TimeoutSec 2 | Out-Null
+    Invoke-RestMethod 'http://127.0.0.1:18082/reqover/report' -TimeoutSec 2 | Out-Null
     $mvcReady = $true
     break
   } catch {
@@ -210,9 +216,9 @@ if (-not $mvcReady) {
 Run:
 
 ```powershell
-Invoke-RestMethod 'http://localhost:18082/orders/1' | Out-Null
-Invoke-RestMethod -Method Post 'http://localhost:18082/payments' | Out-Null
-$mvcReport = Invoke-RestMethod 'http://localhost:18082/reqover/report'
+Invoke-RestMethod 'http://127.0.0.1:18082/orders/1' | Out-Null
+Invoke-RestMethod -Method Post 'http://127.0.0.1:18082/payments' | Out-Null
+$mvcReport = Invoke-RestMethod 'http://127.0.0.1:18082/reqover/report'
 
 if ($mvcReport.completedRequestCount -ne 2) { throw 'Expected two completed MVC requests.' }
 if ($mvcReport.endpoints.endpoint -notcontains 'GET /orders/{id}') { throw 'Missing orders endpoint.' }
@@ -228,7 +234,7 @@ Expected: two endpoint cards and a `SharedValidator` reverse-index row containin
 
 - [ ] **Step 4: Capture the MVC and reverse-index images**
 
-Open `http://localhost:18082/reqover/report.html` in an automated browser with a 1440px viewport.
+Open `http://127.0.0.1:18082/reqover/report.html` in an automated browser with a 1440px viewport.
 
 Capture:
 
@@ -246,7 +252,7 @@ const page = await browser.newPage({
   viewport: { width: 1440, height: 1000 },
   deviceScaleFactor: 1,
 });
-await page.goto('http://localhost:18082/reqover/report.html', {
+await page.goto('http://127.0.0.1:18082/reqover/report.html', {
   waitUntil: 'networkidle',
 });
 await page.locator('.index-panel').evaluate((element) => {
@@ -287,6 +293,7 @@ $webfluxProcess = Start-Process `
     "-javaagent:$agentJar=include=io.reqover.example.webflux.auto",
     '-jar',
     $webfluxJar,
+    '--server.address=127.0.0.1',
     '--server.port=18083',
     '--spring.main.banner-mode=off'
   ) `
@@ -296,7 +303,7 @@ $webfluxProcess = Start-Process `
   -PassThru
 ```
 
-Poll `http://localhost:18083/reqover/report` for up to 45 seconds with the same early-exit diagnostics as the MVC process.
+Poll `http://127.0.0.1:18083/reqover/report` for up to 45 seconds with the same early-exit diagnostics as the MVC process.
 
 Use this exact readiness check:
 
@@ -310,7 +317,7 @@ while ((Get-Date) -lt $webfluxDeadline) {
     throw "WebFlux sample exited with code $($webfluxProcess.ExitCode)."
   }
   try {
-    Invoke-RestMethod 'http://localhost:18083/reqover/report' -TimeoutSec 2 | Out-Null
+    Invoke-RestMethod 'http://127.0.0.1:18083/reqover/report' -TimeoutSec 2 | Out-Null
     $webfluxReady = $true
     break
   } catch {
@@ -327,8 +334,8 @@ if (-not $webfluxReady) {
 - [ ] **Step 7: Generate and assert the WebFlux report data**
 
 ```powershell
-Invoke-RestMethod 'http://localhost:18083/auto/reactive/orders/42' | Out-Null
-$webfluxReport = Invoke-RestMethod 'http://localhost:18083/reqover/report'
+Invoke-RestMethod 'http://127.0.0.1:18083/auto/reactive/orders/42' | Out-Null
+$webfluxReport = Invoke-RestMethod 'http://127.0.0.1:18083/reqover/report'
 $reactive = $webfluxReport.endpoints | Where-Object {
   $_.endpoint -eq 'GET /auto/reactive/orders/{id}'
 }
@@ -347,7 +354,7 @@ if (@($reactive.threadNames).Count -lt 2) {
 
 - [ ] **Step 8: Capture the WebFlux thread-hop image**
 
-Open `http://localhost:18083/reqover/report.html` at a 1440px viewport and capture the summary plus the reactive endpoint card, including its thread chips, as:
+Open `http://127.0.0.1:18083/reqover/report.html` at a 1440px viewport and capture the summary plus the reactive endpoint card, including its thread chips, as:
 
 ```text
 docs/assets/reqover-webflux-thread-hop.png
@@ -362,7 +369,7 @@ const page = await browser.newPage({
   viewport: { width: 1440, height: 1000 },
   deviceScaleFactor: 1,
 });
-await page.goto('http://localhost:18083/reqover/report.html', {
+await page.goto('http://127.0.0.1:18083/reqover/report.html', {
   waitUntil: 'networkidle',
 });
 await page.locator('.index-panel').evaluate((element) => {
@@ -389,7 +396,7 @@ if (Get-NetTCPConnection -State Listen -LocalPort 18083 -ErrorAction SilentlyCon
 
 Create `docs/16_readme_demo_capture.md` with this content:
 
-```markdown
+````markdown
 # 16. README Demo Capture
 
 ## Purpose
@@ -409,28 +416,40 @@ Reqover builds with JDK 21 and emits Java 17-compatible bytecode.
 
 ## Build
 
+Configure a JDK 21 installation through `JAVA_HOME` and ensure its `bin` directory is on `Path`, then run:
+
 ```powershell
-# Configure JAVA_HOME for an installed JDK 21 before running this command.
-$env:Path = "$env:JAVA_HOME\bin;$env:Path"
 .\gradlew.bat clean test --no-daemon --console=plain
 .\gradlew.bat :reqover-agent:jar :examples:mvc-sample:bootJar :examples:webflux-sample:bootJar cyclonedxBom --no-daemon --console=plain
 ```
 
 ## MVC Request Attribution
 
-Start `mvc-sample` on port `18082`, then call:
+> [!WARNING]
+> The sample HTML report has no authentication. Restrict it to loopback access and never expose its port to a public or untrusted network.
+
+Start `mvc-sample` on loopback port `18082` with the built jar:
 
 ```powershell
-Invoke-RestMethod 'http://localhost:18082/orders/1'
-Invoke-RestMethod -Method Post 'http://localhost:18082/payments'
-Invoke-RestMethod 'http://localhost:18082/reqover/report'
+java -jar examples/mvc-sample/build/libs/mvc-sample-0.1.0-SNAPSHOT.jar `
+  --server.address=127.0.0.1 `
+  --server.port=18082 `
+  --spring.main.banner-mode=off
+```
+
+While the sample keeps running, call it from another terminal:
+
+```powershell
+Invoke-RestMethod 'http://127.0.0.1:18082/orders/1'
+Invoke-RestMethod -Method Post 'http://127.0.0.1:18082/payments'
+Invoke-RestMethod 'http://127.0.0.1:18082/reqover/report'
 ```
 
 Verified results:
 
 - `completedRequestCount` is `2`.
 - `GET /orders/{id}` and `POST /payments` are separate endpoint entries.
-- `SharedValidator` maps back to both observed endpoints.
+- `SharedValidator` maps back to both observed endpoints. The current manual-probe metadata deliberately reports the simple class name rather than the fully qualified name.
 
 Assets:
 
@@ -439,11 +458,15 @@ Assets:
 
 ## WebFlux Java-Agent Attribution
 
+> [!WARNING]
+> Keep the unauthenticated report on `127.0.0.1`; do not publish port `18083` to a public or untrusted network.
+
 Run the WebFlux jar with:
 
 ```powershell
 java "-javaagent:reqover-agent/build/libs/reqover-agent-0.1.0-SNAPSHOT.jar=include=io.reqover.example.webflux.auto" `
   -jar examples/webflux-sample/build/libs/webflux-sample-0.1.0-SNAPSHOT.jar `
+  --server.address=127.0.0.1 `
   --server.port=18083 `
   --spring.main.banner-mode=off
 ```
@@ -451,14 +474,14 @@ java "-javaagent:reqover-agent/build/libs/reqover-agent-0.1.0-SNAPSHOT.jar=inclu
 Then call:
 
 ```powershell
-Invoke-RestMethod 'http://localhost:18083/auto/reactive/orders/42'
-Invoke-RestMethod 'http://localhost:18083/reqover/report'
+Invoke-RestMethod 'http://127.0.0.1:18083/auto/reactive/orders/42'
+Invoke-RestMethod 'http://127.0.0.1:18083/reqover/report'
 ```
 
 Verified results:
 
 - `GET /auto/reactive/orders/{id}` is present.
-- `AutoReactiveOrderController` and `AutoReactiveOrderService` were inserted by the Java agent.
+- The Java agent automatically instruments method entry for `AutoReactiveOrderController` and `AutoReactiveOrderService`.
 - The request bucket contains multiple thread names from the reactive execution.
 
 Asset:
@@ -467,7 +490,9 @@ Asset:
 
 ## Interpretation Boundary
 
-Reqover reports execution relationships observed in these requests. An absent relationship does not prove that a code path can never affect an endpoint.
+Observed code-to-endpoint relationships are a lower bound: Reqover reports only execution relationships seen in the captured requests, so an absent relationship does not prove that a code path can never affect an endpoint.
+
+Reqover complements aggregate coverage tools such as JaCoCo by adding request attribution. It does not replace JaCoCo or aggregate coverage reporting.
 
 ## Troubleshooting
 
@@ -476,7 +501,7 @@ Reqover reports execution relationships observed in these requests. An absent re
 - Call a business endpoint before opening the report.
 - Confirm the Java-agent `include=` prefix matches the sample package.
 - Stop the sample JVM after capture; do not commit process logs or build outputs.
-```
+````
 
 - [ ] **Step 11: Visually inspect all three assets**
 
@@ -583,6 +608,9 @@ Java agent가 controller와 service의 method entry를 자동 계측합니다. r
 
 Reqover가 생성하는 bytecode target은 Java 17입니다. 현재 CI는 JDK 21에서 검증합니다.
 
+> [!WARNING]
+> Sample report endpoint에는 인증이 없습니다. 아래 Quickstart 명령은 `SERVER_ADDRESS`를 `127.0.0.1`로 명시해 loopback에만 바인딩합니다. 이 설정을 제거하거나 port를 public 또는 신뢰할 수 없는 네트워크에 노출하지 마십시오.
+
 ### Windows PowerShell
 
 ```powershell
@@ -591,6 +619,7 @@ Set-Location .\reqover
 
 # Configure JAVA_HOME for your installed JDK 21.
 $env:Path = "$env:JAVA_HOME\bin;$env:Path"
+$env:SERVER_ADDRESS = '127.0.0.1'
 
 .\gradlew.bat test
 .\scripts\run-agent-demo.ps1 -App mvc -Port 8080
@@ -609,6 +638,8 @@ http://localhost:8080/reqover/report.html
 ```bash
 git clone https://github.com/reqover-labs/reqover.git
 cd reqover
+
+export SERVER_ADDRESS=127.0.0.1
 
 ./gradlew test
 ./scripts/run-agent-demo.sh mvc 8080
@@ -728,7 +759,7 @@ build/reports/bom/reqover-sbom.json
 - snapshot은 in-memory로 유지되며 기본 상한 10,000건을 넘으면 오래된 항목부터 제거합니다.
 - report는 관측된 요청의 실행 관계만 보여줍니다. 보이지 않은 관계가 없다는 증거가 아닙니다.
 - code-to-endpoint index는 우선 재검증 대상을 좁히는 신호이며 완전한 변경 영향 분석을 보장하지 않습니다.
-- sample의 `/reqover/report`와 `/reqover/report.html`에는 인증이 없습니다. 공개 네트워크에 노출하지 마십시오.
+- sample의 `/reqover/report`와 `/reqover/report.html`에는 인증이 없습니다. Quickstart의 `SERVER_ADDRESS=127.0.0.1` loopback 설정을 유지하고 public 또는 신뢰할 수 없는 네트워크에 노출하지 마십시오.
 - 현재는 production always-on agent가 아니라 개발·QA·staging 관측을 우선합니다.
 
 ## Performance

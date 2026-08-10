@@ -37,7 +37,7 @@ io.reqover.example.webflux.auto.AutoReactiveOrderService
 ## Build
 
 ```bash
-./gradlew :reqover-agent:jar :examples:mvc-sample:bootJar :examples:webflux-sample:bootJar
+./gradlew :reqover-agent:shadowJar :examples:mvc-sample:bootJar :examples:webflux-sample:bootJar
 ```
 
 ## MVC Demo
@@ -45,20 +45,22 @@ io.reqover.example.webflux.auto.AutoReactiveOrderService
 Start the MVC sample with the agent:
 
 ```bash
-java -javaagent:reqover-agent/build/libs/reqover-agent-0.1.0-SNAPSHOT.jar=include=io.reqover.example.mvc.auto -jar examples/mvc-sample/build/libs/mvc-sample-0.1.0-SNAPSHOT.jar
+java -javaagent:reqover-agent/build/libs/reqover-agent-0.1.0.jar=include=io.reqover.example.mvc.auto \
+  -jar examples/mvc-sample/build/libs/mvc-sample-0.1.0.jar \
+  --server.address=127.0.0.1 --server.port=8080
 ```
 
 Call the auto endpoint:
 
 ```text
-GET http://localhost:8080/auto/orders/42
+GET http://127.0.0.1:8080/auto/orders/42
 ```
 
 Open the report:
 
 ```text
-GET http://localhost:8080/reqover/report
-GET http://localhost:8080/reqover/report.html
+GET http://127.0.0.1:8080/reqover/report
+GET http://127.0.0.1:8080/reqover/report.html
 ```
 
 The report should include `GET /auto/orders/{id}` and the auto MVC controller/service classes.
@@ -68,20 +70,22 @@ The report should include `GET /auto/orders/{id}` and the auto MVC controller/se
 Start the WebFlux sample with the agent:
 
 ```bash
-java -javaagent:reqover-agent/build/libs/reqover-agent-0.1.0-SNAPSHOT.jar=include=io.reqover.example.webflux.auto -jar examples/webflux-sample/build/libs/webflux-sample-0.1.0-SNAPSHOT.jar
+java -javaagent:reqover-agent/build/libs/reqover-agent-0.1.0.jar=include=io.reqover.example.webflux.auto \
+  -jar examples/webflux-sample/build/libs/webflux-sample-0.1.0.jar \
+  --server.address=127.0.0.1 --server.port=8080
 ```
 
 Call the auto endpoint:
 
 ```text
-GET http://localhost:8080/auto/reactive/orders/42
+GET http://127.0.0.1:8080/auto/reactive/orders/42
 ```
 
 Open the report:
 
 ```text
-GET http://localhost:8080/reqover/report
-GET http://localhost:8080/reqover/report.html
+GET http://127.0.0.1:8080/reqover/report
+GET http://127.0.0.1:8080/reqover/report.html
 ```
 
 The report should include `GET /auto/reactive/orders/{id}` and the auto WebFlux controller/service classes.
@@ -100,8 +104,9 @@ The test verifies:
 - WebFlux sample starts with the Reqover agent.
 - Auto endpoints return HTTP 200.
 - `/reqover/report` includes endpoint patterns.
-- `/reqover/report` includes auto-instrumented controller and service class names.
-- WebFlux attribution survives the Reactor thread hop used by the sample service.
+- `/reqover/report` includes auto-instrumented controller and service method metadata.
+- WebFlux E2E requires `reactor-http-nio-*`, `boundedElastic-*`, and `parallel-*` hits in the same endpoint, including the auto-instrumented `validate(J)J` method after the thread hop.
+- Starting the agent without an explicit `include=` fails closed: the application starts, but instrumentation remains inactive.
 
 ## Troubleshooting Notes
 
@@ -112,6 +117,8 @@ The agent module should not directly reference the Spring Boot Gradle task type 
 ### Report does not contain auto classes
 
 Check the agent include/exclude configuration first.
+
+An explicit `include=` is required. Omitting it intentionally disables instrumentation instead of scanning every application dependency.
 
 Reqover's default excludes must protect internal runtime packages such as `io.reqover.core.` and `io.reqover.agent.`, but they must not exclude the sample package `io.reqover.example.`. If the broad prefix `io.reqover.` is excluded, the demo application classes will never be instrumented.
 
@@ -127,4 +134,3 @@ Check these conditions:
 ### WebFlux reports global hits instead of endpoint hits
 
 This means the request bucket is not being restored into `CoverageContext` when a method-entry probe runs. The WebFlux adapter relies on Reactor Context and Micrometer Context Propagation to bridge the request bucket back into the ThreadLocal context used by `ReqoverProbe.hit(...)`.
-

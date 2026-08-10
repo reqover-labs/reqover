@@ -1,9 +1,13 @@
 plugins {
-    id("org.springframework.boot") version "3.3.5"
+    id("org.springframework.boot")
 }
 
+val springBootVersion: String by project
+val jacksonVersion: String by project
+
 dependencies {
-    implementation(platform("org.springframework.boot:spring-boot-dependencies:3.3.5"))
+    implementation(platform("org.springframework.boot:spring-boot-dependencies:$springBootVersion"))
+    implementation(platform("com.fasterxml.jackson:jackson-bom:$jacksonVersion"))
     implementation(project(":reqover-core"))
     implementation(project(":reqover-report"))
     implementation(project(":reqover-spring-mvc"))

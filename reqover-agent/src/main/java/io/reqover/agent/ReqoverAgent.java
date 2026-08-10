@@ -12,8 +12,11 @@ public final class ReqoverAgent {
 
     public static void premain(String agentArgs, Instrumentation instrumentation) {
         AgentOptions options = AgentOptions.parse(agentArgs);
+        if (options.includes().isEmpty()) {
+            System.err.println("[reqover] agent inactive; configure an explicit include package to enable instrumentation");
+            return;
+        }
         instrumentation.addTransformer(new ReqoverClassFileTransformer(options));
         System.err.println("[reqover] agent started; includes=" + options.includes() + ", excludes=" + options.excludes());
     }
 }
-

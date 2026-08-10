@@ -9,7 +9,7 @@
   <a href="https://github.com/reqover-labs/reqover/actions/workflows/build.yml"><img alt="Build" src="https://github.com/reqover-labs/reqover/actions/workflows/build.yml/badge.svg"></a>
   <a href="LICENSE"><img alt="License: Apache 2.0" src="https://img.shields.io/badge/License-Apache_2.0-blue.svg"></a>
   <a href="build.gradle.kts"><img alt="Bytecode target: Java 17" src="https://img.shields.io/badge/bytecode-Java_17-orange.svg"></a>
-  <a href="build.gradle.kts"><img alt="Build JDK: 21" src="https://img.shields.io/badge/build-JDK_21-e76f00.svg"></a>
+  <a href=".github/workflows/build.yml"><img alt="Build JDK: 17 and 21" src="https://img.shields.io/badge/build-JDK_17%20%7C%2021-e76f00.svg"></a>
 </p>
 
 <p align="center">
@@ -22,7 +22,7 @@
 ![Reqover MVC report separating code coverage by observed HTTP endpoint](docs/assets/reqover-mvc-request-attribution.png)
 
 > [!IMPORTANT]
-> Reqover는 현재 소스에서 빌드해 사용하는 `0.1.0-SNAPSHOT` MVP입니다. Maven Central 또는 GitHub Releases에 배포된 artifact는 아직 없습니다. 개발·QA·staging 환경의 관측과 시연을 우선하며, sample report endpoint는 인증을 제공하지 않습니다.
+> Reqover `0.1.0`은 소스 빌드와 [GitHub Releases](https://github.com/reqover-labs/reqover/releases)를 통해 제공되는 초기 개발·QA용 릴리스입니다. Maven Central에는 아직 배포하지 않았으며, sample report endpoint는 인증을 제공하지 않습니다.
 
 ## Why Reqover
 
@@ -61,14 +61,14 @@ Java agent가 controller와 service의 method entry를 자동 계측합니다. r
 
 ### Requirements
 
-- JDK 21 — Gradle build와 테스트에 필요
+- JDK 17 또는 21 — Gradle build와 테스트에 필요
 - Git
 - 사용 가능한 HTTP port
 
-Reqover가 생성하는 bytecode target은 Java 17입니다. 현재 CI는 JDK 21에서 검증합니다.
+Reqover가 생성하는 bytecode target은 Java 17입니다. CI는 JDK 17과 21에서 동일한 전체 테스트를 검증합니다.
 
 > [!WARNING]
-> Sample report endpoint에는 인증이 없습니다. 아래 Quickstart 명령은 `SERVER_ADDRESS`를 `127.0.0.1`로 명시해 loopback에만 바인딩합니다. 이 설정을 제거하거나 port를 public 또는 신뢰할 수 없는 네트워크에 노출하지 마십시오.
+> Sample report endpoint에는 인증이 없습니다. 아래 Quickstart 스크립트는 `127.0.0.1` loopback 바인딩을 강제합니다. port를 public 또는 신뢰할 수 없는 네트워크에 노출하지 마십시오.
 
 ### Windows PowerShell
 
@@ -76,18 +76,17 @@ Reqover가 생성하는 bytecode target은 Java 17입니다. 현재 CI는 JDK 21
 git clone https://github.com/reqover-labs/reqover.git
 Set-Location .\reqover
 
-# Configure JAVA_HOME for your installed JDK 21.
+# Configure JAVA_HOME for your installed JDK 17 or 21.
 $env:Path = "$env:JAVA_HOME\bin;$env:Path"
-$env:SERVER_ADDRESS = '127.0.0.1'
 
 .\gradlew.bat test
 .\scripts\run-agent-demo.ps1 -App mvc -Port 8080
 ```
 
-`JAVA_HOME`은 설치한 JDK 21 경로로 설정하십시오. 스크립트가 report URL을 출력하고 대기하면 다음 주소를 엽니다.
+`JAVA_HOME`은 설치한 JDK 17 또는 21 경로로 설정하십시오. 스크립트가 report URL을 출력하고 대기하면 다음 주소를 엽니다.
 
 ```text
-http://localhost:8080/reqover/report.html
+http://127.0.0.1:8080/reqover/report.html
 ```
 
 종료하려면 스크립트를 실행한 터미널에서 Enter를 누릅니다.
@@ -97,8 +96,6 @@ http://localhost:8080/reqover/report.html
 ```bash
 git clone https://github.com/reqover-labs/reqover.git
 cd reqover
-
-export SERVER_ADDRESS=127.0.0.1
 
 ./gradlew test
 ./scripts/run-agent-demo.sh mvc 8080
@@ -148,16 +145,16 @@ flowchart LR
 
 | 항목 | 현재 기준 |
 | --- | --- |
-| Project version | `0.1.0-SNAPSHOT` |
-| Build JDK | 21 |
+| Project version | `0.1.0` |
+| Build JDK | 17 or 21 |
 | Bytecode target | Java 17 |
-| CI | Ubuntu + Temurin 21 |
-| Spring Boot samples | 3.3.5 |
+| CI | Ubuntu + Temurin 17/21 |
+| Spring Boot samples | 3.5.16 |
 | MVC adapter | 구현 및 integration test |
 | WebFlux adapter | 구현 및 thread-hop integration test |
 | Instrumentation | ASM method-entry + `-javaagent` |
 | Report | JSON + standalone HTML |
-| Distribution | source build only |
+| Distribution | source build + GitHub Release |
 
 ### Current capabilities
 
@@ -194,7 +191,13 @@ Windows에서는 `.\gradlew.bat`을 사용합니다.
 SBOM 출력:
 
 ```text
-build/reports/bom/reqover-sbom.json
+build/reports/bom/reqover.cdx.json
+```
+
+Release candidate에 고정한 사본은 [`sbom/reqover.cdx.json`](sbom/reqover.cdx.json)에 있으며, 로컬 OSV 확인은 다음과 같이 재현합니다.
+
+```bash
+./scripts/check-sbom-osv.py sbom/reqover.cdx.json
 ```
 
 ## Documentation
@@ -209,6 +212,7 @@ build/reports/bom/reqover-sbom.json
 - [JaCoCo Interop Decision](docs/14_jacoco_interop_decision.md)
 - [Local Performance Results](docs/15_performance_results.md)
 - [README Demo Capture](docs/16_readme_demo_capture.md)
+- [Spring Application Integration](docs/17_integration_guide.md)
 - [대회 준비 문서](docs/competition/README.md)
 
 ## Limitations and Safe Use
@@ -216,9 +220,12 @@ build/reports/bom/reqover-sbom.json
 - 현재 method-entry 기준이며 JaCoCo 수준의 line/branch coverage를 제공하지 않습니다.
 - synthetic method는 현재 계측 대상에서 제외됩니다.
 - snapshot은 in-memory로 유지되며 기본 상한 10,000건을 넘으면 오래된 항목부터 제거합니다.
+- Spring MVC의 Servlet async worker thread에서 실행되는 코드는 현재 요청 bucket으로 자동 전파되지 않으며, async re-dispatch 구간부터 다시 귀속됩니다.
+- WebFlux adapter는 request context를 scheduler hop에 전달하기 위해 JVM 전역 Reactor automatic context propagation hook을 활성화합니다. 원하지 않으면 애플리케이션 시작 전에 `reqover.webflux.enabled=false`로 adapter 전체를 비활성화하십시오.
+- Java agent는 명시적인 `include=`가 없으면 fail-closed로 계측을 비활성화하며, JDK·ASM·Reqover runtime package는 include로도 계측할 수 없습니다.
 - report는 관측된 요청의 실행 관계만 보여줍니다. 보이지 않은 관계가 없다는 증거가 아닙니다.
 - code-to-endpoint index는 우선 재검증 대상을 좁히는 신호이며 완전한 변경 영향 분석을 보장하지 않습니다.
-- sample의 `/reqover/report`와 `/reqover/report.html`에는 인증이 없습니다. Quickstart의 `SERVER_ADDRESS=127.0.0.1` loopback 설정을 유지하고 public 또는 신뢰할 수 없는 네트워크에 노출하지 마십시오.
+- sample의 `/reqover/report`와 `/reqover/report.html`에는 인증이 없습니다. Quickstart 스크립트가 강제하는 `127.0.0.1` loopback 바인딩을 유지하고 public 또는 신뢰할 수 없는 네트워크에 노출하지 마십시오.
 - 현재는 production always-on agent가 아니라 개발·QA·staging 관측을 우선합니다.
 
 ## Performance

@@ -2,7 +2,7 @@
 
 ## Supported Versions
 
-Reqover is currently in MVP development. Security fixes are handled on the `main` branch until the first stable release tag is created.
+Reqover is an initial developer/QA release. Security fixes are handled on the latest `0.1.x` release and the `main` branch; older snapshots are unsupported.
 
 ## Reporting a Vulnerability
 
@@ -34,7 +34,8 @@ If a secret is committed by mistake:
 
 ## Current Security Scope
 
-Reqover instruments application bytecode through `-javaagent`. Only use agent include prefixes for code you own or explicitly intend to inspect.
+Reqover instruments application bytecode through `-javaagent`. Only use agent include prefixes for code you own or explicitly intend to inspect. JDK, ASM, and Reqover runtime packages are always excluded from instrumentation.
 
 The MVP stores coverage data in memory and exposes reports through sample endpoints. Do not expose sample report endpoints on a public network without authentication.
 
+The WebFlux adapter enables JVM-wide Reactor automatic context propagation. Set `reqover.webflux.enabled=false` before application startup if that global hook is not acceptable for the application.

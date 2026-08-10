@@ -11,10 +11,15 @@ out/
 *.ear
 hs_err_pid*
 
+# Python
+__pycache__/
+*.py[cod]
+
 # IDE
 .idea/
 *.iml
 .vscode/
+.venv*/
 
 # OS
 .DS_Store

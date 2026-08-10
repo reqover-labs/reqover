@@ -1,32 +1,33 @@
-# 15. Local Performance Results
+# 15. Release-Candidate Performance Evidence
 
-## Measurement Scope
+## Status
 
-This is a local sequential HTTP measurement for demo sanity checking, not a production benchmark.
+The earlier 2026-06-30 Windows numbers were retired because they predated the
+final dependency, packaging, and agent-safety changes and did not identify a
+source commit. They are not submission evidence.
 
-Environment:
+The final table is generated only after the runtime changes are committed. Run:
 
-- OS: Windows
-- Date: 2026-06-30
-- JDK: local JDK 21
-- Sample: `examples:webflux-sample`
-- Endpoint: `GET /auto/reactive/orders/1`
-- Warmup requests: 20
-- Measured requests: 120
-- Tool: `scripts/measure-demo-latency.ps1`
+```bash
+./scripts/capture-performance-evidence.sh 18180 50 300
+```
 
-## Results
+The script refuses a dirty worktree and writes the following under
+`docs/evidence/performance/<commit>/`:
 
-| Mode | Average ms | p50 ms | p95 ms | p99 ms | Min ms | Max ms |
-| --- | ---: | ---: | ---: | ---: | ---: | ---: |
-| Baseline, no agent | 18.58 | 17.88 | 26.77 | 31.44 | 8.27 | 54.62 |
-| Reqover agent enabled | 21.57 | 18.15 | 38.19 | 61.65 | 10.24 | 143.59 |
+- exact commit SHA, UTC timestamp, OS, CPU, memory, and Java version
+- baseline and agent JSON summaries
+- all raw latency samples in milliseconds
+- nearest-rank p50, p95, and p99 comparison
 
-## Interpretation
+## Interpretation Boundary
 
-The local sequential measurement shows a small p50 difference and a larger p95/p99 tail in the agent-enabled run.
+This is a sequential loopback HTTP sanity check. The baseline and agent modes
+use the same MVC sample JAR and the same `GET /auto/orders/{id}` endpoint; the
+difference is whether the shaded Reqover Java agent instruments the selected
+application package.
 
-This is acceptable for the MVP claim because Reqover is positioned as a development, demo, and staging observability tool at this stage. It is not yet positioned as a production always-on agent.
-
-The result should be treated as an early signal only. A stronger benchmark should use a dedicated load generator, fixed CPU conditions, multiple runs, and separate MVC/WebFlux scenarios.
-
+It is useful for catching an obvious regression in the release candidate. It is
+not a production load test, throughput claim, capacity plan, or service-level
+guarantee. The official result report should include numbers only after the
+evidence directory and commit SHA are present.

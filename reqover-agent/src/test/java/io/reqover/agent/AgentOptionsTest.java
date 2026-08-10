@@ -34,6 +34,27 @@ class AgentOptionsTest {
     }
 
     @Test
+    void hardExcludesCannotBeOverriddenByMoreSpecificIncludes() {
+        AgentOptions options = AgentOptions.parse(String.join(";",
+                "include=java.lang.",
+                "io.reqover.core.Reqover",
+                "io.reqover.agent.internal.asm.",
+                "io.reqover.instrumentation.Reqover",
+                "io.reqover.report.Coverage",
+                "io.reqover.spring.webflux.Reqover",
+                "org.objectweb.asm.tree."
+        ));
+
+        assertFalse(options.shouldInstrument("java.lang.String"));
+        assertFalse(options.shouldInstrument("io.reqover.core.ReqoverProbe"));
+        assertFalse(options.shouldInstrument("io.reqover.agent.internal.asm.ClassReader"));
+        assertFalse(options.shouldInstrument("io.reqover.instrumentation.ReqoverClassInstrumenter"));
+        assertFalse(options.shouldInstrument("io.reqover.report.CoverageReportGenerator"));
+        assertFalse(options.shouldInstrument("io.reqover.spring.webflux.ReqoverWebFilter"));
+        assertFalse(options.shouldInstrument("org.objectweb.asm.tree.ClassNode"));
+    }
+
+    @Test
     void userExcludeOverridesShorterInclude() {
         AgentOptions options = AgentOptions.parse("include=com.example,exclude=com.example.internal.");
 
@@ -47,5 +68,13 @@ class AgentOptionsTest {
 
         assertTrue(options.shouldInstrument("com.example.OrderService"));
         assertFalse(options.shouldInstrument("com.typo.NotIncluded"));
+    }
+
+    @Test
+    void failsClosedWithoutAValidInclude() {
+        assertFalse(AgentOptions.parse(null).shouldInstrument("com.example.OrderService"));
+        assertFalse(AgentOptions.parse("   ").shouldInstrument("com.example.OrderService"));
+        assertFalse(AgentOptions.parse("verbose,exclude=com.example.generated")
+                .shouldInstrument("com.example.OrderService"));
     }
 }

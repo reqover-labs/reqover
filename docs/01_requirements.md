@@ -28,7 +28,7 @@ bucket에는 최소한 다음 정보가 있어야 합니다.
 - normalized endpoint pattern
 - start time
 - end time
-- thread transition 기록, 선택 사항
+- 관측된 thread 이름 집합
 - class id -> probe id set
 
 ### F3. Probe hit routing
@@ -83,13 +83,11 @@ MVP 리포트는 JSON을 우선합니다.
 }
 ```
 
-대회 데모용으로는 HTML heatmap을 추가합니다.
+대회 데모용으로는 endpoint 카드와 역방향 index를 포함한 standalone HTML report를 제공합니다.
 
 ### F7. 역방향 조회
 
-특정 class, method, line이 어떤 endpoint에서 관측되었는지 조회할 수 있어야 합니다.
-
-MVP에서는 method 또는 class 단위부터 시작해도 됩니다.
+특정 class와 method가 어떤 endpoint에서 관측되었는지 조회할 수 있어야 합니다. 현재 버전은 source line 실행률이나 branch coverage를 제공하지 않습니다.
 
 ## 비기능 요구사항
 
@@ -97,10 +95,7 @@ MVP에서는 method 또는 class 단위부터 시작해도 됩니다.
 
 Reqover는 운영 상시 사용보다 개발, QA, staging, 데모 환경을 우선합니다. 그래도 요청 처리 시간을 과도하게 늘리면 안 됩니다.
 
-초기 목표:
-
-- 간단한 MVC 요청 기준 10% 이하 추가 오버헤드를 목표로 측정합니다.
-- 목표를 넘더라도 측정값을 솔직하게 공개하고 병목을 문서화합니다.
+최종 release candidate에서 동일 endpoint를 agent 미사용/사용 조건으로 반복 측정하고, 실행 환경·원시 표본·한계를 함께 공개합니다. 이 로컬 순차 측정은 production 성능 보장을 뜻하지 않습니다.
 
 ### N2. 안정성
 
@@ -119,7 +114,7 @@ Reqover가 실패해도 애플리케이션의 원래 요청 처리를 깨뜨리�
 지원:
 
 - Java 17+
-- Spring Boot 3.x
+- Spring Boot 3.5.16 sample 검증
 - Spring MVC
 - Spring WebFlux 기본 Reactor chain
 
@@ -172,4 +167,3 @@ MVP에는 다음 테스트가 필요합니다.
 - attribution: hit을 특정 요청, endpoint, trace, job 등에 연결하는 행위
 - endpoint: HTTP method와 path pattern의 조합
 - global bucket: 활성 요청이 없을 때 기록하는 fallback 저장소
-

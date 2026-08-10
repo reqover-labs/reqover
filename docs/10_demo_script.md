@@ -13,15 +13,15 @@ Avoid explaining bytecode instrumentation first. Show the report first, then exp
 Start MVC sample:
 
 ```bash
-./gradlew :examples:mvc-sample:bootRun
+./gradlew :examples:mvc-sample:bootRun --args='--server.address=127.0.0.1 --server.port=8080'
 ```
 
 Call:
 
 ```text
-GET  http://localhost:8080/orders/1
-POST http://localhost:8080/payments
-GET  http://localhost:8080/reqover/report.html
+GET  http://127.0.0.1:8080/orders/1
+POST http://127.0.0.1:8080/payments
+GET  http://127.0.0.1:8080/reqover/report.html
 ```
 
 Show:
@@ -41,7 +41,7 @@ Traditional coverage says this code ran. Reqover adds which request made it run.
 Open:
 
 ```text
-GET http://localhost:8080/reqover/report.html
+GET http://127.0.0.1:8080/reqover/report.html
 ```
 
 Show the reverse index area.
@@ -63,7 +63,7 @@ Run:
 Then open:
 
 ```text
-http://localhost:8080/reqover/report.html
+http://127.0.0.1:8080/reqover/report.html
 ```
 
 Show:
@@ -88,7 +88,7 @@ Run:
 Then open:
 
 ```text
-http://localhost:8080/reqover/report.html
+http://127.0.0.1:8080/reqover/report.html
 ```
 
 Show:

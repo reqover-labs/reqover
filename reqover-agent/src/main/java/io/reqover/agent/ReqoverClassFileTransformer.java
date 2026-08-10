@@ -37,7 +37,11 @@ public final class ReqoverClassFileTransformer implements ClassFileTransformer {
             if (!result.instrumented()) {
                 return null;
             }
-            ProbeRegistry.registerAll(result.metadata());
+            if (!ProbeRegistry.registerAll(result.metadata())) {
+                System.err.println("[reqover] skipped instrumentation for " + dottedClassName
+                        + " because its classId is already registered to another class");
+                return null;
+            }
             return result.bytecode();
         } catch (Throwable error) {
             System.err.println("[reqover] failed to instrument " + dottedClassName + ": " + error);
@@ -45,4 +49,3 @@ public final class ReqoverClassFileTransformer implements ClassFileTransformer {
         }
     }
 }
-

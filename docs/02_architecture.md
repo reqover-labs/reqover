@@ -1,282 +1,165 @@
 # 02. 시스템 아키텍처
 
-## 전체 구조
+이 문서는 Reqover `0.1.0`의 실제 구현을 설명합니다. 향후 아이디어가 아니라
+현재 코드와 자동 테스트가 보장하는 범위만 포함합니다.
 
-Reqover는 크게 세 층으로 나눕니다.
-
-1. Instrumentation layer: 애플리케이션 bytecode에 probe hit 호출을 삽입합니다.
-2. Attribution layer: hit이 발생한 시점의 요청 context를 찾아 bucket에 기록합니다.
-3. Report layer: bucket 데이터를 사람이 읽을 수 있는 endpoint별 coverage 리포트로 변환합니다.
+## 전체 흐름
 
 ```mermaid
 flowchart LR
-  A["Spring application"] --> B["Instrumented bytecode"]
-  B --> C["ReqoverProbe.hit(classId, probeId)"]
-  C --> D["Current coverage context"]
-  D --> E["Request bucket"]
-  D --> F["Global bucket"]
-  E --> G["Aggregator"]
-  F --> G
-  G --> H["JSON report"]
-  G --> I["HTML heatmap"]
+  A["HTTP request"] --> B["MVC interceptor / WebFlux filter"]
+  B --> C["Request coverage bucket"]
+  D["Shaded Java agent"] --> E["ASM method-entry probe"]
+  E --> F["ReqoverProbe.hit(classId, probeId)"]
+  C --> G["Current request context"]
+  G --> F
+  F --> C
+  C --> H["In-memory snapshot store"]
+  H --> I["Endpoint-to-code JSON / HTML"]
+  H --> J["Code-to-endpoint reverse index"]
 ```
 
-## 모듈 설계 초안
+Reqover는 세 층으로 나뉩니다.
 
-### reqover-core
+1. **Instrumentation**: Java agent가 명시적으로 포함된 application class의
+   method entry에 probe 호출을 삽입합니다.
+2. **Attribution**: Spring adapter가 현재 HTTP 요청의 bucket을 context에
+   연결하고 probe hit을 그 bucket으로 보냅니다.
+3. **Reporting**: 완료된 snapshot을 endpoint 기준으로 합치고 정방향·역방향
+   관계를 JSON과 standalone HTML로 렌더링합니다.
 
-프레임워크와 무관한 핵심 모듈입니다.
+## 모듈 책임
 
-책임:
+| 모듈 | 실제 책임 |
+| --- | --- |
+| `reqover-core` | bucket, ThreadLocal context, probe registry, bounded in-memory store |
+| `reqover-instrumentation` | ASM class transform, stable class ID, method metadata |
+| `reqover-agent` | `premain`, include/exclude 정책, shaded standalone agent JAR |
+| `reqover-spring-mvc` | MVC interceptor와 request lifecycle |
+| `reqover-spring-webflux` | WebFilter, Reactor Context ↔ ThreadLocal bridge |
+| `reqover-report` | endpoint aggregation, reverse index, HTML renderer |
+| `examples/*` | manual probe와 agent 자동계측 E2E sample |
 
-- `CoverageBucket`
-- `CoverageContext`
-- `ReqoverProbe`
-- hit 저장 자료구조
-- bucket lifecycle
-- aggregation model
+## Instrumentation
 
-### reqover-instrumentation
+실행 형식은 다음과 같습니다.
 
-bytecode instrumentation을 담당합니다.
-
-초기 후보:
-
-- ASM
-- Byte Buddy
-- Java agent
-- Gradle task 기반 offline instrumentation
-
-MVP에서는 Java agent보다 offline 또는 test-time instrumentation이 더 단순할 수 있습니다. 다만 대회 데모의 임팩트를 위해 최종 형태는 `-javaagent` 실행을 목표로 합니다.
-
-### reqover-spring-mvc
-
-Spring MVC adapter입니다.
-
-책임:
-
-- Servlet Filter 등록
-- 요청 시작 시 bucket 생성
-- ThreadLocal에 bucket 바인딩
-- 요청 종료 시 bucket flush
-- endpoint pattern 추출
-
-### reqover-spring-webflux
-
-Spring WebFlux adapter입니다.
-
-책임:
-
-- WebFilter 등록
-- Reactor Context에 bucket 저장
-- thread hop 이후 ThreadLocal 복원
-- context window 밖에서는 global bucket으로 fallback
-
-### reqover-report
-
-리포트 생성 모듈입니다.
-
-책임:
-
-- bucket snapshot 수집
-- endpoint별 집계
-- class/method/line mapping
-- JSON 출력
-- HTML 출력
-
-### reqover-gradle-plugin
-
-사용성을 위한 Gradle plugin입니다.
-
-초기에는 선택 사항입니다. 제출 전 시간이 부족하면 README 기반 수동 실행으로 대체할 수 있습니다.
-
-## Runtime data model
-
-### CoverageBucket
-
-```java
-class CoverageBucket {
-    String requestId;
-    String method;
-    String endpointPattern;
-    Instant startedAt;
-    Instant endedAt;
-    ConcurrentMap<Integer, ProbeSet> hitsByClass;
-}
+```text
+-javaagent:reqover-agent-0.1.0.jar=include=com.example.app
 ```
 
-### ProbeSet
+- `include=`는 필수이며 여러 prefix는 `;`로 구분합니다.
+- 더 좁은 `exclude=`가 동일 class에 매치하면 exclude가 우선합니다.
+- 유효한 include가 없으면 agent는 fail-closed로 비활성화됩니다.
+- JDK, Spring, Reactor, Micrometer와 Reqover 내부 package는 기본 제외합니다.
+- ASM은 `io.reqover.agent.internal.asm`으로 relocate되어 application의 ASM과
+  classpath 충돌하지 않도록 격리됩니다.
+- 현재 probe 정밀도는 method-entry입니다. synthetic method는 제외합니다.
 
-초기 구현은 단순성과 검증 가능성을 우선합니다.
-
-후보:
-
-- `BitSet`
-- `boolean[]`
-- RoaringBitmap
-- primitive int set
-
-MVP에서는 `BitSet`이 적절합니다. class별 probe 수가 확정되면 `boolean[]` 또는 pooled bitset으로 최적화합니다.
-
-### CoverageContext
-
-MVC에서는 ThreadLocal을 기본으로 둡니다.
-
-```java
-final class CoverageContext {
-    static final ThreadLocal<CoverageBucket> CURRENT = new ThreadLocal<>();
-}
-```
-
-WebFlux에서는 Reactor Context에 bucket을 저장하고, 실행 segment마다 ThreadLocal에 복원합니다.
+transform 결과는 class ID, probe ID, method 이름, JVM descriptor, 확인 가능한
+첫 line metadata를 `ProbeRegistry`에 등록합니다. 변환 실패는 application 실행을
+중단시키지 않고 해당 class의 계측만 포기합니다.
 
 ## Hit routing
 
-계측된 코드는 다음 호출을 실행합니다.
+계측된 application bytecode는 다음 정적 호출만 수행합니다.
 
 ```java
 ReqoverProbe.hit(classId, probeId);
 ```
 
-routing 규칙:
+1. 현재 `CoverageContext`에 request bucket이 있으면 그 bucket에 기록합니다.
+2. bucket이 없으면 global bucket에 기록합니다. global hit은 특정 HTTP
+   endpoint로 오귀속하지 않습니다.
+3. probe 내부 오류는 application 흐름으로 전파하지 않고 dropped-hit count로
+   기록합니다.
 
-1. 현재 ThreadLocal에 bucket이 있으면 그 bucket에 기록합니다.
-2. ThreadLocal에 bucket이 없지만 framework context에서 복원 가능하면 복원 후 기록합니다.
-3. 아무 bucket도 없으면 global bucket에 기록합니다.
-4. 예외가 발생하면 애플리케이션 흐름을 깨뜨리지 않고 기록을 포기합니다.
+정확성 원칙은 **미귀속이 오귀속보다 낫다**입니다.
 
-## MVC sequence
+## Spring MVC lifecycle
 
 ```mermaid
 sequenceDiagram
   participant Client
-  participant Filter
+  participant Interceptor
   participant Context
   participant App
-  participant Probe
   participant Store
 
-  Client->>Filter: HTTP request
-  Filter->>Context: create and bind bucket
-  Filter->>App: continue chain
-  App->>Probe: ReqoverProbe.hit
-  Probe->>Context: current bucket
-  Probe->>Store: record hit
-  App-->>Filter: response
-  Filter->>Context: clear bucket
-  Filter->>Store: flush bucket
+  Client->>Interceptor: HTTP request
+  Interceptor->>Context: create and bind bucket
+  Interceptor->>App: handler execution
+  App->>Context: method-entry hits
+  App-->>Interceptor: response
+  Interceptor->>Store: finish and flush snapshot
+  Interceptor->>Context: clear ThreadLocal
 ```
 
-## WebFlux sequence
+normalized endpoint pattern은 Spring의 best-matching pattern을 사용하고, pattern이
+아직 없으면 request URI로 fallback합니다. Servlet async re-dispatch에는 기존
+bucket을 재사용하지만, re-dispatch 전 async worker thread의 application 실행은
+현재 `0.1.0`에서 자동 전파하지 않습니다.
+
+## Spring WebFlux lifecycle
 
 ```mermaid
 sequenceDiagram
   participant Client
   participant WebFilter
   participant ReactorContext
-  participant Operator
+  participant Scheduler
   participant ThreadLocal
-  participant Probe
   participant Store
 
   Client->>WebFilter: HTTP request
-  WebFilter->>ReactorContext: put bucket
-  ReactorContext->>Operator: propagate logical context
-  Operator->>ThreadLocal: restore bucket for segment
-  Operator->>Probe: ReqoverProbe.hit
-  Probe->>ThreadLocal: current bucket
-  Probe->>Store: record hit
-  Operator->>ThreadLocal: clear after segment
-  WebFilter->>Store: flush bucket on termination
+  WebFilter->>ReactorContext: put request bucket
+  ReactorContext->>Scheduler: propagate logical context
+  Scheduler->>ThreadLocal: restore bucket for segment
+  Scheduler->>ThreadLocal: method-entry hits
+  Scheduler->>ThreadLocal: clear after segment
+  WebFilter->>Store: finish and flush on termination
 ```
 
-## Instrumentation 전략
+Micrometer Context Propagation의 `ThreadLocalAccessor`가 Reactor Context의 bucket을
+각 scheduler segment에서 `CoverageContext`로 복원합니다. agent E2E는 같은
+endpoint bucket에 `reactor-http-nio-*`, `boundedElastic-*`, `parallel-*` hit과
+thread hop 뒤의 `validate(J)J` method가 함께 기록되는지 확인합니다. manual·auto
+reactive 요청 20개를 병렬 실행해 endpoint별 10개씩 분리되고 class가 교차하지
+않는지도 검증합니다.
 
-### Option A. 경량 자체 계측
+## Snapshot과 report
 
-장점:
+`InMemoryCoverageStore`는 기본 최대 10,000개 snapshot을 보관하고 초과 시 오래된
+항목부터 제거합니다. endpoint report에는 다음이 포함됩니다.
 
-- context-aware hit API를 처음부터 설계할 수 있습니다.
-- 라이선스 구조가 단순합니다.
-- Phase 0 PoC가 빠릅니다.
+- normalized endpoint와 완료 요청 수
+- request ID 목록
+- 관측 thread 이름
+- class, method, descriptor, probe ID, 확인 가능한 첫 line
+- 각 method를 실행한 관측 endpoint의 reverse index
 
-단점:
+HTML은 위 관계를 endpoint 카드와 code-to-endpoint 표로 보여줍니다. 현재 구현은
+heatmap, thread transition timeline, execution duration chart를 제공하지 않습니다.
 
-- JaCoCo 수준의 line/branch mapping을 직접 구현하기 어렵습니다.
-- JVM edge case를 직접 처리해야 합니다.
-- 최종 기능이 method coverage에 머물 위험이 있습니다.
+## 데이터·보안 경계
 
-### Option B. JaCoCo 확장
+Reqover bucket은 HTTP method, normalized endpoint pattern, request ID, status,
+시작/종료 시각과 code hit metadata를 보유합니다. 다음 값은 수집하지 않습니다.
 
-장점:
+- request/response body
+- authorization header와 cookie
+- raw query parameter value
 
-- line/branch coverage 분석 자산을 재사용할 수 있습니다.
-- 리포트 생태계와 연결하기 쉽습니다.
-- 기술적으로 더 설득력 있는 결과물이 될 수 있습니다.
+sample의 `/reqover/report*` endpoint는 인증이 없고 데모 스크립트는
+`127.0.0.1`에만 bind합니다. 실제 애플리케이션 통합 시 report controller는
+애플리케이션의 인증·네트워크 정책 아래에 별도로 두어야 합니다.
 
-단점:
+## 해석 한계
 
-- JaCoCo internal 구조를 파악해야 합니다.
-- static probe array cache와 요청별 bucket routing이 충돌합니다.
-- EPL-2.0 라이선스 정리가 필요합니다.
-
-## 권장 진행
-
-Phase 0에서는 Option A로 가장 작은 PoC를 먼저 만듭니다.
-
-성공 기준:
-
-- class/method 진입 probe가 삽입됩니다.
-- `ReqoverProbe.hit`이 호출됩니다.
-- MVC 동시 요청에서 bucket이 분리됩니다.
-- WebFlux thread hop에서 bucket이 유지됩니다.
-
-그 다음 JaCoCo 분석 엔진과 어떻게 만날지 결정합니다.
-
-## 정확성 불변식
-
-Reqover가 지켜야 할 핵심 불변식입니다.
-
-1. 요청 context window 밖의 hit은 특정 요청에 귀속하지 않습니다.
-2. ThreadLocal은 요청 또는 reactive segment 종료 시 반드시 clear합니다.
-3. 오귀속보다 미귀속이 낫습니다.
-4. 관측된 endpoint -> code 관계는 하한으로 해석합니다.
-5. 관측되지 않은 관계는 "절대 실행되지 않는다"는 뜻이 아닙니다.
-
-## 리포트 방향
-
-초기 JSON 리포트:
-
-- endpoint summary
-- request count
-- class hit count
-- probe id list
-- observed thread names
-
-대회 HTML 리포트:
-
-- endpoint list
-- endpoint별 class heatmap
-- 선택한 class가 관측된 endpoint 역조회
-- WebFlux thread transition timeline
-
-## 보안 및 개인정보
-
-MVP에서는 request body를 저장하지 않습니다.
-
-저장 가능 정보:
-
-- HTTP method
-- normalized path pattern
-- status code
-- execution duration
-- coverage hit
-
-저장하지 않을 정보:
-
-- request body
-- response body
-- authorization header
-- cookie
-- query parameter raw value
-
+- Reqover는 JaCoCo의 line/branch coverage를 대체하지 않습니다.
+- report는 관측된 실행 관계의 하한입니다.
+- reverse index는 먼저 재검증할 API를 좁히는 신호이며 완전한 정적 변경 영향
+  분석이 아닙니다.
+- unmanaged thread와 MVC async worker의 context는 자동 보장하지 않습니다.
+- `0.1.0`은 in-memory 개발·QA 관측을 우선하며 production always-on agent를
+  주장하지 않습니다.

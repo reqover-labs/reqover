@@ -80,6 +80,8 @@ jobs:
     permissions:
       actions: read
       contents: read
+      # The pinned reusable workflow declares this permission even when SARIF upload is disabled.
+      security-events: write
     uses: google/osv-scanner-action/.github/workflows/osv-scanner-reusable.yml@8deb546fdb875b9996d27d4950be7312dac076a1 # v2.5.0
     with:
       download-artifact: reqover-sbom

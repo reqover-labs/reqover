@@ -30,11 +30,11 @@ examples/mvc-sample/build/libs/mvc-sample-0.1.0.jar
 examples/webflux-sample/build/libs/webflux-sample-0.1.0.jar
 ```
 
-- [ ] 전체 test failure 0
-- [ ] Java 17 build 성공
-- [ ] Java 21 build 성공
-- [ ] agent JAR에 `META-INF/LICENSE-REQOVER`, `NOTICE-REQOVER`, `THIRD_PARTY_NOTICES.md`, `LICENSE-ASM` 포함
-- [ ] agent JAR에 원래 `org/objectweb/asm` package가 없고 relocated ASM만 포함
+- [x] 전체 test failure 0
+- [x] Java 17 build 성공
+- [x] Java 21 build 성공
+- [x] agent JAR에 `META-INF/LICENSE-REQOVER`, `NOTICE-REQOVER`, `THIRD_PARTY_NOTICES.md`, `LICENSE-ASM` 포함
+- [x] agent JAR에 원래 `org/objectweb/asm` package가 없고 relocated ASM만 포함
 
 ## 3. Demo E2E
 
@@ -43,12 +43,12 @@ examples/webflux-sample/build/libs/webflux-sample-0.1.0.jar
 ./scripts/run-agent-demo.sh webflux 18081 --stop-after-report
 ```
 
-- [ ] 두 endpoint 모두 HTTP 200
-- [ ] MVC report에 controller/service method-entry가 나타남
-- [ ] WebFlux report에 transport별 `reactor-http-*`, `boundedElastic`, `parallel` thread가 나타남
-- [ ] WebFlux `validate(J)J`가 thread hop 이후에도 같은 endpoint에 귀속됨
-- [ ] 사용 중인 port로 실행했을 때 명확히 실패함
-- [ ] 인증 없는 report endpoint는 `127.0.0.1`에만 바인딩됨
+- [x] 두 endpoint 모두 HTTP 200
+- [x] MVC report에 controller/service method-entry가 나타남
+- [x] WebFlux report에 transport별 `reactor-http-*`, `boundedElastic`, `parallel` thread가 나타남
+- [x] WebFlux `validate(J)J`가 thread hop 이후에도 같은 endpoint에 귀속됨
+- [x] 사용 중인 port로 실행했을 때 명확히 실패함
+- [x] 인증 없는 report endpoint는 `127.0.0.1`에만 바인딩됨
 
 ## 4. SBOM, License, Vulnerability
 
@@ -57,12 +57,12 @@ mkdir -p sbom
 cp build/reports/bom/reqover.cdx.json sbom/reqover.cdx.json
 ```
 
-- [ ] CycloneDX JSON schema 유효
-- [ ] root project와 내부 `io.reqover` 모듈은 Apache-2.0으로 설명됨
-- [ ] `THIRD_PARTY_NOTICES.md`의 주요 버전이 resolved dependency와 일치
-- [ ] OSV scan 결과 취약점 0건 또는 예외 사유 문서화
-- [ ] 공식 결과보고서 SBOM 표와 `sbom/reqover.cdx.json`이 일치
-- [ ] source repository, release bundle, agent JAR의 license notice가 일치
+- [x] CycloneDX JSON schema 유효
+- [x] root project와 내부 `io.reqover` 모듈은 Apache-2.0으로 설명됨
+- [x] `THIRD_PARTY_NOTICES.md`의 주요 버전이 resolved dependency와 일치
+- [x] OSV scan 결과 취약점 0건 또는 예외 사유 문서화
+- [x] 공식 결과보고서 SBOM 표와 `sbom/reqover.cdx.json`이 일치
+- [x] source repository, release bundle, agent JAR의 license notice가 일치
 
 ## 5. Secret and Repository Security
 
@@ -70,24 +70,24 @@ GitHub의 private vulnerability reporting, Dependabot alerts/updates, secret sca
 
 전용 scanner가 있으면 현재 tree뿐 아니라 Git history 전체를 검사하고 결과를 보관합니다. 단순 문자열 검색만으로 “secret 없음”을 증명하지 않습니다.
 
-- [ ] `.env`, private key, access token, 개인 credential 미포함
-- [ ] 발견한 credential은 파일 삭제만 하지 않고 먼저 폐기·회전
-- [ ] `SECURITY.md`의 신고 경로와 GitHub security 설정 일치
-- [ ] Actions dependency는 immutable commit SHA로 pin
-- [ ] Gradle wrapper checksum 검증
+- [x] `.env`, private key, access token, 개인 credential 미포함(gitleaks 발견 0건)
+- [x] credential 발견 시 폐기·회전 절차 확인(현재 발견 0건)
+- [x] `SECURITY.md`의 신고 경로와 GitHub security 설정 일치
+- [x] Actions dependency는 immutable commit SHA로 pin
+- [x] Gradle wrapper checksum 검증
 
 ## 6. Documentation Consistency
 
-- [ ] `README.md`
-- [ ] `docs/02_architecture.md`
-- [ ] `docs/09_agent_e2e_demo.md`
-- [ ] `docs/10_demo_script.md`
-- [ ] `docs/11_performance_measurement.md`
-- [ ] `docs/15_performance_results.md`
-- [ ] `docs/17_integration_guide.md`
-- [ ] `LICENSE`, `NOTICE`, `THIRD_PARTY_NOTICES.md`, `CHANGELOG.md`
-- [ ] version, JDK, Spring Boot, dependency, command, report 용어가 모두 동일
-- [ ] line/branch coverage, 완전한 영향 분석, production-ready 같은 미구현 주장이 없음
+- [x] `README.md`
+- [x] `docs/02_architecture.md`
+- [x] `docs/09_agent_e2e_demo.md`
+- [x] `docs/10_demo_script.md`
+- [x] `docs/11_performance_measurement.md`
+- [x] `docs/15_performance_results.md`
+- [x] `docs/17_integration_guide.md`
+- [x] `LICENSE`, `NOTICE`, `THIRD_PARTY_NOTICES.md`, `CHANGELOG.md`
+- [x] version, JDK, Spring Boot, dependency, command, report 용어가 모두 동일
+- [x] line/branch coverage, 완전한 영향 분석, production-ready 같은 미구현 주장이 없음
 
 ## 7. Official Result Report
 
@@ -114,11 +114,11 @@ python3 scripts/build-result-report-docx.py \
   --development-environment "macOS 15.7.3, Apple M1, 16 GB RAM"
 ```
 
-- [ ] 공식 안내 페이지 제거
-- [ ] 공식 A4·여백·표 구조 유지
-- [ ] 본문 최대 5쪽
-- [ ] 필수 SBOM 붙임 포함
-- [ ] AI 모델 붙임 제외, 개발 과정 보조 범위는 본문 한 문장만 기재
+- [x] 공식 안내 페이지 제거
+- [x] 공식 A4·여백·표 구조 유지
+- [x] 본문 최대 5쪽
+- [x] 필수 SBOM 붙임 포함
+- [x] AI 모델 붙임 제외, 개발 과정 보조 범위는 본문 한 문장만 기재
 - [ ] `[확인 필요: ...]` placeholder 0개
 - [ ] DOCX와 PDF 내용 동일
 - [ ] Word/맑은고딕 환경에서 전 페이지 한글·표·그림·페이지 검수
@@ -128,18 +128,18 @@ python3 scripts/build-result-report-docx.py \
 
 동일 runtime candidate와 동일 endpoint에서 baseline/agent를 각각 측정합니다.
 
-- [ ] commit SHA, 날짜, OS, CPU, 메모리, JDK 배포판·버전 기록
-- [ ] warmup/측정 횟수와 percentile 방식 기록
-- [ ] raw sample 보관
-- [ ] local sequential sanity check임을 명시
-- [ ] final code 변경 후 예전 수치를 재사용하지 않음
+- [x] commit SHA, 날짜, OS, CPU, 메모리, JDK 배포판·버전 기록
+- [x] warmup/측정 횟수와 percentile 방식 기록
+- [x] raw sample 보관
+- [x] local sequential sanity check임을 명시
+- [x] final code 변경 후 예전 수치를 재사용하지 않음
 
 ## 9. Pull Request and Release
 
-- [ ] 의도한 변경만 commit
-- [ ] PR의 Java 17/21 build와 OSV check 모두 green
-- [ ] review 후 `main` merge
-- [ ] release tag가 현재 `main` commit과 정확히 일치
+- [x] 의도한 변경만 commit
+- [x] PR의 Java 17/21 build와 OSV check 모두 green
+- [x] review 후 `main` merge
+- [x] release tag가 현재 `main` commit과 정확히 일치
 
 ```bash
 git tag -s v0.1.0 -m "Reqover 0.1.0"
@@ -147,6 +147,10 @@ git push origin v0.1.0
 ```
 
 서명 tag를 사용할 수 없는 환경이면 annotated tag를 사용하고 이유를 release 기록에 남깁니다. Tag push 후 release workflow가 checksum, SBOM, JAR, ZIP을 게시하는지 확인합니다.
+
+`v0.1.0`은 사용 가능한 GPG 비밀키가 없어 annotated tag로 생성했으며,
+[release workflow run 31366748139](https://github.com/reqover-labs/reqover/actions/runs/31366748139)에서
+현재 `main` commit 일치, JDK 17/21, OSV, checksum과 공개 자산 게시를 검증했습니다.
 
 ## 10. Video and Portal
 

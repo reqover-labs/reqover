@@ -1,12 +1,14 @@
 # 07. 결과보고서 작성 초안
 
+> 보관 상태: 초기 기획 문서입니다. 구현 완료 범위와 공식 제출 문안은 공식 양식 기반 생성본 및 `13_result_report_draft.md`를 기준으로 검증합니다.
+
 ## 목표
 
 결과보고서는 5페이지 이내 제한이 있으므로, 기술 백서 전체를 옮기는 방식이 아니라 심사위원이 빠르게 판단할 수 있는 핵심만 압축합니다.
 
 핵심 메시지:
 
-> Reqover는 Spring 애플리케이션에서 HTTP 요청별 코드 커버리지를 수집해, 변경 영향 범위와 테스트 갭을 실제 실행 기록 기반으로 보여주는 오픈소스 개발자 도구입니다.
+> Reqover는 Spring MVC/WebFlux에서 HTTP 요청과 관측된 method-entry 실행을 연결하고, 코드에서 관측 endpoint를 역조회하는 오픈소스 개발자 도구입니다.
 
 ## 1. 프로젝트 개요
 
@@ -39,7 +41,7 @@ YouTube 업로드 후 URL을 기재합니다.
 
 - endpoint별로 실제 실행된 코드 경로를 보여줍니다.
 - 코드 변경 시 영향을 받은 API 후보를 관측 기반으로 제시합니다.
-- 라이브 트래픽 또는 시연 트래픽에서 테스트되지 않은 경로를 찾습니다.
+- 개발·QA 시연 트래픽에서 관측된 실행 관계를 기록합니다.
 - reactive thread hop 상황에서도 coverage attribution이 가능한지 증명합니다.
 
 ## 3. 개발환경
@@ -110,8 +112,8 @@ Reactor Context 기반으로 요청의 논리 context를 전달해 thread가 바
 시연에서 보여줄 핵심 화면:
 
 - 요청별 bucket list
-- endpoint별 class heatmap
-- thread transition timeline
+- endpoint별 관측 class/method 카드
+- endpoint별 관측 thread 이름 집합
 - code -> endpoint reverse lookup
 
 ## 7. 기대효과 및 활용분야
@@ -186,4 +188,3 @@ Reactor Context 기반으로 요청의 논리 context를 전달해 thread가 바
 - 1페이지: 한계, 로드맵, SBOM/라이선스 요약
 
 붙임 SBOM과 AI 모델 정보는 별도 분량 제한이 없으므로 본문에서는 핵심만 언급합니다.
-

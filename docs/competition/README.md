@@ -8,4 +8,6 @@
 - [07. 결과보고서 작성 초안](07_result_report_outline.md)
 - [12. Release Checklist](12_release_checklist.md)
 - [13. Result Report Draft](13_result_report_draft.md)
+- [18. 최종 제출 계획](18_final_submission_plan.md)
+- [19. 3분 시연영상 대본](19_demo_video_script.md)
 - [submission/](submission/) — 결과보고서 DOCX 초안 (`python3 ../../scripts/build-result-report-docx.py`로 재생성)

@@ -1,0 +1,39 @@
+1
+00:00:00,000 --> 00:00:15,000
+어떤 HTTP 요청이 이 코드를 실행했을까요?
+Reqover는 Spring 요청과 method-entry 실행을 연결합니다.
+
+2
+00:00:15,000 --> 00:00:35,000
+Java Agent의 자동 계측 hit를 현재 요청 bucket에 기록하고
+endpoint-to-code와 code-to-endpoint report로 집계합니다.
+
+3
+00:00:35,000 --> 00:01:05,000
+MVC의 GET과 POST가 실행한 코드가 요청별로 분리됩니다.
+공유 validator는 두 endpoint에 각각 관측됩니다.
+
+4
+00:01:05,000 --> 00:01:25,000
+역방향 index는 이 method를 실행한 관측 endpoint를 보여줍니다.
+완전한 정적 영향 분석이 아닌 우선 재검증 신호입니다.
+
+5
+00:01:25,000 --> 00:02:00,000
+WebFlux가 여러 thread로 이동해도 같은 요청 bucket을 유지합니다.
+thread hop 뒤의 validate method도 같은 endpoint에 귀속됩니다.
+
+6
+00:02:00,000 --> 00:02:25,000
+수동 probe 호출 없이 -javaagent와 명시적인 include로 실행합니다.
+include가 없으면 계측은 안전하게 비활성화됩니다.
+
+7
+00:02:25,000 --> 00:02:45,000
+Java 17·21, 35개 테스트, CycloneDX SBOM, OSV 검사,
+Apache-2.0과 서드파티 고지를 함께 제공합니다.
+
+8
+00:02:45,000 --> 00:03:00,000
+Reqover 0.1.0은 method-entry 정밀도의 개발·QA용 초기 릴리스입니다.
+github.com/reqover-labs/reqover

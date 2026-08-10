@@ -87,7 +87,10 @@ class AgentSpringE2ETest {
             JsonNode manualEndpoint = endpoint(report, "GET /reactive/orders/{id}");
             assertEquals(10, endpoint.path("requestCount").asInt(), report);
             assertEquals(10, manualEndpoint.path("requestCount").asInt(), report);
-            assertTrue(hasThreadPrefix(endpoint, "reactor-http-nio-"), report);
+            // Reactor Netty uses transport-specific suffixes such as nio on
+            // macOS and epoll on Linux. Verify the event-loop family rather
+            // than coupling the E2E contract to one operating system.
+            assertTrue(hasThreadPrefix(endpoint, "reactor-http-"), report);
             assertTrue(hasThreadPrefix(endpoint, "boundedElastic-"), report);
             assertTrue(hasThreadPrefix(endpoint, "parallel-"), report);
             assertTrue(hasMethod(

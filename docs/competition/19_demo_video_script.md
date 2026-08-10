@@ -25,7 +25,7 @@
 
 아래 역방향 index에서는 특정 method를 실제로 실행한 관측 endpoint를 다시 찾을 수 있습니다. 이것은 완전한 정적 영향 분석이 아니라, 코드 변경 뒤 먼저 재검증할 API 후보를 좁히는 실행 근거입니다.
 
-WebFlux에서는 요청 처리가 `reactor-http-nio`, `boundedElastic`, `parallel` thread로 이동합니다. Reqover는 Reactor Context와 context propagation을 이용해 세 thread의 hit를 같은 endpoint bucket에 유지합니다. thread hop 뒤 실행된 `validate` method도 자동 계측 결과에 포함됩니다.
+WebFlux에서는 요청 처리가 `reactor-http-*` event loop, `boundedElastic`, `parallel` thread로 이동합니다. Reqover는 Reactor Context와 context propagation을 이용해 세 thread의 hit를 같은 endpoint bucket에 유지합니다. thread hop 뒤 실행된 `validate` method도 자동 계측 결과에 포함됩니다.
 
 자동 시연 endpoint에는 수동 `ReqoverProbe.hit` 호출이 없습니다. `-javaagent`와 명시적인 `include` package만으로 실행하며, include가 없으면 안전하게 계측을 비활성화합니다.
 

@@ -105,7 +105,7 @@ The test verifies:
 - Auto endpoints return HTTP 200.
 - `/reqover/report` includes endpoint patterns.
 - `/reqover/report` includes auto-instrumented controller and service method metadata.
-- WebFlux E2E requires `reactor-http-nio-*`, `boundedElastic-*`, and `parallel-*` hits in the same endpoint, including the auto-instrumented `validate(J)J` method after the thread hop.
+- WebFlux E2E requires `reactor-http-*` (for example `nio` or `epoll`), `boundedElastic-*`, and `parallel-*` hits in the same endpoint, including the auto-instrumented `validate(J)J` method after the thread hop.
 - Starting the agent without an explicit `include=` fails closed: the application starts, but instrumentation remains inactive.
 
 ## Troubleshooting Notes

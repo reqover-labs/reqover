@@ -45,7 +45,7 @@ examples/webflux-sample/build/libs/webflux-sample-0.1.0.jar
 
 - [ ] 두 endpoint 모두 HTTP 200
 - [ ] MVC report에 controller/service method-entry가 나타남
-- [ ] WebFlux report에 `reactor-http-nio`, `boundedElastic`, `parallel` thread가 나타남
+- [ ] WebFlux report에 transport별 `reactor-http-*`, `boundedElastic`, `parallel` thread가 나타남
 - [ ] WebFlux `validate(J)J`가 thread hop 이후에도 같은 endpoint에 귀속됨
 - [ ] 사용 중인 port로 실행했을 때 명확히 실패함
 - [ ] 인증 없는 report endpoint는 `127.0.0.1`에만 바인딩됨

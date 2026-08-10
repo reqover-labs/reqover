@@ -122,7 +122,7 @@ sequenceDiagram
 
 Micrometer Context Propagation의 `ThreadLocalAccessor`가 Reactor Context의 bucket을
 각 scheduler segment에서 `CoverageContext`로 복원합니다. agent E2E는 같은
-endpoint bucket에 `reactor-http-nio-*`, `boundedElastic-*`, `parallel-*` hit과
+endpoint bucket에 transport별 `reactor-http-*`(`nio` 또는 `epoll`), `boundedElastic-*`, `parallel-*` hit과
 thread hop 뒤의 `validate(J)J` method가 함께 기록되는지 확인합니다. manual·auto
 reactive 요청 20개를 병렬 실행해 endpoint별 10개씩 분리되고 class가 교차하지
 않는지도 검증합니다.

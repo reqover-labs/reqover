@@ -27,31 +27,31 @@
 
 ## 엔지니어링 체크
 
-- [ ] no-option agent는 애플리케이션을 깨지 않고 계측을 비활성화한다.
-- [ ] JDK/ASM/Reqover runtime package는 include로도 계측할 수 없다.
-- [ ] class ID 충돌 시 기존 metadata를 보존하고 충돌 class 계측을 중단한다.
-- [ ] MVC 동시 요청과 WebFlux 동시 요청이 서로 오귀속되지 않는다.
-- [ ] WebFlux 자동 context propagation의 JVM 전역 효과와 opt-out을 문서화한다.
-- [ ] demo script는 loopback만 사용하고 port 충돌·child 조기 종료를 명시적으로 실패시킨다.
-- [ ] release workflow는 JDK 17/21과 OSV 검사를 통과한 현재 `main` tag만 배포한다.
+- [x] no-option agent는 애플리케이션을 깨지 않고 계측을 비활성화한다.
+- [x] JDK/ASM/Reqover runtime package는 include로도 계측할 수 없다.
+- [x] class ID 충돌 시 기존 metadata를 보존하고 충돌 class 계측을 중단한다.
+- [x] MVC 동시 요청과 WebFlux 동시 요청이 서로 오귀속되지 않는다.
+- [x] WebFlux 자동 context propagation의 JVM 전역 효과와 opt-out을 문서화한다.
+- [x] demo script는 loopback만 사용하고 port 충돌·child 조기 종료를 명시적으로 실패시킨다.
+- [x] release workflow는 JDK 17/21과 OSV 검사를 통과한 현재 `main` tag만 배포한다.
 
 ## 오픈소스·공급망 체크
 
-- [ ] `LICENSE`, `NOTICE`, `THIRD_PARTY_NOTICES.md`와 agent JAR 내 고지가 일치한다.
-- [ ] ASM BSD-3-Clause 전문을 저장소·agent JAR·release bundle에 포함한다.
-- [ ] 최종 `sbom/reqover.cdx.json`을 schema 검증하고 공식 SBOM 표와 일치시킨다.
-- [ ] dependency vulnerability scan 결과와 실행 시각을 증거로 남긴다.
-- [ ] Dependabot alerts/updates, private vulnerability reporting, secret scanning을 가능한 범위에서 활성화한다.
-- [ ] changelog, source JAR, checksum, GitHub Release가 최종 tag와 일치한다.
+- [x] `LICENSE`, `NOTICE`, `THIRD_PARTY_NOTICES.md`와 agent JAR 내 고지가 일치한다.
+- [x] ASM BSD-3-Clause 전문을 저장소·agent JAR·release bundle에 포함한다.
+- [x] 최종 `sbom/reqover.cdx.json`을 schema 검증하고 공식 SBOM 표와 일치시킨다.
+- [x] dependency vulnerability scan 결과와 실행 시각을 증거로 남긴다.
+- [x] Dependabot alerts/updates, private vulnerability reporting, secret scanning을 가능한 범위에서 활성화한다.
+- [x] changelog, source JAR, checksum, GitHub Release가 최종 tag와 일치한다.
 
 ## 결과보고서 체크
 
-- [ ] 공식 안내 페이지를 제거하고 공식 표·A4·여백을 보존한다.
-- [ ] 결과보고서 본문은 최대 5쪽이다.
-- [ ] SBOM 붙임에는 OSS명, 버전, 라이선스, 공식 URL, 사용 목적이 있다.
-- [ ] 성능 수치는 최종 runtime candidate, 동일 endpoint, 원시 표본과 환경이 있을 때만 사용한다.
+- [x] 공식 안내 페이지를 제거하고 공식 표·A4·여백을 보존한다.
+- [x] 결과보고서 본문은 최대 5쪽이다.
+- [x] SBOM 붙임에는 OSS명, 버전, 라이선스, 공식 URL, 사용 목적이 있다.
+- [x] 성능 수치는 최종 runtime candidate, 동일 endpoint, 원시 표본과 환경이 있을 때만 사용한다.
 - [ ] 팀원별 역할과 실제 의사결정을 확인받는다.
-- [ ] AI 모델 붙임은 제외하고 개발 과정의 Codex 보조 범위만 본문 한 문장으로 기재한다.
+- [x] AI 모델 붙임은 제외하고 개발 과정의 Codex 보조 범위만 본문 한 문장으로 기재한다.
 - [ ] Word/맑은고딕 환경에서 DOCX와 PDF를 열어 한글·표·그림·페이지를 전부 확인한다.
 
 ## 3분 영상 구성

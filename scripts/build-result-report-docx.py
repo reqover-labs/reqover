@@ -68,9 +68,9 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--verification",
         default=(
-            "2026-08-10 로컬 JDK 17 및 Temurin 21.0.12 clean build에서 35 tests 통과. "
-            "CycloneDX 1.6 SBOM 고정본 일치, Maven 구성요소 96개 OSV 조회 결과 0건. "
-            "[확인 필요: 최종 제출 tag·commit SHA·GitHub Actions 성공 URL]"
+            "2026-08-10 JDK 17·21 clean build 35 tests 통과, CycloneDX 1.6 SBOM lock 일치, "
+            "외부 Maven 구성요소 96개 OSV 0건. v0.1.0=62910fc1896d. Release CI 성공: "
+            "https://github.com/reqover-labs/reqover/actions/runs/31366748139"
         ),
     )
     parser.add_argument(

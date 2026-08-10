@@ -18,3 +18,8 @@ Reqover-owned components use Apache-2.0. Third-party license metadata comes from
 the resolved Maven components and is summarized for human review in
 [`THIRD_PARTY_NOTICES.md`](../THIRD_PARTY_NOTICES.md). The ASM license text is
 retained separately because ASM classes are redistributed in the shaded agent.
+
+The lock verifier compares every component, version, license, property, and
+dependency edge. It intentionally normalizes only volatile SBOM provenance: the
+serial number, generation timestamp, GitHub Actions run URL, and the equivalent
+presence or absence of a trailing `.git` in the root VCS URL.

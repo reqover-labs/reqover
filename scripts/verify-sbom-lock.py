@@ -24,6 +24,25 @@ def normalized(path: Path) -> dict:
     data.pop("serialNumber", None)
     metadata = data.get("metadata", {})
     metadata.pop("timestamp", None)
+
+    # CycloneDX adds run-specific provenance when Gradle executes in GitHub
+    # Actions. That URL changes on every run and the plugin also canonicalizes
+    # the repository URL by dropping a trailing ".git". Neither changes the
+    # dependency inventory that this checked-in lock is intended to protect.
+    root_component = metadata.get("component", {})
+    external_references = root_component.get("externalReferences", [])
+    normalized_references = []
+    for reference in external_references:
+        if reference.get("type") == "build-system":
+            continue
+        normalized_reference = copy.deepcopy(reference)
+        if normalized_reference.get("type") == "vcs":
+            url = normalized_reference.get("url")
+            if isinstance(url, str) and url.endswith(".git"):
+                normalized_reference["url"] = url[:-4]
+        normalized_references.append(normalized_reference)
+    if "externalReferences" in root_component:
+        root_component["externalReferences"] = normalized_references
     return data
 
 

@@ -16,10 +16,11 @@ import java.util.Objects;
  * Binds a {@link CoverageBucket} to each MVC request and flushes it to the
  * store when the request completes.
  *
- * <p>Async request processing is supported: the bucket created on the initial
- * dispatch is reused on the async re-dispatch, and the container thread's
- * coverage context is cleared as soon as concurrent handling starts so that
- * unrelated work on that thread cannot record into a foreign bucket.
+ * <p>For Servlet async processing, the bucket created on the initial dispatch
+ * is reused on the async re-dispatch. The container thread's coverage context
+ * is cleared as soon as concurrent handling starts so unrelated work on that
+ * thread cannot record into a foreign bucket. Application code executed on an
+ * async worker thread is not attributed until the request is re-dispatched.
  */
 public final class ReqoverMvcInterceptor implements AsyncHandlerInterceptor {
     private static final String BUCKET_ATTRIBUTE = ReqoverMvcInterceptor.class.getName() + ".bucket";

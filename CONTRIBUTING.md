@@ -6,19 +6,19 @@ Reqover is an experimental Java developer tool for request-scoped coverage attri
 
 Requirements:
 
-- JDK 21
+- JDK 17 or 21
 - Git
 
 Run tests:
 
 ```bash
-./gradlew test
+./gradlew clean test --no-daemon
 ```
 
 Build all artifacts:
 
 ```bash
-./gradlew build
+./gradlew build --no-daemon
 ```
 
 Generate SBOM:

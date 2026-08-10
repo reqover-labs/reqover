@@ -1,5 +1,7 @@
 # 13. Result Report Draft
 
+> Working source only. The official A4 DOCX/PDF generated from the contest template is the submission artifact. Numeric claims in this Markdown file must be refreshed from the final release candidate before use.
+
 ## Project Information
 
 - Project name: Reqover
@@ -90,14 +92,7 @@ Automated tests cover:
 - agent-based MVC sample E2E without manual probes
 - agent-based WebFlux sample E2E without manual probes
 
-Local WebFlux sequential latency reference:
-
-| Mode | Average ms | p50 ms | p95 ms | p99 ms |
-| --- | ---: | ---: | ---: | ---: |
-| Baseline, no agent | 18.58 | 17.88 | 26.77 | 31.44 |
-| Reqover agent enabled | 21.57 | 18.15 | 38.19 | 61.65 |
-
-This is a local demo sanity check, not a production benchmark. Details are in `docs/15_performance_results.md`.
+Performance evidence is generated from the final release candidate with the same endpoint in baseline and agent-enabled modes. It is treated as a local sequential sanity check, not a production benchmark. Details and raw samples are in `docs/15_performance_results.md` and `docs/evidence/performance/`.
 
 ## 6. Demo Scenario
 
@@ -137,23 +132,21 @@ The project generates a CycloneDX SBOM:
 Expected output:
 
 ```text
-build/reports/bom/reqover-sbom.json
+build/reports/bom/reqover.cdx.json
 ```
 
 JaCoCo is not currently linked or forked in the implementation. If a future version integrates or modifies JaCoCo internals, EPL-2.0 obligations must be reviewed separately.
 
 ## 9. AI Model Statement
 
-Reqover does not embed an AI model in the submitted software.
-
-If AI tools were used during development assistance, they are not part of the runtime artifact and no AI model weights or inference APIs are included in the project.
+상용 생성형 AI(Codex)는 일부 코드·테스트·문서의 초안 작성 및 검토 보조에 활용했으며, 팀이 요구사항을 결정하고 결과를 검증·수정하여 최종 반영했다. 출품작에는 AI 모델이나 외부 추론 API가 포함되지 않는다.
 
 ## 10. Limitations
 
 - Coverage precision is method-entry level.
 - In-memory storage is used for the MVP.
 - Report UI is a demo-oriented HTML renderer.
-- The Java agent include/exclude policy is minimal.
+- The Java agent requires explicit package-prefix includes and always excludes JDK, ASM, and Reqover runtime packages.
 - WebFlux support is validated for standard Reactor chains, not arbitrary unmanaged threads.
 - Production authentication, persistence, and retention policies are not implemented.
 

@@ -83,8 +83,8 @@ This does not yet claim JaCoCo-level line or branch coverage. The MVP proves req
 - Branch coverage is not implemented yet.
 - WebFlux support is validated for standard Reactor chains, not arbitrary raw threads or fire-and-forget tasks.
 - Storage is in-memory only.
-- Agent include/exclude configuration is intentionally minimal.
-- Spring auto-configuration is present, but advanced conditional customization is minimal.
+- Agent instrumentation requires an explicit include and permanently excludes JDK, ASM, and Reqover runtime packages.
+- WebFlux auto-configuration installs JVM-wide Reactor automatic context propagation and can be disabled with `reqover.webflux.enabled=false`.
 - Agent instrumentation currently records method entry and first method line metadata, not exact line hit ranges.
 
 ## Commands
@@ -122,13 +122,13 @@ Run WebFlux sample:
 Build the agent:
 
 ```bash
-./gradlew :reqover-agent:jar
+./gradlew :reqover-agent:shadowJar
 ```
 
 Example agent usage:
 
 ```bash
-java -javaagent:reqover-agent/build/libs/reqover-agent-0.1.0-SNAPSHOT.jar=include=io.reqover.example.mvc -jar examples/mvc-sample/build/libs/mvc-sample-0.1.0-SNAPSHOT.jar
+java -javaagent:reqover-agent/build/libs/reqover-agent-0.1.0.jar=include=io.reqover.example.mvc -jar examples/mvc-sample/build/libs/mvc-sample-0.1.0.jar
 ```
 
 Run the Spring agent E2E tests:

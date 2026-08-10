@@ -1,0 +1,34 @@
+{
+  "baseline": {
+    "url": "http://127.0.0.1:18180/auto/orders/1",
+    "warmupRequests": 50,
+    "measuredRequests": 300,
+    "percentileMethod": "nearest-rank",
+    "averageMs": 1.352,
+    "p50Ms": 1.192,
+    "p95Ms": 2.16,
+    "p99Ms": 4.085,
+    "minMs": 0.945,
+    "maxMs": 8.44
+  },
+  "agent": {
+    "url": "http://127.0.0.1:18180/auto/orders/1",
+    "warmupRequests": 50,
+    "measuredRequests": 300,
+    "percentileMethod": "nearest-rank",
+    "averageMs": 1.102,
+    "p50Ms": 1.094,
+    "p95Ms": 1.308,
+    "p99Ms": 1.502,
+    "minMs": 0.876,
+    "maxMs": 1.912
+  },
+  "relativeChangePercent": {
+    "averageMs": -18.49,
+    "p50Ms": -8.22,
+    "p95Ms": -39.44,
+    "p99Ms": -63.23,
+    "minMs": -7.3,
+    "maxMs": -77.35
+  }
+}

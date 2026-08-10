@@ -1,32 +1,46 @@
-# 15. Local Performance Results
+# 15. Release-Candidate Performance Evidence
 
-## Measurement Scope
+## Release-candidate measurement
 
-This is a local sequential HTTP measurement for demo sanity checking, not a production benchmark.
+The earlier 2026-06-30 Windows numbers were retired because they predated the
+final dependency, packaging, and agent-safety changes and did not identify a
+source commit. They are not submission evidence.
 
-Environment:
+The release-candidate sanity measurement was captured with:
 
-- OS: Windows
-- Date: 2026-06-30
-- JDK: local JDK 21
-- Sample: `examples:webflux-sample`
-- Endpoint: `GET /auto/reactive/orders/1`
-- Warmup requests: 20
-- Measured requests: 120
-- Tool: `scripts/measure-demo-latency.ps1`
+```bash
+./scripts/capture-performance-evidence.sh 18180 50 300
+```
 
-## Results
+The script refuses a dirty worktree. Evidence for commit
+`ae83d1209c9a1ad632567a9569ece2c925570947` is stored in
+[`docs/evidence/performance/ae83d1209c9a/`](evidence/performance/ae83d1209c9a/).
 
-| Mode | Average ms | p50 ms | p95 ms | p99 ms | Min ms | Max ms |
+| Mode | Average | p50 | p95 | p99 | Min | Max |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: |
-| Baseline, no agent | 18.58 | 17.88 | 26.77 | 31.44 | 8.27 | 54.62 |
-| Reqover agent enabled | 21.57 | 18.15 | 38.19 | 61.65 | 10.24 | 143.59 |
+| Baseline | 1.352 ms | 1.192 ms | 2.160 ms | 4.085 ms | 0.945 ms | 8.440 ms |
+| Reqover agent | 1.102 ms | 1.094 ms | 1.308 ms | 1.502 ms | 0.876 ms | 1.912 ms |
 
-## Interpretation
+Captured at `2026-08-10T07:19:11Z` on macOS 15.7.3, Apple M1,
+16 GB RAM, and Homebrew OpenJDK 17.0.19. Each mode used 50 warm-up and 300
+measured requests; percentiles use the nearest-rank method. The evidence contains:
 
-The local sequential measurement shows a small p50 difference and a larger p95/p99 tail in the agent-enabled run.
+- exact commit SHA, UTC timestamp, OS, CPU, memory, and Java version
+- baseline and agent JSON summaries
+- all raw latency samples in milliseconds
+- nearest-rank p50, p95, and p99 comparison
 
-This is acceptable for the MVP claim because Reqover is positioned as a development, demo, and staging observability tool at this stage. It is not yet positioned as a production always-on agent.
+## Interpretation Boundary
 
-The result should be treated as an early signal only. A stronger benchmark should use a dedicated load generator, fixed CPU conditions, multiple runs, and separate MVC/WebFlux scenarios.
+This is one sequential loopback HTTP sanity-check round. The baseline ran first
+and the agent ran second, so cache, scheduling, thermal, and run-order effects
+are not controlled. The baseline and agent modes
+use the same MVC sample JAR and the same `GET /auto/orders/{id}` endpoint; the
+difference is whether the shaded Reqover Java agent instruments the selected
+application package.
 
+It is useful for catching an obvious regression in the release candidate. It is
+not a production load test, throughput claim, capacity plan, or service-level
+guarantee. The lower values observed in the second, agent-enabled run must not be
+described as a Reqover performance improvement or as a general overhead result.
+No comparative performance claim is used in the official result report.

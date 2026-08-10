@@ -1,12 +1,21 @@
+val springBootVersion: String by project
+val junitVersion: String by project
+
 dependencies {
     api(project(":reqover-core"))
-    implementation("io.micrometer:context-propagation:1.1.2")
-    implementation("io.projectreactor:reactor-core:3.6.11")
-    compileOnly("org.springframework.boot:spring-boot-autoconfigure:3.3.5")
-    compileOnly("org.springframework:spring-context:6.1.14")
-    compileOnly("org.springframework:spring-webflux:6.1.14")
+    implementation(platform("org.springframework.boot:spring-boot-dependencies:$springBootVersion"))
+    implementation("io.micrometer:context-propagation")
+    implementation("io.projectreactor:reactor-core")
+    compileOnly(platform("org.springframework.boot:spring-boot-dependencies:$springBootVersion"))
+    compileOnly("org.springframework.boot:spring-boot-autoconfigure")
+    compileOnly("org.springframework:spring-context")
+    compileOnly("org.springframework:spring-webflux")
 
-    testImplementation(platform("org.junit:junit-bom:5.10.3"))
+    testImplementation(platform("org.junit:junit-bom:$junitVersion"))
     testImplementation("org.junit.jupiter:junit-jupiter")
+    testImplementation("org.springframework.boot:spring-boot-test")
+    testImplementation("org.springframework.boot:spring-boot-autoconfigure")
+    testImplementation("org.springframework:spring-webflux")
+    testImplementation("org.assertj:assertj-core")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }

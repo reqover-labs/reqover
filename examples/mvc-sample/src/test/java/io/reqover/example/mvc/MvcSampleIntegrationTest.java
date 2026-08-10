@@ -18,6 +18,7 @@ import java.util.concurrent.TimeUnit;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -35,11 +36,15 @@ class MvcSampleIntegrationTest {
 
     @Test
     void recordsEndpointBucketsSeparately() {
-        rest.getForEntity("/orders/1", String.class);
-        rest.postForEntity("/payments", null, String.class);
+        ResponseEntity<String> orderResponse = rest.getForEntity("/orders/1", String.class);
+        ResponseEntity<String> paymentResponse = rest.postForEntity("/payments", null, String.class);
+        assertEquals(200, orderResponse.getStatusCode().value(), orderResponse.getBody());
+        assertEquals(200, paymentResponse.getStatusCode().value(), paymentResponse.getBody());
 
         ResponseEntity<CoverageReport> response = rest.getForEntity("/reqover/report", CoverageReport.class);
+        assertEquals(200, response.getStatusCode().value());
         CoverageReport report = response.getBody();
+        assertNotNull(report);
 
         assertEquals(2, report.completedRequestCount());
         EndpointCoverage orders = endpoint(report, "GET /orders/{id}");
@@ -52,7 +57,10 @@ class MvcSampleIntegrationTest {
         assertTrue(report.reverseIndex().stream()
                 .anyMatch(item -> item.className().equals("SharedValidator") && item.endpoints().size() == 2));
 
-        String html = rest.getForEntity("/reqover/report.html", String.class).getBody();
+        ResponseEntity<String> htmlResponse = rest.getForEntity("/reqover/report.html", String.class);
+        assertEquals(200, htmlResponse.getStatusCode().value());
+        String html = htmlResponse.getBody();
+        assertNotNull(html);
         assertTrue(html.contains("Reqover Coverage Report"));
         assertTrue(html.contains("GET /orders/{id}"));
         assertTrue(html.contains("Code to Endpoint Index"));
@@ -69,11 +77,13 @@ class MvcSampleIntegrationTest {
 
                 Future<?> order = executor.submit(() -> {
                     await(ready, start);
-                    rest.getForEntity("/orders/1", String.class);
+                    ResponseEntity<String> response = rest.getForEntity("/orders/1", String.class);
+                    assertEquals(200, response.getStatusCode().value(), response.getBody());
                 });
                 Future<?> payment = executor.submit(() -> {
                     await(ready, start);
-                    rest.postForEntity("/payments", null, String.class);
+                    ResponseEntity<String> response = rest.postForEntity("/payments", null, String.class);
+                    assertEquals(200, response.getStatusCode().value(), response.getBody());
                 });
 
                 assertTrue(ready.await(5, TimeUnit.SECONDS));
@@ -85,7 +95,10 @@ class MvcSampleIntegrationTest {
             executor.shutdownNow();
         }
 
-        CoverageReport report = rest.getForEntity("/reqover/report", CoverageReport.class).getBody();
+        ResponseEntity<CoverageReport> response = rest.getForEntity("/reqover/report", CoverageReport.class);
+        assertEquals(200, response.getStatusCode().value());
+        CoverageReport report = response.getBody();
+        assertNotNull(report);
         EndpointCoverage orders = endpoint(report, "GET /orders/{id}");
         EndpointCoverage payments = endpoint(report, "POST /payments");
 

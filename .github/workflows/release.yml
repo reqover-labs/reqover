@@ -1,0 +1,150 @@
+name: release
+
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    name: verify tag (Java ${{ matrix.java }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        java: [17, 21]
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Set up JDK
+        uses: actions/setup-java@b6effb05e454b25005698d916606bdc6ffcbf961 # v5.7.0
+        with:
+          distribution: temurin
+          java-version: ${{ matrix.java }}
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@9c971963bec38e04b3d30dcc455b5382be2fdbfb # v6.3.0
+
+      - name: Build and test
+        run: ./gradlew clean build --no-daemon --console=plain
+
+      - name: Generate CycloneDX SBOM
+        if: matrix.java == 21
+        run: |
+          ./gradlew cyclonedxBom --no-daemon --console=plain
+          ./scripts/verify-sbom-lock.py build/reports/bom/reqover.cdx.json sbom/reqover.cdx.json
+
+      - name: Upload SBOM for vulnerability scan
+        if: matrix.java == 21
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: release-sbom
+          path: build/reports/bom/reqover.cdx.json
+          if-no-files-found: error
+          retention-days: 14
+
+  osv:
+    name: OSV dependency scan
+    needs: verify
+    permissions:
+      actions: read
+      contents: read
+      # The pinned reusable workflow declares this permission even when SARIF upload is disabled.
+      security-events: write
+    uses: google/osv-scanner-action/.github/workflows/osv-scanner-reusable.yml@8deb546fdb875b9996d27d4950be7312dac076a1 # v2.5.0
+    with:
+      download-artifact: release-sbom
+      scan-args: |-
+        --sbom=reqover.cdx.json
+      upload-sarif: false
+      fail-on-vuln: true
+
+  release:
+    name: publish release
+    needs: [verify, osv]
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout tag
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Verify tag targets the current main commit
+        run: |
+          git fetch --no-tags origin main
+          test "$(git rev-parse HEAD)" = "$(git rev-parse origin/main)"
+
+      - name: Set up JDK
+        uses: actions/setup-java@b6effb05e454b25005698d916606bdc6ffcbf961 # v5.7.0
+        with:
+          distribution: temurin
+          java-version: 21
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@9c971963bec38e04b3d30dcc455b5382be2fdbfb # v6.3.0
+
+      - name: Verify version and build release artifacts
+        run: |
+          project_version="$(./gradlew properties -q | sed -n 's/^version: //p')"
+          test "${GITHUB_REF_NAME}" = "v${project_version}"
+          ./gradlew clean build cyclonedxBom --no-daemon --console=plain
+          ./scripts/verify-sbom-lock.py build/reports/bom/reqover.cdx.json sbom/reqover.cdx.json
+
+          bundle="dist/reqover-${project_version}"
+          mkdir -p "${bundle}/lib" "${bundle}/sources" "${bundle}/licenses"
+          cp reqover-agent/build/libs/reqover-agent-${project_version}.jar "${bundle}/"
+          cp reqover-core/build/libs/reqover-core-${project_version}.jar "${bundle}/lib/"
+          cp reqover-report/build/libs/reqover-report-${project_version}.jar "${bundle}/lib/"
+          cp reqover-instrumentation/build/libs/reqover-instrumentation-${project_version}.jar "${bundle}/lib/"
+          cp reqover-spring-mvc/build/libs/reqover-spring-mvc-${project_version}.jar "${bundle}/lib/"
+          cp reqover-spring-webflux/build/libs/reqover-spring-webflux-${project_version}.jar "${bundle}/lib/"
+          cp reqover-agent/build/libs/reqover-agent-${project_version}-sources.jar "${bundle}/sources/"
+          cp reqover-core/build/libs/reqover-core-${project_version}-sources.jar "${bundle}/sources/"
+          cp reqover-report/build/libs/reqover-report-${project_version}-sources.jar "${bundle}/sources/"
+          cp reqover-instrumentation/build/libs/reqover-instrumentation-${project_version}-sources.jar "${bundle}/sources/"
+          cp reqover-spring-mvc/build/libs/reqover-spring-mvc-${project_version}-sources.jar "${bundle}/sources/"
+          cp reqover-spring-webflux/build/libs/reqover-spring-webflux-${project_version}-sources.jar "${bundle}/sources/"
+          cp build/reports/bom/reqover.cdx.json "${bundle}/"
+          cp LICENSE NOTICE THIRD_PARTY_NOTICES.md CHANGELOG.md "${bundle}/"
+          cp third-party-licenses/ASM-BSD-3-Clause.txt "${bundle}/licenses/"
+
+          (cd dist && zip -qr "reqover-${project_version}.zip" "reqover-${project_version}")
+          (cd dist && sha256sum "reqover-${project_version}.zip" \
+            "reqover-${project_version}/reqover-agent-${project_version}.jar" \
+            "reqover-${project_version}/reqover.cdx.json" > "reqover-${project_version}-SHA256SUMS.txt")
+
+      - name: Upload release bundle
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: reqover-release
+          path: |
+            dist/reqover-*.zip
+            dist/reqover-*-SHA256SUMS.txt
+            dist/reqover-*/reqover-agent-*.jar
+            dist/reqover-*/reqover.cdx.json
+          if-no-files-found: error
+
+      - name: Create GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "${GITHUB_REF_NAME}" \
+            dist/reqover-*.zip \
+            dist/reqover-*-SHA256SUMS.txt \
+            dist/reqover-*/reqover-agent-*.jar \
+            dist/reqover-*/reqover.cdx.json \
+            --verify-tag \
+            --title "Reqover ${GITHUB_REF_NAME#v}" \
+            --generate-notes

@@ -9,28 +9,33 @@ import java.util.List;
  * <p>Syntax: {@code include=com.example;org.demo,exclude=com.example.generated}.
  * Prefixes are matched against dotted class names, and the most specific
  * (longest) matching prefix wins, so an explicit include may carve out a
- * subpackage of a default-excluded prefix. On a tie the exclude wins.
+ * subpackage of a default-excluded framework prefix. JDK, ASM, and Reqover
+ * runtime packages are always excluded and cannot be enabled by an include.
+ * On a tie the exclude wins.
  */
 public record AgentOptions(
         List<String> includes,
         List<String> excludes
 ) {
-    private static final List<String> DEFAULT_EXCLUDES = List.of(
+    private static final List<String> HARD_EXCLUDES = List.of(
             "java.",
             "javax.",
             "jakarta.",
             "jdk.",
             "sun.",
             "com.sun.",
-            "org.springframework.",
-            "reactor.",
-            "io.micrometer.",
             "org.objectweb.asm.",
             "io.reqover.core.",
             "io.reqover.agent.",
             "io.reqover.instrumentation.",
             "io.reqover.report.",
             "io.reqover.spring."
+    );
+
+    private static final List<String> DEFAULT_EXCLUDES = List.of(
+            "org.springframework.",
+            "reactor.",
+            "io.micrometer."
     );
 
     public AgentOptions {
@@ -43,7 +48,7 @@ public record AgentOptions(
         List<String> excludes = new ArrayList<>(DEFAULT_EXCLUDES);
 
         if (args == null || args.isBlank()) {
-            warn("no include configured; every class not covered by the default excludes will be instrumented");
+            warn("no include configured; instrumentation is disabled (use include=com.example.app)");
             return new AgentOptions(includes, excludes);
         }
 
@@ -69,16 +74,16 @@ public record AgentOptions(
         }
 
         if (includes.isEmpty()) {
-            warn("no include configured; every class not covered by the default excludes will be instrumented");
+            warn("no valid include configured; instrumentation is disabled (use include=com.example.app)");
         }
         return new AgentOptions(includes, excludes);
     }
 
     public boolean shouldInstrument(String dottedClassName) {
-        int longestExclude = longestMatch(excludes, dottedClassName);
-        if (includes.isEmpty()) {
-            return longestExclude < 0;
+        if (includes.isEmpty() || longestMatch(HARD_EXCLUDES, dottedClassName) >= 0) {
+            return false;
         }
+        int longestExclude = longestMatch(excludes, dottedClassName);
         return longestMatch(includes, dottedClassName) > longestExclude;
     }
 

@@ -11,8 +11,7 @@ Reqover는 Spring 애플리케이션에서 "어느 HTTP 요청이 어느 코드�
 백엔드 팀이 실제로 알고 싶은 질문은 전역 커버리지 숫자보다 더 구체적인 경우가 많습니다.
 
 - `OrderService.calculate()`를 수정하면 어떤 API가 영향을 받는가?
-- `POST /payments`는 실제로 어떤 service, repository, branch를 지나가는가?
-- 라이브 트래픽 기준으로 어떤 엔드포인트의 분기 경로가 아직 한 번도 실행되지 않았는가?
+- `POST /payments`는 실제로 어떤 controller와 service method를 지나가는가?
 - 동시 요청이 많은 환경에서 특정 코드 실행을 요청별로 분리해서 볼 수 있는가?
 
 기존 커버리지 도구만으로는 이 질문에 직접 답하기 어렵습니다. 전역 probe 배열에는 "켜졌다"는 사실만 남고 "누가 켰는지"는 사라지기 때문입니다.
@@ -25,9 +24,8 @@ Reqover는 coverage probe가 점등될 때 그 신호를 전역 저장소에만 
 
 - 엔드포인트 -> 실행 코드 목록
 - 코드 -> 관측된 엔드포인트 목록
-- 엔드포인트별 line coverage
-- 엔드포인트별 branch coverage 후보
-- 전체 coverage와 요청별 coverage의 비교
+- 엔드포인트별로 관측된 class/method entry
+- 특정 method를 실행한 관측 엔드포인트의 역방향 index
 
 ## 핵심 차별점
 
@@ -59,7 +57,7 @@ Reqover는 완성형 서비스가 아니라 개발자 도구입니다. 오픈소
 MVP는 다음 질문에 답할 수 있으면 성공입니다.
 
 - 두 개 이상의 HTTP 요청이 동시에 들어와도 coverage bucket이 섞이지 않는가?
-- 한 요청이 실행한 method 또는 line을 endpoint 단위로 볼 수 있는가?
+- 한 요청이 실행한 method entry를 endpoint 단위로 볼 수 있는가?
 - MVC에서는 ThreadLocal 기반 routing이 안정적으로 되는가?
 - WebFlux에서는 thread가 바뀌어도 bucket이 유지되는가?
 - 결과를 사람이 이해할 수 있는 HTML 또는 JSON 리포트로 볼 수 있는가?
@@ -89,4 +87,3 @@ MVP는 다음 질문에 답할 수 있으면 성공입니다.
 Reqover는 Request와 Coverage의 합성어입니다.
 
 대체 이름 후보는 남겨두되, 현재 문서와 발표에서는 Reqover를 기본 이름으로 사용합니다.
-

@@ -1,247 +1,706 @@
+#!/usr/bin/env python3
+"""Build Reqover's 2026 OSS contest report from the official DOCX template.
+
+The retained template is never modified. The generated copy removes the guide
+page and the non-applicable AI-model appendix, fills the official report slots,
+and expands Attachment 1 from a CycloneDX JSON SBOM.
+"""
+
+from __future__ import annotations
+
+import argparse
+import hashlib
+import json
+import re
+from copy import deepcopy
 from pathlib import Path
+from urllib.parse import quote
 
 from docx import Document
-from docx.enum.section import WD_SECTION
-from docx.enum.table import WD_TABLE_ALIGNMENT, WD_CELL_VERTICAL_ALIGNMENT
-from docx.enum.text import WD_ALIGN_PARAGRAPH
+from docx.enum.table import WD_CELL_VERTICAL_ALIGNMENT
+from docx.enum.text import WD_ALIGN_PARAGRAPH, WD_COLOR_INDEX
 from docx.oxml import OxmlElement
 from docx.oxml.ns import qn
 from docx.shared import Inches, Pt, RGBColor
 
 
 ROOT = Path(__file__).resolve().parents[1]
-OUT_DIR = ROOT / "docs" / "competition" / "submission"
-DOCX_PATH = OUT_DIR / "Reqover_result_report_draft.docx"
-SCREENSHOT = ROOT / "docs" / "assets" / "reqover-webflux-report.png"
+TEMPLATE_NAME = "2026 오픈소스 개발자대회 결과보고서_접수번호(팀명).docx"
+TEMPLATE_PATH = ROOT / "docs" / "competition" / "templates" / TEMPLATE_NAME
+TEMPLATE_SHA256 = "937679bac40cbfaced3457530c232c9d190a74f6b5d67c58b4bc33014a579195"
+DEFAULT_SBOM_PATH = ROOT / "sbom" / "reqover.cdx.json"
+DEFAULT_OUTPUT_PATH = ROOT / "docs" / "competition" / "submission" / "Reqover_result_report_draft.docx"
+
+FONT_NAME = "Malgun Gothic"
+BODY_FONT_SIZE = Pt(10)
+SMALL_FONT_SIZE = Pt(8)
+SBOM_FONT_SIZE = Pt(7)
+PLACEHOLDER_PREFIX = "[확인 필요:"
+
+ASSET_MVC = ROOT / "docs" / "assets" / "reqover-mvc-request-attribution.png"
+ASSET_REVERSE = ROOT / "docs" / "assets" / "reqover-code-to-endpoint-index.png"
+ASSET_WEBFLUX = ROOT / "docs" / "assets" / "reqover-webflux-thread-hop.png"
 
 
-def set_cell_shading(cell, fill):
-    tc_pr = cell._tc.get_or_add_tcPr()
-    shd = OxmlElement("w:shd")
-    shd.set(qn("w:fill"), fill)
-    tc_pr.append(shd)
+def parse_args() -> argparse.Namespace:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--template", type=Path, default=TEMPLATE_PATH)
+    parser.add_argument("--sbom", type=Path, default=DEFAULT_SBOM_PATH)
+    parser.add_argument("--output", type=Path, default=DEFAULT_OUTPUT_PATH)
+    parser.add_argument("--team-name", default="[확인 필요: 참가 접수 정보와 동일한 팀명]")
+    parser.add_argument("--team-size", default="[확인 필요: 팀장 포함 총 인원]")
+    parser.add_argument("--division", default="[확인 필요: 학생 또는 일반]")
+    parser.add_argument("--task-type", default="[확인 필요: 자유과제 또는 지정과제(기업명)]")
+    parser.add_argument("--registration-number", default="[확인 필요: 접수번호]")
+    parser.add_argument("--video-url", default="[확인 필요: 공개 또는 일부 공개 YouTube URL]")
+    parser.add_argument(
+        "--development-environment",
+        default="[확인 필요: 최종 개발·검증 PC의 OS, CPU, RAM]",
+    )
+    parser.add_argument(
+        "--team-contributions",
+        default=(
+            "[확인 필요: 팀원별 최종 역할·기여 확정] "
+            "김태희—문제 정의와 제품 방향, core·instrumentation·Java Agent·report·sample 설계 및 통합. "
+            "이상민—빌드·CI·크로스플랫폼 환경, core 안정화, Spring adapter·테스트·라이선스·공개 문서 정비."
+        ),
+    )
+    parser.add_argument(
+        "--verification",
+        default=(
+            "2026-08-10 로컬 JDK 17 및 Temurin 21.0.12 clean build에서 35 tests 통과. "
+            "CycloneDX 1.6 SBOM 고정본 일치, Maven 구성요소 96개 OSV 조회 결과 0건. "
+            "[확인 필요: 최종 제출 tag·commit SHA·GitHub Actions 성공 URL]"
+        ),
+    )
+    parser.add_argument(
+        "--duplicate-benefit",
+        default="[확인 필요: 정부지원·정부 대회 수상 등 중복수혜 여부와 별도 확인서 필요 여부]",
+    )
+    return parser.parse_args()
 
 
-def set_cell_text(cell, text, bold=False):
+def sha256(path: Path) -> str:
+    digest = hashlib.sha256()
+    with path.open("rb") as handle:
+        for chunk in iter(lambda: handle.read(1024 * 1024), b""):
+            digest.update(chunk)
+    return digest.hexdigest()
+
+
+def verify_template(path: Path) -> None:
+    if not path.is_file():
+        raise FileNotFoundError(f"Official template not found: {path}")
+    actual = sha256(path)
+    if actual != TEMPLATE_SHA256:
+        raise ValueError(
+            "Official template checksum mismatch. "
+            f"expected={TEMPLATE_SHA256}, actual={actual}, path={path}"
+        )
+
+
+def set_run_font(
+    run,
+    *,
+    size=BODY_FONT_SIZE,
+    bold: bool | None = None,
+    italic: bool | None = None,
+    color: str = "000000",
+) -> None:
+    run.font.name = FONT_NAME
+    run.font.size = size
+    if bold is not None:
+        run.bold = bold
+    if italic is not None:
+        run.italic = italic
+    run.font.color.rgb = RGBColor.from_string(color)
+
+    r_pr = run._element.get_or_add_rPr()
+    r_fonts = r_pr.get_or_add_rFonts()
+    for attribute in ("ascii", "hAnsi", "eastAsia", "cs"):
+        r_fonts.set(qn(f"w:{attribute}"), FONT_NAME)
+    lang = r_pr.find(qn("w:lang"))
+    if lang is None:
+        lang = OxmlElement("w:lang")
+        r_pr.append(lang)
+    lang.set(qn("w:val"), "ko-KR")
+    lang.set(qn("w:eastAsia"), "ko-KR")
+
+
+def clear_paragraph(paragraph) -> None:
+    for child in list(paragraph._p):
+        if child.tag != qn("w:pPr"):
+            paragraph._p.remove(child)
+
+
+def format_paragraph(paragraph, *, after=2, before=0, line=1.05, alignment=None) -> None:
+    paragraph.paragraph_format.space_before = Pt(before)
+    paragraph.paragraph_format.space_after = Pt(after)
+    paragraph.paragraph_format.line_spacing = line
+    if alignment is not None:
+        paragraph.alignment = alignment
+
+
+def add_text_run(paragraph, text: str, *, bold=False, italic=False, size=BODY_FONT_SIZE, color="000000"):
+    last_run = None
+    for part in re.split(r"(\[확인 필요:[^\]]+\])", text):
+        if not part:
+            continue
+        run = paragraph.add_run(part)
+        set_run_font(run, size=size, bold=bold, italic=italic, color=color)
+        if part.startswith(PLACEHOLDER_PREFIX) and part.endswith("]"):
+            run.font.highlight_color = WD_COLOR_INDEX.YELLOW
+            run.font.color.rgb = RGBColor.from_string("C00000")
+            run.bold = True
+        last_run = run
+    return last_run
+
+
+def replace_paragraph(paragraph, text: str, *, bold=False, size=BODY_FONT_SIZE, alignment=None) -> None:
+    clear_paragraph(paragraph)
+    format_paragraph(paragraph, alignment=alignment)
+    add_text_run(paragraph, text, bold=bold, size=size)
+
+
+def clear_cell(cell) -> None:
     cell.text = ""
-    paragraph = cell.paragraphs[0]
-    run = paragraph.add_run(text)
-    run.bold = bold
-    run.font.name = "Calibri"
-    run.font.size = Pt(10)
     cell.vertical_alignment = WD_CELL_VERTICAL_ALIGNMENT.CENTER
 
 
-def add_heading(doc, text, level):
-    paragraph = doc.add_heading(text, level=level)
-    paragraph.paragraph_format.keep_with_next = True
-    return paragraph
+def append_labeled_paragraph(cell, label: str, text: str, *, first=False, after=2) -> None:
+    paragraph = cell.paragraphs[0] if first else cell.add_paragraph()
+    if first:
+        clear_paragraph(paragraph)
+    format_paragraph(paragraph, after=after)
+    if label:
+        add_text_run(paragraph, f"{label}  ", bold=True, color="1F4E78")
+    add_text_run(paragraph, text)
 
 
-def add_bullets(doc, items):
-    for item in items:
-        paragraph = doc.add_paragraph(style="List Bullet")
-        paragraph.add_run(item)
+def set_cell_text(cell, text: str, *, bold=False, size=BODY_FONT_SIZE, center=False) -> None:
+    clear_cell(cell)
+    paragraph = cell.paragraphs[0]
+    format_paragraph(
+        paragraph,
+        after=0,
+        alignment=WD_ALIGN_PARAGRAPH.CENTER if center else WD_ALIGN_PARAGRAPH.LEFT,
+    )
+    add_text_run(paragraph, text, bold=bold, size=size)
 
 
-def add_numbered(doc, items):
-    for item in items:
-        paragraph = doc.add_paragraph(style="List Number")
-        paragraph.add_run(item)
+def add_picture(cell, path: Path, caption: str, *, first=False, width=Inches(4.15)) -> None:
+    if not path.is_file():
+        paragraph = cell.paragraphs[0] if first else cell.add_paragraph()
+        if first:
+            clear_paragraph(paragraph)
+        format_paragraph(paragraph, after=2)
+        add_text_run(paragraph, f"[확인 필요: 이미지 파일 없음 — {path.name}]")
+        return
+
+    paragraph = cell.paragraphs[0] if first else cell.add_paragraph()
+    if first:
+        clear_paragraph(paragraph)
+    format_paragraph(paragraph, after=1, alignment=WD_ALIGN_PARAGRAPH.CENTER)
+    run = paragraph.add_run()
+    inline_shape = run.add_picture(str(path), width=width)
+    doc_pr = inline_shape._inline.docPr
+    doc_pr.set("title", caption)
+    doc_pr.set("descr", caption)
+
+    caption_paragraph = cell.add_paragraph()
+    format_paragraph(caption_paragraph, after=3, alignment=WD_ALIGN_PARAGRAPH.CENTER)
+    add_text_run(caption_paragraph, caption, italic=True, size=SMALL_FONT_SIZE, color="595959")
 
 
-def add_label_table(doc, rows):
-    table = doc.add_table(rows=1, cols=2)
-    table.alignment = WD_TABLE_ALIGNMENT.CENTER
-    table.style = "Table Grid"
-    table.autofit = False
-    table.columns[0].width = Inches(1.65)
-    table.columns[1].width = Inches(4.85)
-    header = table.rows[0].cells
-    set_cell_text(header[0], "항목", bold=True)
-    set_cell_text(header[1], "내용", bold=True)
-    set_cell_shading(header[0], "F2F4F7")
-    set_cell_shading(header[1], "F2F4F7")
-    for label, value in rows:
-        cells = table.add_row().cells
-        set_cell_text(cells[0], label, bold=True)
-        set_cell_text(cells[1], value)
-    doc.add_paragraph()
+def remove_element(element) -> None:
+    parent = element.getparent()
+    if parent is not None:
+        parent.remove(element)
 
 
-def configure_styles(doc):
-    section = doc.sections[0]
-    section.top_margin = Inches(1)
-    section.bottom_margin = Inches(1)
-    section.left_margin = Inches(1)
-    section.right_margin = Inches(1)
-    section.header_distance = Inches(0.492)
-    section.footer_distance = Inches(0.492)
+def remove_guide_and_ai_appendix(document: Document) -> None:
+    if len(document.tables) < 9:
+        raise ValueError("Unexpected official template structure: expected at least 9 tables")
 
-    styles = doc.styles
-    normal = styles["Normal"]
-    normal.font.name = "Calibri"
-    normal.font.size = Pt(11)
-    normal.paragraph_format.space_after = Pt(6)
-    normal.paragraph_format.line_spacing = 1.10
+    guide_table = document.tables[0]
+    if "결과보고서 작성 안내" not in guide_table.cell(0, 0).text:
+        raise ValueError("Unexpected official template structure: guide page table not found")
+    remove_element(guide_table._element)
 
-    for name, size, color, before, after in [
-        ("Heading 1", 16, "2E74B5", 16, 8),
-        ("Heading 2", 13, "2E74B5", 12, 6),
-        ("Heading 3", 12, "1F4D78", 8, 4),
-    ]:
-        style = styles[name]
-        style.font.name = "Calibri"
-        style.font.size = Pt(size)
-        style.font.color.rgb = RGBColor.from_string(color)
-        style.paragraph_format.space_before = Pt(before)
-        style.paragraph_format.space_after = Pt(after)
-        style.paragraph_format.keep_with_next = True
+    sbom_note = next(
+        (paragraph for paragraph in document.paragraphs if "필요 시, 행을 추가" in paragraph.text),
+        None,
+    )
+    if sbom_note is None:
+        raise ValueError("Unexpected official template structure: SBOM note not found")
+
+    body = document.element.body
+    note_index = list(body).index(sbom_note._p)
+    for element in list(body)[note_index + 1 :]:
+        if element.tag != qn("w:sectPr"):
+            body.remove(element)
 
 
-def build_doc():
-    OUT_DIR.mkdir(parents=True, exist_ok=True)
+def paragraph_after(document: Document, element) -> object:
+    body = document.element.body
+    elements = list(body)
+    index = elements.index(element)
+    for candidate in elements[index + 1 :]:
+        if candidate.tag == qn("w:p"):
+            from docx.text.paragraph import Paragraph
 
-    doc = Document()
-    configure_styles(doc)
+            return Paragraph(candidate, document._body)
+    raise ValueError("Expected paragraph not found after template element")
 
-    title = doc.add_paragraph()
-    title.alignment = WD_ALIGN_PARAGRAPH.LEFT
-    title.paragraph_format.space_after = Pt(3)
-    run = title.add_run("Reqover 결과보고서 초안")
-    run.font.name = "Calibri"
-    run.font.size = Pt(24)
-    run.font.bold = True
-    run.font.color.rgb = RGBColor(24, 33, 47)
 
-    subtitle = doc.add_paragraph()
-    subtitle.add_run("요청 단위 코드 커버리지 귀속 도구").italic = True
+def fill_basic_information(document: Document, args: argparse.Namespace) -> None:
+    # After guide removal, tables are: title, basic info, report body, SBOM title, SBOM table.
+    if len(document.tables) != 5:
+        raise ValueError(f"Unexpected generated structure: expected 5 tables, got {len(document.tables)}")
+    info = document.tables[1]
+    set_cell_text(info.rows[1].cells[1], args.team_name)
+    set_cell_text(info.rows[1].cells[3], args.team_size)
+    set_cell_text(info.rows[2].cells[1], args.division)
+    set_cell_text(info.rows[2].cells[3], args.task_type)
 
-    add_label_table(
-        doc,
-        [
-            ("프로젝트명", "Reqover"),
-            ("저장소", "https://github.com/reqover-labs/reqover"),
-            ("팀명", "<팀명 입력>"),
-            ("접수번호", "<접수번호 입력>"),
-            ("시연영상", "<YouTube URL 입력>"),
-        ],
+    registration_paragraph = paragraph_after(document, info._element)
+    replace_paragraph(
+        registration_paragraph,
+        f"{args.registration_number} — 최종 제출 시 접수번호를 공식 파일명에 반영",
+        size=Pt(9),
     )
 
-    add_heading(doc, "1. 프로젝트 개요", 1)
-    doc.add_paragraph(
-        "Reqover는 Java/Spring 애플리케이션에서 발생한 coverage hit을 개별 HTTP 요청과 endpoint 단위로 귀속하는 개발자 도구이다. "
-        "기존 coverage 도구가 코드 실행 여부를 전역 기준으로 보여준다면, Reqover는 어떤 API 요청이 어떤 코드 경로를 실행했는지를 보여준다."
-    )
-    doc.add_paragraph(
-        "MVP는 Spring MVC와 Spring WebFlux를 대상으로 하며, Java agent 기반 method-entry instrumentation, 요청별 coverage bucket, "
-        "JSON/HTML 리포트, code-to-endpoint 역조회 기능을 포함한다."
-    )
 
-    add_heading(doc, "2. 개발 배경과 문제 정의", 1)
-    doc.add_paragraph(
-        "백엔드 서비스는 여러 endpoint가 service, validator, mapper, utility 코드를 공유한다. 특정 메서드를 수정했을 때 어떤 API를 우선 재테스트해야 하는지 판단하기 어렵다."
-    )
-    doc.add_paragraph(
-        "Reqover는 이 문제를 정적 추측이 아니라 실제 실행 관측 데이터로 좁히는 것을 목표로 한다."
-    )
+def resolved_versions(components: list[dict], group: str, name: str) -> str:
+    versions = {
+        str(component.get("version") or "").strip()
+        for component in components
+        if str(component.get("group") or "").strip() == group
+        and str(component.get("name") or "").strip() == name
+        and not component_is_test_only(component)
+        and str(component.get("version") or "").strip()
+    }
 
-    add_heading(doc, "3. 주요 기능", 1)
-    add_bullets(
-        doc,
-        [
-            "HTTP 요청마다 coverage bucket을 생성하고 probe hit을 해당 bucket에 기록",
-            "Spring MVC interceptor로 endpoint pattern과 request lifecycle 관리",
-            "Spring WebFlux Reactor Context와 Micrometer Context Propagation을 이용한 thread-hop 귀속 유지",
-            "ASM 기반 Java agent로 애플리케이션 클래스 method entry에 probe 삽입",
-            "endpoint-to-code 리포트와 code-to-endpoint 영향 범위 역조회 제공",
-            "CycloneDX 1.6 JSON SBOM 생성 task 제공",
-        ],
-    )
+    def version_key(value: str) -> tuple:
+        return tuple(
+            (0, int(part)) if part.isdigit() else (1, part.lower())
+            for part in re.split(r"([0-9]+)", value)
+            if part
+        )
 
-    add_heading(doc, "4. 아키텍처", 1)
-    add_numbered(
-        doc,
-        [
-            "HTTP 요청이 Spring MVC interceptor 또는 WebFlux filter에 진입한다.",
-            "Reqover가 request id와 endpoint 정보를 가진 coverage bucket을 생성한다.",
-            "Java agent가 삽입한 ReqoverProbe.hit(classId, probeId)가 메서드 진입 시 호출된다.",
-            "ReqoverProbe는 현재 요청 context를 찾아 해당 bucket에 hit을 기록한다.",
-            "요청 종료 시 bucket snapshot이 in-memory store에 저장된다.",
-            "report module이 endpoint 기준으로 coverage와 reverse index를 집계한다.",
-        ],
+    if not versions:
+        return f"[확인 필요: {group}:{name} 해결 버전]"
+    return "·".join(sorted(versions, key=version_key))
+
+
+def component_is_test_only(component: dict) -> bool:
+    return any(
+        str(item.get("name") or "") == "cdx:maven:package:test"
+        and str(item.get("value") or "").lower() == "true"
+        for item in component.get("properties") or []
     )
 
-    add_heading(doc, "5. 검증 결과", 1)
-    add_bullets(
-        doc,
-        [
-            "./gradlew test 통과",
-            "./gradlew build --quiet 통과",
-            "./gradlew cyclonedxBom 통과",
-            "MVC agent E2E: 수동 probe 없는 endpoint가 자동 계측되어 report에 표시됨",
-            "WebFlux agent E2E: boundedElastic, parallel, reactor-http-nio thread hop 이후에도 같은 endpoint bucket에 귀속됨",
-        ],
-    )
-    doc.add_paragraph("로컬 WebFlux 순차 요청 성능 참고값:")
-    perf = doc.add_table(rows=1, cols=5)
-    perf.alignment = WD_TABLE_ALIGNMENT.CENTER
-    perf.style = "Table Grid"
-    headers = ["모드", "Average ms", "p50 ms", "p95 ms", "p99 ms"]
-    for idx, text in enumerate(headers):
-        set_cell_text(perf.rows[0].cells[idx], text, bold=True)
-        set_cell_shading(perf.rows[0].cells[idx], "F2F4F7")
-    for row in [
-        ["Baseline, no agent", "18.58", "17.88", "26.77", "31.44"],
-        ["Reqover agent enabled", "21.57", "18.15", "38.19", "61.65"],
-    ]:
-        cells = perf.add_row().cells
-        for idx, text in enumerate(row):
-            set_cell_text(cells[idx], text, bold=(idx == 0))
-    doc.add_paragraph("위 수치는 로컬 데모 sanity check이며 production benchmark가 아니다.")
 
-    if SCREENSHOT.exists():
-        add_heading(doc, "6. 리포트 화면", 1)
-        doc.add_paragraph("WebFlux 자동 계측 데모 리포트 예시:")
-        doc.add_picture(str(SCREENSHOT), width=Inches(6.3))
+def fill_report_body(document: Document, args: argparse.Namespace, components: list[dict]) -> None:
+    table = document.tables[2]
 
-    add_heading(doc, "7. 오픈소스 준비 상태", 1)
-    add_bullets(
-        doc,
-        [
-            "Apache License 2.0 적용",
-            "THIRD_PARTY_NOTICES.md 작성",
-            "CONTRIBUTING.md, SECURITY.md, CODE_OF_CONDUCT.md 작성",
-            "GitHub issue template 3종 작성",
-            "GitHub Actions build workflow 구성",
-            "SBOM 생성 파일: build/reports/bom/reqover-sbom.json",
-        ],
+    set_cell_text(table.rows[1].cells[1], "Reqover", bold=True)
+    set_cell_text(table.rows[2].cells[1], "https://github.com/reqover-labs/reqover")
+    set_cell_text(table.rows[3].cells[1], args.video_url)
+    set_cell_text(
+        table.rows[4].cells[1],
+        "Spring MVC와 WebFlux에서 각 HTTP 요청이 실제로 실행한 메서드를 Java Agent로 자동 계측하여, "
+        "endpoint-to-code 및 code-to-endpoint 관계를 JSON/HTML로 제공하는 오픈소스 개발자 도구이다.",
     )
 
-    add_heading(doc, "8. 한계와 향후 계획", 1)
-    add_bullets(
-        doc,
-        [
-            "현재 coverage 정밀도는 method-entry 수준이며 JaCoCo 수준의 branch coverage는 제공하지 않음",
-            "저장소는 MVP 단계에서 in-memory 방식",
-            "report endpoint 인증, 보존 정책, 운영 배포 기능은 후속 과제",
-            "향후 JaCoCo XML/report 연동, Gradle/Maven plugin, persistent storage, richer report UI를 검토",
-        ],
+    background = table.rows[6].cells[1]
+    clear_cell(background)
+    append_labeled_paragraph(
+        background,
+        "문제",
+        "일반적인 집계 커버리지는 코드가 실행됐다는 사실은 보여주지만, 어떤 HTTP 요청이 해당 코드를 실행했는지는 기본 차원으로 제공하지 않는다. "
+        "공유 service·validator가 많은 백엔드에서는 코드 변경 후 우선 재검증할 API를 경험과 넓은 회귀 테스트에 의존하기 쉽다.",
+        first=True,
+    )
+    append_labeled_paragraph(
+        background,
+        "목표",
+        "실제 요청 중 관측된 실행 관계를 endpoint별로 분리하고 역조회하여, 개발·QA·staging 환경의 디버깅과 회귀 테스트 우선순위 결정을 돕는다.",
+    )
+    append_labeled_paragraph(
+        background,
+        "해석 범위",
+        "Reqover가 제시하는 관계는 관측된 실행의 하한이며, 보이지 않은 관계가 존재하지 않음을 보장하는 완전한 정적 영향 분석은 아니다.",
     )
 
-    add_heading(doc, "9. AI 모델 활용 정보", 1)
-    doc.add_paragraph(
-        "Reqover 제출 소프트웨어에는 AI 모델이 탑재되어 있지 않다. 개발 과정에서 AI 도구를 보조적으로 활용한 경우에도, "
-        "런타임 산출물에는 모델 가중치나 외부 inference API 호출이 포함되지 않는다."
+    environment = table.rows[7].cells[1]
+    clear_cell(environment)
+    append_labeled_paragraph(environment, "언어·빌드", "Java 17 bytecode, JDK 17·21, Gradle 9.5.1", first=True)
+    append_labeled_paragraph(
+        environment,
+        "프레임워크",
+        f"Spring Boot {resolved_versions(components, 'org.springframework.boot', 'spring-boot')}, "
+        f"Spring MVC {resolved_versions(components, 'org.springframework', 'spring-webmvc')}, "
+        f"Spring WebFlux {resolved_versions(components, 'org.springframework', 'spring-webflux')}",
     )
+    append_labeled_paragraph(
+        environment,
+        "핵심 기술",
+        f"ASM {resolved_versions(components, 'org.ow2.asm', 'asm')}, "
+        f"Reactor {resolved_versions(components, 'io.projectreactor', 'reactor-core')}, "
+        f"Micrometer Context Propagation {resolved_versions(components, 'io.micrometer', 'context-propagation')}",
+    )
+    append_labeled_paragraph(
+        environment,
+        "검증",
+        "JUnit 5.12.2, 별도 JVM Agent E2E, "
+        "GitHub Actions Ubuntu/Temurin 17·21 matrix",
+    )
+    append_labeled_paragraph(environment, "개발 장비", args.development_environment)
 
-    footer = doc.sections[0].footer.paragraphs[0]
-    footer.text = "Reqover result report draft"
-    footer.alignment = WD_ALIGN_PARAGRAPH.RIGHT
+    architecture = table.rows[8].cells[1]
+    clear_cell(architecture)
+    append_labeled_paragraph(
+        architecture,
+        "핵심 흐름",
+        "HTTP 요청 → MVC Interceptor/WebFlux Filter → 요청 bucket 생성 → ASM Java Agent가 삽입한 method-entry probe → "
+        "현재 요청 context로 hit 귀속 → snapshot 저장 → 양방향 JSON/HTML 리포트",
+        first=True,
+    )
+    append_labeled_paragraph(architecture, "Core", "요청 수명주기, context, probe registry, in-memory 저장")
+    append_labeled_paragraph(architecture, "Instrumentation/Agent", "선택한 애플리케이션 class를 로드할 때 method entry에 ReqoverProbe.hit을 삽입")
+    append_labeled_paragraph(architecture, "Spring adapters", "MVC는 요청 ThreadLocal을, WebFlux는 Reactor Context와 context propagation을 사용")
+    append_labeled_paragraph(architecture, "Report", "endpoint별 관측 메서드와 특정 코드가 관측된 endpoint를 양방향으로 집계")
 
-    doc.save(DOCX_PATH)
-    print(DOCX_PATH)
+    features = table.rows[9].cells[1]
+    clear_cell(features)
+    append_labeled_paragraph(
+        features,
+        "1. 요청 분리",
+        "동시 실행된 GET /orders/{id}와 POST /payments를 별도 bucket으로 기록하고, 공통 SharedValidator만 양쪽 관계에 표시한다.",
+        first=True,
+    )
+    add_picture(features, ASSET_MVC, "그림 1. MVC 요청별 실행 경로 분리 결과")
+    append_labeled_paragraph(
+        features,
+        "2. 코드 역조회",
+        "특정 class·method를 실행한 관측 endpoint를 찾아 코드 변경 후 우선 재검증할 API 후보를 좁힌다.",
+    )
+    add_picture(features, ASSET_REVERSE, "그림 2. code-to-endpoint 역조회 결과")
+    append_labeled_paragraph(
+        features,
+        "3. 자동 계측",
+        "사용자 코드에 수동 probe 호출을 넣지 않고 -javaagent 옵션으로 선택 package의 method entry를 계측한다.",
+    )
+    append_labeled_paragraph(
+        features,
+        "4. WebFlux thread-hop",
+        "boundedElastic·parallel 등 thread가 바뀌는 표준 Reactor chain에서도 같은 요청 bucket으로 귀속한다.",
+    )
+    add_picture(features, ASSET_WEBFLUX, "그림 3. WebFlux thread 전환 후 동일 요청 귀속 결과")
+    append_labeled_paragraph(
+        features,
+        "구동",
+        "JDK 17 이상 환경에서 ./gradlew clean test 실행 후 ./scripts/run-agent-demo.sh mvc 8080 또는 webflux 8080을 실행하고, "
+        "http://127.0.0.1:8080/reqover/report.html을 연다. 데모는 report endpoint를 loopback에만 노출한다.",
+    )
+    append_labeled_paragraph(features, "최종 검증", args.verification)
+
+    effects = table.rows[10].cells[1]
+    clear_cell(effects)
+    append_labeled_paragraph(effects, "회귀 테스트", "관측 근거로 우선 재검증할 endpoint 후보를 좁혀 테스트 범위 결정 과정을 보조한다.", first=True)
+    append_labeled_paragraph(effects, "디버깅·QA", "API 요청과 실제 실행 코드를 연결해 공유 로직과 reactive 실행 경로를 빠르게 이해한다.")
+    append_labeled_paragraph(effects, "확장성", "향후 HTTP 외 메시지·배치·테스트 단위, CI 결과, persistent backend로 attribution 단위를 확장할 수 있다.")
+    append_labeled_paragraph(effects, "오픈소스", "Apache-2.0, 재현 가능한 sample, 기여·보안 가이드와 SBOM을 제공해 외부 검증과 기여 기반을 마련한다.")
+
+    other = table.rows[11].cells[1]
+    clear_cell(other)
+    append_labeled_paragraph(
+        other,
+        "혁신성·차별성",
+        "집계 커버리지의 실행 여부를 요청 차원으로 확장하고, Java bytecode 계측과 WebFlux context propagation을 결합한다. "
+        "endpoint→code와 code→endpoint를 함께 제공하며 JaCoCo를 대체하지 않고 요청 귀속 정보를 보완한다.",
+        first=True,
+    )
+    append_labeled_paragraph(
+        other,
+        "현재 한계",
+        "method-entry 수준, in-memory 저장, 명시적 include·불변 runtime exclude 정책, 인증 없는 sample report, 표준 Reactor chain 중심 검증 단계이다.",
+    )
+    append_labeled_paragraph(
+        other,
+        "로드맵",
+        "재현 가능한 release artifact와 Gradle/Maven 연동, persistent storage와 인증, report filtering/export, JaCoCo XML 상호운용, "
+        "반복 부하 측정을 순차적으로 추진한다.",
+    )
+    append_labeled_paragraph(other, "팀 역할·기여", args.team_contributions)
+    append_labeled_paragraph(
+        other,
+        "개발 보조도구",
+        "상용 생성형 AI(Codex)는 일부 코드·테스트·문서의 초안 작성 및 검토 보조에 활용했으며, 팀이 요구사항을 결정하고 결과를 검증·수정하여 "
+        "최종 반영했다. 출품작에는 AI 모델이나 외부 추론 API가 포함되지 않는다.",
+    )
+    append_labeled_paragraph(
+        other,
+        "소감",
+        "요청 수명주기와 reactive context를 bytecode 계측 결과에 안전하게 연결하면서 오귀속보다 미귀속을 우선하는 원칙의 중요성을 확인했다. "
+        "기능 구현뿐 아니라 라이선스, SBOM, 재현 문서가 오픈소스 완성도의 일부임을 학습했다.",
+    )
+    append_labeled_paragraph(other, "중복수혜 확인", args.duplicate_benefit)
+
+
+def component_license(component: dict) -> str:
+    values: list[str] = []
+    for entry in component.get("licenses") or []:
+        if expression := entry.get("expression"):
+            values.append(str(expression))
+            continue
+        license_info = entry.get("license") or {}
+        value = license_info.get("id") or license_info.get("name")
+        if value:
+            values.append(str(value))
+    unique = list(dict.fromkeys(values))
+    return " OR ".join(unique) if unique else "[확인 필요: 라이선스 확인]"
+
+
+def component_url(component: dict) -> str:
+    references = component.get("externalReferences") or []
+    priority = {"vcs": 0, "website": 1, "distribution": 2, "documentation": 3}
+    for reference in sorted(references, key=lambda item: priority.get(item.get("type"), 99)):
+        if reference.get("url"):
+            url = str(reference["url"])
+            replacements = {
+                "scm:git:git://github.com/": "https://github.com/",
+                "scm:git:https://github.com/": "https://github.com/",
+                "git://github.com/": "https://github.com/",
+                "http://github.com/": "https://github.com/",
+                "http://developer.android.com/": "https://developer.android.com/",
+            }
+            for prefix, replacement in replacements.items():
+                if url.startswith(prefix):
+                    url = replacement + url.removeprefix(prefix)
+                    break
+            return url
+
+    group = str(component.get("group") or "").strip()
+    name = str(component.get("name") or "").strip()
+    version = str(component.get("version") or "").strip()
+    if group and name:
+        base = f"https://central.sonatype.com/artifact/{quote(group, safe='.')}/{quote(name, safe='')}"
+        return f"{base}/{quote(version, safe='.-_')}" if version else base
+    if purl := component.get("purl"):
+        return str(purl)
+    return "[확인 필요: 공식 저장소 URL]"
+
+
+def component_purpose(component: dict) -> str:
+    group = str(component.get("group") or "").lower()
+    name = str(component.get("name") or "").lower()
+    key = f"{group}:{name}"
+
+    if component_is_test_only(component):
+        if "junit" in key or name in {"assertj-core", "awaitility", "hamcrest"}:
+            return "단위·통합·E2E 테스트"
+        if name.startswith("mockito-") or name in {"byte-buddy", "byte-buddy-agent", "objenesis"}:
+            return "테스트 mocking 전이 의존성"
+        return "테스트 전이 의존성"
+
+    if name == "asm" or "ow2.asm" in group:
+        return "Java bytecode method-entry 계측"
+    if "spring-boot" in name:
+        return "Spring Boot 실행·자동 설정 및 sample"
+    if name in {"spring-webmvc", "spring-webflux"}:
+        return "Spring MVC/WebFlux 요청 adapter"
+    if name.startswith("spring-"):
+        return "Spring Framework 전이 의존성"
+    if "context-propagation" in name:
+        return "Reactor Context와 ThreadLocal 전달"
+    if name.startswith("reactor-core"):
+        return "WebFlux reactive 실행과 thread-hop"
+    if name.startswith("reactor-netty") or name.startswith("netty-"):
+        return "WebFlux sample 네트워크 런타임"
+    if name.startswith("tomcat-"):
+        return "MVC sample 내장 HTTP 서버"
+    if name.startswith("jackson-") or "json" in name:
+        return "JSON 직렬화·테스트 지원"
+    if "slf4j" in name or "logback" in name or "log4j" in name:
+        return "로깅 API·구현체"
+    if name.startswith("micrometer-"):
+        return "Spring 관측·context 전이 의존성"
+    if name.startswith("jakarta.") or group.startswith("jakarta."):
+        return "Spring adapter 표준 Jakarta API"
+    if name == "snakeyaml":
+        return "Spring 설정 YAML 처리"
+    if name == "reactive-streams":
+        return "Reactive Streams 표준 API"
+    return "빌드·실행·테스트 전이 의존성"
+
+
+def load_sbom_components(path: Path) -> list[dict]:
+    if not path.is_file():
+        raise FileNotFoundError(
+            f"CycloneDX SBOM not found: {path}\n"
+            "Generate it with ./gradlew cyclonedxBom, preserve the final JSON under sbom/, or pass --sbom PATH."
+        )
+    with path.open("r", encoding="utf-8") as handle:
+        data = json.load(handle)
+    if data.get("bomFormat") != "CycloneDX":
+        raise ValueError(f"Expected CycloneDX JSON SBOM: {path}")
+
+    unique: dict[tuple[str, str, str], dict] = {}
+    for component in data.get("components") or []:
+        group = str(component.get("group") or "").strip()
+        name = str(component.get("name") or "").strip()
+        version = str(component.get("version") or "").strip()
+        if not name or group == "io.reqover":
+            continue
+        unique[(group, name, version)] = component
+    return [unique[key] for key in sorted(unique, key=lambda value: tuple(part.lower() for part in value))]
+
+
+def repeat_table_header(row) -> None:
+    tr_pr = row._tr.get_or_add_trPr()
+    header = OxmlElement("w:tblHeader")
+    header.set(qn("w:val"), "true")
+    tr_pr.append(header)
+
+
+def keep_row_together(row) -> None:
+    tr_pr = row._tr.get_or_add_trPr()
+    cant_split = OxmlElement("w:cantSplit")
+    tr_pr.append(cant_split)
+
+
+def fill_sbom(document: Document, components: list[dict]) -> int:
+    table = document.tables[4]
+    repeat_table_header(table.rows[0])
+
+    template_row = deepcopy(table.rows[1]._tr)
+    for row in list(table.rows)[1:]:
+        table._tbl.remove(row._tr)
+
+    for index, component in enumerate(components, start=1):
+        new_tr = deepcopy(template_row)
+        table._tbl.append(new_tr)
+        row = table.rows[-1]
+        keep_row_together(row)
+        values = [
+            str(index),
+            f"{component.get('group') or ''}:{component.get('name') or ''}".lstrip(":"),
+            str(component.get("version") or "[확인 필요: 버전 확인]"),
+            component_license(component),
+            component_url(component),
+            component_purpose(component),
+        ]
+        for column, value in enumerate(values):
+            set_cell_text(
+                row.cells[column],
+                value,
+                size=SBOM_FONT_SIZE,
+                center=column in {0, 2, 3},
+            )
+
+    if not components:
+        new_tr = deepcopy(template_row)
+        table._tbl.append(new_tr)
+        row = table.rows[-1]
+        for column, value in enumerate(
+            [
+                "1",
+                "[확인 필요: SBOM component 없음]",
+                "",
+                "",
+                "",
+                "CycloneDX 생성 설정과 대상 configuration 확인",
+            ]
+        ):
+            set_cell_text(row.cells[column], value, size=SBOM_FONT_SIZE, center=column in {0, 2, 3})
+
+    # The template note is not evidence and its required post-table paragraph can
+    # become a blank trailing page after the table expands across many pages.
+    note = next(paragraph for paragraph in document.paragraphs if "필요 시, 행을 추가" in paragraph.text)
+    remove_element(note._p)
+    return len(components)
+
+
+def normalize_document_fonts(document: Document) -> None:
+    def format_runs(paragraphs) -> None:
+        for paragraph in paragraphs:
+            for run in paragraph.runs:
+                current_size = run.font.size or BODY_FONT_SIZE
+                set_run_font(
+                    run,
+                    size=current_size,
+                    bold=run.bold,
+                    italic=run.italic,
+                    color=(
+                        str(run.font.color.rgb)
+                        if run.font.color is not None and run.font.color.type is not None and run.font.color.rgb is not None
+                        else "000000"
+                    ),
+                )
+
+    format_runs(document.paragraphs)
+    for table in document.tables:
+        for row in table.rows:
+            for cell in row.cells:
+                format_runs(cell.paragraphs)
+
+
+def list_placeholders(document: Document) -> list[str]:
+    values: list[str] = []
+
+    def inspect_paragraphs(paragraphs) -> None:
+        for paragraph in paragraphs:
+            for match in re.findall(r"\[확인 필요:[^\]]+\]", paragraph.text):
+                values.append(match)
+
+    inspect_paragraphs(document.paragraphs)
+    for table in document.tables:
+        for row in table.rows:
+            for cell in row.cells:
+                inspect_paragraphs(cell.paragraphs)
+    return list(dict.fromkeys(values))
+
+
+def build_document(args: argparse.Namespace) -> tuple[Path, int, list[str]]:
+    template = args.template.resolve()
+    sbom = args.sbom.resolve()
+    output = args.output.resolve()
+    verify_template(template)
+    components = load_sbom_components(sbom)
+
+    document = Document(str(template))
+    remove_guide_and_ai_appendix(document)
+    fill_basic_information(document, args)
+    fill_report_body(document, args, components)
+    component_count = fill_sbom(document, components)
+    normalize_document_fonts(document)
+
+    document.core_properties.title = "2026 오픈소스 개발자대회 결과보고서 - Reqover"
+    document.core_properties.subject = "Reqover 요청 단위 런타임 커버리지 귀속 도구"
+    document.core_properties.keywords = "Reqover, Java Agent, Spring MVC, WebFlux, coverage attribution"
+    document.core_properties.author = "Reqover"
+    document.core_properties.last_modified_by = "Reqover"
+
+    placeholders = list_placeholders(document)
+    output.parent.mkdir(parents=True, exist_ok=True)
+    document.save(str(output))
+    if sha256(template) != TEMPLATE_SHA256:
+        raise RuntimeError("Retained official template changed during generation")
+    return output, component_count, placeholders
+
+
+def main() -> None:
+    args = parse_args()
+    output, component_count, placeholders = build_document(args)
+    print(f"Generated: {output}")
+    print(f"SBOM components: {component_count}")
+    if placeholders:
+        print("Unresolved placeholders:")
+        for placeholder in placeholders:
+            print(f"- {placeholder}")
 
 
 if __name__ == "__main__":
-    build_doc()
+    main()

@@ -139,7 +139,7 @@ python3 scripts/build-result-report-docx.py \
 - [x] 의도한 변경만 commit
 - [x] PR의 Java 17/21 build와 OSV check 모두 green
 - [x] review 후 `main` merge
-- [x] release tag가 현재 `main` commit과 정확히 일치
+- [x] release tag가 생성 시점의 `main` runtime commit과 정확히 일치(이후 제출 문서만 별도 merge)
 
 ```bash
 git tag -s v0.1.0 -m "Reqover 0.1.0"

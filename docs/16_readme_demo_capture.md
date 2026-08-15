@@ -8,15 +8,27 @@ from local Reqover runs. The images are product output, not mockups.
 ## Verified Environment
 
 - OS: macOS 15.7.3, Apple M1, 16 GB RAM
-- Date: 2026-08-10
-- JDK: OpenJDK 17.0.19
-- Gradle: 9.5.1 wrapper
-- Browser capture viewport: 1440 × 900
+- Date: 2026-08-14 (0.1.1 assets; 0.1.0 assets were taken on 2026-08-10)
+- JDK: OpenJDK 21.0.11
+- Browser capture viewport: 1440 × 1000 at device scale factor 2
 - MVC port: 18200
 - WebFlux port: 18201
 
-The same release candidate also passed the full build on Temurin 21.0.12.
-Reqover emits Java 17-compatible bytecode.
+Reqover emits Java 17-compatible bytecode and the full build passes on both
+JDK 17 and JDK 21.
+
+## Capture Method
+
+The images are element-scoped screenshots of the saved report page, taken with
+Playwright against a CSS selector rather than a pixel rectangle, so a layout
+change cannot silently shift what the image shows.
+
+| Asset | Selector |
+| --- | --- |
+| `reqover-mvc-request-attribution.png` | first `section.section` (Endpoint to Code) |
+| `reqover-code-to-endpoint-index.png` | second `section.section` (Code to Endpoint Index) |
+| `reqover-webflux-thread-hop.png` | first `article.endpoint` |
+| `reqover-webflux-report.png` | `body` (whole report) |
 
 ## Build
 
@@ -37,7 +49,7 @@ Reqover emits Java 17-compatible bytecode.
 Start the MVC sample on loopback:
 
 ```bash
-java -jar examples/mvc-sample/build/libs/mvc-sample-0.1.0.jar \
+java -jar examples/mvc-sample/build/libs/mvc-sample-0.1.1.jar \
   --server.address=127.0.0.1 \
   --server.port=18200 \
   --spring.main.banner-mode=off
@@ -72,8 +84,8 @@ Start the WebFlux sample with the shaded agent and a narrow include prefix:
 
 ```bash
 java \
-  -javaagent:reqover-agent/build/libs/reqover-agent-0.1.0.jar=include=io.reqover.example.webflux.auto \
-  -jar examples/webflux-sample/build/libs/webflux-sample-0.1.0.jar \
+  -javaagent:reqover-agent/build/libs/reqover-agent-0.1.1.jar=include=io.reqover.example.webflux.auto \
+  -jar examples/webflux-sample/build/libs/webflux-sample-0.1.1.jar \
   --server.address=127.0.0.1 \
   --server.port=18201 \
   --spring.main.banner-mode=off
@@ -95,7 +107,8 @@ Verified results:
 - `reactor-http-nio-2`, `boundedElastic-1`, and `parallel-1` are retained in the
   same request bucket.
 - `AutoReactiveOrderService#validate(J)J`, which runs after the scheduler hop,
-  is attributed to the same endpoint.
+  is attributed to the same endpoint. The report renders it as
+  `validate(long): long`.
 
 Assets:
 

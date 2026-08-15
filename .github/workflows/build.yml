@@ -47,10 +47,17 @@ jobs:
           ./gradlew cyclonedxBom --no-daemon --console=plain
           ./scripts/verify-sbom-lock.py build/reports/bom/reqover.cdx.json sbom/reqover.cdx.json
 
+      - name: Resolve project version
+        if: matrix.java == 21
+        run: |
+          project_version="$(./gradlew properties -q --no-daemon --console=plain | sed -n 's/^version: //p')"
+          test -n "${project_version}"
+          echo "PROJECT_VERSION=${project_version}" >> "${GITHUB_ENV}"
+
       - name: Verify release metadata in agent JAR
         if: matrix.java == 21
         run: |
-          jar tf reqover-agent/build/libs/reqover-agent-0.1.0.jar > jar-entries.txt
+          jar tf "reqover-agent/build/libs/reqover-agent-${PROJECT_VERSION}.jar" > jar-entries.txt
           grep -Fx 'META-INF/LICENSE-REQOVER' jar-entries.txt
           grep -Fx 'META-INF/NOTICE-REQOVER' jar-entries.txt
           grep -Fx 'META-INF/THIRD_PARTY_NOTICES.md' jar-entries.txt
@@ -70,7 +77,7 @@ jobs:
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: reqover-agent
-          path: reqover-agent/build/libs/reqover-agent-0.1.0.jar
+          path: reqover-agent/build/libs/reqover-agent-${{ env.PROJECT_VERSION }}.jar
           if-no-files-found: error
           retention-days: 14
 

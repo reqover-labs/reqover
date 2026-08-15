@@ -34,8 +34,16 @@ mkdir -p "$OUTPUT_DIR"
 
 ./gradlew :reqover-agent:shadowJar :examples:mvc-sample:bootJar --no-daemon --console=plain
 
-AGENT_JAR="reqover-agent/build/libs/reqover-agent-0.1.0.jar"
-APP_JAR="examples/mvc-sample/build/libs/mvc-sample-0.1.0.jar"
+# Read the version the build stamps into the artifact names so a release bump
+# does not have to be repeated in this script.
+REQOVER_VERSION="${REQOVER_VERSION:-$(awk -F'"' '/^[[:space:]]*version = "/ { print $2; exit }' build.gradle.kts)}"
+if [[ -z "$REQOVER_VERSION" ]]; then
+    echo "could not read the project version from build.gradle.kts" >&2
+    exit 1
+fi
+
+AGENT_JAR="reqover-agent/build/libs/reqover-agent-${REQOVER_VERSION}.jar"
+APP_JAR="examples/mvc-sample/build/libs/mvc-sample-${REQOVER_VERSION}.jar"
 ENDPOINT="http://127.0.0.1:${PORT}/auto/orders/1"
 APP_PID=""
 

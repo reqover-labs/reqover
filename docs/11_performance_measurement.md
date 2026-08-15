@@ -53,8 +53,8 @@ Start MVC sample with agent:
 
 ```bash
 ./gradlew :reqover-agent:shadowJar :examples:mvc-sample:bootJar
-java -javaagent:reqover-agent/build/libs/reqover-agent-0.1.0.jar=include=io.reqover.example.mvc.auto \
-  -jar examples/mvc-sample/build/libs/mvc-sample-0.1.0.jar \
+java -javaagent:reqover-agent/build/libs/reqover-agent-0.1.1.jar=include=io.reqover.example.mvc.auto \
+  -jar examples/mvc-sample/build/libs/mvc-sample-0.1.1.jar \
   --server.address=127.0.0.1 --server.port=8080
 ```
 
@@ -77,8 +77,8 @@ Start WebFlux sample with agent:
 
 ```bash
 ./gradlew :reqover-agent:shadowJar :examples:webflux-sample:bootJar
-java -javaagent:reqover-agent/build/libs/reqover-agent-0.1.0.jar=include=io.reqover.example.webflux.auto \
-  -jar examples/webflux-sample/build/libs/webflux-sample-0.1.0.jar \
+java -javaagent:reqover-agent/build/libs/reqover-agent-0.1.1.jar=include=io.reqover.example.webflux.auto \
+  -jar examples/webflux-sample/build/libs/webflux-sample-0.1.1.jar \
   --server.address=127.0.0.1 --server.port=8080
 ```
 

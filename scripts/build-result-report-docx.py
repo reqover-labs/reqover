@@ -68,8 +68,11 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--verification",
         default=(
-            "2026-08-10 JDK 17·21 clean build 35 tests 통과, CycloneDX 1.6 SBOM lock 일치, "
-            "외부 Maven 구성요소 96개 OSV 0건. v0.1.0=62910fc1896d. Release CI 성공: "
+            "2026-08-14 JDK 17·21 clean build 35 tests 통과, CycloneDX 1.6 SBOM lock 일치, "
+            "외부 Maven 구성요소 104개 OSV 0건 (log4j-api를 2.25.5로 올려 "
+            "GHSA-qv9r-c865-cp47 해소). "
+            "[확인 필요: v0.1.1 태그 커밋 해시와 Release CI 실행 URL — 태그 push 후 기입]. "
+            "직전 기록: 2026-08-10 v0.1.0=62910fc1896d, "
             "https://github.com/reqover-labs/reqover/actions/runs/31366748139"
         ),
     )

@@ -1,6 +1,6 @@
 # 02. 시스템 아키텍처
 
-이 문서는 Reqover `0.1.0`의 실제 구현을 설명합니다. 향후 아이디어가 아니라
+이 문서는 Reqover `0.1.1`의 실제 구현을 설명합니다. 향후 아이디어가 아니라
 현재 코드와 자동 테스트가 보장하는 범위만 포함합니다.
 
 ## 전체 흐름
@@ -45,7 +45,7 @@ Reqover는 세 층으로 나뉩니다.
 실행 형식은 다음과 같습니다.
 
 ```text
--javaagent:reqover-agent-0.1.0.jar=include=com.example.app
+-javaagent:reqover-agent-0.1.1.jar=include=com.example.app
 ```
 
 - `include=`는 필수이며 여러 prefix는 `;`로 구분합니다.
@@ -98,7 +98,7 @@ sequenceDiagram
 normalized endpoint pattern은 Spring의 best-matching pattern을 사용하고, pattern이
 아직 없으면 request URI로 fallback합니다. Servlet async re-dispatch에는 기존
 bucket을 재사용하지만, re-dispatch 전 async worker thread의 application 실행은
-현재 `0.1.0`에서 자동 전파하지 않습니다.
+현재 `0.1.1`에서 자동 전파하지 않습니다.
 
 ## Spring WebFlux lifecycle
 
@@ -161,5 +161,5 @@ sample의 `/reqover/report*` endpoint는 인증이 없고 데모 스크립트는
 - reverse index는 먼저 재검증할 API를 좁히는 신호이며 완전한 정적 변경 영향
   분석이 아닙니다.
 - unmanaged thread와 MVC async worker의 context는 자동 보장하지 않습니다.
-- `0.1.0`은 in-memory 개발·QA 관측을 우선하며 production always-on agent를
+- `0.1.1`은 in-memory 개발·QA 관측을 우선하며 production always-on agent를
   주장하지 않습니다.

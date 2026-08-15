@@ -128,7 +128,7 @@ Build the agent:
 Example agent usage:
 
 ```bash
-java -javaagent:reqover-agent/build/libs/reqover-agent-0.1.0.jar=include=io.reqover.example.mvc -jar examples/mvc-sample/build/libs/mvc-sample-0.1.0.jar
+java -javaagent:reqover-agent/build/libs/reqover-agent-0.1.1.jar=include=io.reqover.example.mvc -jar examples/mvc-sample/build/libs/mvc-sample-0.1.1.jar
 ```
 
 Run the Spring agent E2E tests:

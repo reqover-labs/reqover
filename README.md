@@ -22,7 +22,7 @@
 ![Reqover MVC report separating code coverage by observed HTTP endpoint](docs/assets/reqover-mvc-request-attribution.png)
 
 > [!IMPORTANT]
-> Reqover `0.1.0`은 소스 빌드와 [GitHub Releases](https://github.com/reqover-labs/reqover/releases)를 통해 제공되는 초기 개발·QA용 릴리스입니다. Maven Central에는 아직 배포하지 않았으며, sample report endpoint는 인증을 제공하지 않습니다.
+> Reqover `0.1.1`은 소스 빌드와 [GitHub Releases](https://github.com/reqover-labs/reqover/releases)를 통해 제공되는 초기 개발·QA용 릴리스입니다. Maven Central에는 아직 배포하지 않았으며, sample report endpoint는 인증을 제공하지 않습니다.
 
 ## Why Reqover
 
@@ -41,7 +41,7 @@ Reqover는 JaCoCo를 대체하지 않습니다. line/branch 정밀 커버리지�
 
 ### 1. 요청별 실행 경로 분리
 
-같은 애플리케이션에서 `GET /orders/{id}`와 `POST /payments`를 호출하면 각 endpoint가 실행한 controller와 service가 별도 카드에 표시됩니다. 공통으로 실행된 `SharedValidator`는 두 카드 모두에 나타납니다.
+같은 애플리케이션에서 `GET /orders/{id}`와 `POST /payments`를 호출하면 각 endpoint가 실행한 controller와 service가 endpoint별로 나뉘어 표시됩니다. 두 요청이 공통으로 실행한 `SharedValidator`는 양쪽에 모두 나타나며, 2개 이상 endpoint가 도달한 메서드는 리포트에서 강조됩니다.
 
 ### 2. WebFlux thread hop 추적
 
@@ -51,7 +51,7 @@ Java agent가 controller와 service의 method entry를 자동 계측합니다. r
 
 ### 3. 코드에서 관측 endpoint 역조회
 
-`Code to Endpoint Index`는 특정 메서드를 실행한 관측 API를 보여줍니다. 코드 변경 후 먼저 재검증할 endpoint를 좁히는 신호로 사용할 수 있습니다.
+`Code to Endpoint Index`는 특정 메서드를 실행한 관측 API를 보여줍니다. 코드 변경 후 먼저 재검증할 endpoint를 좁히는 신호로 사용할 수 있습니다. 메서드 시그니처는 JVM descriptor 대신 `find(long): OrderResponse` 형태로 표시합니다.
 
 ![Reqover code-to-endpoint reverse index mapping SharedValidator to two endpoints](docs/assets/reqover-code-to-endpoint-index.png)
 
@@ -145,7 +145,7 @@ flowchart LR
 
 | 항목 | 현재 기준 |
 | --- | --- |
-| Project version | `0.1.0` |
+| Project version | `0.1.1` |
 | Build JDK | 17 or 21 |
 | Bytecode target | Java 17 |
 | CI | Ubuntu + Temurin 17/21 |

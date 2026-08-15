@@ -21,13 +21,25 @@ Push-Location $repoRoot
 try {
     .\gradlew.bat :reqover-agent:shadowJar ":examples:$App-sample:bootJar"
 
-    $agentJar = Join-Path $repoRoot "reqover-agent\build\libs\reqover-agent-0.1.0.jar"
+    # Read the version the build stamps into the artifact names so a release
+    # bump does not have to be repeated in this script.
+    $reqoverVersion = $env:REQOVER_VERSION
+    if (-not $reqoverVersion) {
+        $versionMatch = Select-String -Path (Join-Path $repoRoot "build.gradle.kts") `
+            -Pattern '^\s*version = "([^"]+)"' | Select-Object -First 1
+        if (-not $versionMatch) {
+            throw "Could not read the project version from build.gradle.kts."
+        }
+        $reqoverVersion = $versionMatch.Matches[0].Groups[1].Value
+    }
+
+    $agentJar = Join-Path $repoRoot "reqover-agent\build\libs\reqover-agent-${reqoverVersion}.jar"
     if ($App -eq "mvc") {
-        $appJar = Join-Path $repoRoot "examples\mvc-sample\build\libs\mvc-sample-0.1.0.jar"
+        $appJar = Join-Path $repoRoot "examples\mvc-sample\build\libs\mvc-sample-${reqoverVersion}.jar"
         $include = "io.reqover.example.mvc.auto"
         $endpoint = "http://127.0.0.1:$Port/auto/orders/42"
     } else {
-        $appJar = Join-Path $repoRoot "examples\webflux-sample\build\libs\webflux-sample-0.1.0.jar"
+        $appJar = Join-Path $repoRoot "examples\webflux-sample\build\libs\webflux-sample-${reqoverVersion}.jar"
         $include = "io.reqover.example.webflux.auto"
         $endpoint = "http://127.0.0.1:$Port/auto/reactive/orders/42"
     }

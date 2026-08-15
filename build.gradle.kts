@@ -13,7 +13,7 @@ plugins {
 
 allprojects {
     group = "io.reqover"
-    version = "0.1.0"
+    version = "0.1.1"
 
     tasks.withType<org.cyclonedx.gradle.BaseCyclonedxTask>().configureEach {
         licenseChoice.set(LicenseChoice().apply {

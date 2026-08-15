@@ -1,12 +1,12 @@
 # 17. Integrating Reqover into a Spring Application
 
-Reqover `0.1.0` is an initial developer/QA release. The Java agent is distributed
+Reqover `0.1.1` is an initial developer/QA release. The Java agent is distributed
 through GitHub Releases; the library modules can be built from the same tag and
 published to a local Maven repository for integration testing.
 
 ## 1. Publish the library modules locally
 
-From a checkout of the `v0.1.0` tag:
+From a checkout of the `v0.1.1` tag:
 
 ```bash
 ./gradlew clean publishToMavenLocal
@@ -27,8 +27,8 @@ repositories {
 }
 
 dependencies {
-    implementation("io.reqover:reqover-spring-mvc:0.1.0")
-    implementation("io.reqover:reqover-report:0.1.0")
+    implementation("io.reqover:reqover-spring-mvc:0.1.1")
+    implementation("io.reqover:reqover-report:0.1.1")
 }
 ```
 
@@ -36,8 +36,8 @@ Spring WebFlux:
 
 ```kotlin
 dependencies {
-    implementation("io.reqover:reqover-spring-webflux:0.1.0")
-    implementation("io.reqover:reqover-report:0.1.0")
+    implementation("io.reqover:reqover-spring-webflux:0.1.1")
+    implementation("io.reqover:reqover-report:0.1.1")
 }
 ```
 
@@ -91,12 +91,12 @@ network access controls. Do not expose the sample endpoint to the public Interne
 
 ## 4. Start with the shaded Java agent
 
-Download `reqover-agent-0.1.0.jar` from the matching GitHub Release, then pass a
+Download `reqover-agent-0.1.1.jar` from the matching GitHub Release, then pass a
 narrow application package explicitly:
 
 ```bash
 java \
-  -javaagent:reqover-agent-0.1.0.jar=include=com.example.orders \
+  -javaagent:reqover-agent-0.1.1.jar=include=com.example.orders \
   -jar app.jar
 ```
 

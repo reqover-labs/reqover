@@ -2,6 +2,28 @@
 
 All notable changes to Reqover are documented in this file.
 
+## 0.1.1 - 2026-08-14
+
+Report readability. No change to instrumentation, attribution or the JSON report.
+
+### Changed
+
+- HTML report renders JVM descriptors the way a reader says them:
+  `find(J)Lcom/example/OrderResponse;` is shown as `find(long): OrderResponse`.
+  Unparseable descriptors are printed verbatim rather than hidden.
+- The summary line reports how many methods are reached by more than one
+  endpoint, replacing three counters that restated what the page already listed.
+  Those methods are highlighted in both directions of the report.
+- A class instrumented through more than one registration path is listed once
+  instead of repeated per class id.
+- Endpoints carry the HTTP verb as the only colour on the page; request ids and
+  thread names are monospace text rather than pills.
+- Wider content column so long Java descriptors stop wrapping on every row.
+
+### Added
+
+- Dark presentation when the reader's system asks for it.
+
 ## 0.1.0 - 2026-08-10
 
 Initial developer/QA release.

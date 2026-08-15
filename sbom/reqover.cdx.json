@@ -1,10 +1,10 @@
 {
     "bomFormat": "CycloneDX",
     "specVersion": "1.6",
-    "serialNumber": "urn:uuid:036c80e0-d99c-4b47-81ca-b11ae4ee1419",
+    "serialNumber": "urn:uuid:f1c2065c-f925-47c8-8ffd-1e7fd01a1067",
     "version": 1,
     "metadata": {
-        "timestamp": "2026-08-10T06:18:52Z",
+        "timestamp": "2026-08-14T11:23:20Z",
         "tools": {
             "components": [
                 {
@@ -17,11 +17,11 @@
         },
         "component": {
             "type": "library",
-            "bom-ref": "pkg:maven/io.reqover/reqover@0.1.0?project_path=%3A",
+            "bom-ref": "pkg:maven/io.reqover/reqover@0.1.1?project_path=%3A",
             "group": "io.reqover",
             "name": "reqover",
-            "version": "0.1.0",
-            "purl": "pkg:maven/io.reqover/reqover@0.1.0?project_path=%3A",
+            "version": "0.1.1",
+            "purl": "pkg:maven/io.reqover/reqover@0.1.1?project_path=%3A",
             "modified": false,
             "externalReferences": [
                 {
@@ -48,6 +48,75 @@
         ]
     },
     "components": [
+        {
+            "type": "library",
+            "bom-ref": "pkg:maven/biz.aQute.bnd/biz.aQute.bnd.annotation@7.1.0?type=jar",
+            "publisher": "Bndtools",
+            "group": "biz.aQute.bnd",
+            "name": "biz.aQute.bnd.annotation",
+            "version": "7.1.0",
+            "description": "bnd Annotations Library",
+            "hashes": [
+                {
+                    "alg": "MD5",
+                    "content": "664c398da304527f42ab13a0f8036025"
+                },
+                {
+                    "alg": "SHA-1",
+                    "content": "2f2be18c936d08cf46ea6cfa0043f34afdf38705"
+                },
+                {
+                    "alg": "SHA-256",
+                    "content": "f69c2de3a695c113d125ac8053c92a680a3ce9d02ea25845095cf2d4626a7663"
+                },
+                {
+                    "alg": "SHA-512",
+                    "content": "b29e68403ff0b0cd0efacf23a466390b922ef464f79b49c25518864839a1cd86329ace0a7214c6f0ce99056019d857301994bbb71dea0c35dd94511edd789ca4"
+                },
+                {
+                    "alg": "SHA-384",
+                    "content": "71a5290b7cde52d3cae668492cfb368c6955a176dd7442a93e0f26f2258806c56b45869436ad9f336ad3f7a316b45838"
+                },
+                {
+                    "alg": "SHA3-384",
+                    "content": "84c2757373413bfaedba04dc84329bf01b26c02a417d87674842f147a05e4001ed154efecc0f43d4473b8a7ba5175296"
+                },
+                {
+                    "alg": "SHA3-256",
+                    "content": "f3cd557e7b9b6f8996ea1006cce7d4b007fbd3b1fc27b62dacdece5e38988d9e"
+                },
+                {
+                    "alg": "SHA3-512",
+                    "content": "2059f5cb86d9d1b71479d2217107584fb0ff880f064a2cae0dd916d840e660314aaa746d4e6451c15ae56a500bc4e18191b40662ee4eda52aa3b0c33ea82c94b"
+                }
+            ],
+            "licenses": [
+                {
+                    "license": {
+                        "name": "(Apache-2.0 OR EPL-2.0)",
+                        "url": "https://opensource.org/licenses/Apache-2.0,https://opensource.org/licenses/EPL-2.0"
+                    }
+                }
+            ],
+            "purl": "pkg:maven/biz.aQute.bnd/biz.aQute.bnd.annotation@7.1.0?type=jar",
+            "modified": false,
+            "externalReferences": [
+                {
+                    "type": "website",
+                    "url": "https://bndtools.org/"
+                },
+                {
+                    "type": "vcs",
+                    "url": "https://github.com/bndtools/bnd"
+                }
+            ],
+            "properties": [
+                {
+                    "name": "cdx:maven:package:test",
+                    "value": "false"
+                }
+            ]
+        },
         {
             "type": "library",
             "bom-ref": "pkg:maven/ch.qos.logback/logback-classic@1.5.34?type=jar",
@@ -567,6 +636,62 @@
                 {
                     "name": "cdx:maven:package:test",
                     "value": "true"
+                }
+            ]
+        },
+        {
+            "type": "library",
+            "bom-ref": "pkg:maven/com.google.errorprone/error_prone_annotations@2.38.0?type=jar",
+            "group": "com.google.errorprone",
+            "name": "error_prone_annotations",
+            "version": "2.38.0",
+            "hashes": [
+                {
+                    "alg": "MD5",
+                    "content": "912f8206614000252841d89cb0461895"
+                },
+                {
+                    "alg": "SHA-1",
+                    "content": "fc0ae991433e8590ba51cd558421478318a74c8c"
+                },
+                {
+                    "alg": "SHA-256",
+                    "content": "6661d5335090a5fc61dd869d2095bc6c1e2156e3aa47a6e4ababdf64c99a7889"
+                },
+                {
+                    "alg": "SHA-512",
+                    "content": "b13fdb7e06ec1f12ea1d63b0ff942c239e4decb391d736a1f7d46c9aa9e2744e9391be4398a02a78d551a96969622e65b75bbd31e5bf67a5938716765f451f3a"
+                },
+                {
+                    "alg": "SHA-384",
+                    "content": "47be5289bf8ca3f9dfe2d22e4baf6defc71dabb5476f878a240412e336d77d81148b2f79ffc0702079e48bd67ad7fd22"
+                },
+                {
+                    "alg": "SHA3-384",
+                    "content": "53f3f57b51ea34afd38e1270fbe08dfcf1e2dcfb50f4ac9369bb625febb75611c9e5d8bb09f4dfcb504b5d0b9ac47443"
+                },
+                {
+                    "alg": "SHA3-256",
+                    "content": "02eaa5431cda49a9e702cac4ad8051d88397e1d5219a0ef65673dae8eaf9c70d"
+                },
+                {
+                    "alg": "SHA3-512",
+                    "content": "0307dfc76cae6d539d93649ef3ccb85937d62f6f74be212e8a05ae1cc892f3b63a5c03cd6f61ace9f5dbd0f8dfb0baf086eaf3cd10bbefd22640966d00686dac"
+                }
+            ],
+            "licenses": [
+                {
+                    "license": {
+                        "id": "Apache-2.0"
+                    }
+                }
+            ],
+            "purl": "pkg:maven/com.google.errorprone/error_prone_annotations@2.38.0?type=jar",
+            "modified": false,
+            "properties": [
+                {
+                    "name": "cdx:maven:package:test",
+                    "value": "false"
                 }
             ]
         },
@@ -2149,11 +2274,11 @@
         },
         {
             "type": "library",
-            "bom-ref": "pkg:maven/io.reqover/examples@0.1.0?project_path=%3Aexamples",
+            "bom-ref": "pkg:maven/io.reqover/examples@0.1.1?project_path=%3Aexamples",
             "group": "io.reqover",
             "name": "examples",
-            "version": "0.1.0",
-            "purl": "pkg:maven/io.reqover/examples@0.1.0?project_path=%3Aexamples",
+            "version": "0.1.1",
+            "purl": "pkg:maven/io.reqover/examples@0.1.1?project_path=%3Aexamples",
             "modified": false,
             "properties": [
                 {
@@ -2172,11 +2297,11 @@
         },
         {
             "type": "library",
-            "bom-ref": "pkg:maven/io.reqover/mvc-sample@0.1.0?project_path=%3Aexamples%3Amvc-sample",
+            "bom-ref": "pkg:maven/io.reqover/mvc-sample@0.1.1?project_path=%3Aexamples%3Amvc-sample",
             "group": "io.reqover",
             "name": "mvc-sample",
-            "version": "0.1.0",
-            "purl": "pkg:maven/io.reqover/mvc-sample@0.1.0?project_path=%3Aexamples%3Amvc-sample",
+            "version": "0.1.1",
+            "purl": "pkg:maven/io.reqover/mvc-sample@0.1.1?project_path=%3Aexamples%3Amvc-sample",
             "modified": false,
             "properties": [
                 {
@@ -2195,11 +2320,11 @@
         },
         {
             "type": "library",
-            "bom-ref": "pkg:maven/io.reqover/reqover-agent@0.1.0?project_path=%3Areqover-agent",
+            "bom-ref": "pkg:maven/io.reqover/reqover-agent@0.1.1?project_path=%3Areqover-agent",
             "group": "io.reqover",
             "name": "reqover-agent",
-            "version": "0.1.0",
-            "purl": "pkg:maven/io.reqover/reqover-agent@0.1.0?project_path=%3Areqover-agent",
+            "version": "0.1.1",
+            "purl": "pkg:maven/io.reqover/reqover-agent@0.1.1?project_path=%3Areqover-agent",
             "modified": false,
             "properties": [
                 {
@@ -2218,11 +2343,11 @@
         },
         {
             "type": "library",
-            "bom-ref": "pkg:maven/io.reqover/reqover-core@0.1.0?project_path=%3Areqover-core",
+            "bom-ref": "pkg:maven/io.reqover/reqover-core@0.1.1?project_path=%3Areqover-core",
             "group": "io.reqover",
             "name": "reqover-core",
-            "version": "0.1.0",
-            "purl": "pkg:maven/io.reqover/reqover-core@0.1.0?project_path=%3Areqover-core",
+            "version": "0.1.1",
+            "purl": "pkg:maven/io.reqover/reqover-core@0.1.1?project_path=%3Areqover-core",
             "modified": false,
             "properties": [
                 {
@@ -2241,11 +2366,11 @@
         },
         {
             "type": "library",
-            "bom-ref": "pkg:maven/io.reqover/reqover-instrumentation@0.1.0?project_path=%3Areqover-instrumentation",
+            "bom-ref": "pkg:maven/io.reqover/reqover-instrumentation@0.1.1?project_path=%3Areqover-instrumentation",
             "group": "io.reqover",
             "name": "reqover-instrumentation",
-            "version": "0.1.0",
-            "purl": "pkg:maven/io.reqover/reqover-instrumentation@0.1.0?project_path=%3Areqover-instrumentation",
+            "version": "0.1.1",
+            "purl": "pkg:maven/io.reqover/reqover-instrumentation@0.1.1?project_path=%3Areqover-instrumentation",
             "modified": false,
             "properties": [
                 {
@@ -2264,11 +2389,11 @@
         },
         {
             "type": "library",
-            "bom-ref": "pkg:maven/io.reqover/reqover-report@0.1.0?project_path=%3Areqover-report",
+            "bom-ref": "pkg:maven/io.reqover/reqover-report@0.1.1?project_path=%3Areqover-report",
             "group": "io.reqover",
             "name": "reqover-report",
-            "version": "0.1.0",
-            "purl": "pkg:maven/io.reqover/reqover-report@0.1.0?project_path=%3Areqover-report",
+            "version": "0.1.1",
+            "purl": "pkg:maven/io.reqover/reqover-report@0.1.1?project_path=%3Areqover-report",
             "modified": false,
             "properties": [
                 {
@@ -2287,11 +2412,11 @@
         },
         {
             "type": "library",
-            "bom-ref": "pkg:maven/io.reqover/reqover-spring-mvc@0.1.0?project_path=%3Areqover-spring-mvc",
+            "bom-ref": "pkg:maven/io.reqover/reqover-spring-mvc@0.1.1?project_path=%3Areqover-spring-mvc",
             "group": "io.reqover",
             "name": "reqover-spring-mvc",
-            "version": "0.1.0",
-            "purl": "pkg:maven/io.reqover/reqover-spring-mvc@0.1.0?project_path=%3Areqover-spring-mvc",
+            "version": "0.1.1",
+            "purl": "pkg:maven/io.reqover/reqover-spring-mvc@0.1.1?project_path=%3Areqover-spring-mvc",
             "modified": false,
             "properties": [
                 {
@@ -2310,11 +2435,11 @@
         },
         {
             "type": "library",
-            "bom-ref": "pkg:maven/io.reqover/reqover-spring-webflux@0.1.0?project_path=%3Areqover-spring-webflux",
+            "bom-ref": "pkg:maven/io.reqover/reqover-spring-webflux@0.1.1?project_path=%3Areqover-spring-webflux",
             "group": "io.reqover",
             "name": "reqover-spring-webflux",
-            "version": "0.1.0",
-            "purl": "pkg:maven/io.reqover/reqover-spring-webflux@0.1.0?project_path=%3Areqover-spring-webflux",
+            "version": "0.1.1",
+            "purl": "pkg:maven/io.reqover/reqover-spring-webflux@0.1.1?project_path=%3Areqover-spring-webflux",
             "modified": false,
             "properties": [
                 {
@@ -2333,11 +2458,11 @@
         },
         {
             "type": "library",
-            "bom-ref": "pkg:maven/io.reqover/webflux-sample@0.1.0?project_path=%3Aexamples%3Awebflux-sample",
+            "bom-ref": "pkg:maven/io.reqover/webflux-sample@0.1.1?project_path=%3Aexamples%3Awebflux-sample",
             "group": "io.reqover",
             "name": "webflux-sample",
-            "version": "0.1.0",
-            "purl": "pkg:maven/io.reqover/webflux-sample@0.1.0?project_path=%3Aexamples%3Awebflux-sample",
+            "version": "0.1.1",
+            "purl": "pkg:maven/io.reqover/webflux-sample@0.1.1?project_path=%3Aexamples%3Awebflux-sample",
             "modified": false,
             "properties": [
                 {
@@ -2888,43 +3013,43 @@
         },
         {
             "type": "library",
-            "bom-ref": "pkg:maven/org.apache.logging.log4j/log4j-api@2.24.3?type=jar",
+            "bom-ref": "pkg:maven/org.apache.logging.log4j/log4j-api@2.25.5?type=jar",
             "group": "org.apache.logging.log4j",
             "name": "log4j-api",
-            "version": "2.24.3",
+            "version": "2.25.5",
             "description": "The logging API of the Log4j project. Library and application code can log through this API. It contains a simple built-in implementation (`SimpleLogger`) for trivial use cases. Production applications are recommended to use Log4j API in combination with a fully-fledged implementation, such as Log4j Core.",
             "hashes": [
                 {
                     "alg": "MD5",
-                    "content": "d89516699543c5c21be87ee1760695f3"
+                    "content": "6da507c0ef11c49576534c1db69e1b99"
                 },
                 {
                     "alg": "SHA-1",
-                    "content": "b02c125db8b6d295adf72ae6e71af5d83bce2370"
+                    "content": "6c80ea65e41f7858f7e15cb390c98c36167c7b3a"
                 },
                 {
                     "alg": "SHA-256",
-                    "content": "5b4a0a0cd0e751ded431c162442bdbdd53328d1f8bb2bae5fc1bbeee0f66d80f"
+                    "content": "64777f73ea0b3104c04eb82befbdccc30a425a19e83ad06cb2f93aa303511863"
                 },
                 {
                     "alg": "SHA-512",
-                    "content": "d936ac37b3d7ca2e4370ef122629c5ceb0bef60a6c08a3bd8bb278204dbed84bb888aaa307c58e80e4e9d645b73792433f52adcccd30378fbac99b1d271042f7"
+                    "content": "68c21b4af4770f18c27794448c335a236eb906326ffe51b7a2634c988d443da760a6057cd94ff5e44363f4b209489091225a48916f327d11ce690bb45d334318"
                 },
                 {
                     "alg": "SHA-384",
-                    "content": "d376ab3673186a1a39ea8b3d3c8359bb16dbb3f5d3782c182a112ab19b61d7730434c6d0f631d43d6daae66005d1df4e"
+                    "content": "822c01f1bab171f9e8d8738ea565affb0a3d7a0469d2aca239bc3f05073d7f7a7f6e9cc621c6407cd60e7a5fbb301df4"
                 },
                 {
                     "alg": "SHA3-384",
-                    "content": "7ee1b17a329d90bf648d05defced8d79f7bfbca66cc7e90aa2e1b2d7622697d535969e50d1a03460447eda2fa008f86c"
+                    "content": "c0ec07e06db924837ee4a55211d6a2a1f53dc60b7dbcfca01a13636e8af25201fd99d5010c9ab9484be7308078e98125"
                 },
                 {
                     "alg": "SHA3-256",
-                    "content": "5d2ad18a3352c3d7269ecb8d52d6a5ac8bf0d0d937e4809f5023a45d0f8f50f3"
+                    "content": "73418d86d441a821fd8abc6658058e0cf47bd289d31facc7c52fe4c85f00a258"
                 },
                 {
                     "alg": "SHA3-512",
-                    "content": "7e964e6425a1198e2568a9e8c326f730b7d139f71e8d3b1b440aa90860f136f443e5ebd62aa022c1c7834e23995ed0992f68dfb1760140d469b85fed84815ae1"
+                    "content": "69d1ef7061426e264f475c47a72b4d4962e4dfca0a21db8df751ac9423b1227fd9352da4627509aa3e01e2df9c7b2cc2257c21e1f83d3dec9e14ec6466946312"
                 }
             ],
             "licenses": [
@@ -2935,7 +3060,7 @@
                     }
                 }
             ],
-            "purl": "pkg:maven/org.apache.logging.log4j/log4j-api@2.24.3?type=jar",
+            "purl": "pkg:maven/org.apache.logging.log4j/log4j-api@2.25.5?type=jar",
             "modified": false,
             "properties": [
                 {
@@ -2946,43 +3071,90 @@
         },
         {
             "type": "library",
-            "bom-ref": "pkg:maven/org.apache.logging.log4j/log4j-to-slf4j@2.24.3?type=jar",
+            "bom-ref": "pkg:maven/org.apache.logging.log4j/log4j-bom@2.25.5?type=pom",
+            "publisher": "The Apache Software Foundation",
+            "group": "org.apache.logging.log4j",
+            "name": "log4j-bom",
+            "version": "2.25.5",
+            "description": "Apache Log4j Bill-of-Materials",
+            "licenses": [
+                {
+                    "license": {
+                        "id": "Apache-2.0",
+                        "url": "https://www.apache.org/licenses/LICENSE-2.0"
+                    }
+                }
+            ],
+            "purl": "pkg:maven/org.apache.logging.log4j/log4j-bom@2.25.5?type=pom",
+            "modified": false,
+            "externalReferences": [
+                {
+                    "type": "website",
+                    "url": "https://www.apache.org/"
+                },
+                {
+                    "type": "build-system",
+                    "url": "https://github.com/apache/logging-log4j2/actions"
+                },
+                {
+                    "type": "issue-tracker",
+                    "url": "https://github.com/apache/logging-log4j2/issues"
+                },
+                {
+                    "type": "mailing-list",
+                    "url": "https://lists.apache.org/list.html?log4j-user@logging.apache.org"
+                },
+                {
+                    "type": "vcs",
+                    "url": "https://github.com/apache/logging-log4j2"
+                }
+            ],
+            "properties": [
+                {
+                    "name": "cdx:maven:package:test",
+                    "value": "false"
+                }
+            ]
+        },
+        {
+            "type": "library",
+            "bom-ref": "pkg:maven/org.apache.logging.log4j/log4j-to-slf4j@2.25.5?type=jar",
             "group": "org.apache.logging.log4j",
             "name": "log4j-to-slf4j",
-            "version": "2.24.3",
+            "version": "2.25.5",
             "description": "Forwards the Log4j API calls to SLF4J. (Refer to the `log4j-slf4j[2]-impl` artifacts for forwarding SLF4J to the Log4j API.)",
             "hashes": [
                 {
                     "alg": "MD5",
-                    "content": "1f4b63f9c41f2f5179aa10b35d76e805"
+                    "content": "9927bacbf08e748e4c816338658aeb7a"
                 },
                 {
                     "alg": "SHA-1",
-                    "content": "da1143e2a2531ee1c2d90baa98eb50a28a39d5a7"
+                    "content": "bafb12d62913815e040218e34c80d75ad6db09c1"
                 },
                 {
                     "alg": "SHA-256",
-                    "content": "c7f2b0c612a4eb05b1587d1c880eb4cf5f4f53850676a8ede8da2b8fabb4f73f"
+                    "content": "b68e8b47342dbc9b35644a14fe2efc0b7bf18da703910cd05ad5501ffe07bba1"
                 },
                 {
                     "alg": "SHA-512",
-                    "content": "8ca27fa34d4a8a6e57c9f578c85769a685659d34dd00a855d65f22ebc936155eac1c76aa4bf4f439e302e9a202f9c0856df01e543259bd9d2675ab59c20b6f9b"
+                    "content": "aba646c8b91906b118aa02dcebd56af56a957e9f0ec4dce8ae3c91e71ffb2fce0d047503c09f1cab665702405f67742e427277e00941e082d0239df2c82ef935"
                 },
                 {
                     "alg": "SHA-384",
-                    "content": "9078afac573cf6ae3b4d548a933ffebe5113ba74438cc4db75135c45f35594079fb85b698521227a61dd464a3652fa8c"
+                    "content": "fa667475559142e809e6c6c17173e621c1c268a70a8d657761b1d5b00bdc2d2b7240e7b05d10907c0a51881901ca755c"
                 },
                 {
                     "alg": "SHA3-384",
-                    "content": "65b28474ade17f1b34da33d6197f54571f598fa4535c49c0f41ba807d559045ff4d41140a55b0b5f4103cfa965daa237"
+                    "content": "3a00ef5aef16579ef99c7ab4b7020d025a2fa9286e6f374bba05e96e2a10123a997f565193485a191641fa4648afc884"
                 },
                 {
                     "alg": "SHA3-256",
-                    "content": "dade25cfd6470dfc19cf2006073b7838c543b10ccee5b86c6d459461377e7a0b"
+                    "content": "9a3c0afb01d2ee9671ef65d006eb30d2c3a839b6ee115446ae58ec6ba85a554d"
                 },
                 {
                     "alg": "SHA3-512",
-                    "content": "d39e348fa249075eecee78ce17d4be794d3dfd9d07ab9c9e90a5981139836318d48d3c46146ec197e561869d7af19ae36de9b172272f878242c97a02f68620ee"
+                    "content": "64e5427520d22fa8fe8e9faabf50a17a994081cb7e41df7e4eaa1f408aee422997db2b6ebae59f00b880114031fb9192fff0c2b831d61b5d7b66c9eb9312ea11"
                 }
             ],
             "licenses": [
@@ -2993,7 +3165,7 @@
                     }
                 }
             ],
-            "purl": "pkg:maven/org.apache.logging.log4j/log4j-to-slf4j@2.24.3?type=jar",
+            "purl": "pkg:maven/org.apache.logging.log4j/log4j-to-slf4j@2.25.5?type=jar",
             "modified": false,
             "properties": [
                 {
@@ -3418,6 +3590,69 @@
                 {
                     "name": "cdx:maven:package:test",
                     "value": "true"
+                }
+            ]
+        },
+        {
+            "type": "library",
+            "bom-ref": "pkg:maven/org.jspecify/jspecify@1.0.0?type=jar",
+            "group": "org.jspecify",
+            "name": "jspecify",
+            "version": "1.0.0",
+            "description": "An artifact of well-named and well-specified annotations to power static analysis checks",
+            "hashes": [
+                {
+                    "alg": "MD5",
+                    "content": "9133aba420d0ca3b001dbb6ae9992cf6"
+                },
+                {
+                    "alg": "SHA-1",
+                    "content": "7425a601c1c7ec76645a78d22b8c6a627edee507"
+                },
+                {
+                    "alg": "SHA-256",
+                    "content": "1fad6e6be7557781e4d33729d49ae1cdc8fdda6fe477bb0cc68ce351eafdfbab"
+                },
+                {
+                    "alg": "SHA-512",
+                    "content": "efded31ef5b342f09422935076e599789076431e93a746685c0607e7de5592719ba6aacde0be670b3f064d1e85630d58d5bce6b34aed2a288fdb34f745efb7bc"
+                },
+                {
+                    "alg": "SHA-384",
+                    "content": "814f860e5a44ead6c457676841eef471a8b87be31b84c60a8a4477a18a9cbcb6e3c2ae700969d5c5e52309d961e0537a"
+                },
+                {
+                    "alg": "SHA3-384",
+                    "content": "c8844e5b71e5ecfbb7366097ce34af2f5863d86d5ccc3f9ec384d8ade4b60ccc8124c7fc88664f1afd2b0962fc8775bf"
+                },
+                {
+                    "alg": "SHA3-256",
+                    "content": "4b4f08ad7606a3ac62997779484919a302267b26d26ee19125f8a7eea60e8a71"
+                },
+                {
+                    "alg": "SHA3-512",
+                    "content": "65c6845ebae981cb81b61107707ced39f5b377dae970b47606ef482aaf10e3729def0da40d9377c43abbfb483a5ceae039b0d51c129c50a6d36ad351a5d6b01e"
+                }
+            ],
+            "licenses": [
+                {
+                    "license": {
+                        "id": "Apache-2.0"
+                    }
+                }
+            ],
+            "purl": "pkg:maven/org.jspecify/jspecify@1.0.0?type=jar",
+            "modified": false,
+            "externalReferences": [
+                {
+                    "type": "vcs",
+                    "url": "https://github.com/jspecify/jspecify/"
+                }
+            ],
+            "properties": [
+                {
+                    "name": "cdx:maven:package:test",
+                    "value": "false"
                 }
             ]
         },
@@ -4152,6 +4387,272 @@
                 {
                     "name": "cdx:maven:package:test",
                     "value": "true"
+                }
+            ]
+        },
+        {
+            "type": "library",
+            "bom-ref": "pkg:maven/org.osgi/org.osgi.annotation.bundle@2.0.0?type=jar",
+            "publisher": "Eclipse Foundation",
+            "group": "org.osgi",
+            "name": "org.osgi.annotation.bundle",
+            "version": "2.0.0",
+            "description": "OSGi Companion Code for org.osgi.annotation.bundle Version 2.0.0",
+            "hashes": [
+                {
+                    "alg": "MD5",
+                    "content": "19115314a0ce4cfb711a811dcc0be0a3"
+                },
+                {
+                    "alg": "SHA-1",
+                    "content": "f5c2cd6e670c3c5d440d3003efd5ef2ead5c68eb"
+                },
+                {
+                    "alg": "SHA-256",
+                    "content": "b9c9546ec5be3ebc2e85ba4919150ad76d64594805282fc895133a47d264a7ae"
+                },
+                {
+                    "alg": "SHA-512",
+                    "content": "f16b8983240ba3c08d6bc78e2eae92e89eb528f32a705961d90b463def0a5ed1ba08cc3d0be38b5dcfb946c6f759df772e122fb769e58e8c20aa79a489a1fd21"
+                },
+                {
+                    "alg": "SHA-384",
+                    "content": "88217b7d3a2d9a0a3f005162b95d68ba2bd29629688b2c32e93e4587d89fe6bd468f5c62ef422ebf2b609d402e62ff56"
+                },
+                {
+                    "alg": "SHA3-384",
+                    "content": "c7ee64dd3e235d900d01d8629b82245303d34a006e1edcd2571ef736d9c6256dcb718be326ad4909cb6d2cea26118ea9"
+                },
+                {
+                    "alg": "SHA3-256",
+                    "content": "9adcacb036caf30d17a13fcd5952a35e011678b1dbfabafdff73dba065ace8a3"
+                },
+                {
+                    "alg": "SHA3-512",
+                    "content": "76bec6bb2cdbc8da043760a7aedd51203c8d70b740c9b8de0ba6b0cf9ad991a58059566e7f62dee30606f32d267b2596d5bd5e885c73e336ae7fff6cf7f970db"
+                }
+            ],
+            "licenses": [
+                {
+                    "license": {
+                        "id": "Apache-2.0",
+                        "url": "https://www.apache.org/licenses/LICENSE-2.0"
+                    }
+                }
+            ],
+            "purl": "pkg:maven/org.osgi/org.osgi.annotation.bundle@2.0.0?type=jar",
+            "modified": false,
+            "externalReferences": [
+                {
+                    "type": "vcs",
+                    "url": "https://github.com/osgi/osgi"
+                }
+            ],
+            "properties": [
+                {
+                    "name": "cdx:maven:package:test",
+                    "value": "false"
+                }
+            ]
+        },
+        {
+            "type": "library",
+            "bom-ref": "pkg:maven/org.osgi/org.osgi.annotation.versioning@1.1.2?type=jar",
+            "publisher": "Eclipse Foundation",
+            "group": "org.osgi",
+            "name": "org.osgi.annotation.versioning",
+            "version": "1.1.2",
+            "description": "OSGi Companion Code for org.osgi.annotation.versioning Version 1.1.2",
+            "hashes": [
+                {
+                    "alg": "MD5",
+                    "content": "a61b3b8d09c85ad296c61e21bf77ec70"
+                },
+                {
+                    "alg": "SHA-1",
+                    "content": "dc3cd4ec96c0b3c5459fe00694bd73a816ecf93e"
+                },
+                {
+                    "alg": "SHA-256",
+                    "content": "f51f235e80df8ffbc30ef1b557b6ea38a696632d675404ec117e952978b8b863"
+                },
+                {
+                    "alg": "SHA-512",
+                    "content": "a4c612bec624a168f25f0923d51925bbc914686673eeebd5b2442998b876f05855e2b0a6e6e9aca4a6533ed3156b0d24f94c3e508ee9778e1b2e469be318afa3"
+                },
+                {
+                    "alg": "SHA-384",
+                    "content": "68a2046f083a2e77304622a56d07c0e73ba88534af4a87b5428cebf8b638c40ce21bbac089a8b5520ad488c946b633ea"
+                },
+                {
+                    "alg": "SHA3-384",
+                    "content": "930734f6979650191d51cd8bf1f9ab4548d307950735aa98e2dbda7aecc19b49d01a3b968824f6df2ffafce65e122c60"
+                },
+                {
+                    "alg": "SHA3-256",
+                    "content": "513392d0e8ddd873d04c5cf4f402a9cfe094413832bb859fe37b70fd0512dd12"
+                },
+                {
+                    "alg": "SHA3-512",
+                    "content": "3d2bd7d2eb784a9fab4b09c42adb0722363079235340f1915bb82a99f1c5e616ee8f3dc34d2c90b941d2651dcb4f393c7fea3e23b579456a696604148d10f22b"
+                }
+            ],
+            "licenses": [
+                {
+                    "license": {
+                        "id": "Apache-2.0",
+                        "url": "https://www.apache.org/licenses/LICENSE-2.0"
+                    }
+                }
+            ],
+            "purl": "pkg:maven/org.osgi/org.osgi.annotation.versioning@1.1.2?type=jar",
+            "modified": false,
+            "externalReferences": [
+                {
+                    "type": "vcs",
+                    "url": "https://github.com/osgi/osgi"
+                }
+            ],
+            "properties": [
+                {
+                    "name": "cdx:maven:package:test",
+                    "value": "false"
+                }
+            ]
+        },
+        {
+            "type": "library",
+            "bom-ref": "pkg:maven/org.osgi/org.osgi.resource@1.0.0?type=jar",
+            "publisher": "OSGi Alliance",
+            "group": "org.osgi",
+            "name": "org.osgi.resource",
+            "version": "1.0.0",
+            "description": "OSGi Companion Code for org.osgi.resource Version 1.0.0.",
+            "hashes": [
+                {
+                    "alg": "MD5",
+                    "content": "7d857a4203e2996fab0cf070133e43df"
+                },
+                {
+                    "alg": "SHA-1",
+                    "content": "343c88949132984b3f2d4175a72c40b77dc65619"
+                },
+                {
+                    "alg": "SHA-256",
+                    "content": "81fc50f1f1d38a4af28e131907d4afe213249aab05060484edca0e60c4af9b4a"
+                },
+                {
+                    "alg": "SHA-512",
+                    "content": "4e798790856f83f50832db80bfab64dfceeff1c509d7dde43e74a9f9192ea7a7d5ea77b9b1e81291fa6ba3dcef5ab8fa791ca8093a72a08d7ca6f6499e13e506"
+                },
+                {
+                    "alg": "SHA-384",
+                    "content": "73038c395166552b64b6b5469bd8056584f48d19b5762df2e8bd2770405ed8f6071e397a87d9a7ed39f8c2e0e8ab85b2"
+                },
+                {
+                    "alg": "SHA3-384",
+                    "content": "e06c8a460b3bf06d6cb22237aeffa6afd2eadd9461096c67b768a14603ad8aaa88f891d03cf0a273a99d86906c1c8eb3"
+                },
+                {
+                    "alg": "SHA3-256",
+                    "content": "1097cfd20e80ce368fd828a23ad7c32a202cebd92106f6ebb88ba55ca74349ee"
+                },
+                {
+                    "alg": "SHA3-512",
+                    "content": "d7b710e1e0484badb875f326c602c90df6705df48b0f057320919a5255d3ecbddd7053eabc68787480a70aebd7e553e9f51728112e1fa0846c849366b7e8d69b"
+                }
+            ],
+            "licenses": [
+                {
+                    "license": {
+                        "id": "Apache-2.0"
+                    }
+                }
+            ],
+            "purl": "pkg:maven/org.osgi/org.osgi.resource@1.0.0?type=jar",
+            "modified": false,
+            "externalReferences": [
+                {
+                    "type": "website",
+                    "url": "http://www.osgi.org/"
+                },
+                {
+                    "type": "vcs",
+                    "url": "https://osgi.org/git/build.git"
+                }
+            ],
+            "properties": [
+                {
+                    "name": "cdx:maven:package:test",
+                    "value": "false"
+                }
+            ]
+        },
+        {
+            "type": "library",
+            "bom-ref": "pkg:maven/org.osgi/org.osgi.service.serviceloader@1.0.0?type=jar",
+            "publisher": "OSGi Alliance",
+            "group": "org.osgi",
+            "name": "org.osgi.service.serviceloader",
+            "version": "1.0.0",
+            "description": "OSGi Companion Code for org.osgi.service.serviceloader Version 1.0.0.",
+            "hashes": [
+                {
+                    "alg": "MD5",
+                    "content": "4943f0102a6d893c4dd77f369a5f0537"
+                },
+                {
+                    "alg": "SHA-1",
+                    "content": "3728ff37909c6a3c1870b3e851342d9f2bd3cc63"
+                },
+                {
+                    "alg": "SHA-256",
+                    "content": "8f876ce2a9aa4e95b1f1952950255103e2487425050a654f3285447ba601c154"
+                },
+                {
+                    "alg": "SHA-512",
+                    "content": "a7def4cb7a8ed992645faa80a780e0b30bd39c1587b5bcb65fe170d10842d0d880c2849edd50c64807fe0e4b9cc0051337d1b161d0d390465d9e63a762861c49"
+                },
+                {
+                    "alg": "SHA-384",
+                    "content": "1e480694b8a541da4cd1e044d3f3ea3cd55152515ac022b80d865b6654242506c2138daabb4e71c30d36b12b9aaf676d"
+                },
+                {
+                    "alg": "SHA3-384",
+                    "content": "7f076af200ae9c2bd9f235b949aee01a1a758c8aac10fee8b98ec2497197d2029117d5627eb0eabd9b42979eb1baa009"
+                },
+                {
+                    "alg": "SHA3-256",
+                    "content": "83b1dce69c4c899176eb6e368e434ecb77dfed7c436530b8c5d08b9b6f2430aa"
+                },
+                {
+                    "alg": "SHA3-512",
+                    "content": "5debde53a7ead231dcd907467d59728f59cae4eb3b967c19808f78890bd97d2f04657cad9c093e88f9818338b0b3b38a57c66400ebcff61fbb26d18e9f7bf8ed"
+                }
+            ],
+            "licenses": [
+                {
+                    "license": {
+                        "id": "Apache-2.0"
+                    }
+                }
+            ],
+            "purl": "pkg:maven/org.osgi/org.osgi.service.serviceloader@1.0.0?type=jar",
+            "modified": false,
+            "externalReferences": [
+                {
+                    "type": "website",
+                    "url": "http://www.osgi.org/"
+                },
+                {
+                    "type": "vcs",
+                    "url": "https://osgi.org/git/build.git"
+                }
+            ],
+            "properties": [
+                {
+                    "name": "cdx:maven:package:test",
+                    "value": "false"
                 }
             ]
         },
@@ -6280,6 +6781,13 @@
     ],
     "dependencies": [
         {
+            "ref": "pkg:maven/biz.aQute.bnd/biz.aQute.bnd.annotation@7.1.0?type=jar",
+            "dependsOn": [
+                "pkg:maven/org.osgi/org.osgi.resource@1.0.0?type=jar",
+                "pkg:maven/org.osgi/org.osgi.service.serviceloader@1.0.0?type=jar"
+            ]
+        },
+        {
             "ref": "pkg:maven/ch.qos.logback/logback-classic@1.5.34?type=jar",
             "dependsOn": [
                 "pkg:maven/ch.qos.logback/logback-core@1.5.34?type=jar",
@@ -6289,13 +6797,13 @@
         {
             "ref": "pkg:maven/ch.qos.logback/logback-core@1.5.34?type=jar",
             "dependsOn": [
-
+                
             ]
         },
         {
             "ref": "pkg:maven/com.fasterxml.jackson.core/jackson-annotations@2.21?type=jar",
             "dependsOn": [
-
+                
             ]
         },
         {
@@ -6340,7 +6848,13 @@
         {
             "ref": "pkg:maven/com.fasterxml.jackson/jackson-bom@2.21.5?type=pom",
             "dependsOn": [
-
+                
+            ]
+        },
+        {
+            "ref": "pkg:maven/com.google.errorprone/error_prone_annotations@2.38.0?type=jar",
+            "dependsOn": [
+                
             ]
         },
         {
@@ -6353,19 +6867,19 @@
         {
             "ref": "pkg:maven/com.vaadin.external.google/android-json@0.0.20131108.vaadin1?type=jar",
             "dependsOn": [
-
+                
             ]
         },
         {
             "ref": "pkg:maven/io.micrometer/context-propagation@1.1.4?type=jar",
             "dependsOn": [
-
+                
             ]
         },
         {
             "ref": "pkg:maven/io.micrometer/micrometer-commons@1.15.12?type=jar",
             "dependsOn": [
-
+                
             ]
         },
         {
@@ -6377,7 +6891,7 @@
         {
             "ref": "pkg:maven/io.netty/netty-bom@4.1.136.Final?type=pom",
             "dependsOn": [
-
+                
             ]
         },
         {
@@ -6436,7 +6950,7 @@
         {
             "ref": "pkg:maven/io.netty/netty-common@4.1.136.Final?type=jar",
             "dependsOn": [
-
+                
             ]
         },
         {
@@ -6564,18 +7078,19 @@
             ]
         },
         {
-            "ref": "pkg:maven/io.reqover/examples@0.1.0?project_path=%3Aexamples",
+            "ref": "pkg:maven/io.reqover/examples@0.1.1?project_path=%3Aexamples",
             "dependsOn": [
-
+                
             ]
         },
         {
-            "ref": "pkg:maven/io.reqover/mvc-sample@0.1.0?project_path=%3Aexamples%3Amvc-sample",
+            "ref": "pkg:maven/io.reqover/mvc-sample@0.1.1?project_path=%3Aexamples%3Amvc-sample",
             "dependsOn": [
                 "pkg:maven/com.fasterxml.jackson/jackson-bom@2.21.5?type=pom",
-                "pkg:maven/io.reqover/reqover-core@0.1.0?project_path=%3Areqover-core",
-                "pkg:maven/io.reqover/reqover-report@0.1.0?project_path=%3Areqover-report",
-                "pkg:maven/io.reqover/reqover-spring-mvc@0.1.0?project_path=%3Areqover-spring-mvc",
+                "pkg:maven/io.reqover/reqover-core@0.1.1?project_path=%3Areqover-core",
+                "pkg:maven/io.reqover/reqover-report@0.1.1?project_path=%3Areqover-report",
+                "pkg:maven/io.reqover/reqover-spring-mvc@0.1.1?project_path=%3Areqover-spring-mvc",
+                "pkg:maven/org.apache.logging.log4j/log4j-bom@2.25.5?type=pom",
                 "pkg:maven/org.junit.platform/junit-platform-launcher@1.12.2?type=jar",
                 "pkg:maven/org.springframework.boot/spring-boot-dependencies@3.5.16?type=pom",
                 "pkg:maven/org.springframework.boot/spring-boot-starter-test@3.5.16?type=jar",
@@ -6583,18 +7098,18 @@
             ]
         },
         {
-            "ref": "pkg:maven/io.reqover/reqover-agent@0.1.0?project_path=%3Areqover-agent",
+            "ref": "pkg:maven/io.reqover/reqover-agent@0.1.1?project_path=%3Areqover-agent",
             "dependsOn": [
                 "pkg:maven/com.fasterxml.jackson.core/jackson-databind@2.21.5?type=jar",
-                "pkg:maven/io.reqover/reqover-core@0.1.0?project_path=%3Areqover-core",
-                "pkg:maven/io.reqover/reqover-instrumentation@0.1.0?project_path=%3Areqover-instrumentation",
+                "pkg:maven/io.reqover/reqover-core@0.1.1?project_path=%3Areqover-core",
+                "pkg:maven/io.reqover/reqover-instrumentation@0.1.1?project_path=%3Areqover-instrumentation",
                 "pkg:maven/org.junit.jupiter/junit-jupiter@5.12.2?type=jar",
                 "pkg:maven/org.junit.platform/junit-platform-launcher@1.12.2?type=jar",
                 "pkg:maven/org.junit/junit-bom@5.12.2?type=pom"
             ]
         },
         {
-            "ref": "pkg:maven/io.reqover/reqover-core@0.1.0?project_path=%3Areqover-core",
+            "ref": "pkg:maven/io.reqover/reqover-core@0.1.1?project_path=%3Areqover-core",
             "dependsOn": [
                 "pkg:maven/org.junit.jupiter/junit-jupiter@5.12.2?type=jar",
                 "pkg:maven/org.junit.platform/junit-platform-launcher@1.12.2?type=jar",
@@ -6602,9 +7117,9 @@
             ]
         },
         {
-            "ref": "pkg:maven/io.reqover/reqover-instrumentation@0.1.0?project_path=%3Areqover-instrumentation",
+            "ref": "pkg:maven/io.reqover/reqover-instrumentation@0.1.1?project_path=%3Areqover-instrumentation",
             "dependsOn": [
-                "pkg:maven/io.reqover/reqover-core@0.1.0?project_path=%3Areqover-core",
+                "pkg:maven/io.reqover/reqover-core@0.1.1?project_path=%3Areqover-core",
                 "pkg:maven/org.junit.jupiter/junit-jupiter@5.12.2?type=jar",
                 "pkg:maven/org.junit.platform/junit-platform-launcher@1.12.2?type=jar",
                 "pkg:maven/org.junit/junit-bom@5.12.2?type=pom",
@@ -6612,18 +7127,18 @@
             ]
         },
         {
-            "ref": "pkg:maven/io.reqover/reqover-report@0.1.0?project_path=%3Areqover-report",
+            "ref": "pkg:maven/io.reqover/reqover-report@0.1.1?project_path=%3Areqover-report",
             "dependsOn": [
-                "pkg:maven/io.reqover/reqover-core@0.1.0?project_path=%3Areqover-core",
+                "pkg:maven/io.reqover/reqover-core@0.1.1?project_path=%3Areqover-core",
                 "pkg:maven/org.junit.jupiter/junit-jupiter@5.12.2?type=jar",
                 "pkg:maven/org.junit.platform/junit-platform-launcher@1.12.2?type=jar",
                 "pkg:maven/org.junit/junit-bom@5.12.2?type=pom"
             ]
         },
         {
-            "ref": "pkg:maven/io.reqover/reqover-spring-mvc@0.1.0?project_path=%3Areqover-spring-mvc",
+            "ref": "pkg:maven/io.reqover/reqover-spring-mvc@0.1.1?project_path=%3Areqover-spring-mvc",
             "dependsOn": [
-                "pkg:maven/io.reqover/reqover-core@0.1.0?project_path=%3Areqover-core",
+                "pkg:maven/io.reqover/reqover-core@0.1.1?project_path=%3Areqover-core",
                 "pkg:maven/jakarta.servlet/jakarta.servlet-api@6.0.0?type=jar",
                 "pkg:maven/org.junit.jupiter/junit-jupiter@5.12.2?type=jar",
                 "pkg:maven/org.junit.platform/junit-platform-launcher@1.12.2?type=jar",
@@ -6634,11 +7149,11 @@
             ]
         },
         {
-            "ref": "pkg:maven/io.reqover/reqover-spring-webflux@0.1.0?project_path=%3Areqover-spring-webflux",
+            "ref": "pkg:maven/io.reqover/reqover-spring-webflux@0.1.1?project_path=%3Areqover-spring-webflux",
             "dependsOn": [
                 "pkg:maven/io.micrometer/context-propagation@1.1.4?type=jar",
                 "pkg:maven/io.projectreactor/reactor-core@3.7.19?type=jar",
-                "pkg:maven/io.reqover/reqover-core@0.1.0?project_path=%3Areqover-core",
+                "pkg:maven/io.reqover/reqover-core@0.1.1?project_path=%3Areqover-core",
                 "pkg:maven/org.assertj/assertj-core@3.27.7?type=jar",
                 "pkg:maven/org.junit.jupiter/junit-jupiter@5.12.2?type=jar",
                 "pkg:maven/org.junit.platform/junit-platform-launcher@1.12.2?type=jar",
@@ -6651,28 +7166,29 @@
             ]
         },
         {
-            "ref": "pkg:maven/io.reqover/reqover@0.1.0?project_path=%3A",
+            "ref": "pkg:maven/io.reqover/reqover@0.1.1?project_path=%3A",
             "dependsOn": [
-                "pkg:maven/io.reqover/examples@0.1.0?project_path=%3Aexamples",
-                "pkg:maven/io.reqover/mvc-sample@0.1.0?project_path=%3Aexamples%3Amvc-sample",
-                "pkg:maven/io.reqover/reqover-agent@0.1.0?project_path=%3Areqover-agent",
-                "pkg:maven/io.reqover/reqover-core@0.1.0?project_path=%3Areqover-core",
-                "pkg:maven/io.reqover/reqover-instrumentation@0.1.0?project_path=%3Areqover-instrumentation",
-                "pkg:maven/io.reqover/reqover-report@0.1.0?project_path=%3Areqover-report",
-                "pkg:maven/io.reqover/reqover-spring-mvc@0.1.0?project_path=%3Areqover-spring-mvc",
-                "pkg:maven/io.reqover/reqover-spring-webflux@0.1.0?project_path=%3Areqover-spring-webflux",
-                "pkg:maven/io.reqover/webflux-sample@0.1.0?project_path=%3Aexamples%3Awebflux-sample"
+                "pkg:maven/io.reqover/examples@0.1.1?project_path=%3Aexamples",
+                "pkg:maven/io.reqover/mvc-sample@0.1.1?project_path=%3Aexamples%3Amvc-sample",
+                "pkg:maven/io.reqover/reqover-agent@0.1.1?project_path=%3Areqover-agent",
+                "pkg:maven/io.reqover/reqover-core@0.1.1?project_path=%3Areqover-core",
+                "pkg:maven/io.reqover/reqover-instrumentation@0.1.1?project_path=%3Areqover-instrumentation",
+                "pkg:maven/io.reqover/reqover-report@0.1.1?project_path=%3Areqover-report",
+                "pkg:maven/io.reqover/reqover-spring-mvc@0.1.1?project_path=%3Areqover-spring-mvc",
+                "pkg:maven/io.reqover/reqover-spring-webflux@0.1.1?project_path=%3Areqover-spring-webflux",
+                "pkg:maven/io.reqover/webflux-sample@0.1.1?project_path=%3Aexamples%3Awebflux-sample"
             ]
         },
         {
-            "ref": "pkg:maven/io.reqover/webflux-sample@0.1.0?project_path=%3Aexamples%3Awebflux-sample",
+            "ref": "pkg:maven/io.reqover/webflux-sample@0.1.1?project_path=%3Aexamples%3Awebflux-sample",
             "dependsOn": [
                 "pkg:maven/com.fasterxml.jackson/jackson-bom@2.21.5?type=pom",
                 "pkg:maven/io.netty/netty-bom@4.1.136.Final?type=pom",
                 "pkg:maven/io.projectreactor/reactor-test@3.7.19?type=jar",
-                "pkg:maven/io.reqover/reqover-core@0.1.0?project_path=%3Areqover-core",
-                "pkg:maven/io.reqover/reqover-report@0.1.0?project_path=%3Areqover-report",
-                "pkg:maven/io.reqover/reqover-spring-webflux@0.1.0?project_path=%3Areqover-spring-webflux",
+                "pkg:maven/io.reqover/reqover-core@0.1.1?project_path=%3Areqover-core",
+                "pkg:maven/io.reqover/reqover-report@0.1.1?project_path=%3Areqover-report",
+                "pkg:maven/io.reqover/reqover-spring-webflux@0.1.1?project_path=%3Areqover-spring-webflux",
+                "pkg:maven/org.apache.logging.log4j/log4j-bom@2.25.5?type=pom",
                 "pkg:maven/org.junit.platform/junit-platform-launcher@1.12.2?type=jar",
                 "pkg:maven/org.springframework.boot/spring-boot-dependencies@3.5.16?type=pom",
                 "pkg:maven/org.springframework.boot/spring-boot-starter-test@3.5.16?type=jar",
@@ -6682,19 +7198,19 @@
         {
             "ref": "pkg:maven/jakarta.activation/jakarta.activation-api@2.1.4?type=jar",
             "dependsOn": [
-
+                
             ]
         },
         {
             "ref": "pkg:maven/jakarta.annotation/jakarta.annotation-api@2.1.1?type=jar",
             "dependsOn": [
-
+                
             ]
         },
         {
             "ref": "pkg:maven/jakarta.servlet/jakarta.servlet-api@6.0.0?type=jar",
             "dependsOn": [
-
+                
             ]
         },
         {
@@ -6706,13 +7222,13 @@
         {
             "ref": "pkg:maven/net.bytebuddy/byte-buddy-agent@1.17.8?type=jar",
             "dependsOn": [
-
+                
             ]
         },
         {
             "ref": "pkg:maven/net.bytebuddy/byte-buddy@1.18.3?type=jar",
             "dependsOn": [
-
+                
             ]
         },
         {
@@ -6728,28 +7244,43 @@
             ]
         },
         {
-            "ref": "pkg:maven/org.apache.logging.log4j/log4j-api@2.24.3?type=jar",
+            "ref": "pkg:maven/org.apache.logging.log4j/log4j-api@2.25.5?type=jar",
             "dependsOn": [
-
+                "pkg:maven/biz.aQute.bnd/biz.aQute.bnd.annotation@7.1.0?type=jar",
+                "pkg:maven/com.google.errorprone/error_prone_annotations@2.38.0?type=jar",
+                "pkg:maven/org.jspecify/jspecify@1.0.0?type=jar",
+                "pkg:maven/org.osgi/org.osgi.annotation.bundle@2.0.0?type=jar",
+                "pkg:maven/org.osgi/org.osgi.annotation.versioning@1.1.2?type=jar"
             ]
         },
         {
-            "ref": "pkg:maven/org.apache.logging.log4j/log4j-to-slf4j@2.24.3?type=jar",
+            "ref": "pkg:maven/org.apache.logging.log4j/log4j-bom@2.25.5?type=pom",
             "dependsOn": [
-                "pkg:maven/org.apache.logging.log4j/log4j-api@2.24.3?type=jar",
+                
+            ]
+        },
+        {
+            "ref": "pkg:maven/org.apache.logging.log4j/log4j-to-slf4j@2.25.5?type=jar",
+            "dependsOn": [
+                "pkg:maven/biz.aQute.bnd/biz.aQute.bnd.annotation@7.1.0?type=jar",
+                "pkg:maven/com.google.errorprone/error_prone_annotations@2.38.0?type=jar",
+                "pkg:maven/org.apache.logging.log4j/log4j-api@2.25.5?type=jar",
+                "pkg:maven/org.jspecify/jspecify@1.0.0?type=jar",
+                "pkg:maven/org.osgi/org.osgi.annotation.bundle@2.0.0?type=jar",
+                "pkg:maven/org.osgi/org.osgi.annotation.versioning@1.1.2?type=jar",
                 "pkg:maven/org.slf4j/slf4j-api@2.0.18?type=jar"
             ]
         },
         {
             "ref": "pkg:maven/org.apache.tomcat.embed/tomcat-embed-core@10.1.55?type=jar",
             "dependsOn": [
-
+                
             ]
         },
         {
             "ref": "pkg:maven/org.apache.tomcat.embed/tomcat-embed-el@10.1.55?type=jar",
             "dependsOn": [
-
+                
             ]
         },
         {
@@ -6761,7 +7292,7 @@
         {
             "ref": "pkg:maven/org.apiguardian/apiguardian-api@1.1.2?type=jar",
             "dependsOn": [
-
+                
             ]
         },
         {
@@ -6779,7 +7310,13 @@
         {
             "ref": "pkg:maven/org.hamcrest/hamcrest@3.0?type=jar",
             "dependsOn": [
-
+                
+            ]
+        },
+        {
+            "ref": "pkg:maven/org.jspecify/jspecify@1.0.0?type=jar",
+            "dependsOn": [
+                
             ]
         },
         {
@@ -6841,7 +7378,7 @@
         {
             "ref": "pkg:maven/org.junit/junit-bom@5.12.2?type=pom",
             "dependsOn": [
-
+                
             ]
         },
         {
@@ -6862,31 +7399,55 @@
         {
             "ref": "pkg:maven/org.objenesis/objenesis@3.3?type=jar",
             "dependsOn": [
-
+                
             ]
         },
         {
             "ref": "pkg:maven/org.opentest4j/opentest4j@1.3.0?type=jar",
             "dependsOn": [
-
+                
+            ]
+        },
+        {
+            "ref": "pkg:maven/org.osgi/org.osgi.annotation.bundle@2.0.0?type=jar",
+            "dependsOn": [
+                "pkg:maven/org.osgi/org.osgi.annotation.versioning@1.1.2?type=jar"
+            ]
+        },
+        {
+            "ref": "pkg:maven/org.osgi/org.osgi.annotation.versioning@1.1.2?type=jar",
+            "dependsOn": [
+                
+            ]
+        },
+        {
+            "ref": "pkg:maven/org.osgi/org.osgi.resource@1.0.0?type=jar",
+            "dependsOn": [
+                
+            ]
+        },
+        {
+            "ref": "pkg:maven/org.osgi/org.osgi.service.serviceloader@1.0.0?type=jar",
+            "dependsOn": [
+                
             ]
         },
         {
             "ref": "pkg:maven/org.ow2.asm/asm@9.10.1?type=jar",
             "dependsOn": [
-
+                
             ]
         },
         {
             "ref": "pkg:maven/org.ow2.asm/asm@9.7.1?type=jar",
             "dependsOn": [
-
+                
             ]
         },
         {
             "ref": "pkg:maven/org.reactivestreams/reactive-streams@1.0.4?type=jar",
             "dependsOn": [
-
+                
             ]
         },
         {
@@ -6904,7 +7465,7 @@
         {
             "ref": "pkg:maven/org.slf4j/slf4j-api@2.0.18?type=jar",
             "dependsOn": [
-
+                
             ]
         },
         {
@@ -6916,7 +7477,7 @@
         {
             "ref": "pkg:maven/org.springframework.boot/spring-boot-dependencies@3.5.16?type=pom",
             "dependsOn": [
-
+                
             ]
         },
         {
@@ -6934,7 +7495,7 @@
             "ref": "pkg:maven/org.springframework.boot/spring-boot-starter-logging@3.5.16?type=jar",
             "dependsOn": [
                 "pkg:maven/ch.qos.logback/logback-classic@1.5.34?type=jar",
-                "pkg:maven/org.apache.logging.log4j/log4j-to-slf4j@2.24.3?type=jar",
+                "pkg:maven/org.apache.logging.log4j/log4j-to-slf4j@2.25.5?type=jar",
                 "pkg:maven/org.slf4j/jul-to-slf4j@2.0.18?type=jar"
             ]
         },
@@ -7066,7 +7627,7 @@
         {
             "ref": "pkg:maven/org.springframework/spring-jcl@6.2.19?type=jar",
             "dependsOn": [
-
+                
             ]
         },
         {
@@ -7106,13 +7667,13 @@
         {
             "ref": "pkg:maven/org.xmlunit/xmlunit-core@2.10.4?type=jar",
             "dependsOn": [
-
+                
             ]
         },
         {
             "ref": "pkg:maven/org.yaml/snakeyaml@2.4?type=jar",
             "dependsOn": [
-
+                
             ]
         }
     ]

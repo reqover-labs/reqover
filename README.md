@@ -60,7 +60,9 @@ WebFlux는 요청 하나를 처리하면서 스레드를 여러 번 갈아탑니
 
 ### 3. 코드 → API 역방향 조회
 
-`Code to Endpoint Index`는 방향을 뒤집습니다. 메서드 이름을 넣으면 **그 메서드를 실행한 API 목록**이 나옵니다. 코드를 고친 뒤 어디부터 다시 확인할지 정할 때 쓰는 기능입니다. 메서드 이름은 JVM 내부 표기 대신 `find(long): OrderResponse`처럼 읽기 쉬운 형태로 보여줍니다.
+`Code to Endpoint Index`는 방향을 뒤집은 표입니다. 메서드마다 **그 메서드를 실행한 API가 나열됩니다.** 코드를 고친 뒤 어디부터 다시 확인할지 정할 때 쓰면 됩니다. 메서드 이름은 JVM 내부 표기 대신 `find(long): OrderResponse`처럼 읽기 쉬운 형태로 보여줍니다.
+
+> 지금은 표 전체가 그려진 정적 HTML입니다. 브라우저 찾기(`Ctrl`/`Cmd`+`F`)로 찾으세요. 리포트 안에서 바로 걸러 보는 필터는 [이슈 #5](https://github.com/reqover-labs/reqover/issues/5)에 있습니다 — 기여하기 좋은 항목입니다.
 
 ![SharedValidator를 두 개의 API에 연결해 보여주는 역방향 조회](docs/assets/reqover-code-to-endpoint-index.png)
 

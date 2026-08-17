@@ -324,8 +324,8 @@ git push origin fix/webflux-context-leak
 
 | 이름  | GitHub                                       | LinkedIn                                                        | 맡은 부분                                            |
 | --- | -------------------------------------------- | --------------------------------------------------------------- | ------------------------------------------------ |
-| 김태희 | [@TaeHuiKKIM](https://github.com/TaeHuiKKIM) | [TaeHui Kim](https://www.linkedin.com/in/taehui-kim-930713412/) | 전체 설계와 MVP 구현: core, 계측, agent, 리포트, 데모          |
-| 이상민 | [@lsmin3388](https://github.com/lsmin3388)   | [Sangmin Lee](https://www.linkedin.com/in/sangminn0)            | 공개 저장소 정비: 빌드, CI, core 안정화, Spring 어댑터, 문서      |
+| 김태희 | [@TaeHuiKKIM](https://github.com/TaeHuiKKIM) | [TaeHui Kim](https://www.linkedin.com/in/taehui-kim-930713412/) | 설계 및 MVP 구현: core, 계측, agent, 리포트, 데모          |
+| 이상민 | [@lsmin3388](https://github.com/lsmin3388)   | [Sangmin Lee](https://www.linkedin.com/in/sangminn0)            | 설계 및 공개 저장소 정비: 빌드, CI, core 안정화, Spring 어댑터, 문서      |
 
 ## 라이선스
 

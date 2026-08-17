@@ -1,5 +1,8 @@
 blank_issues_enabled: false
 contact_links:
-  - name: 보안 취약점 신고
+  - name: Report a security vulnerability
     url: https://github.com/reqover-labs/reqover/security/advisories/new
-    about: 보안 문제는 공개 이슈 대신 GitHub 비공개 취약점 신고를 이용해 주세요.
+    about: Please use GitHub's private vulnerability reporting instead of a public issue.
+  - name: 한국어 문서 (Korean documentation)
+    url: https://github.com/reqover-labs/reqover/blob/main/README.ko.md
+    about: 한국어 README와 연동 가이드입니다. 이슈는 영어로 작성해 주시면 감사합니다.

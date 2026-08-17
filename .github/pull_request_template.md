@@ -1,11 +1,24 @@
-## 변경 내용
+## What changed
 
-<!-- 무엇을, 왜 바꾸었는지 요약해 주세요. 관련 이슈가 있다면 링크해 주세요. -->
+<!--
+Summarize what you changed and why. Link any related issue (e.g. "Closes #12").
+Please write in English so contributors from anywhere can follow the history.
+-->
 
-## 체크리스트
+## Checklist
 
-- [ ] `./gradlew test` 통과
-- [ ] `./gradlew build` 통과
-- [ ] 새 동작이 문서화됨 (README 또는 docs)
-- [ ] 라이선스·의존성 변경이 `THIRD_PARTY_NOTICES.md`에 반영됨
-- [ ] 시크릿이 포함되지 않음
+- [ ] `./gradlew test` passes
+- [ ] `./gradlew build` passes
+- [ ] New behavior is documented (README or `docs/`)
+- [ ] License or dependency changes are reflected in `THIRD_PARTY_NOTICES.md`
+- [ ] No secrets, tokens, or `.env` files included
+
+<!--
+Docs-only or docs-first change? Say so and skip the build boxes — CI verifies them
+on this PR anyway. Just don't tick a box you didn't actually run.
+
+Changing user-facing docs? README.md and docs/17_integration_guide.md are the
+English versions; README.ko.md and docs/17_integration_guide.ko.md are Korean.
+Updating both is appreciated but not required — flag it and a maintainer will
+follow up on the other language.
+-->

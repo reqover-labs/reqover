@@ -357,4 +357,4 @@ The scope and limits of the performance measurements are in [local performance r
 
 **Where people get stuck is the most valuable information this project can receive right now.** Getting stuck because the documentation was unclear counts as a bug too.
 
-Related: [System architecture](02_architecture.md) (Korean) · [Agent E2E Demo](09_agent_e2e_demo.md) · [Demo script](10_demo_script.md)
+Related: [System architecture](02_architecture.md) · [Agent E2E Demo](09_agent_e2e_demo.md) · [Demo script](10_demo_script.md)

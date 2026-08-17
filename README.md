@@ -166,7 +166,7 @@ In a little more detail:
 2. **Linking to the request** — in MVC it uses the storage bound to each request; in WebFlux it uses the context Reactor carries along with the request, to answer "which request is this?"
 3. **Building the report** — once a request finishes, the records are grouped by API and rendered as JSON and HTML. The HTML opens on its own with no other files.
 
-Design documents: [System architecture](docs/02_architecture.md) (Korean) · [Agent E2E Demo](docs/09_agent_e2e_demo.md)
+Design documents: [System architecture](docs/02_architecture.md) · [Agent E2E Demo](docs/09_agent_e2e_demo.md)
 
 ---
 
@@ -317,7 +317,8 @@ Terms that keep appearing in this project's docs and code.
 
 ## Documentation
 
-- [Project plan](docs/00_project_plan.md) (Korean) · [Requirements](docs/01_requirements.md) (Korean) · [System architecture](docs/02_architecture.md) (Korean)
+- [System architecture](docs/02_architecture.md) · [한국어판](docs/02_architecture.ko.md)
+- [Project plan](docs/00_project_plan.md) (Korean) · [Requirements](docs/01_requirements.md) (Korean)
 - [MVP status](docs/08_phase0_mvp_status.md) · [Agent E2E Demo](docs/09_agent_e2e_demo.md) · [Demo script](docs/10_demo_script.md)
 - [Performance measurement](docs/11_performance_measurement.md) · [Local performance results](docs/15_performance_results.md)
 - [JaCoCo interop decision](docs/14_jacoco_interop_decision.md) · [README demo capture](docs/16_readme_demo_capture.md)

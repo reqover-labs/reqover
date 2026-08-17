@@ -357,4 +357,4 @@ void resetCoverage() {
 
 **어디서 막혔는지가 지금 이 프로젝트에 가장 필요한 정보입니다.** 문서가 부실해서 막힌 것도 버그로 취급합니다.
 
-관련 문서: [시스템 아키텍처](02_architecture.md) · [Agent E2E Demo](09_agent_e2e_demo.md) · [데모 스크립트](10_demo_script.md)
+관련 문서: [시스템 아키텍처](02_architecture.ko.md) · [Agent E2E Demo](09_agent_e2e_demo.md) · [데모 스크립트](10_demo_script.md)

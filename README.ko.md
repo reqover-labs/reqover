@@ -164,7 +164,7 @@ flowchart LR
 2. **요청과 연결** — MVC에서는 요청마다 붙어 있는 저장 공간을, WebFlux에서는 Reactor가 요청 따라 전달하는 컨텍스트를 이용해 "지금 이건 어느 요청인지"를 찾습니다.
 3. **리포트 만들기** — 요청이 끝나면 기록을 API별로 묶어서 JSON과 HTML 파일로 만듭니다. HTML은 다른 파일 없이 혼자 열립니다.
 
-설계 문서: [시스템 아키텍처](docs/02_architecture.md) · [Agent E2E Demo](docs/09_agent_e2e_demo.md)
+설계 문서: [시스템 아키텍처](docs/02_architecture.ko.md) · [Agent E2E Demo](docs/09_agent_e2e_demo.md)
 
 ---
 
@@ -313,7 +313,7 @@ git push origin fix/webflux-context-leak
 
 ## 문서 목록
 
-- [프로젝트 기획](docs/00_project_plan.md) · [요구사항](docs/01_requirements.md) · [시스템 아키텍처](docs/02_architecture.md)
+- [프로젝트 기획](docs/00_project_plan.md) · [요구사항](docs/01_requirements.md) · [시스템 아키텍처](docs/02_architecture.ko.md)
 - [MVP 진행 상태](docs/08_phase0_mvp_status.md) · [Agent E2E Demo](docs/09_agent_e2e_demo.md) · [데모 스크립트](docs/10_demo_script.md)
 - [성능 측정 방법](docs/11_performance_measurement.md) · [로컬 성능 결과](docs/15_performance_results.md)
 - [JaCoCo 연동 관련 결정](docs/14_jacoco_interop_decision.md) · [README 스크린샷 촬영 기록](docs/16_readme_demo_capture.md)

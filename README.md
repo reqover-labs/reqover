@@ -333,6 +333,10 @@ Documents marked *(Korean)* have not been translated yet. Translations are welco
 
 [Reqover Labs](https://github.com/reqover-labs) — building Reqover, initially as an entry for the 2026 Korea Open Source Developer Competition.
 
+Reqover started as a competition entry, but we intend to keep maintaining it past
+the contest. Issues and pull requests are welcome regardless of the competition
+timeline.
+
 | Name | GitHub | LinkedIn | Area |
 | --- | --- | --- | --- |
 | TaeHui Kim | [@TaeHuiKKIM](https://github.com/TaeHuiKKIM) | [TaeHui Kim](https://www.linkedin.com/in/taehui-kim-930713412/) | Design and MVP implementation: core, instrumentation, agent, report, demos |

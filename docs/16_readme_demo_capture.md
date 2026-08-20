@@ -7,7 +7,7 @@ from local Reqover runs. The images are product output, not mockups.
 
 ## Verified Environment
 
-- OS: macOS 15.7.3, Apple M1, 16 GB RAM
+- OS: macOS 15.7.3, Apple M1 Pro, 16 GB RAM
 - Date: 2026-08-14 (0.1.1 assets; 0.1.0 assets were taken on 2026-08-10)
 - JDK: OpenJDK 21.0.11
 - Browser capture viewport: 1440 × 1000 at device scale factor 2
@@ -28,6 +28,19 @@ change cannot silently shift what the image shows.
 | `reqover-mvc-request-attribution.png` | first `section.section` (Endpoint to Code) |
 | `reqover-code-to-endpoint-index.png` | second `section.section` (Code to Endpoint Index) |
 | `reqover-webflux-thread-hop.png` | first `article.endpoint` |
+
+## Print Capture
+
+The images above are captured at a 1440 px viewport, which suits the README at
+full width. Scaled into an A4 table cell for the contest report they fall below
+four points and stop being readable on paper, so `docs/assets/report-print/`
+holds the same three selectors captured at a 820 px viewport and a device scale
+factor of 3. The narrower capture is 756 CSS px wide instead of 1136, so at the
+same printed width the text renders about 1.5x larger. The report generator
+points at `report-print/`; the README keeps the wide versions.
+
+- Captured: 2026-08-20 on macOS 26.5.2, Apple M1 Pro, 16 GB RAM
+- Same saved report HTML and same selectors as the screen capture above
 | `reqover-webflux-report.png` | `body` (whole report) |
 
 ## Build

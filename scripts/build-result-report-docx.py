@@ -36,10 +36,14 @@ BODY_FONT_SIZE = Pt(10)
 SMALL_FONT_SIZE = Pt(8)
 SBOM_FONT_SIZE = Pt(7)
 PLACEHOLDER_PREFIX = "[확인 필요:"
+# 심사는 링크를 눌러 근거를 확인한다. 일반 텍스트로 두면 손으로 옮겨 적어야 한다.
+URL_PATTERN = re.compile(r"(https?://[^\s()<>\[\]]+[^\s()<>\[\].,;:])")
 
-ASSET_MVC = ROOT / "docs" / "assets" / "reqover-mvc-request-attribution.png"
-ASSET_REVERSE = ROOT / "docs" / "assets" / "reqover-code-to-endpoint-index.png"
-ASSET_WEBFLUX = ROOT / "docs" / "assets" / "reqover-webflux-thread-hop.png"
+# README용 넓은 캡처는 A4 표 안에서 10.5cm로 줄면 본문이 4pt 아래로 떨어진다.
+# 인쇄용은 좁은 viewport로 다시 잡아 같은 폭에서 글자가 1.5배로 커진다.
+ASSET_MVC = ROOT / "docs" / "assets" / "report-print" / "reqover-mvc-request-attribution.png"
+ASSET_REVERSE = ROOT / "docs" / "assets" / "report-print" / "reqover-code-to-endpoint-index.png"
+ASSET_WEBFLUX = ROOT / "docs" / "assets" / "report-print" / "reqover-webflux-thread-hop.png"
 
 
 def parse_args() -> argparse.Namespace:
@@ -145,7 +149,7 @@ def clear_paragraph(paragraph) -> None:
             paragraph._p.remove(child)
 
 
-def format_paragraph(paragraph, *, after=5, before=0, line=1.15, alignment=None) -> None:
+def format_paragraph(paragraph, *, after=5, before=0, line=1.10, alignment=None) -> None:
     paragraph.paragraph_format.space_before = Pt(before)
     paragraph.paragraph_format.space_after = Pt(after)
     paragraph.paragraph_format.line_spacing = line
@@ -153,10 +157,44 @@ def format_paragraph(paragraph, *, after=5, before=0, line=1.15, alignment=None)
         paragraph.alignment = alignment
 
 
+def add_hyperlink(paragraph, url: str, text: str, *, size=BODY_FONT_SIZE):
+    """외부 링크를 w:hyperlink 관계로 넣는다. python-docx에는 없는 기능이다."""
+    part = paragraph.part
+    r_id = part.relate_to(
+        url,
+        "http://schemas.openxmlformats.org/officeDocument/2006/relationships/hyperlink",
+        is_external=True,
+    )
+    link = OxmlElement("w:hyperlink")
+    link.set(qn("r:id"), r_id)
+    run = OxmlElement("w:r")
+    link.append(run)
+    paragraph._p.append(link)
+
+    from docx.text.run import Run
+
+    wrapped = Run(run, paragraph)
+    wrapped.text = text
+    set_run_font(wrapped, size=size, color="0563C1")
+    wrapped.underline = True
+    return wrapped
+
+
 def add_text_run(paragraph, text: str, *, bold=False, italic=False, size=BODY_FONT_SIZE, color="000000"):
     last_run = None
     for part in re.split(r"(\[확인 필요:[^\]]+\])", text):
         if not part:
+            continue
+        if not part.startswith(PLACEHOLDER_PREFIX) and URL_PATTERN.search(part):
+            for piece in URL_PATTERN.split(part):
+                if not piece:
+                    continue
+                if URL_PATTERN.fullmatch(piece):
+                    last_run = add_hyperlink(paragraph, piece, piece, size=size)
+                else:
+                    run = paragraph.add_run(piece)
+                    set_run_font(run, size=size, bold=bold, italic=italic, color=color)
+                    last_run = run
             continue
         run = paragraph.add_run(part)
         set_run_font(run, size=size, bold=bold, italic=italic, color=color)
@@ -200,7 +238,7 @@ def set_cell_text(cell, text: str, *, bold=False, size=BODY_FONT_SIZE, center=Fa
     add_text_run(paragraph, text, bold=bold, size=size)
 
 
-def add_picture(cell, path: Path, caption: str, *, first=False, width=Inches(4.15)) -> None:
+def add_picture(cell, path: Path, caption: str, *, first=False, width=Inches(3.9)) -> None:
     if not path.is_file():
         paragraph = cell.paragraphs[0] if first else cell.add_paragraph()
         if first:
@@ -320,7 +358,7 @@ def fill_report_body(document: Document, args: argparse.Namespace, components: l
     set_cell_text(
         table.rows[4].cells[1],
         "Spring MVC와 WebFlux에서 각 HTTP 요청이 실제로 실행한 메서드를 Java Agent로 자동 계측하여, "
-        "endpoint-to-code 및 code-to-endpoint 관계를 JSON/HTML로 제공하는 오픈소스 개발자 도구이다.",
+        "endpoint-to-code 및 code-to-endpoint 관계를 JSON/HTML 리포트로 제공하는 오픈소스 개발자 도구이다.",
     )
 
     background = table.rows[6].cells[1]
@@ -383,9 +421,9 @@ def fill_report_body(document: Document, args: argparse.Namespace, components: l
         first=True,
     )
     append_labeled_paragraph(architecture, "Core", "요청 수명주기, context, probe registry, in-memory 저장")
-    append_labeled_paragraph(architecture, "Instrumentation/Agent", "선택한 애플리케이션 class를 로드할 때 method entry에 ReqoverProbe.hit을 삽입")
+    append_labeled_paragraph(architecture, "Instrumentation/Agent", "선택한 애플리케이션 클래스를 로드할 때 메서드 진입부에 ReqoverProbe.hit을 삽입")
     append_labeled_paragraph(architecture, "Spring adapters", "MVC는 요청 ThreadLocal을, WebFlux는 Reactor Context와 context propagation을 사용")
-    append_labeled_paragraph(architecture, "Report", "endpoint별 관측 메서드와 특정 코드가 관측된 endpoint를 양방향으로 집계")
+    append_labeled_paragraph(architecture, "Report", "endpoint별 관측 메서드와, 특정 코드를 실행한 것으로 관측된 endpoint를 양방향으로 집계")
 
     features = table.rows[9].cells[1]
     clear_cell(features)
@@ -400,13 +438,13 @@ def fill_report_body(document: Document, args: argparse.Namespace, components: l
     append_labeled_paragraph(
         features,
         "2. 코드 역조회",
-        "특정 class·method를 실행한 관측 endpoint를 찾아 코드 변경 후 우선 재검증할 API 후보를 좁힌다.",
+        "특정 클래스·메서드를 실행한 것으로 관측된 endpoint를 찾아, 코드 변경 후 우선 재검증할 API 후보를 좁힌다.",
     )
     add_picture(features, ASSET_REVERSE, "그림 2. code-to-endpoint 역조회 결과")
     append_labeled_paragraph(
         features,
         "3. 자동 계측",
-        "사용자 코드에 수동 probe 호출을 넣지 않고 -javaagent 옵션으로 선택 package의 method entry를 계측한다.",
+        "사용자 코드에 수동 probe 호출을 넣지 않고 -javaagent 옵션으로 선택한 패키지의 메서드 진입부만 계측한다.",
     )
     append_labeled_paragraph(
         features,
@@ -420,7 +458,7 @@ def fill_report_body(document: Document, args: argparse.Namespace, components: l
         "JDK 17 또는 21 환경에서 ./gradlew clean test로 전체 테스트를 실행한 뒤, "
         "./scripts/run-agent-demo.sh mvc 8080을 실행하고 http://127.0.0.1:8080/reqover/report.html을 연다. "
         "WebFlux 데모는 같은 명령에서 mvc를 webflux로 바꿔 실행한다. "
-        "데모는 report endpoint를 loopback에만 노출한다.",
+        "데모는 리포트 endpoint를 loopback에만 노출한다.",
     )
     append_labeled_paragraph(features, "최종 검증", args.verification)
     append_labeled_paragraph(features, "공급망 점검", args.supply_chain)
@@ -442,7 +480,7 @@ def fill_report_body(document: Document, args: argparse.Namespace, components: l
         "회귀 테스트 범위를 정하는 비용이 크다. Reqover는 그 판단 근거를 실행 기록으로 제공하므로, "
         "QA 자동화와 테스트 최적화 도구를 도입하려는 조직에 별도 계측 코드 없이 적용할 수 있다.",
     )
-    append_labeled_paragraph(effects, "오픈소스", "Apache-2.0, 재현 가능한 sample, 기여·보안 가이드와 SBOM을 제공해 외부 검증과 기여 기반을 마련한다.")
+    append_labeled_paragraph(effects, "오픈소스", "Apache-2.0, 재현 가능한 샘플 애플리케이션, 기여·보안 가이드와 SBOM을 제공해 외부 검증과 기여 기반을 마련한다.")
 
     other = table.rows[11].cells[1]
     clear_cell(other)
@@ -459,7 +497,7 @@ def fill_report_body(document: Document, args: argparse.Namespace, components: l
         "현재 한계",
         "계측은 method-entry 수준에 머물고, 수집 결과는 in-memory에만 저장한다. "
         "계측 대상은 명시적 include로만 지정할 수 있으며 runtime exclude 목록은 사용자가 바꿀 수 없다. "
-        "sample report에는 인증이 없고, 검증은 표준 Reactor chain을 중심으로 이루어졌다.",
+        "샘플 리포트에는 인증이 없고, 검증은 표준 Reactor chain을 중심으로 이루어졌다.",
     )
     append_labeled_paragraph(
         other,

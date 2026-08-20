@@ -331,7 +331,7 @@ Documents marked *(Korean)* have not been translated yet. Translations are welco
 
 ## Team
 
-[Reqover Labs](https://github.com/reqover-labs) — building Reqover, initially as an entry for the 2026 Korea Open Source Developer Competition.
+[Reqover Lab](https://github.com/reqover-labs) — building Reqover, initially as an entry for the 2026 Korea Open Source Developer Competition.
 
 Reqover started as a competition entry, but we intend to keep maintaining it past
 the contest. Issues and pull requests are welcome regardless of the competition

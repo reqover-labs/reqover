@@ -324,7 +324,7 @@ git push origin fix/webflux-context-leak
 
 ## 만든 사람들
 
-[Reqover Labs](https://github.com/reqover-labs) — 2026 오픈소스 개발자대회 출품을 목표로 개발 중입니다.
+[Reqover Lab](https://github.com/reqover-labs) — 2026 오픈소스 개발자대회 출품을 목표로 개발 중입니다.
 
 Reqover는 대회 출품작으로 시작했지만, **대회가 끝난 뒤에도 계속 유지할 생각입니다.** 대회 일정과 무관하게 이슈와 Pull Request를 환영합니다.
 

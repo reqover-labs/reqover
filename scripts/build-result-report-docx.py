@@ -68,13 +68,21 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--verification",
         default=(
-            "2026-08-14 JDK 17·21 clean build 35 tests 통과, CycloneDX 1.6 SBOM lock 일치, "
-            "외부 Maven 구성요소 104개 OSV 0건 (log4j-api를 2.25.5로 올려 "
-            "GHSA-qv9r-c865-cp47 해소). "
-            "v0.1.1=2ae31931984f. Release CI 성공: "
-            "https://github.com/reqover-labs/reqover/actions/runs/31864712084. "
-            "직전 기록: 2026-08-10 v0.1.0=62910fc1896d, "
-            "https://github.com/reqover-labs/reqover/actions/runs/31366748139"
+            "2026-08-15 v0.1.1(태그 커밋 2ae31931984f) 릴리스 CI에서 JDK 17과 21의 clean build와 "
+            "35개 자동화 테스트를 모두 통과했다. "
+            "실행 기록: https://github.com/reqover-labs/reqover/actions/runs/31864712084 "
+            "(직전 기록은 2026-08-10 v0.1.0=62910fc1896d, "
+            "https://github.com/reqover-labs/reqover/actions/runs/31366748139)"
+        ),
+    )
+    parser.add_argument(
+        "--supply-chain",
+        default=(
+            "CycloneDX 1.6 형식의 SBOM을 생성해 저장소에 고정했고, 외부 Maven 구성요소 104개를 "
+            "OSV에 조회한 결과 알려진 취약점은 0건이다. 조회 중 확인된 두 건은 모두 해소했다. "
+            "log4j-api는 2.25.5로 올려 GHSA-qv9r-c865-cp47을, netty는 4.1.137.Final로 올려 "
+            "2026-08-17 공개된 GHSA-8c42-7qj2-3j46을 해소했다. netty는 sample 애플리케이션에만 "
+            "쓰이며 라이브러리 모듈은 포함하지 않는다."
         ),
     )
     parser.add_argument(
@@ -137,7 +145,7 @@ def clear_paragraph(paragraph) -> None:
             paragraph._p.remove(child)
 
 
-def format_paragraph(paragraph, *, after=2, before=0, line=1.05, alignment=None) -> None:
+def format_paragraph(paragraph, *, after=5, before=0, line=1.15, alignment=None) -> None:
     paragraph.paragraph_format.space_before = Pt(before)
     paragraph.paragraph_format.space_after = Pt(after)
     paragraph.paragraph_format.line_spacing = line
@@ -171,7 +179,7 @@ def clear_cell(cell) -> None:
     cell.vertical_alignment = WD_CELL_VERTICAL_ALIGNMENT.CENTER
 
 
-def append_labeled_paragraph(cell, label: str, text: str, *, first=False, after=2) -> None:
+def append_labeled_paragraph(cell, label: str, text: str, *, first=False, after=5) -> None:
     paragraph = cell.paragraphs[0] if first else cell.add_paragraph()
     if first:
         clear_paragraph(paragraph)
@@ -267,12 +275,10 @@ def fill_basic_information(document: Document, args: argparse.Namespace) -> None
     set_cell_text(info.rows[2].cells[1], args.division)
     set_cell_text(info.rows[2].cells[3], args.task_type)
 
+    # 접수번호는 공식 파일명으로만 전달한다. 본문에 작업 메모를 남기지 않는다.
     registration_paragraph = paragraph_after(document, info._element)
-    replace_paragraph(
-        registration_paragraph,
-        f"{args.registration_number} — 최종 제출 시 접수번호를 공식 파일명에 반영",
-        size=Pt(9),
-    )
+    clear_paragraph(registration_paragraph)
+    format_paragraph(registration_paragraph, after=0)
 
 
 def resolved_versions(components: list[dict], group: str, name: str) -> str:
@@ -322,24 +328,28 @@ def fill_report_body(document: Document, args: argparse.Namespace, components: l
     append_labeled_paragraph(
         background,
         "문제",
-        "일반적인 집계 커버리지는 코드가 실행됐다는 사실은 보여주지만, 어떤 HTTP 요청이 해당 코드를 실행했는지는 기본 차원으로 제공하지 않는다. "
-        "공유 service·validator가 많은 백엔드에서는 코드 변경 후 우선 재검증할 API를 경험과 넓은 회귀 테스트에 의존하기 쉽다.",
+        "전체를 누적해 집계하는 기존 코드 커버리지는 코드가 실행되었다는 사실은 보여주지만, "
+        "어떤 HTTP 요청이 그 코드를 실행했는지는 기본 정보로 알려 주지 않는다. "
+        "공유 service·validator가 많은 백엔드에서는 코드를 변경한 뒤 어떤 API를 먼저 재검증할지 정하는 일이 "
+        "개발자의 경험과 광범위한 회귀 테스트에 의존하기 쉽다.",
         first=True,
     )
     append_labeled_paragraph(
         background,
         "목표",
-        "실제 요청 중 관측된 실행 관계를 endpoint별로 분리하고 역조회하여, 개발·QA·staging 환경의 디버깅과 회귀 테스트 우선순위 결정을 돕는다.",
+        "실제 요청에서 관측한 실행 관계를 endpoint별로 분리하고 역방향으로도 조회할 수 있게 하여, "
+        "개발·QA·스테이징 환경의 디버깅과 회귀 테스트 우선순위 결정을 돕는다.",
     )
     append_labeled_paragraph(
         background,
         "해석 범위",
-        "Reqover가 제시하는 관계는 관측된 실행의 하한이며, 보이지 않은 관계가 존재하지 않음을 보장하는 완전한 정적 영향 분석은 아니다.",
+        "Reqover가 제시하는 관계는 실제로 관측된 실행만 담은 하한(lower bound)이다. "
+        "관측되지 않은 관계가 없다는 것까지 보장하지는 못하므로, 완전한 정적 영향 분석을 대체하지 않는다.",
     )
 
     environment = table.rows[7].cells[1]
     clear_cell(environment)
-    append_labeled_paragraph(environment, "언어·빌드", "Java 17 bytecode, JDK 17·21, Gradle 9.5.1", first=True)
+    append_labeled_paragraph(environment, "언어·빌드", "Java 17(컴파일 대상 bytecode 17), JDK 17·21, Gradle 9.5.1", first=True)
     append_labeled_paragraph(
         environment,
         "프레임워크",
@@ -357,7 +367,7 @@ def fill_report_body(document: Document, args: argparse.Namespace, components: l
     append_labeled_paragraph(
         environment,
         "검증",
-        "JUnit 5.12.2, 별도 JVM Agent E2E, "
+        "JUnit 5.12.2, 별도 JVM에 Java Agent를 붙여 실행하는 E2E 테스트, "
         "GitHub Actions Ubuntu/Temurin 17·21 matrix",
     )
     append_labeled_paragraph(environment, "개발 장비", args.development_environment)
@@ -367,8 +377,9 @@ def fill_report_body(document: Document, args: argparse.Namespace, components: l
     append_labeled_paragraph(
         architecture,
         "핵심 흐름",
-        "HTTP 요청 → MVC Interceptor/WebFlux Filter → 요청 bucket 생성 → ASM Java Agent가 삽입한 method-entry probe → "
-        "현재 요청 context로 hit 귀속 → snapshot 저장 → 양방향 JSON/HTML 리포트",
+        "HTTP 요청 → MVC Interceptor/WebFlux Filter → 요청 단위 수집 공간(bucket) 생성 → "
+        "ASM Java Agent가 삽입한 method-entry probe → 현재 요청에 hit 귀속 → snapshot 저장 → "
+        "양방향 JSON/HTML 리포트",
         first=True,
     )
     append_labeled_paragraph(architecture, "Core", "요청 수명주기, context, probe registry, in-memory 저장")
@@ -381,7 +392,8 @@ def fill_report_body(document: Document, args: argparse.Namespace, components: l
     append_labeled_paragraph(
         features,
         "1. 요청 분리",
-        "동시 실행된 GET /orders/{id}와 POST /payments를 별도 bucket으로 기록하고, 공통 SharedValidator만 양쪽 관계에 표시한다.",
+        "동시 실행된 GET /orders/{id}와 POST /payments를 별도 bucket으로 기록하며, "
+        "두 요청이 함께 호출한 SharedValidator만 양쪽 결과에 동시에 나타난다.",
         first=True,
     )
     add_picture(features, ASSET_MVC, "그림 1. MVC 요청별 실행 경로 분리 결과")
@@ -399,22 +411,37 @@ def fill_report_body(document: Document, args: argparse.Namespace, components: l
     append_labeled_paragraph(
         features,
         "4. WebFlux thread-hop",
-        "boundedElastic·parallel 등 thread가 바뀌는 표준 Reactor chain에서도 같은 요청 bucket으로 귀속한다.",
+        "boundedElastic·parallel 등 thread가 바뀌는 표준 Reactor chain에서도 같은 요청에 귀속시킨다.",
     )
     add_picture(features, ASSET_WEBFLUX, "그림 3. WebFlux thread 전환 후 동일 요청 귀속 결과")
     append_labeled_paragraph(
         features,
         "구동",
-        "JDK 17 이상 환경에서 ./gradlew clean test 실행 후 ./scripts/run-agent-demo.sh mvc 8080 또는 webflux 8080을 실행하고, "
-        "http://127.0.0.1:8080/reqover/report.html을 연다. 데모는 report endpoint를 loopback에만 노출한다.",
+        "JDK 17 또는 21 환경에서 ./gradlew clean test로 전체 테스트를 실행한 뒤, "
+        "./scripts/run-agent-demo.sh mvc 8080을 실행하고 http://127.0.0.1:8080/reqover/report.html을 연다. "
+        "WebFlux 데모는 같은 명령에서 mvc를 webflux로 바꿔 실행한다. "
+        "데모는 report endpoint를 loopback에만 노출한다.",
     )
     append_labeled_paragraph(features, "최종 검증", args.verification)
+    append_labeled_paragraph(features, "공급망 점검", args.supply_chain)
 
     effects = table.rows[10].cells[1]
     clear_cell(effects)
     append_labeled_paragraph(effects, "회귀 테스트", "관측 근거로 우선 재검증할 endpoint 후보를 좁혀 테스트 범위 결정 과정을 보조한다.", first=True)
     append_labeled_paragraph(effects, "디버깅·QA", "API 요청과 실제 실행 코드를 연결해 공유 로직과 reactive 실행 경로를 빠르게 이해한다.")
-    append_labeled_paragraph(effects, "확장성", "향후 HTTP 외 메시지·배치·테스트 단위, CI 결과, persistent backend로 attribution 단위를 확장할 수 있다.")
+    append_labeled_paragraph(
+        effects,
+        "확장성",
+        "귀속 단위를 HTTP 요청 외에 메시지·배치·테스트 단위까지 넓히고, CI 결과 연동과 영속 저장소 지원으로 "
+        "적용 범위를 확장할 계획이다.",
+    )
+    append_labeled_paragraph(
+        effects,
+        "시장성",
+        "Spring은 국내 백엔드에서 가장 널리 쓰이는 프레임워크이고, 공유 로직이 많은 서비스일수록 "
+        "회귀 테스트 범위를 정하는 비용이 크다. Reqover는 그 판단 근거를 실행 기록으로 제공하므로, "
+        "QA 자동화와 테스트 최적화 도구를 도입하려는 조직에 별도 계측 코드 없이 적용할 수 있다.",
+    )
     append_labeled_paragraph(effects, "오픈소스", "Apache-2.0, 재현 가능한 sample, 기여·보안 가이드와 SBOM을 제공해 외부 검증과 기여 기반을 마련한다.")
 
     other = table.rows[11].cells[1]
@@ -422,20 +449,23 @@ def fill_report_body(document: Document, args: argparse.Namespace, components: l
     append_labeled_paragraph(
         other,
         "혁신성·차별성",
-        "집계 커버리지의 실행 여부를 요청 차원으로 확장하고, Java bytecode 계측과 WebFlux context propagation을 결합한다. "
-        "endpoint→code와 code→endpoint를 함께 제공하며 JaCoCo를 대체하지 않고 요청 귀속 정보를 보완한다.",
+        "기존 커버리지가 알려 주던 “실행되었는가”를 “어느 요청이 실행했는가”까지 넓히고, "
+        "Java bytecode 계측과 WebFlux context propagation을 결합했다. "
+        "endpoint-to-code와 code-to-endpoint를 함께 제공하며, JaCoCo를 대체하지 않고 요청 귀속 정보를 보완한다.",
         first=True,
     )
     append_labeled_paragraph(
         other,
         "현재 한계",
-        "method-entry 수준, in-memory 저장, 명시적 include·불변 runtime exclude 정책, 인증 없는 sample report, 표준 Reactor chain 중심 검증 단계이다.",
+        "계측은 method-entry 수준에 머물고, 수집 결과는 in-memory에만 저장한다. "
+        "계측 대상은 명시적 include로만 지정할 수 있으며 runtime exclude 목록은 사용자가 바꿀 수 없다. "
+        "sample report에는 인증이 없고, 검증은 표준 Reactor chain을 중심으로 이루어졌다.",
     )
     append_labeled_paragraph(
         other,
         "로드맵",
-        "재현 가능한 release artifact와 Gradle/Maven 연동, persistent storage와 인증, report filtering/export, JaCoCo XML 상호운용, "
-        "반복 부하 측정을 순차적으로 추진한다.",
+        "재현 가능한 release artifact와 Gradle/Maven 연동, 영속 저장소와 인증, 리포트 필터링·내보내기, "
+        "JaCoCo XML 상호운용, 반복 부하 측정을 순차적으로 추진한다.",
     )
     append_labeled_paragraph(other, "팀 역할·기여", args.team_contributions)
     append_labeled_paragraph(
@@ -447,7 +477,8 @@ def fill_report_body(document: Document, args: argparse.Namespace, components: l
     append_labeled_paragraph(
         other,
         "소감",
-        "요청 수명주기와 reactive context를 bytecode 계측 결과에 안전하게 연결하면서 오귀속보다 미귀속을 우선하는 원칙의 중요성을 확인했다. "
+        "요청 수명주기와 reactive context를 bytecode 계측 결과에 안전하게 연결하면서, "
+        "잘못 귀속시키느니 아예 귀속하지 않는 쪽을 택하는 원칙이 중요하다는 것을 확인했다. "
         "기능 구현뿐 아니라 라이선스, SBOM, 재현 문서가 오픈소스 완성도의 일부임을 학습했다.",
     )
     append_labeled_paragraph(other, "중복수혜 확인", args.duplicate_benefit)
@@ -467,7 +498,24 @@ def component_license(component: dict) -> str:
     return " OR ".join(unique) if unique else "[확인 필요: 라이선스 확인]"
 
 
+# 업스트림 POM 메타데이터의 vcs URL이 404이거나 소스 저장소가 아닌 경우의 교정 표.
+# 붙임1은 규정 제8조⑥(출처·라이선스 공개)을 이행하는 서식이므로 링크가 살아 있어야 한다.
+URL_OVERRIDES = {
+    "org.assertj:assertj-core": "https://github.com/assertj/assertj",
+    "org.osgi:org.osgi.resource": "https://github.com/osgi/osgi",
+    "org.osgi:org.osgi.service.serviceloader": "https://github.com/osgi/osgi",
+    "com.vaadin.external.google:android-json":
+        "https://central.sonatype.com/artifact/com.vaadin.external.google/android-json/0.0.20131108.vaadin1",
+    "com.jayway.jsonpath:json-path": "https://github.com/json-path/JsonPath",
+    "jakarta.servlet:jakarta.servlet-api": "https://github.com/jakartaee/servlet",
+}
+
+
 def component_url(component: dict) -> str:
+    coordinate = f"{component.get('group') or ''}:{component.get('name') or ''}"
+    if override := URL_OVERRIDES.get(coordinate):
+        return override
+
     references = component.get("externalReferences") or []
     priority = {"vcs": 0, "website": 1, "distribution": 2, "documentation": 3}
     for reference in sorted(references, key=lambda item: priority.get(item.get("type"), 99)):
@@ -484,6 +532,9 @@ def component_url(component: dict) -> str:
                 if url.startswith(prefix):
                     url = replacement + url.removeprefix(prefix)
                     break
+            # clone URL이 아니라 브라우징 주소를 싣는다.
+            if url.startswith("https://github.com/") and url.endswith(".git"):
+                url = url.removesuffix(".git")
             return url
 
     group = str(component.get("group") or "").strip()

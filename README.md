@@ -23,6 +23,7 @@ recorded per request, and answerable in reverse.</p>
   <a href="#what-problem-it-solves">Why</a> ·
   <a href="#how-it-works">How it works</a> ·
   <a href="docs/17_integration_guide.md">Integration</a> ·
+  <a href="https://youtu.be/9UtReW8TxZ8">Demo video</a> ·
   <a href="#documentation">Docs</a> ·
   <a href="README.ko.md">한국어</a>
 </p>
@@ -30,6 +31,11 @@ recorded per request, and answerable in reverse.</p>
 </div>
 
 ![Reqover report separating executed code by HTTP endpoint](docs/assets/reqover-mvc-request-attribution.png)
+
+<p align="center">
+  <a href="https://youtu.be/9UtReW8TxZ8"><b>▶&nbsp; Watch the 2-minute demo</b></a><br>
+  <sub>Request separation, WebFlux thread hops, and the reverse lookup — running, not slides.</sub>
+</p>
 
 > [!IMPORTANT]
 > Reqover `0.1.1` is an **early development release**. You can build it from source or download it from [GitHub Releases](https://github.com/reqover-labs/reqover/releases); it is not on Maven Central yet. It is designed for development, QA, and staging — not for running permanently in production.
@@ -127,15 +133,20 @@ When the script prints an address and waits, open this in your browser:
 http://127.0.0.1:8080/reqover/report.html
 ```
 
-If the report shows something like this, it worked:
+If the report groups the executed classes under the endpoint like this, it worked:
 
 ```
-GET /auto/orders/{id}
-  io.reqover.example.mvc.auto.AutoOrderController
-  io.reqover.example.mvc.auto.AutoOrderService
+GET /auto/orders/{id}          3 classes · 3 methods · 1 thread
+  AutoOrderController          io.reqover.example.mvc.auto
+  AutoOrderService             io.reqover.example.mvc.auto
+  AutoOrderResponse            io.reqover.example.mvc.auto
 ```
 
-Press `Enter` in the terminal running the script to shut it down.
+Press `Enter` in the terminal running the script to shut it down. To capture the report and exit without waiting — useful in scripts and CI — pass a third argument:
+
+```bash
+./scripts/run-agent-demo.sh mvc 8080 --stop-after-report
+```
 
 ### To see the WebFlux version
 

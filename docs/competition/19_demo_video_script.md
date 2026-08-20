@@ -1,6 +1,6 @@
 # 19. 3분 시연영상 대본
 
-최종 영상은 `v0.1.0` tag와 같은 소스로 촬영합니다. 화면은 1920×1080, 브라우저 125~150% 확대, IDE·터미널 글자는 최소 22px를 권장합니다.
+최종 영상은 `v0.1.1` tag와 같은 소스로 촬영합니다. 화면은 1920×1080, 브라우저 125~150% 확대, IDE·터미널 글자는 최소 22px를 권장합니다.
 
 ## 타임라인
 
@@ -29,7 +29,7 @@ WebFlux에서는 요청 처리가 `reactor-http-*` event loop, `boundedElastic`,
 
 자동 시연 endpoint에는 수동 `ReqoverProbe.hit` 호출이 없습니다. `-javaagent`와 명시적인 `include` package만으로 실행하며, include가 없으면 안전하게 계측을 비활성화합니다.
 
-현재 소스는 Java 17과 21에서 35개 테스트로 검증하고, CycloneDX SBOM과 OSV 취약점 검사, Apache-2.0 및 서드파티 고지를 함께 제공합니다. Reqover 0.1.0은 method-entry 정밀도의 개발·QA용 초기 릴리스입니다. 설치와 한계, 전체 재현 절차는 GitHub 저장소에서 확인해 주세요.
+현재 소스는 Java 17과 21에서 35개 테스트로 검증하고, CycloneDX SBOM과 OSV 취약점 검사, Apache-2.0 및 서드파티 고지를 함께 제공합니다. Reqover 0.1.1은 method-entry 정밀도의 개발·QA용 초기 릴리스입니다. 설치와 한계, 전체 재현 절차는 GitHub 저장소에서 확인해 주세요.
 
 ## 촬영 명령
 

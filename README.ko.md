@@ -23,6 +23,7 @@
   <a href="#무슨-문제를-푸나">왜 필요한가</a> ·
   <a href="#어떻게-동작하나">동작 원리</a> ·
   <a href="docs/17_integration_guide.ko.md">내 앱에 붙이기</a> ·
+  <a href="https://youtu.be/9UtReW8TxZ8">데모 영상</a> ·
   <a href="#문서-목록">문서</a> ·
   <a href="README.md">English</a>
 </p>
@@ -30,6 +31,11 @@
 </div>
 
 ![endpoint별로 실행된 코드를 나눠서 보여주는 Reqover 리포트](docs/assets/reqover-mvc-request-attribution.png)
+
+<p align="center">
+  <a href="https://youtu.be/9UtReW8TxZ8"><b>▶&nbsp; 2분 데모 영상 보기</b></a><br>
+  <sub>요청 분리, WebFlux thread hop, 역방향 조회를 실제로 돌아가는 화면으로 봅니다.</sub>
+</p>
 
 > [!IMPORTANT]
 > Reqover `0.1.1`은 **초기 개발 단계**입니다. 소스를 직접 빌드하거나 [GitHub Releases](https://github.com/reqover-labs/reqover/releases)에서 받아 쓸 수 있고, Maven Central에는 아직 올리지 않았습니다. 개발·QA·스테이징 환경에서 써보는 것을 전제로 만들었고, 운영 환경에 상시로 켜두는 용도는 아닙니다.
@@ -130,9 +136,10 @@ http://127.0.0.1:8080/reqover/report.html
 리포트에 이런 내용이 보이면 정상 동작한 것입니다.
 
 ```
-GET /auto/orders/{id}
-  io.reqover.example.mvc.auto.AutoOrderController
-  io.reqover.example.mvc.auto.AutoOrderService
+GET /auto/orders/{id}          3 classes · 3 methods · 1 thread
+  AutoOrderController          io.reqover.example.mvc.auto
+  AutoOrderService             io.reqover.example.mvc.auto
+  AutoOrderResponse            io.reqover.example.mvc.auto
 ```
 
 끝낼 때는 스크립트를 실행한 터미널에서 `Enter`를 누릅니다.

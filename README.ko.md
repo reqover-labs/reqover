@@ -1,24 +1,39 @@
-**한국어** | [English](README.md)
+<div align="center">
 
-# Reqover
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/assets/reqover-wordmark-dark.svg">
+  <img alt="Reqover" src="docs/assets/reqover-wordmark-light.svg" width="214" height="48">
+</picture>
 
-**"이 API를 호출하면 어떤 코드가 실행되는가?"를 실제로 실행해서 보여주는 도구입니다.**
+<p><strong>이 API를 호출하면, 실제로 어떤 코드가 실행되는가?</strong></p>
 
-Spring MVC / WebFlux 애플리케이션용. 반대 방향도 됩니다 — "이 메서드를 고쳤는데, 어떤 API를 다시 테스트해야 하지?"
+<p>Spring MVC와 WebFlux의 실행 귀속을 —<br>
+요청 단위로 기록하고, 역방향으로도 되묻습니다.</p>
 
-[![Build](https://github.com/reqover-labs/reqover/actions/workflows/build.yml/badge.svg)](https://github.com/reqover-labs/reqover/actions/workflows/build.yml)
-[![License: Apache 2.0](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
-[![Bytecode target: Java 17](https://img.shields.io/badge/bytecode-Java_17-orange.svg)](build.gradle.kts)
-[![Build JDK: 17 and 21](https://img.shields.io/badge/build-JDK_17%20%7C%2021-e76f00.svg)](.github/workflows/build.yml)
+<p>
+  <a href="https://github.com/reqover-labs/reqover/actions/workflows/build.yml"><img alt="Build" src="https://img.shields.io/github/actions/workflow/status/reqover-labs/reqover/build.yml?branch=main&style=flat-square&label=build"></a>
+  <a href="https://github.com/reqover-labs/reqover/releases/latest"><img alt="Release" src="https://img.shields.io/github/v/release/reqover-labs/reqover?style=flat-square&color=5B7CFA&label=release"></a>
+  <a href="LICENSE"><img alt="License" src="https://img.shields.io/badge/license-Apache--2.0-2f7d32?style=flat-square"></a>
+  <a href=".github/workflows/build.yml"><img alt="JDK 17 and 21" src="https://img.shields.io/badge/JDK-17%20%7C%2021-e76f00?style=flat-square"></a>
+  <a href="build.gradle.kts"><img alt="Spring Boot 3.5" src="https://img.shields.io/badge/Spring%20Boot-3.5-6DB33F?style=flat-square"></a>
+</p>
 
-[5분 체험](#5분-만에-직접-보기) · [무슨 문제를 푸나](#무슨-문제를-푸나) · [어떻게 동작하나](#어떻게-동작하나) · [기여하기](#기여하기)
+<p>
+  <a href="#5분-만에-직접-보기"><b>5분 체험</b></a> ·
+  <a href="#무슨-문제를-푸나">왜 필요한가</a> ·
+  <a href="#어떻게-동작하나">동작 원리</a> ·
+  <a href="docs/17_integration_guide.ko.md">내 앱에 붙이기</a> ·
+  <a href="#문서-목록">문서</a> ·
+  <a href="README.md">English</a>
+</p>
+
+</div>
 
 ![endpoint별로 실행된 코드를 나눠서 보여주는 Reqover 리포트](docs/assets/reqover-mvc-request-attribution.png)
 
 > [!IMPORTANT]
 > Reqover `0.1.1`은 **초기 개발 단계**입니다. 소스를 직접 빌드하거나 [GitHub Releases](https://github.com/reqover-labs/reqover/releases)에서 받아 쓸 수 있고, Maven Central에는 아직 올리지 않았습니다. 개발·QA·스테이징 환경에서 써보는 것을 전제로 만들었고, 운영 환경에 상시로 켜두는 용도는 아닙니다.
 
----
 
 ## 무슨 문제를 푸나
 
@@ -46,8 +61,6 @@ Reqover는 요청이 들어오는 순간부터 응답이 나갈 때까지 **그 
 - **레거시 코드 읽기** — 문서 없는 서비스에 들어와서, API 하나가 어디까지 파고드는지 눈으로 확인할 때
 - **WebFlux 디버깅** — 요청 처리가 여러 스레드로 흩어져서 흐름을 따라가기 어려울 때
 
----
-
 ## 리포트가 보여주는 세 가지
 
 ### 1. API별로 나눠 본 실행 경로
@@ -69,8 +82,6 @@ WebFlux는 요청 하나를 처리하면서 스레드를 여러 번 갈아탑니
 ![SharedValidator를 두 개의 API에 연결해 보여주는 역방향 조회](docs/assets/reqover-code-to-endpoint-index.png)
 
 > 스크린샷을 어떤 환경에서 어떻게 찍었는지는 [README Demo Capture](docs/16_readme_demo_capture.md)에 적어두었습니다.
-
----
 
 ## 5분 만에 직접 보기
 
@@ -142,8 +153,6 @@ GET /auto/orders/{id}
 
 [Spring 애플리케이션 연동 가이드](docs/17_integration_guide.ko.md)를 참고하세요. 잘 안 되면 [이슈](https://github.com/reqover-labs/reqover/issues)로 남겨주시면 도움이 됩니다 — 어디서 막히는지가 지금 가장 필요한 정보입니다.
 
----
-
 ## 어떻게 동작하나
 
 한 문장으로: **애플리케이션이 시작될 때 코드에 "여기 지나갔다"고 알리는 코드를 자동으로 끼워 넣고, 그 기록을 요청별로 모읍니다.**
@@ -165,8 +174,6 @@ flowchart LR
 3. **리포트 만들기** — 요청이 끝나면 기록을 API별로 묶어서 JSON과 HTML 파일로 만듭니다. HTML은 다른 파일 없이 혼자 열립니다.
 
 설계 문서: [시스템 아키텍처](docs/02_architecture.ko.md) · [Agent E2E Demo](docs/09_agent_e2e_demo.md)
-
----
 
 ## 지금 되는 것 / 안 되는 것
 
@@ -196,8 +203,6 @@ flowchart LR
 
 성능은 [로컬 측정 결과](docs/15_performance_results.md)에 공개해 두었습니다. 정식 벤치마크가 아니라 "심하게 느려지지는 않는다" 수준의 확인입니다.
 
----
-
 ## 지원 범위
 
 | 항목                 | 현재                            |
@@ -211,8 +216,6 @@ flowchart LR
 | WebFlux            | 구현 완료 + 스레드 전환 통합 테스트         |
 | 리포트 형식             | JSON, 단독 실행 HTML              |
 | 배포 방법              | 소스 빌드 또는 GitHub Release       |
-
----
 
 ## 저장소 구조
 
@@ -244,58 +247,28 @@ Windows는 `.\gradlew.bat`을 씁니다. 의존성 목록은 `build/reports/bom/
 ./scripts/check-sbom-osv.py sbom/reqover.cdx.json
 ```
 
----
-
 ## 기여하기
 
 작은 저장소라 무엇이든 도움이 됩니다. 특히 **"데모를 돌렸는데 안 됐다"는 제보**가 지금 제일 귀합니다.
 
-### 처음이라면 이런 것부터
+**처음이라면 이런 것부터**
 
 - 데모를 돌려보고 안 되는 부분 [이슈로 남기기](https://github.com/reqover-labs/reqover/issues/new/choose) — OS와 JDK 버전, 실행한 명령어, 실제로 나온 결과를 적어주세요
 - README나 `docs/`에서 이해 안 되는 문장 지적하기 (이해가 안 된다는 것 자체가 버그입니다)
-- 오타·깨진 링크 수정
+- 리포트에 필터 붙이기([이슈 #5](https://github.com/reqover-labs/reqover/issues/5)), 또는 아직 *(한국어)*로만 있는 문서 번역
 - 내 Spring 프로젝트에 붙여본 후기 공유
 
-### 코드로 기여하는 흐름
+fork 후 브랜치를 만들고, `./gradlew clean test` 통과를 확인한 뒤 `main`으로 Pull Request를 열어주세요. 큰 변경이라면 코드를 쓰기 전에 이슈로 먼저 이야기해 주세요 — 방향이 안 맞아서 작업이 버려지는 게 제일 아깝습니다. 전체 규칙과 PR 체크리스트: [Contributing Guide](CONTRIBUTING.md) · [행동 강령](CODE_OF_CONDUCT.md)
 
-```bash
-# 1. 저장소를 fork 한 뒤 내 fork를 클론
-git clone https://github.com/<내-아이디>/reqover.git
-cd reqover
-
-# 2. 브랜치 만들기
-git checkout -b fix/webflux-context-leak
-
-# 3. 작업하고, 테스트 통과 확인
-./gradlew clean test
-
-# 4. 커밋하고 push
-git commit -m "fix(webflux): ..."
-git push origin fix/webflux-context-leak
-```
-
-그리고 GitHub에서 Pull Request를 엽니다. PR 템플릿의 체크리스트를 채워주시면 리뷰가 빨라집니다.
-
-**PR 전 확인 사항**
-
-- [ ] `./gradlew test` 통과
-- [ ] `./gradlew build` 통과
-- [ ] 동작이 바뀌었다면 문서도 함께 수정
-- [ ] 실행 방법이 바뀌었다면 README도 함께 수정
-- [ ] 의존성을 추가했다면 `THIRD_PARTY_NOTICES.md` 갱신
-- [ ] 비밀 키·토큰·`.env` 파일이 포함되지 않았는지 확인
-
-큰 변경을 계획한다면 코드를 쓰기 전에 이슈로 먼저 이야기해 주세요. 방향이 안 맞아서 작업이 버려지는 게 제일 아깝습니다.
-
-자세한 규칙: [Contributing Guide](CONTRIBUTING.md) · [행동 강령](CODE_OF_CONDUCT.md)
+이슈·PR·커밋 메시지는 영어로 씁니다. 한국어 질문도 환영이니 영어 요약만 함께 달아주세요.
 
 > [!CAUTION]
 > **보안 취약점은 공개 이슈로 올리지 마세요.** [Security Policy](SECURITY.md)의 비공개 신고 절차를 이용해 주세요.
 
----
-
 ## 용어 정리
+
+<details>
+<summary>이 프로젝트 문서와 코드에 반복해서 나오는 용어들</summary>
 
 이 문서와 코드에 반복해서 나오는 표현들입니다.
 
@@ -309,7 +282,7 @@ git push origin fix/webflux-context-leak
 | **버킷(bucket)**      | 요청 하나에 대응하는 기록함. "이 요청이 지나간 메서드들"을 담아둠                      |
 | **SBOM**            | 이 프로젝트가 쓰는 외부 라이브러리 목록. 취약점 점검에 사용                         |
 
----
+</details>
 
 ## 문서 목록
 
@@ -319,8 +292,6 @@ git push origin fix/webflux-context-leak
 - [JaCoCo 연동 관련 결정](docs/14_jacoco_interop_decision.md) · [README 스크린샷 촬영 기록](docs/16_readme_demo_capture.md)
 - [Spring 애플리케이션 연동 가이드](docs/17_integration_guide.ko.md)
 - [대회 준비 문서](docs/competition/README.md)
-
----
 
 ## 만든 사람들
 

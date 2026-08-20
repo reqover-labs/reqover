@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 214 48" width="214" height="48" role="img" aria-label="Reqover">
+  <g fill="none" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M24 13 H40" stroke="#5B7CFA" stroke-width="4"/>
+    <path d="M24 35 H40" stroke="#5B7CFA" stroke-width="4"/>
+    <path d="M6 24 H38" stroke="#F59E0B" stroke-width="4.5"/>
+    <path d="M33 19 L38 24 L33 29" stroke="#F59E0B" stroke-width="4.5"/>
+  </g>
+  <text x="58" y="34" fill="#1f2328" font-size="34" font-weight="700" letter-spacing="-0.8"
+        font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif">Reqover</text>
+</svg>

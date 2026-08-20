@@ -1,26 +1,39 @@
-> 🇰🇷 **한국어 사용자는 [한국어 README](README.ko.md)를 봐주세요.** — 설치·사용법·기여 안내 전체가 한국어로 준비되어 있습니다.
+<div align="center">
 
-**English** | [한국어](README.ko.md)
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/assets/reqover-wordmark-dark.svg">
+  <img alt="Reqover" src="docs/assets/reqover-wordmark-light.svg" width="214" height="48">
+</picture>
 
-# Reqover
+<p><strong>Which code actually ran when this API was called?</strong></p>
 
-**A tool that answers "which code actually runs when I call this API?" — by running it and recording what happened.**
+<p>Runtime execution attribution for Spring MVC and WebFlux —<br>
+recorded per request, and answerable in reverse.</p>
 
-For Spring MVC and WebFlux applications. It works the other way around too — "I changed this method; which APIs do I need to retest?"
+<p>
+  <a href="https://github.com/reqover-labs/reqover/actions/workflows/build.yml"><img alt="Build" src="https://img.shields.io/github/actions/workflow/status/reqover-labs/reqover/build.yml?branch=main&style=flat-square&label=build"></a>
+  <a href="https://github.com/reqover-labs/reqover/releases/latest"><img alt="Release" src="https://img.shields.io/github/v/release/reqover-labs/reqover?style=flat-square&color=5B7CFA&label=release"></a>
+  <a href="LICENSE"><img alt="License" src="https://img.shields.io/badge/license-Apache--2.0-2f7d32?style=flat-square"></a>
+  <a href=".github/workflows/build.yml"><img alt="JDK 17 and 21" src="https://img.shields.io/badge/JDK-17%20%7C%2021-e76f00?style=flat-square"></a>
+  <a href="build.gradle.kts"><img alt="Spring Boot 3.5" src="https://img.shields.io/badge/Spring%20Boot-3.5-6DB33F?style=flat-square"></a>
+</p>
 
-[![Build](https://github.com/reqover-labs/reqover/actions/workflows/build.yml/badge.svg)](https://github.com/reqover-labs/reqover/actions/workflows/build.yml)
-[![License: Apache 2.0](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
-[![Bytecode target: Java 17](https://img.shields.io/badge/bytecode-Java_17-orange.svg)](build.gradle.kts)
-[![Build JDK: 17 and 21](https://img.shields.io/badge/build-JDK_17%20%7C%2021-e76f00.svg)](.github/workflows/build.yml)
+<p>
+  <a href="#try-it-in-5-minutes"><b>Quickstart</b></a> ·
+  <a href="#what-problem-it-solves">Why</a> ·
+  <a href="#how-it-works">How it works</a> ·
+  <a href="docs/17_integration_guide.md">Integration</a> ·
+  <a href="#documentation">Docs</a> ·
+  <a href="README.ko.md">한국어</a>
+</p>
 
-[Try it in 5 minutes](#try-it-in-5-minutes) · [What problem it solves](#what-problem-it-solves) · [How it works](#how-it-works) · [Contributing](#contributing)
+</div>
 
 ![Reqover report separating executed code by HTTP endpoint](docs/assets/reqover-mvc-request-attribution.png)
 
 > [!IMPORTANT]
 > Reqover `0.1.1` is an **early development release**. You can build it from source or download it from [GitHub Releases](https://github.com/reqover-labs/reqover/releases); it is not on Maven Central yet. It is designed for development, QA, and staging — not for running permanently in production.
 
----
 
 ## What problem it solves
 
@@ -48,8 +61,6 @@ Reqover records, from the moment a request arrives until the response leaves, **
 - **Reading unfamiliar code** — you joined an undocumented service and want to see how deep one API actually reaches
 - **Debugging WebFlux** — request handling is scattered across threads and the flow is hard to follow
 
----
-
 ## Three things the report shows
 
 ### 1. Execution paths split per API
@@ -71,8 +82,6 @@ WebFlux switches threads several times while handling a single request. That nor
 ![Reverse index mapping SharedValidator to two APIs](docs/assets/reqover-code-to-endpoint-index.png)
 
 > How and where these screenshots were captured is recorded in [README Demo Capture](docs/16_readme_demo_capture.md).
-
----
 
 ## Try it in 5 minutes
 
@@ -144,8 +153,6 @@ This time you should see `GET /auto/reactive/orders/{id}` together with **two or
 
 See the [Spring integration guide](docs/17_integration_guide.md). If it doesn't work, [opening an issue](https://github.com/reqover-labs/reqover/issues) genuinely helps — where people get stuck is the information this project needs most right now.
 
----
-
 ## How it works
 
 In one sentence: **when the application starts, Reqover inserts code that reports "execution passed here", then groups those reports per request.**
@@ -167,8 +174,6 @@ In a little more detail:
 3. **Building the report** — once a request finishes, the records are grouped by API and rendered as JSON and HTML. The HTML opens on its own with no other files.
 
 Design documents: [System architecture](docs/02_architecture.md) · [Agent E2E Demo](docs/09_agent_e2e_demo.md)
-
----
 
 ## What works / What doesn't
 
@@ -198,8 +203,6 @@ Written plainly. Using a tool with the wrong expectations wastes everyone's time
 
 Performance is published in [local measurement results](docs/15_performance_results.md). It is a sanity check, not a formal benchmark.
 
----
-
 ## Support matrix
 
 | Item                      | Current                       |
@@ -213,8 +216,6 @@ Performance is published in [local measurement results](docs/15_performance_resu
 | WebFlux                   | Implemented + thread-hop integration tests |
 | Report formats            | JSON, self-contained HTML     |
 | Distribution              | Source build or GitHub Release |
-
----
 
 ## Repository layout
 
@@ -246,62 +247,28 @@ On Windows use `.\gradlew.bat`. The inventory is written to `build/reports/bom/r
 ./scripts/check-sbom-osv.py sbom/reqover.cdx.json
 ```
 
----
-
 ## Contributing
 
-This is a small repository, so anything helps. The most valuable contribution right now is a report saying **"I ran the demo and it didn't work."**
+This is a small project, so anything helps. The most valuable contribution right now is a report saying **"I ran the demo and it didn't work."**
 
-### Good places to start
+**Good first steps**
 
 - Run the demo and [open an issue](https://github.com/reqover-labs/reqover/issues/new/choose) about whatever broke — include your OS and JDK version, the exact command, and what actually happened
-- Point out sentences in the README or `docs/` that don't make sense (if it isn't understandable, that is a bug)
-- Fix typos and broken links
-- Share what happened when you wired it into your own Spring project
+- Point out sentences in the README or `docs/` that don't make sense; if it isn't understandable, that is a bug
+- Add an in-report filter ([issue #5](https://github.com/reqover-labs/reqover/issues/5)), or translate a document still marked *(Korean)*
+- Tell us what happened when you wired it into your own Spring project
 
-### The code contribution flow
+Fork, branch, confirm `./gradlew clean test` passes, and open a pull request against `main`. For anything large, open an issue first — work thrown away because the direction didn't match is the worst outcome for everyone. Full rules and the PR checklist: [Contributing Guide](CONTRIBUTING.md) · [Code of Conduct](CODE_OF_CONDUCT.md)
 
-```bash
-# 1. Fork the repository, then clone your fork
-git clone https://github.com/<your-username>/reqover.git
-cd reqover
-
-# 2. Create a branch
-git checkout -b fix/webflux-context-leak
-
-# 3. Make your change and confirm the tests pass
-./gradlew clean test
-
-# 4. Commit and push
-git commit -m "fix(webflux): ..."
-git push origin fix/webflux-context-leak
-```
-
-Then open a Pull Request on GitHub. Filling in the PR template checklist speeds up review.
-
-**Before opening a PR**
-
-- [ ] `./gradlew test` passes
-- [ ] `./gradlew build` passes
-- [ ] Documentation updated if behavior changed
-- [ ] README updated if the way you run it changed
-- [ ] `THIRD_PARTY_NOTICES.md` updated if you added a dependency
-- [ ] No secrets, tokens, or `.env` files included
-
-If you are planning a large change, please open an issue before writing code. Work thrown away because the direction didn't match is the worst outcome for everyone.
-
-Commit messages, PR descriptions, and issues are written in English so contributors from anywhere can follow the history.
-
-Full rules: [Contributing Guide](CONTRIBUTING.md) · [Code of Conduct](CODE_OF_CONDUCT.md)
+Issues, pull requests, and commit messages are written in English so contributors anywhere can follow the history. Questions in Korean are welcome — just add an English summary.
 
 > [!CAUTION]
 > **Do not report security vulnerabilities in public issues.** Use the private reporting process in the [Security Policy](SECURITY.md).
 
----
-
 ## Glossary
 
-Terms that keep appearing in this project's docs and code.
+<details>
+<summary>Terms that keep appearing in this project's docs and code</summary>
 
 | Term                | Meaning                                                          |
 | ------------------- | ---------------------------------------------------------------- |
@@ -313,7 +280,7 @@ Terms that keep appearing in this project's docs and code.
 | **Bucket**          | The record holder for a single request — "the methods this request passed through" |
 | **SBOM**            | The inventory of third-party libraries this project uses; used for vulnerability checks |
 
----
+</details>
 
 ## Documentation
 
@@ -326,8 +293,6 @@ Terms that keep appearing in this project's docs and code.
 - [Competition preparation documents](docs/competition/README.md) (Korean)
 
 Documents marked *(Korean)* have not been translated yet. Translations are welcome contributions.
-
----
 
 ## Team
 

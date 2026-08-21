@@ -72,11 +72,11 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--verification",
         default=(
-            "2026-08-21 v0.2.0 기준 JDK 21 clean build와 121개 자동화 테스트, 그리고 기록→내보내기→"
-            "영향도 분석 CI 파이프라인 검증을 모두 통과했다. "
-            "[확인 필요: v0.2.0 태그 커밋 해시와 릴리스 CI 실행 URL — 태그 푸시 후 채울 것] "
-            "직전 기록은 v0.1.1(2ae31931984f), "
-            "https://github.com/reqover-labs/reqover/actions/runs/31864712084"
+            "2026-08-21 v0.2.0(태그 커밋 17b1eea9939c) 릴리스 CI에서 JDK 17과 21의 clean build와 "
+            "121개 자동화 테스트, 기록→내보내기→영향도 분석 파이프라인 검증을 모두 통과했다. "
+            "실행 기록: https://github.com/reqover-labs/reqover/actions/runs/32452321362 "
+            "(직전 기록은 2026-08-15 v0.1.1=2ae31931984f, "
+            "https://github.com/reqover-labs/reqover/actions/runs/31864712084)"
         ),
     )
     parser.add_argument(
@@ -367,8 +367,7 @@ def fill_report_body(document: Document, args: argparse.Namespace, components: l
         background,
         "문제",
         "누적 집계하는 코드 커버리지는 코드가 실행되었다는 사실만 보여줄 뿐, 어떤 HTTP 요청이 실행했는지는 "
-        "알려 주지 않는다. 공유 로직이 많은 백엔드에서 재검증할 API를 고르는 일이 경험과 광범위한 회귀 "
-        "테스트에 의존하는 이유다.",
+        "알려 주지 않는다. 공유 로직이 많은 백엔드에서 재검증할 API를 고르는 일이 경험에 의존하는 이유다.",
         first=True,
     )
     append_labeled_paragraph(
@@ -380,7 +379,7 @@ def fill_report_body(document: Document, args: argparse.Namespace, components: l
     append_labeled_paragraph(
         background,
         "해석 범위",
-        "제시하는 관계는 관측된 실행만 담은 하한(lower bound)이며, 정적 영향 분석을 대체하지 않는다.",
+        "제시하는 관계는 관측된 실행만 담은 하한이며, 정적 영향 분석을 대체하지 않는다.",
     )
 
     environment = table.rows[7].cells[1]
@@ -486,7 +485,7 @@ def fill_report_body(document: Document, args: argparse.Namespace, components: l
         "리뷰 시점에 근거를 함께 놓는다.",
         first=True,
     )
-    append_labeled_paragraph(effects, "디버깅·QA", "API 요청과 실행 코드를 연결해 공유 로직과 reactive 경로를 빠르게 이해한다.")
+    append_labeled_paragraph(effects, "디버깅·QA", "API 요청과 실행 코드를 연결해 reactive 경로까지 빠르게 이해한다.")
     append_labeled_paragraph(
         effects,
         "확장성",
@@ -495,10 +494,9 @@ def fill_report_body(document: Document, args: argparse.Namespace, components: l
     append_labeled_paragraph(
         effects,
         "시장성",
-        "Spring은 국내 백엔드에서 가장 널리 쓰이고, 공유 로직이 많을수록 회귀 범위 결정 비용이 크다. "
-        "Reqover는 그 근거를 계측 코드 없이 제공한다.",
+        "Spring은 국내 백엔드에서 가장 널리 쓰이고, 공유 로직이 많을수록 회귀 범위 결정 비용이 크다.",
     )
-    append_labeled_paragraph(effects, "오픈소스", "Apache-2.0, 재현 가능한 샘플, 기여·보안 가이드와 SBOM으로 외부 검증 기반을 마련한다.")
+    append_labeled_paragraph(effects, "오픈소스", "Apache-2.0, 재현 가능한 샘플, 기여·보안 가이드와 SBOM을 제공한다.")
 
     other = table.rows[11].cells[1]
     clear_cell(other)
@@ -522,7 +520,7 @@ def fill_report_body(document: Document, args: argparse.Namespace, components: l
         other,
         "로드맵",
         "Maven Central 첫 배포, Gradle/Maven 플러그인, 영속 저장소, source-line·branch 정밀도, "
-        "JaCoCo XML 상호운용, trace id 연계를 순차 추진한다.",
+        "JaCoCo XML 상호운용을 순차 추진한다.",
     )
     append_labeled_paragraph(other, "팀 역할·기여", args.team_contributions)
     append_labeled_paragraph(
@@ -534,8 +532,8 @@ def fill_report_body(document: Document, args: argparse.Namespace, components: l
     append_labeled_paragraph(
         other,
         "소감",
-        "요청 수명주기와 reactive context를 계측 결과에 연결하며, 잘못 귀속시키느니 귀속하지 않는 원칙이 "
-        "중요함을 확인했다. 라이선스·SBOM·재현 문서도 완성도의 일부였다.",
+        "잘못 귀속시키느니 귀속하지 않는 원칙이 중요함을 확인했고, "
+        "라이선스·SBOM·재현 문서도 완성도의 일부였다.",
     )
     append_labeled_paragraph(other, "중복수혜 확인", args.duplicate_benefit)
 

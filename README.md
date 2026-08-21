@@ -24,7 +24,7 @@ recorded per request, answerable in reverse, and checkable in CI.</p>
   <a href="#use-it-in-ci">In CI</a> ·
   <a href="#how-it-works">How it works</a> ·
   <a href="docs/17_integration_guide.md">Integration</a> ·
-  <a href="https://youtu.be/9UtReW8TxZ8">Demo video</a> ·
+  <a href="https://youtu.be/N62BEzVchSM">Demo video</a> ·
   <a href="#documentation">Docs</a> ·
   <a href="README.ko.md">한국어</a>
 </p>
@@ -34,8 +34,8 @@ recorded per request, answerable in reverse, and checkable in CI.</p>
 ![Reqover report separating executed code by HTTP endpoint](docs/assets/reqover-mvc-request-attribution.png)
 
 <p align="center">
-  <a href="https://youtu.be/9UtReW8TxZ8"><b>▶&nbsp; Watch the 2-minute demo</b></a><br>
-  <sub>Request separation, WebFlux thread hops, and the reverse lookup — running, not slides.</sub>
+  <a href="https://youtu.be/N62BEzVchSM"><b>▶&nbsp; Watch the 2-minute demo</b></a><br>
+  <sub>Request separation, the reverse lookup, WebFlux thread hops, and the pull request comment — running, not slides.</sub>
 </p>
 
 > [!IMPORTANT]

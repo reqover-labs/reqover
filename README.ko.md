@@ -24,7 +24,7 @@
   <a href="#use-it-in-ci">CI에서 쓰기</a> ·
   <a href="#어떻게-동작하나">동작 원리</a> ·
   <a href="docs/17_integration_guide.ko.md">내 앱에 붙이기</a> ·
-  <a href="https://youtu.be/9UtReW8TxZ8">데모 영상</a> ·
+  <a href="https://youtu.be/N62BEzVchSM">데모 영상</a> ·
   <a href="#문서-목록">문서</a> ·
   <a href="README.md">English</a>
 </p>
@@ -34,8 +34,8 @@
 ![endpoint별로 실행된 코드를 나눠서 보여주는 Reqover 리포트](docs/assets/reqover-mvc-request-attribution.png)
 
 <p align="center">
-  <a href="https://youtu.be/9UtReW8TxZ8"><b>▶&nbsp; 2분 데모 영상 보기</b></a><br>
-  <sub>요청 분리, WebFlux thread hop, 역방향 조회를 실제로 돌아가는 화면으로 봅니다.</sub>
+  <a href="https://youtu.be/N62BEzVchSM"><b>▶&nbsp; 2분 데모 영상 보기</b></a><br>
+  <sub>요청 분리, 역방향 조회, WebFlux thread hop, 그리고 Pull Request 코멘트까지 실제로 돌아가는 화면으로 봅니다.</sub>
 </p>
 
 > [!IMPORTANT]

@@ -1,0 +1,3 @@
+io.reqover.spring.boot.ReqoverReportAutoConfiguration
+io.reqover.spring.boot.ReqoverMvcReportEndpointAutoConfiguration
+io.reqover.spring.boot.ReqoverWebFluxReportEndpointAutoConfiguration

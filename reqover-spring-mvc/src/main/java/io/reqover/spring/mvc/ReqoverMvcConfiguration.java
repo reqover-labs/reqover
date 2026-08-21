@@ -1,8 +1,10 @@
 package io.reqover.spring.mvc;
 
+import io.reqover.core.CoverageStore;
 import io.reqover.core.InMemoryCoverageStore;
 import io.reqover.core.RequestIdGenerator;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
@@ -13,11 +15,12 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
  * backs off when the application defines its own instance.
  */
 @Configuration(proxyBeanMethods = false)
+@EnableConfigurationProperties(ReqoverMvcProperties.class)
 public class ReqoverMvcConfiguration {
     @Bean
-    @ConditionalOnMissingBean
-    public InMemoryCoverageStore reqoverCoverageStore() {
-        return new InMemoryCoverageStore();
+    @ConditionalOnMissingBean(CoverageStore.class)
+    public CoverageStore reqoverCoverageStore(ReqoverMvcProperties properties) {
+        return new InMemoryCoverageStore(properties.getMaxSnapshots());
     }
 
     @Bean
@@ -29,20 +32,23 @@ public class ReqoverMvcConfiguration {
     @Bean
     @ConditionalOnMissingBean
     public ReqoverMvcInterceptor reqoverMvcInterceptor(
-            InMemoryCoverageStore coverageStore,
+            CoverageStore coverageStore,
             RequestIdGenerator requestIdGenerator
     ) {
         return new ReqoverMvcInterceptor(coverageStore, requestIdGenerator);
     }
 
     @Bean
-    public WebMvcConfigurer reqoverWebMvcConfigurer(ReqoverMvcInterceptor interceptor) {
+    public WebMvcConfigurer reqoverWebMvcConfigurer(
+            ReqoverMvcInterceptor interceptor,
+            ReqoverMvcProperties properties
+    ) {
         return new WebMvcConfigurer() {
             @Override
             public void addInterceptors(InterceptorRegistry registry) {
                 registry.addInterceptor(interceptor)
-                        .addPathPatterns("/**")
-                        .excludePathPatterns("/reqover", "/reqover/**", "/error");
+                        .addPathPatterns(properties.getIncludePathPatterns())
+                        .excludePathPatterns(properties.getExcludePathPatterns());
             }
         };
     }

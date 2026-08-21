@@ -1,6 +1,6 @@
 package io.reqover.example.mvc;
 
-import io.reqover.core.InMemoryCoverageStore;
+import io.reqover.core.CoverageStore;
 import io.reqover.report.CoverageReport;
 import io.reqover.report.EndpointCoverage;
 import org.junit.jupiter.api.BeforeEach;
@@ -27,7 +27,7 @@ class MvcSampleIntegrationTest {
     TestRestTemplate rest;
 
     @Autowired
-    InMemoryCoverageStore coverageStore;
+    CoverageStore coverageStore;
 
     @BeforeEach
     void clearCoverage() {

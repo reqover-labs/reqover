@@ -18,6 +18,12 @@ import java.util.concurrent.atomic.AtomicReference;
 public final class CoverageBucket {
     private static final int UNFINISHED_STATUS = CoverageBucketSnapshot.UNFINISHED_STATUS;
 
+    /**
+     * Status recorded for a unit of work that finished but has no HTTP status —
+     * a scheduled job or a test case, for example.
+     */
+    public static final int NO_STATUS = 0;
+
     private final AtomicReference<UnitInfo> unitInfo;
     private final Clock clock;
     private final Instant startedAt;
@@ -75,11 +81,16 @@ public final class CoverageBucket {
     /**
      * Marks this bucket finished. Only the first call wins; later calls keep
      * the original end time and status code.
+     *
+     * @return {@code true} if this call is the one that finished the bucket,
+     * which makes it the caller responsible for flushing it exactly once
      */
-    public void finish(int statusCode) {
+    public boolean finish(int statusCode) {
         if (endedAt.compareAndSet(null, Instant.now(clock))) {
             this.statusCode.set(statusCode);
+            return true;
         }
+        return false;
     }
 
     public CoverageBucketSnapshot snapshot() {

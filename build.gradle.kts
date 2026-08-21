@@ -5,6 +5,7 @@ import org.cyclonedx.model.LicenseChoice
 import org.gradle.api.plugins.JavaPluginExtension
 import org.gradle.api.publish.PublishingExtension
 import org.gradle.api.publish.maven.MavenPublication
+import org.gradle.plugins.signing.SigningExtension
 
 plugins {
     `java-library`
@@ -13,7 +14,7 @@ plugins {
 
 allprojects {
     group = "io.reqover"
-    version = "0.1.1"
+    version = "0.2.0"
 
     tasks.withType<org.cyclonedx.gradle.BaseCyclonedxTask>().configureEach {
         licenseChoice.set(LicenseChoice().apply {
@@ -24,6 +25,23 @@ allprojects {
         })
     }
 }
+
+/**
+ * Modules published as libraries. The agent and the CLI are shaded executables
+ * that ship in the release bundle, and the samples are demos, so neither is
+ * something to compile against.
+ */
+val publishedModules = mapOf(
+    "reqover-core" to "Request-scoped coverage buckets and the record store at the heart of Reqover",
+    "reqover-instrumentation" to "ASM bytecode instrumentation that inserts Reqover's method-entry probes",
+    "reqover-report" to "Report aggregation, reverse lookup, impact analysis, and JSON/HTML rendering",
+    "reqover-spring-mvc" to "Spring MVC adapter binding coverage buckets to servlet requests",
+    "reqover-spring-webflux" to "Spring WebFlux adapter that keeps attribution across Reactor thread hops",
+    "reqover-spring-boot-starter" to "Spring Boot starter wiring Reqover with a single dependency"
+)
+
+/** Where {@code centralBundle} stages the Maven Central upload layout. */
+val centralBundleRepository = layout.buildDirectory.dir("central-bundle/repository")
 
 subprojects {
     apply(plugin = "java-library")
@@ -41,15 +59,31 @@ subprojects {
         useJUnitPlatform()
     }
 
-    if (!path.startsWith(":examples") && path != ":reqover-agent") {
+    val moduleDescription = publishedModules[name]
+    if (moduleDescription != null) {
         apply(plugin = "maven-publish")
+
+        // Maven Central requires a Javadoc jar. Missing comments are not an
+        // error here, but malformed markup is: a release should not be the
+        // first time we notice.
+        extensions.configure<JavaPluginExtension> {
+            withJavadocJar()
+        }
+        tasks.withType<Javadoc>().configureEach {
+            (options as StandardJavadocDocletOptions).apply {
+                addStringOption("Xdoclint:all,-missing", "-quiet")
+                encoding = "UTF-8"
+                charSet = "UTF-8"
+            }
+        }
+
         extensions.configure<PublishingExtension> {
             publications {
                 create<MavenPublication>("mavenJava") {
                     from(components["java"])
                     pom {
                         name.set(project.name)
-                        description.set("Reqover request-scoped runtime coverage attribution module")
+                        description.set(moduleDescription)
                         url.set("https://github.com/reqover-labs/reqover")
                         licenses {
                             license {
@@ -78,8 +112,58 @@ subprojects {
                     }
                 }
             }
+
+            repositories {
+                // A local directory rather than a live server: the release job
+                // stages the exact bytes, checks them, then uploads the zip.
+                maven {
+                    name = "centralBundle"
+                    url = centralBundleRepository.get().asFile.toURI()
+                }
+            }
+        }
+
+        // Signing is skipped when no key is configured, so a clone with no
+        // secrets still builds and publishes to mavenLocal.
+        val signingKey = providers.environmentVariable("REQOVER_SIGNING_KEY").orNull
+        val signingPassword = providers.environmentVariable("REQOVER_SIGNING_PASSWORD").orNull
+        if (!signingKey.isNullOrBlank() && !signingPassword.isNullOrBlank()) {
+            apply(plugin = "signing")
+            extensions.configure<SigningExtension> {
+                useInMemoryPgpKeys(signingKey, signingPassword)
+                sign(extensions.getByType<PublishingExtension>().publications["mavenJava"])
+            }
         }
     }
+}
+
+/**
+ * Stages every published module into one directory laid out the way Maven
+ * Central expects, then zips it for the Central Portal upload API.
+ *
+ * <p>Run with the signing key present, or Central will reject the bundle:
+ * {@code REQOVER_SIGNING_KEY=... REQOVER_SIGNING_PASSWORD=... ./gradlew centralBundle}
+ */
+val centralBundle by tasks.registering(Zip::class) {
+    group = "publishing"
+    description = "Builds the signed Maven Central upload bundle for every published module."
+
+    dependsOn(publishedModules.keys.map { ":$it:publishMavenJavaPublicationToCentralBundleRepository" })
+    doFirst {
+        if (System.getenv("REQOVER_SIGNING_KEY").isNullOrBlank()) {
+            logger.warn(
+                "[reqover] REQOVER_SIGNING_KEY is not set: the bundle will have no .asc signatures "
+                    + "and Maven Central will reject it."
+            )
+        }
+    }
+
+    from(centralBundleRepository) {
+        // Central generates its own metadata; an uploaded copy only invalidates the bundle.
+        exclude("**/maven-metadata.xml*")
+    }
+    archiveFileName.set("reqover-$version-central-bundle.zip")
+    destinationDirectory.set(layout.buildDirectory.dir("central-bundle"))
 }
 
 val reqoverGroup = group.toString()

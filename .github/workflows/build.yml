@@ -81,6 +81,42 @@ jobs:
           if-no-files-found: error
           retention-days: 14
 
+  impact-pipeline:
+    name: report export and impact analysis
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Set up JDK
+        uses: actions/setup-java@b6effb05e454b25005698d916606bdc6ffcbf961 # v5.7.0
+        with:
+          distribution: temurin
+          java-version: 21
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@9c971963bec38e04b3d30dcc455b5382be2fdbfb # v6.3.0
+
+      # Exercises the loop the CLI exists for: record traffic, export a report
+      # on shutdown, then name the endpoints a source change would affect. The
+      # script fails if the analysis does not find the endpoint it should.
+      - name: Record, export, and analyse
+        run: ./scripts/run-impact-demo.sh 18080
+
+      - name: Upload the recorded report
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: reqover-demo-report
+          path: |
+            build/reqover-impact-demo/report.json
+            build/reqover-impact-demo/report.html
+          if-no-files-found: error
+          retention-days: 14
+
   osv:
     name: OSV dependency scan
     needs: verify

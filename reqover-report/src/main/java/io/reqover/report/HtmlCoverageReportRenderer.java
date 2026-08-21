@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
@@ -19,6 +20,66 @@ import java.util.Set;
  */
 public final class HtmlCoverageReportRenderer {
     private static final int MAX_IDS = 12;
+
+    /**
+     * Client-side filtering over the pre-rendered tables. The page still
+     * contains every row without scripting; this only hides the ones that do
+     * not match, which is why the filter control stays hidden until this runs.
+     */
+    private static final String FILTER_SCRIPT = """
+            <script>
+            (function () {
+              var box = document.getElementById('reqover-filter-box');
+              var input = document.getElementById('reqover-filter');
+              var count = document.getElementById('reqover-filter-count');
+              if (!box || !input || !count) { return; }
+
+              var endpoints = [].slice.call(document.querySelectorAll('article.endpoint'));
+              var rows = [].slice.call(document.querySelectorAll('tr[data-search]'));
+              var noEndpoint = document.getElementById('reqover-no-endpoint');
+              var noCode = document.getElementById('reqover-no-code');
+
+              function apply() {
+                var query = input.value.trim().toLowerCase();
+                var shownEndpoints = 0;
+                var shownRows = 0;
+
+                for (var i = 0; i < endpoints.length; i++) {
+                  var hit = query === '' || endpoints[i].getAttribute('data-search').indexOf(query) !== -1;
+                  endpoints[i].hidden = !hit;
+                  if (hit) { shownEndpoints++; }
+                }
+                for (var j = 0; j < rows.length; j++) {
+                  var rowHit = query === '' || rows[j].getAttribute('data-search').indexOf(query) !== -1;
+                  rows[j].hidden = !rowHit;
+                  if (rowHit) { shownRows++; }
+                }
+
+                if (noEndpoint) { noEndpoint.hidden = endpoints.length === 0 || shownEndpoints > 0; }
+                if (noCode) { noCode.hidden = rows.length === 0 || shownRows > 0; }
+
+                count.textContent = query === ''
+                  ? endpoints.length + ' endpoints, ' + rows.length + ' methods'
+                  : shownEndpoints + ' of ' + endpoints.length + ' endpoints, '
+                    + shownRows + ' of ' + rows.length + ' methods';
+              }
+
+              input.addEventListener('input', apply);
+              input.addEventListener('keydown', function (event) {
+                if (event.key === 'Escape') { input.value = ''; apply(); }
+              });
+              document.addEventListener('keydown', function (event) {
+                if (event.key === '/' && document.activeElement !== input) {
+                  event.preventDefault();
+                  input.focus();
+                }
+              });
+
+              box.hidden = false;
+              apply();
+            })();
+            </script>
+            """;
 
     public String render(CoverageReport report) {
         Set<String> sharedCode = sharedCodeKeys(report);
@@ -189,6 +250,58 @@ public final class HtmlCoverageReportRenderer {
                       border-radius: 6px;
                     }
                     footer { padding: 48px 0 64px; color: var(--ink-3); font-size: 12px; }
+
+                    /* The filter is inert without scripting, so it stays hidden
+                       until the script that drives it has run. */
+                    [hidden] { display: none !important; }
+                    .filter {
+                      display: flex;
+                      align-items: center;
+                      gap: 12px;
+                      flex-wrap: wrap;
+                      padding: 16px 0;
+                      border-bottom: 1px solid var(--rule);
+                    }
+                    .filter input {
+                      flex: 1 1 320px;
+                      min-width: 0;
+                      padding: 8px 12px;
+                      color: var(--ink);
+                      background: var(--bg);
+                      border: 1px solid var(--rule-strong);
+                      border-radius: 6px;
+                      font: inherit;
+                    }
+                    .filter input:focus-visible {
+                      outline: 2px solid var(--verb-patch);
+                      outline-offset: 1px;
+                    }
+                    .filter-count {
+                      color: var(--ink-3);
+                      font-size: 12px;
+                      font-variant-numeric: tabular-nums;
+                      white-space: nowrap;
+                    }
+                    .filter-hint { color: var(--ink-3); font-size: 12px; }
+                    .filter-hint kbd {
+                      padding: 1px 5px;
+                      border: 1px solid var(--rule-strong);
+                      border-radius: 4px;
+                      font-family: inherit;
+                      font-size: 11px;
+                    }
+                    .no-match { margin: 24px 0; color: var(--ink-2); }
+                    .sr-only {
+                      position: absolute;
+                      width: 1px;
+                      height: 1px;
+                      padding: 0;
+                      margin: -1px;
+                      overflow: hidden;
+                      clip: rect(0, 0, 0, 0);
+                      white-space: nowrap;
+                      border: 0;
+                    }
                   </style>
                 </head>
                 <body>
@@ -214,6 +327,16 @@ public final class HtmlCoverageReportRenderer {
         appendCount(html, sharedCode.size(), "method reached by 2+ endpoints", "methods reached by 2+ endpoints");
         html.append("</p>\n");
 
+        html.append("""
+                <div class="filter" id="reqover-filter-box" hidden>
+                  <label class="sr-only" for="reqover-filter">Filter</label>
+                  <input type="search" id="reqover-filter" autocomplete="off" spellcheck="false"
+                         placeholder="Filter by endpoint, class, or method">
+                  <span class="filter-count" id="reqover-filter-count"></span>
+                  <span class="filter-hint">Press <kbd>/</kbd> to focus, <kbd>Esc</kbd> to clear.</span>
+                </div>
+                """);
+
         html.append("<section class=\"section\">\n");
         html.append("<h2 class=\"section-label\">Endpoint to Code</h2>\n");
         html.append("<p class=\"section-note\">What each observed request actually executed.</p>\n");
@@ -224,6 +347,8 @@ public final class HtmlCoverageReportRenderer {
         for (EndpointCoverage endpoint : report.endpoints()) {
             appendEndpoint(html, endpoint, sharedCode);
         }
+        html.append("<p class=\"no-match\" id=\"reqover-no-endpoint\" hidden>"
+                + "No endpoint matches this filter.</p>\n");
         html.append("</section>\n");
 
         html.append("<section class=\"section\">\n");
@@ -234,7 +359,9 @@ public final class HtmlCoverageReportRenderer {
                 + "<th scope=\"col\">Observed endpoints</th></tr></thead><tbody>\n");
         for (CodeEndpointCoverage item : report.reverseIndex()) {
             boolean shared = item.endpoints().size() > 1;
-            html.append(shared ? "<tr class=\"shared\"><td>" : "<tr><td>");
+            html.append(shared ? "<tr class=\"shared\" data-search=\"" : "<tr data-search=\"");
+            html.append(escape(reverseSearchIndex(item)));
+            html.append("\"><td>");
             appendTypeName(html, item.className());
             html.append("<div class=\"member\"><code>")
                     .append(escape(item.methodName()))
@@ -254,11 +381,15 @@ public final class HtmlCoverageReportRenderer {
             html.append("</td></tr>\n");
         }
         html.append("</tbody></table>\n");
+        html.append("<p class=\"no-match\" id=\"reqover-no-code\" hidden>"
+                + "No code matches this filter.</p>\n");
         html.append("</section>\n");
 
         html.append("<footer>Reqover records method-entry hits per observed request. "
                 + "It reports what ran, not line or branch coverage.</footer>\n");
-        html.append("</main></body></html>\n");
+        html.append("</main>\n");
+        html.append(FILTER_SCRIPT);
+        html.append("</body></html>\n");
         return html.toString();
     }
 
@@ -271,6 +402,8 @@ public final class HtmlCoverageReportRenderer {
 
         html.append("<article class=\"endpoint\" data-endpoint=\"")
                 .append(escape(endpoint.endpoint()))
+                .append("\" data-search=\"")
+                .append(escape(endpointSearchIndex(endpoint.endpoint(), types)))
                 .append("\">\n");
         html.append("<div class=\"ep-head\"><h3 class=\"ep-name\">");
         appendEndpointName(html, endpoint.endpoint());
@@ -345,6 +478,35 @@ public final class HtmlCoverageReportRenderer {
             groups.add(new TypeGroup(entry.getKey(), List.copyOf(members)));
         }
         return List.copyOf(groups);
+    }
+
+    /**
+     * The lowercase text one endpoint card is matched against. Both the raw
+     * descriptor and its readable form are included so {@code (J)} and
+     * {@code long} both find the same method.
+     */
+    private static String endpointSearchIndex(String endpoint, List<TypeGroup> types) {
+        StringBuilder text = new StringBuilder(endpoint);
+        for (TypeGroup group : types) {
+            text.append(' ').append(group.className());
+            for (MethodCoverage method : group.members()) {
+                text.append(' ').append(method.methodName())
+                        .append(' ').append(method.descriptor())
+                        .append(' ').append(readableSignature(method.descriptor()));
+            }
+        }
+        return text.toString().toLowerCase(Locale.ROOT);
+    }
+
+    private static String reverseSearchIndex(CodeEndpointCoverage item) {
+        StringBuilder text = new StringBuilder(item.className());
+        text.append(' ').append(item.methodName())
+                .append(' ').append(item.descriptor())
+                .append(' ').append(readableSignature(item.descriptor()));
+        for (String endpoint : item.endpoints()) {
+            text.append(' ').append(endpoint);
+        }
+        return text.toString().toLowerCase(Locale.ROOT);
     }
 
     private static Set<String> sharedCodeKeys(CoverageReport report) {

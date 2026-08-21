@@ -104,18 +104,16 @@ jobs:
 
           bundle="dist/reqover-${project_version}"
           mkdir -p "${bundle}/lib" "${bundle}/sources" "${bundle}/licenses"
+          # The two executables sit at the bundle root: the agent you attach to
+          # a JVM, and the CLI you run over the report it produced.
           cp reqover-agent/build/libs/reqover-agent-${project_version}.jar "${bundle}/"
-          cp reqover-core/build/libs/reqover-core-${project_version}.jar "${bundle}/lib/"
-          cp reqover-report/build/libs/reqover-report-${project_version}.jar "${bundle}/lib/"
-          cp reqover-instrumentation/build/libs/reqover-instrumentation-${project_version}.jar "${bundle}/lib/"
-          cp reqover-spring-mvc/build/libs/reqover-spring-mvc-${project_version}.jar "${bundle}/lib/"
-          cp reqover-spring-webflux/build/libs/reqover-spring-webflux-${project_version}.jar "${bundle}/lib/"
+          cp reqover-cli/build/libs/reqover-cli-${project_version}.jar "${bundle}/"
+          for module in core report instrumentation spring-mvc spring-webflux spring-boot-starter; do
+            cp "reqover-${module}/build/libs/reqover-${module}-${project_version}.jar" "${bundle}/lib/"
+            cp "reqover-${module}/build/libs/reqover-${module}-${project_version}-sources.jar" "${bundle}/sources/"
+          done
           cp reqover-agent/build/libs/reqover-agent-${project_version}-sources.jar "${bundle}/sources/"
-          cp reqover-core/build/libs/reqover-core-${project_version}-sources.jar "${bundle}/sources/"
-          cp reqover-report/build/libs/reqover-report-${project_version}-sources.jar "${bundle}/sources/"
-          cp reqover-instrumentation/build/libs/reqover-instrumentation-${project_version}-sources.jar "${bundle}/sources/"
-          cp reqover-spring-mvc/build/libs/reqover-spring-mvc-${project_version}-sources.jar "${bundle}/sources/"
-          cp reqover-spring-webflux/build/libs/reqover-spring-webflux-${project_version}-sources.jar "${bundle}/sources/"
+          cp reqover-cli/build/libs/reqover-cli-${project_version}-sources.jar "${bundle}/sources/"
           cp build/reports/bom/reqover.cdx.json "${bundle}/"
           cp LICENSE NOTICE THIRD_PARTY_NOTICES.md CHANGELOG.md "${bundle}/"
           cp third-party-licenses/ASM-BSD-3-Clause.txt "${bundle}/licenses/"
@@ -123,6 +121,7 @@ jobs:
           (cd dist && zip -qr "reqover-${project_version}.zip" "reqover-${project_version}")
           (cd dist && sha256sum "reqover-${project_version}.zip" \
             "reqover-${project_version}/reqover-agent-${project_version}.jar" \
+            "reqover-${project_version}/reqover-cli-${project_version}.jar" \
             "reqover-${project_version}/reqover.cdx.json" > "reqover-${project_version}-SHA256SUMS.txt")
 
       - name: Upload release bundle
@@ -133,6 +132,7 @@ jobs:
             dist/reqover-*.zip
             dist/reqover-*-SHA256SUMS.txt
             dist/reqover-*/reqover-agent-*.jar
+            dist/reqover-*/reqover-cli-*.jar
             dist/reqover-*/reqover.cdx.json
           if-no-files-found: error
 
@@ -144,7 +144,68 @@ jobs:
             dist/reqover-*.zip \
             dist/reqover-*-SHA256SUMS.txt \
             dist/reqover-*/reqover-agent-*.jar \
+            dist/reqover-*/reqover-cli-*.jar \
             dist/reqover-*/reqover.cdx.json \
             --verify-tag \
             --title "Reqover ${GITHUB_REF_NAME#v}" \
             --generate-notes
+
+  maven-central:
+    name: publish to Maven Central
+    needs: [verify, osv]
+    # Inert until the repository sets PUBLISH_TO_MAVEN_CENTRAL=true and adds the
+    # three secrets, so a tag can never publish by accident.
+    if: ${{ vars.PUBLISH_TO_MAVEN_CENTRAL == 'true' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+
+    steps:
+      - name: Checkout tag
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Set up JDK
+        uses: actions/setup-java@b6effb05e454b25005698d916606bdc6ffcbf961 # v5.7.0
+        with:
+          distribution: temurin
+          java-version: 21
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@9c971963bec38e04b3d30dcc455b5382be2fdbfb # v6.3.0
+
+      - name: Build the signed Central bundle
+        env:
+          REQOVER_SIGNING_KEY: ${{ secrets.MAVEN_CENTRAL_SIGNING_KEY }}
+          REQOVER_SIGNING_PASSWORD: ${{ secrets.MAVEN_CENTRAL_SIGNING_PASSWORD }}
+        run: ./gradlew centralBundle --no-daemon --console=plain
+
+      - name: Verify every artifact is signed
+        run: |
+          missing=0
+          while IFS= read -r artifact; do
+            if [ ! -f "${artifact}.asc" ]; then
+              echo "unsigned: ${artifact}"
+              missing=1
+            fi
+          done < <(find build/central-bundle/repository \
+            \( -name '*.jar' -o -name '*.pom' \) -print)
+          test "${missing}" -eq 0
+
+      - name: Upload to the Central Portal
+        env:
+          CENTRAL_USERNAME: ${{ secrets.MAVEN_CENTRAL_USERNAME }}
+          CENTRAL_PASSWORD: ${{ secrets.MAVEN_CENTRAL_PASSWORD }}
+        run: |
+          token="$(printf '%s:%s' "${CENTRAL_USERNAME}" "${CENTRAL_PASSWORD}" | base64 -w0)"
+          # USER_MANAGED: the deployment is staged and validated, then a human
+          # presses publish in the portal. Releasing to Central is permanent.
+          status="$(curl --silent --show-error --fail-with-body \
+            --output /tmp/central-response.txt --write-out '%{http_code}' \
+            --request POST \
+            --header "Authorization: Bearer ${token}" \
+            --form "bundle=@build/central-bundle/reqover-${GITHUB_REF_NAME#v}-central-bundle.zip" \
+            "https://central.sonatype.com/api/v1/publisher/upload?name=reqover-${GITHUB_REF_NAME}&publishingType=USER_MANAGED")"
+          echo "Central Portal responded ${status}"
+          cat /tmp/central-response.txt
+          test "${status}" = "201"

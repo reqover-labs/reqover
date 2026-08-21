@@ -12,9 +12,8 @@ dependencies {
     implementation(platform("com.fasterxml.jackson:jackson-bom:$jacksonVersion"))
     implementation(platform("io.netty:netty-bom:$nettyVersion"))
     implementation(platform("org.apache.logging.log4j:log4j-bom:$log4jVersion"))
-    implementation(project(":reqover-core"))
-    implementation(project(":reqover-report"))
-    implementation(project(":reqover-spring-webflux"))
+    // One dependency: the starter brings core, report, and both adapters.
+    implementation(project(":reqover-spring-boot-starter"))
     implementation("org.springframework.boot:spring-boot-starter-webflux")
 
     testImplementation("org.springframework.boot:spring-boot-starter-test")

@@ -2,7 +2,7 @@ package io.reqover.spring.webflux;
 
 import io.reqover.core.CoverageBucket;
 import io.reqover.core.CoverageContext;
-import io.reqover.core.InMemoryCoverageStore;
+import io.reqover.core.CoverageStore;
 import io.reqover.core.RequestIdGenerator;
 import io.reqover.core.UnitInfo;
 import org.springframework.http.HttpStatusCode;
@@ -12,6 +12,7 @@ import org.springframework.web.server.WebFilter;
 import org.springframework.web.server.WebFilterChain;
 import reactor.core.publisher.Mono;
 
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -20,18 +21,28 @@ import java.util.Objects;
  * regardless of which scheduler thread completes it.
  */
 public final class ReqoverWebFilter implements WebFilter {
-    private final InMemoryCoverageStore coverageStore;
+    private final CoverageStore coverageStore;
     private final RequestIdGenerator requestIdGenerator;
+    private final List<String> excludePathPrefixes;
 
-    public ReqoverWebFilter(InMemoryCoverageStore coverageStore, RequestIdGenerator requestIdGenerator) {
+    public ReqoverWebFilter(CoverageStore coverageStore, RequestIdGenerator requestIdGenerator) {
+        this(coverageStore, requestIdGenerator, List.of("/reqover"));
+    }
+
+    public ReqoverWebFilter(
+            CoverageStore coverageStore,
+            RequestIdGenerator requestIdGenerator,
+            List<String> excludePathPrefixes
+    ) {
         this.coverageStore = Objects.requireNonNull(coverageStore, "coverageStore");
         this.requestIdGenerator = Objects.requireNonNull(requestIdGenerator, "requestIdGenerator");
+        this.excludePathPrefixes = List.copyOf(Objects.requireNonNull(excludePathPrefixes, "excludePathPrefixes"));
     }
 
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, WebFilterChain chain) {
         String path = exchange.getRequest().getPath().pathWithinApplication().value();
-        if (path.equals("/reqover") || path.startsWith("/reqover/")) {
+        if (isExcluded(path)) {
             return chain.filter(exchange);
         }
 
@@ -56,6 +67,20 @@ public final class ReqoverWebFilter implements WebFilter {
                         }
                     });
         });
+    }
+
+    /**
+     * A prefix excludes the path itself and everything below it, so
+     * {@code /reqover} covers {@code /reqover/report} without also covering an
+     * unrelated {@code /reqover-admin}.
+     */
+    private boolean isExcluded(String path) {
+        for (String prefix : excludePathPrefixes) {
+            if (path.equals(prefix) || path.startsWith(prefix.endsWith("/") ? prefix : prefix + "/")) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private static String endpointPattern(ServerWebExchange exchange) {

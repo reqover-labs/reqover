@@ -2,7 +2,7 @@ package io.reqover.spring.mvc;
 
 import io.reqover.core.CoverageBucket;
 import io.reqover.core.CoverageContext;
-import io.reqover.core.InMemoryCoverageStore;
+import io.reqover.core.CoverageStore;
 import io.reqover.core.RequestIdGenerator;
 import io.reqover.core.UnitInfo;
 import jakarta.servlet.http.HttpServletRequest;
@@ -25,10 +25,10 @@ import java.util.Objects;
 public final class ReqoverMvcInterceptor implements AsyncHandlerInterceptor {
     private static final String BUCKET_ATTRIBUTE = ReqoverMvcInterceptor.class.getName() + ".bucket";
 
-    private final InMemoryCoverageStore coverageStore;
+    private final CoverageStore coverageStore;
     private final RequestIdGenerator requestIdGenerator;
 
-    public ReqoverMvcInterceptor(InMemoryCoverageStore coverageStore, RequestIdGenerator requestIdGenerator) {
+    public ReqoverMvcInterceptor(CoverageStore coverageStore, RequestIdGenerator requestIdGenerator) {
         this.coverageStore = Objects.requireNonNull(coverageStore, "coverageStore");
         this.requestIdGenerator = Objects.requireNonNull(requestIdGenerator, "requestIdGenerator");
     }

@@ -1,0 +1,116 @@
+name: Reqover impact analysis
+description: >-
+  Name the observed API endpoints that execute the code a pull request changes,
+  from a Reqover report recorded earlier in the job.
+
+inputs:
+  report:
+    description: Path to the recorded report JSON, as written by reqover.report.export.json-path.
+    required: true
+  version:
+    description: Reqover release to download the CLI from, without the leading v.
+    required: false
+    default: "0.2.0"
+  base-ref:
+    description: Git ref the diff is taken against. Defaults to the pull request base.
+    required: false
+    default: ""
+  fail-on-impact:
+    description: Fail the step when any observed endpoint runs changed code.
+    required: false
+    default: "false"
+  comment:
+    description: Post the analysis as a pull request comment. Needs pull-requests:write.
+    required: false
+    default: "true"
+
+outputs:
+  markdown:
+    description: The analysis as Markdown.
+    value: ${{ steps.analyse.outputs.markdown }}
+  has-impact:
+    description: "true when at least one observed endpoint runs changed code."
+    value: ${{ steps.analyse.outputs.has-impact }}
+
+runs:
+  using: composite
+  steps:
+    - name: Download the Reqover CLI
+      shell: bash
+      env:
+        REQOVER_VERSION: ${{ inputs.version }}
+      run: |
+        set -euo pipefail
+        curl --silent --show-error --fail --location \
+          --output "${RUNNER_TEMP}/reqover-cli.jar" \
+          "https://github.com/reqover-labs/reqover/releases/download/v${REQOVER_VERSION}/reqover-cli-${REQOVER_VERSION}.jar"
+
+    - name: Collect the changed files
+      shell: bash
+      env:
+        BASE_REF: ${{ inputs.base-ref }}
+        PR_BASE: ${{ github.base_ref }}
+      run: |
+        set -euo pipefail
+        base="${BASE_REF}"
+        if [ -z "${base}" ]; then
+          if [ -z "${PR_BASE}" ]; then
+            echo "base-ref is required outside a pull request" >&2
+            exit 1
+          fi
+          git fetch --no-tags --depth=1 origin "${PR_BASE}"
+          base="FETCH_HEAD"
+        fi
+        # Three-dot: files this branch changed, not files the base moved on.
+        git diff --name-only "${base}...HEAD" > "${RUNNER_TEMP}/reqover-changed.txt"
+        echo "Changed files:"
+        cat "${RUNNER_TEMP}/reqover-changed.txt"
+
+    - name: Analyse impact
+      id: analyse
+      shell: bash
+      env:
+        REPORT: ${{ inputs.report }}
+        FAIL_ON_IMPACT: ${{ inputs.fail-on-impact }}
+      run: |
+        set -euo pipefail
+        java -jar "${RUNNER_TEMP}/reqover-cli.jar" impact \
+          --report "${REPORT}" \
+          --changed-files "${RUNNER_TEMP}/reqover-changed.txt" \
+          --format markdown \
+          --out "${RUNNER_TEMP}/reqover-impact.md"
+
+        java -jar "${RUNNER_TEMP}/reqover-cli.jar" impact \
+          --report "${REPORT}" \
+          --changed-files "${RUNNER_TEMP}/reqover-changed.txt" \
+          --format json \
+          --out "${RUNNER_TEMP}/reqover-impact.json"
+
+        has_impact="$(grep -o '"hasImpact": [a-z]*' "${RUNNER_TEMP}/reqover-impact.json" | awk '{print $2}')"
+        echo "has-impact=${has_impact}" >> "${GITHUB_OUTPUT}"
+
+        {
+          echo "markdown<<REQOVER_EOF"
+          cat "${RUNNER_TEMP}/reqover-impact.md"
+          echo "REQOVER_EOF"
+        } >> "${GITHUB_OUTPUT}"
+
+        cat "${RUNNER_TEMP}/reqover-impact.md" >> "${GITHUB_STEP_SUMMARY}"
+
+        if [ "${FAIL_ON_IMPACT}" = "true" ] && [ "${has_impact}" = "true" ]; then
+          echo "::error::changed code is reached by observed endpoints" >&2
+          exit 1
+        fi
+
+    - name: Comment on the pull request
+      if: ${{ inputs.comment == 'true' && github.event_name == 'pull_request' }}
+      shell: bash
+      env:
+        GH_TOKEN: ${{ github.token }}
+        PR_NUMBER: ${{ github.event.pull_request.number }}
+        REPO: ${{ github.repository }}
+      run: |
+        set -euo pipefail
+        gh pr comment "${PR_NUMBER}" --repo "${REPO}" \
+          --body-file "${RUNNER_TEMP}/reqover-impact.md" \
+          --edit-last --create-if-none

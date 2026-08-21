@@ -8,7 +8,7 @@
 - Repository: https://github.com/reqover-labs/reqover
 - Team name: `<팀명 입력>`
 - Registration number: `<접수번호 입력>`
-- Demo video URL: `<YouTube URL 입력>`
+- Demo video URL: https://youtu.be/N62BEzVchSM
 
 ## 1. Project Summary
 

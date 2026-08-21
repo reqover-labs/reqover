@@ -1,37 +1,55 @@
 # 19. 3분 시연영상 대본
 
-> 이 문서는 **이미 제출한 시연영상**([youtu.be/9UtReW8TxZ8](https://youtu.be/9UtReW8TxZ8))의 대본 기록입니다. 영상은 `v0.1.1` 소스로 촬영했으므로 본문의 "35개 테스트", "Reqover 0.1.1" 같은 수치는 촬영 시점 값 그대로 두었습니다. 현재 소스(`0.2.0`)는 테스트 121개이고 CI 영향도 분석이 추가되었습니다 — 영상을 다시 찍는다면 그 두 가지를 반영해야 합니다.
+> 현재 영상은 **v6**입니다. `v0.2.0` 소스로 만들었고, v5에서 두 가지가 바뀌었습니다.
+> **CI 영향도 분석 장면(`impact`)이 역방향 조회 뒤에 새로 들어갔고**, 검증 수치가
+> **v0.2.0 · 자동화 테스트 121개**로 갱신되었습니다.
+>
+> 아래 타임라인과 내레이션은 실제로 만들어진 영상에서 그대로 뽑은 것입니다
+> (`video/source/narration/script-v6.json`과 정렬 결과 `out/timeline.json`).
+> 길이 **2분 32초**, 대회 3분 제한 안에 들어갑니다.
 
-최종 영상은 `v0.1.1` tag와 같은 소스로 촬영합니다. 화면은 1920×1080, 브라우저 125~150% 확대, IDE·터미널 글자는 최소 22px를 권장합니다.
+영상 소스와 빌드 파이프라인은 비공개 제출 아카이브에 있습니다. 화면은 1920×1080이고,
+슬라이드는 HTML로 작성해 headless Chrome으로 2560×1440 PNG로 렌더합니다.
 
 ## 타임라인
 
-| 시간 | 화면 | 내레이션 핵심 |
+| 시간 | 화면 | 내레이션 |
 | --- | --- | --- |
-| 0:00~0:15 | 제목과 문제 한 문장 | 일반 커버리지는 코드 실행 여부를 보여주지만 어떤 HTTP 요청이 실행했는지는 기본 차원으로 남기지 않습니다. |
-| 0:15~0:35 | 6개 모듈 아키텍처 한 장 | Reqover는 Java Agent가 넣은 method-entry hit를 현재 요청 bucket에 기록하고 두 방향 report로 집계합니다. |
-| 0:35~1:05 | MVC report의 GET/POST 카드 | 서로 다른 두 endpoint의 controller/service가 분리되고, 공유 validator는 두 요청에 각각 관측됩니다. |
-| 1:05~1:25 | Code to Endpoint Index 확대 | 특정 method에서 실제로 그 method를 실행한 관측 endpoint를 역으로 확인합니다. 완전한 정적 영향 분석이 아니라 우선 재검증할 후보를 좁히는 신호입니다. |
-| 1:25~2:00 | WebFlux report의 thread names와 `validate(J)J` | Reactor가 세 thread로 이동해도 같은 endpoint bucket으로 유지되고, hop 뒤의 자동 계측 method도 함께 귀속됩니다. |
-| 2:00~2:25 | terminal의 `run-agent-demo`와 auto sample 코드 | 애플리케이션 코드에 수동 probe 호출을 넣지 않고, 좁은 package를 `include=`로 지정해 agent를 실행합니다. |
-| 2:25~2:45 | GitHub Actions, SBOM, LICENSE | Java 17·21에서 35개 테스트를 실행하고 CycloneDX SBOM과 OSV 검사, Apache-2.0·서드파티 고지를 제공합니다. |
-| 2:45~3:00 | limitations와 GitHub URL | 현재 정밀도는 method-entry이고 개발·QA용 초기 릴리스입니다. 저장소에서 5분 Quickstart와 재현 절차를 확인할 수 있습니다. |
+| 0:00~0:10 | 제목 슬라이드 | 안녕하세요. Reqover입니다. Spring 애플리케이션에서 어떤 요청이 어떤 코드를 실행했는지 연결해서 보여주는 오픈소스 도구입니다. |
+| 0:10~0:26 | 기존 커버리지와의 대비 | 지금까지의 커버리지는 코드가 실행됐다는 사실까지만 알려줬습니다. 그 실행을 만든 요청이 무엇이었는지는 남지 않습니다. 그래서 테스트가 통과해도 어떤 API가 그 코드를 지나갔는지는 따로 찾아야 했습니다. |
+| 0:26~0:44 | 세 단계 구조 | Reqover는 이걸 세 단계로 해결합니다. 먼저 Spring adapter가 요청이 들어올 때마다 실행 bucket을 엽니다. Java Agent는 지정한 패키지에만 method-entry probe를 넣습니다. 마지막으로 그 실행 기록을 양방향 report로 모읍니다. |
+| 0:44~0:58 | MVC report의 GET/POST 카드 | 실제 결과입니다. GET /orders 요청과 POST /payments 요청이 실행한 코드가 endpoint별로 분리됩니다. 두 요청이 공통으로 실행한 SharedValidator는 양쪽에 모두 관측됩니다. |
+| 0:58~1:13 | Code to Endpoint Index | 반대 방향도 됩니다. 이 메서드를 실제로 실행한 endpoint가 무엇인지 코드에서 거꾸로 찾을 수 있습니다. 정적 영향 분석은 아닙니다. 코드를 고친 뒤에 먼저 확인할 API를 좁혀 주는 실행 근거입니다. |
+| 1:13~1:31 | PR 코멘트 — 재검증 대상 endpoint | 0.2.0부터는 이 역방향 조회를 CI에서 그대로 씁니다. 기록한 리포트를 파일로 내보내고 변경된 파일 목록을 넘기면 다시 확인할 endpoint를 뽑아 줍니다. 그 결과를 Pull Request 코멘트로 남기기 때문에 리뷰하는 자리에서 바로 보입니다. |
+| 1:31~1:52 | WebFlux report의 thread names | WebFlux는 조금 더 까다롭습니다. 요청 처리가 event loop에서 boundedElastic과 parallel 스레드로 옮겨 다니기 때문입니다. Reqover는 Reactor Context를 사용해서 스레드가 바뀌어도 같은 요청 bucket을 유지합니다. 스레드를 옮긴 뒤에 실행된 validate 메서드까지 같은 요청 아래에 그대로 잡힙니다. |
+| 1:52~2:02 | terminal의 run-agent-demo | 이 데모에는 손으로 넣은 probe가 없습니다. 실행 스크립트가 샘플과 Java Agent를 함께 빌드하고 지정한 include 패키지만 자동으로 계측합니다. |
+| 2:02~2:07 | include 없이 실행한 terminal | include가 비어 있으면 계측을 아예 켜지 않습니다. 기본값이 안전합니다. |
+| 2:07~2:19 | 검증 수치 슬라이드 | v0.2.0 태그 소스는 Java 17과 21에서 자동화 테스트 121개를 통과했습니다. 고정한 SBOM을 기준으로 OSV에 알려진 취약 구성요소는 0건이었습니다. |
+| 2:19~2:31 | 한계와 저장소 URL | 현재 정밀도는 method-entry이고 개발과 품질 검증을 위한 초기 릴리스입니다. 설치 방법과 한계 · 재현 절차는 GitHub 저장소에 정리해 두었습니다. 감사합니다. |
 
 ## 그대로 읽을 수 있는 내레이션
 
-안녕하세요. Reqover는 Spring 애플리케이션에서 어떤 HTTP 요청이 어떤 메서드를 실행했는지 연결하는 오픈소스 개발자 도구입니다.
+안녕하세요. Reqover입니다. Spring 애플리케이션에서 어떤 요청이 어떤 코드를 실행했는지 연결해서 보여주는 오픈소스 도구입니다.
 
-일반적인 집계 커버리지는 코드가 실행됐다는 사실은 보여주지만, 그 실행을 만든 HTTP 요청을 기본 차원으로 남기지는 않습니다. Reqover의 Java Agent는 선택한 애플리케이션 클래스에 method-entry probe를 넣고, Spring adapter가 만든 현재 요청 bucket으로 hit를 전달합니다.
+지금까지의 커버리지는 코드가 실행됐다는 사실까지만 알려줬습니다. 그 실행을 만든 요청이 무엇이었는지는 남지 않습니다. 그래서 테스트가 통과해도 어떤 API가 그 코드를 지나갔는지는 따로 찾아야 했습니다.
 
-먼저 MVC 결과입니다. `GET /orders/{id}`와 `POST /payments`가 실행한 controller와 service가 서로 다른 카드에 분리됩니다. 두 요청이 함께 실행한 `SharedValidator`는 양쪽에 각각 관측됩니다.
+Reqover는 이걸 세 단계로 해결합니다. 먼저 Spring adapter가 요청이 들어올 때마다 실행 bucket을 엽니다. Java Agent는 지정한 패키지에만 method-entry probe를 넣습니다. 마지막으로 그 실행 기록을 양방향 report로 모읍니다.
 
-아래 역방향 index에서는 특정 method를 실제로 실행한 관측 endpoint를 다시 찾을 수 있습니다. 이것은 완전한 정적 영향 분석이 아니라, 코드 변경 뒤 먼저 재검증할 API 후보를 좁히는 실행 근거입니다.
+실제 결과입니다. GET /orders 요청과 POST /payments 요청이 실행한 코드가 endpoint별로 분리됩니다. 두 요청이 공통으로 실행한 SharedValidator는 양쪽에 모두 관측됩니다.
 
-WebFlux에서는 요청 처리가 `reactor-http-*` event loop, `boundedElastic`, `parallel` thread로 이동합니다. Reqover는 Reactor Context와 context propagation을 이용해 세 thread의 hit를 같은 endpoint bucket에 유지합니다. thread hop 뒤 실행된 `validate` method도 자동 계측 결과에 포함됩니다.
+반대 방향도 됩니다. 이 메서드를 실제로 실행한 endpoint가 무엇인지 코드에서 거꾸로 찾을 수 있습니다. 정적 영향 분석은 아닙니다. 코드를 고친 뒤에 먼저 확인할 API를 좁혀 주는 실행 근거입니다.
 
-자동 시연 endpoint에는 수동 `ReqoverProbe.hit` 호출이 없습니다. `-javaagent`와 명시적인 `include` package만으로 실행하며, include가 없으면 안전하게 계측을 비활성화합니다.
+0.2.0부터는 이 역방향 조회를 CI에서 그대로 씁니다. 기록한 리포트를 파일로 내보내고 변경된 파일 목록을 넘기면 다시 확인할 endpoint를 뽑아 줍니다. 그 결과를 Pull Request 코멘트로 남기기 때문에 리뷰하는 자리에서 바로 보입니다.
 
-현재 소스는 Java 17과 21에서 35개 테스트로 검증하고, CycloneDX SBOM과 OSV 취약점 검사, Apache-2.0 및 서드파티 고지를 함께 제공합니다. Reqover 0.1.1은 method-entry 정밀도의 개발·QA용 초기 릴리스입니다. 설치와 한계, 전체 재현 절차는 GitHub 저장소에서 확인해 주세요.
+WebFlux는 조금 더 까다롭습니다. 요청 처리가 event loop에서 boundedElastic과 parallel 스레드로 옮겨 다니기 때문입니다. Reqover는 Reactor Context를 사용해서 스레드가 바뀌어도 같은 요청 bucket을 유지합니다. 스레드를 옮긴 뒤에 실행된 validate 메서드까지 같은 요청 아래에 그대로 잡힙니다.
+
+이 데모에는 손으로 넣은 probe가 없습니다. 실행 스크립트가 샘플과 Java Agent를 함께 빌드하고 지정한 include 패키지만 자동으로 계측합니다.
+
+include가 비어 있으면 계측을 아예 켜지 않습니다. 기본값이 안전합니다.
+
+v0.2.0 태그 소스는 Java 17과 21에서 자동화 테스트 121개를 통과했습니다. 고정한 SBOM을 기준으로 OSV에 알려진 취약 구성요소는 0건이었습니다.
+
+현재 정밀도는 method-entry이고 개발과 품질 검증을 위한 초기 릴리스입니다. 설치 방법과 한계 · 재현 절차는 GitHub 저장소에 정리해 두었습니다. 감사합니다.
 
 ## 촬영 명령
 
@@ -61,6 +79,7 @@ examples/webflux-sample/src/main/java/io/reqover/example/webflux/auto/AutoReacti
 - 개인정보, local 절대경로, token, 알림 popup을 가립니다.
 - thread 이름과 `validate(J)J`는 확대 또는 강조 상자로 표시합니다.
 - 결과보고서·README와 동일하게 “method-entry 실행 귀속”이라고 표현합니다.
+- 재업로드하면 YouTube URL이 바뀝니다. 결과보고서를 `--video-url`로 다시 생성하고 PDF도 다시 내보냅니다.
 - YouTube 업로드 후 로그아웃 상태에서 영상·자막·설명란 GitHub 링크를 확인합니다.
 
 ## 실패 대비 백업

@@ -45,15 +45,18 @@ On Windows, use `.\gradlew.bat` instead of `./gradlew`.
 
 ## Project Structure
 
-- `reqover-core`: coverage bucket model and probe runtime
+- `reqover-core`: coverage bucket model, probe runtime, and the `CoverageStore` SPI
 - `reqover-instrumentation`: ASM bytecode instrumentation
 - `reqover-agent`: Java agent packaging and transformer
 - `reqover-spring-mvc`: Spring MVC request adapter
 - `reqover-spring-webflux`: WebFlux request adapter
-- `reqover-report`: report aggregation and HTML rendering
+- `reqover-spring-boot-starter`: one-dependency wiring, the opt-in report endpoint, and the shutdown export
+- `reqover-report`: aggregation, reverse lookup, impact analysis, diffing, JSON/HTML rendering
+- `reqover-cli`: `render`, `diff`, and `impact` over a report written to disk
 - `examples`: demo applications
 - `docs`: planning, architecture, troubleshooting, and competition notes
-- `scripts`: demo runners and the SBOM vulnerability check
+- `scripts`: demo runners, the impact demo, and the SBOM vulnerability check
+- `.github/actions/impact`: the reusable pull request action
 
 ## Documentation Layout
 

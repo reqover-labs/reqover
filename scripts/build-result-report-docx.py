@@ -72,21 +72,20 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--verification",
         default=(
-            "2026-08-15 v0.1.1(태그 커밋 2ae31931984f) 릴리스 CI에서 JDK 17과 21의 clean build와 "
-            "35개 자동화 테스트를 모두 통과했다. "
-            "실행 기록: https://github.com/reqover-labs/reqover/actions/runs/31864712084 "
-            "(직전 기록은 2026-08-10 v0.1.0=62910fc1896d, "
-            "https://github.com/reqover-labs/reqover/actions/runs/31366748139)"
+            "2026-08-21 v0.2.0 기준 JDK 21 clean build와 121개 자동화 테스트, 그리고 기록→내보내기→"
+            "영향도 분석 CI 파이프라인 검증을 모두 통과했다. "
+            "[확인 필요: v0.2.0 태그 커밋 해시와 릴리스 CI 실행 URL — 태그 푸시 후 채울 것] "
+            "직전 기록은 v0.1.1(2ae31931984f), "
+            "https://github.com/reqover-labs/reqover/actions/runs/31864712084"
         ),
     )
     parser.add_argument(
         "--supply-chain",
         default=(
-            "CycloneDX 1.6 형식의 SBOM을 생성해 저장소에 고정했고, 외부 Maven 구성요소 104개를 "
-            "OSV에 조회한 결과 알려진 취약점은 0건이다. 조회 중 확인된 두 건은 모두 해소했다. "
-            "log4j-api는 2.25.5로 올려 GHSA-qv9r-c865-cp47을, netty는 4.1.137.Final로 올려 "
-            "2026-08-17 공개된 GHSA-8c42-7qj2-3j46을 해소했다. netty는 sample 애플리케이션에만 "
-            "쓰이며 라이브러리 모듈은 포함하지 않는다."
+            "CycloneDX 1.6 SBOM을 저장소에 고정했고, 외부 Maven 구성요소 104개를 OSV에 조회한 결과 "
+            "알려진 취약점은 0건이다. log4j-api 2.25.5(GHSA-qv9r-c865-cp47), "
+            "netty 4.1.137.Final(GHSA-8c42-7qj2-3j46), jackson 2.21.5를 Spring Boot BOM보다 앞서 고정해 "
+            "해소했고, 셋 다 sample·테스트에만 쓰인다. CI는 취약점 발견 시 빌드를 실패시킨다."
         ),
     )
     parser.add_argument(
@@ -357,8 +356,9 @@ def fill_report_body(document: Document, args: argparse.Namespace, components: l
     set_cell_text(table.rows[3].cells[1], args.video_url)
     set_cell_text(
         table.rows[4].cells[1],
-        "Spring MVC와 WebFlux에서 각 HTTP 요청이 실제로 실행한 메서드를 Java Agent로 자동 계측하여, "
-        "endpoint-to-code 및 code-to-endpoint 관계를 JSON/HTML 리포트로 제공하는 오픈소스 개발자 도구이다.",
+        "Spring MVC와 WebFlux에서 각 HTTP 요청이 실행한 메서드를 Java Agent로 계측해 endpoint-to-code와 "
+        "역방향 관계를 리포트로 제공하고, “이번 변경은 어떤 API를 재검증해야 하는가”에 CI에서 답하는 "
+        "오픈소스 개발자 도구이다.",
     )
 
     background = table.rows[6].cells[1]
@@ -366,23 +366,21 @@ def fill_report_body(document: Document, args: argparse.Namespace, components: l
     append_labeled_paragraph(
         background,
         "문제",
-        "전체를 누적해 집계하는 기존 코드 커버리지는 코드가 실행되었다는 사실은 보여주지만, "
-        "어떤 HTTP 요청이 그 코드를 실행했는지는 기본 정보로 알려 주지 않는다. "
-        "공유 service·validator가 많은 백엔드에서는 코드를 변경한 뒤 어떤 API를 먼저 재검증할지 정하는 일이 "
-        "개발자의 경험과 광범위한 회귀 테스트에 의존하기 쉽다.",
+        "누적 집계하는 코드 커버리지는 코드가 실행되었다는 사실만 보여줄 뿐, 어떤 HTTP 요청이 실행했는지는 "
+        "알려 주지 않는다. 공유 로직이 많은 백엔드에서 재검증할 API를 고르는 일이 경험과 광범위한 회귀 "
+        "테스트에 의존하는 이유다.",
         first=True,
     )
     append_labeled_paragraph(
         background,
         "목표",
-        "실제 요청에서 관측한 실행 관계를 endpoint별로 분리하고 역방향으로도 조회할 수 있게 하여, "
-        "개발·QA·스테이징 환경의 디버깅과 회귀 테스트 우선순위 결정을 돕는다.",
+        "관측한 실행 관계를 endpoint별로 분리하고 역방향으로도 조회해 회귀 테스트 우선순위 결정을 돕는다. "
+        "0.2.0은 그 근거를 리포트를 열어 보는 시점이 아니라 코드 리뷰 시점에 전달하는 것을 목표로 삼았다.",
     )
     append_labeled_paragraph(
         background,
         "해석 범위",
-        "Reqover가 제시하는 관계는 실제로 관측된 실행만 담은 하한(lower bound)이다. "
-        "관측되지 않은 관계가 없다는 것까지 보장하지는 못하므로, 완전한 정적 영향 분석을 대체하지 않는다.",
+        "제시하는 관계는 관측된 실행만 담은 하한(lower bound)이며, 정적 영향 분석을 대체하지 않는다.",
     )
 
     environment = table.rows[7].cells[1]
@@ -405,7 +403,7 @@ def fill_report_body(document: Document, args: argparse.Namespace, components: l
     append_labeled_paragraph(
         environment,
         "검증",
-        "JUnit 5.12.2, 별도 JVM에 Java Agent를 붙여 실행하는 E2E 테스트, "
+        "JUnit 5.12.2, 별도 JVM에 Agent를 붙이는 E2E 테스트, 기록→내보내기→영향도 분석 전 구간 CI 검증, "
         "GitHub Actions Ubuntu/Temurin 17·21 matrix",
     )
     append_labeled_paragraph(environment, "개발 장비", args.development_environment)
@@ -415,109 +413,129 @@ def fill_report_body(document: Document, args: argparse.Namespace, components: l
     append_labeled_paragraph(
         architecture,
         "핵심 흐름",
-        "HTTP 요청 → MVC Interceptor/WebFlux Filter → 요청 단위 수집 공간(bucket) 생성 → "
-        "ASM Java Agent가 삽입한 method-entry probe → 현재 요청에 hit 귀속 → snapshot 저장 → "
-        "양방향 JSON/HTML 리포트",
+        "HTTP 요청 → MVC Interceptor/WebFlux Filter → 요청 단위 bucket 생성 → Agent가 삽입한 "
+        "method-entry probe → 현재 요청에 hit 귀속 → CoverageStore 저장 → 양방향 JSON/HTML 리포트 → "
+        "파일 내보내기 → CLI 영향도 분석 → exit code 또는 PR 코멘트",
         first=True,
     )
-    append_labeled_paragraph(architecture, "Core", "요청 수명주기, context, probe registry, in-memory 저장")
-    append_labeled_paragraph(architecture, "Instrumentation/Agent", "선택한 애플리케이션 클래스를 로드할 때 메서드 진입부에 ReqoverProbe.hit을 삽입")
-    append_labeled_paragraph(architecture, "Spring adapters", "MVC는 요청 ThreadLocal을, WebFlux는 Reactor Context와 context propagation을 사용")
-    append_labeled_paragraph(architecture, "Report", "endpoint별 관측 메서드와, 특정 코드를 실행한 것으로 관측된 endpoint를 양방향으로 집계")
+    append_labeled_paragraph(
+        architecture,
+        "Core",
+        "요청 수명주기, context, probe registry, 보관을 분리하는 CoverageStore SPI(기본 in-memory)",
+    )
+    append_labeled_paragraph(architecture, "Instrumentation/Agent", "선택한 클래스를 로드할 때 메서드 진입부에 ReqoverProbe.hit 삽입")
+    append_labeled_paragraph(architecture, "Spring adapters", "MVC는 요청 ThreadLocal, WebFlux는 Reactor Context와 context propagation 사용")
+    append_labeled_paragraph(
+        architecture,
+        "Report/CLI",
+        "endpoint별 관측 메서드와 역방향을 함께 집계한다. 파일로 쓴 리포트에는 이름이 그대로 담겨, "
+        "CLI가 원래 JVM 없이 읽어 렌더링·비교·영향도 분석을 수행한다.",
+    )
 
     features = table.rows[9].cells[1]
     clear_cell(features)
     append_labeled_paragraph(
         features,
         "1. 요청 분리",
-        "동시 실행된 GET /orders/{id}와 POST /payments를 별도 bucket으로 기록하며, "
-        "두 요청이 함께 호출한 SharedValidator만 양쪽 결과에 동시에 나타난다.",
+        "동시 실행된 GET /orders/{id}와 POST /payments를 별도 bucket으로 기록하고, "
+        "함께 호출한 SharedValidator만 양쪽에 나타난다.",
         first=True,
     )
     add_picture(features, ASSET_MVC, "그림 1. MVC 요청별 실행 경로 분리 결과")
     append_labeled_paragraph(
         features,
         "2. 코드 역조회",
-        "특정 클래스·메서드를 실행한 것으로 관측된 endpoint를 찾아, 코드 변경 후 우선 재검증할 API 후보를 좁힌다.",
+        "특정 코드를 실행한 것으로 관측된 endpoint를 찾아, 변경 후 재검증할 API 후보를 좁힌다.",
     )
     add_picture(features, ASSET_REVERSE, "그림 2. code-to-endpoint 역조회 결과")
     append_labeled_paragraph(
         features,
         "3. 자동 계측",
-        "사용자 코드에 수동 probe 호출을 넣지 않고 -javaagent 옵션으로 선택한 패키지의 메서드 진입부만 계측한다.",
+        "수동 probe 호출 없이 -javaagent로 선택한 패키지의 메서드 진입부만 계측한다.",
     )
     append_labeled_paragraph(
         features,
         "4. WebFlux thread-hop",
-        "boundedElastic·parallel 등 thread가 바뀌는 표준 Reactor chain에서도 같은 요청에 귀속시킨다.",
+        "boundedElastic·parallel 등 thread가 바뀌어도 같은 요청에 귀속시킨다.",
     )
     add_picture(features, ASSET_WEBFLUX, "그림 3. WebFlux thread 전환 후 동일 요청 귀속 결과")
     append_labeled_paragraph(
         features,
+        "5. CI 영향도 분석",
+        "내보낸 리포트와 변경된 소스 경로를 대조해, 그 코드를 실행한 것으로 관측된 endpoint 목록을 만든다. "
+        "출력은 텍스트·PR 코멘트용 Markdown·JSON이며 --fail-on-impact로 게이트가 된다(exit code 0/1/2). "
+        "대조되지 않은 파일은 “관측된 실행 없음”으로 따로 보고해 “영향 없음”과 구분한다.",
+    )
+    append_labeled_paragraph(
+        features,
         "구동",
-        "JDK 17 또는 21 환경에서 ./gradlew clean test로 전체 테스트를 실행한 뒤, "
-        "./scripts/run-agent-demo.sh mvc 8080을 실행하고 http://127.0.0.1:8080/reqover/report.html을 연다. "
-        "WebFlux 데모는 같은 명령에서 mvc를 webflux로 바꿔 실행한다. "
-        "데모는 리포트 endpoint를 loopback에만 노출한다.",
+        "JDK 17 또는 21에서 ./gradlew clean test 후 ./scripts/run-agent-demo.sh mvc 8080을 실행하고 "
+        "http://127.0.0.1:8080/reqover/report.html을 연다(webflux로 바꾸면 WebFlux 데모). "
+        "./scripts/run-impact-demo.sh 8080은 기록부터 영향도 분석까지 한 번에 실행하며, 기대한 endpoint를 "
+        "찾지 못하면 실패하므로 그 자체가 검증이다. 데모는 리포트를 loopback에만 노출한다.",
     )
     append_labeled_paragraph(features, "최종 검증", args.verification)
     append_labeled_paragraph(features, "공급망 점검", args.supply_chain)
 
     effects = table.rows[10].cells[1]
     clear_cell(effects)
-    append_labeled_paragraph(effects, "회귀 테스트", "관측 근거로 우선 재검증할 endpoint 후보를 좁혀 테스트 범위 결정 과정을 보조한다.", first=True)
-    append_labeled_paragraph(effects, "디버깅·QA", "API 요청과 실제 실행 코드를 연결해 공유 로직과 reactive 실행 경로를 빠르게 이해한다.")
+    append_labeled_paragraph(
+        effects,
+        "회귀 테스트",
+        "재검증할 endpoint 후보를 관측 근거로 좁히고, 그 목록을 Pull Request 코멘트로 전달해 "
+        "리뷰 시점에 근거를 함께 놓는다.",
+        first=True,
+    )
+    append_labeled_paragraph(effects, "디버깅·QA", "API 요청과 실행 코드를 연결해 공유 로직과 reactive 경로를 빠르게 이해한다.")
     append_labeled_paragraph(
         effects,
         "확장성",
-        "귀속 단위를 HTTP 요청 외에 메시지·배치·테스트 단위까지 넓히고, CI 결과 연동과 영속 저장소 지원으로 "
-        "적용 범위를 확장할 계획이다.",
+        "CoverageStore SPI로 보관 방식을 바꾸고, UnitScope로 귀속 단위를 배치·메시지·테스트까지 넓힐 수 있다.",
     )
     append_labeled_paragraph(
         effects,
         "시장성",
-        "Spring은 국내 백엔드에서 가장 널리 쓰이는 프레임워크이고, 공유 로직이 많은 서비스일수록 "
-        "회귀 테스트 범위를 정하는 비용이 크다. Reqover는 그 판단 근거를 실행 기록으로 제공하므로, "
-        "QA 자동화와 테스트 최적화 도구를 도입하려는 조직에 별도 계측 코드 없이 적용할 수 있다.",
+        "Spring은 국내 백엔드에서 가장 널리 쓰이고, 공유 로직이 많을수록 회귀 범위 결정 비용이 크다. "
+        "Reqover는 그 근거를 계측 코드 없이 제공한다.",
     )
-    append_labeled_paragraph(effects, "오픈소스", "Apache-2.0, 재현 가능한 샘플 애플리케이션, 기여·보안 가이드와 SBOM을 제공해 외부 검증과 기여 기반을 마련한다.")
+    append_labeled_paragraph(effects, "오픈소스", "Apache-2.0, 재현 가능한 샘플, 기여·보안 가이드와 SBOM으로 외부 검증 기반을 마련한다.")
 
     other = table.rows[11].cells[1]
     clear_cell(other)
     append_labeled_paragraph(
         other,
         "혁신성·차별성",
-        "기존 커버리지가 알려 주던 “실행되었는가”를 “어느 요청이 실행했는가”까지 넓히고, "
-        "Java bytecode 계측과 WebFlux context propagation을 결합했다. "
-        "endpoint-to-code와 code-to-endpoint를 함께 제공하며, JaCoCo를 대체하지 않고 요청 귀속 정보를 보완한다.",
+        "“실행되었는가”를 “어느 요청이 실행했는가”까지 넓히고, bytecode 계측과 WebFlux context "
+        "propagation을 결합했다. JaCoCo를 대체하지 않고 보완하며, 0.2.0은 그 역방향 인덱스를 diff와 "
+        "대조해 “이번 변경이 어떤 API에 닿는가”를 리뷰 시점에 제시한다.",
         first=True,
     )
     append_labeled_paragraph(
         other,
         "현재 한계",
-        "계측은 method-entry 수준에 머물고, 수집 결과는 in-memory에만 저장한다. "
-        "계측 대상은 명시적 include로만 지정할 수 있으며 runtime exclude 목록은 사용자가 바꿀 수 없다. "
-        "샘플 리포트에는 인증이 없고, 검증은 표준 Reactor chain을 중심으로 이루어졌다.",
+        "계측은 method-entry 수준이다. 기본 저장소는 in-memory이고, SPI로 교체할 수는 있으나 영속 "
+        "구현체는 배포하지 않는다. 영향도 분석은 관측된 실행까지만 알 수 있어, 대조되지 않은 파일은 "
+        "“영향 없음”이 아니라 “관측되지 않음”이다. 리포트 endpoint는 기본 비활성이며 인증은 "
+        "애플리케이션 책임이다. 검증은 표준 Reactor chain 중심이고, Maven Central 배포는 아직 실행 전이다.",
     )
     append_labeled_paragraph(
         other,
         "로드맵",
-        "재현 가능한 release artifact와 Gradle/Maven 연동, 영속 저장소와 인증, 리포트 필터링·내보내기, "
-        "JaCoCo XML 상호운용, 반복 부하 측정을 순차적으로 추진한다.",
+        "Maven Central 첫 배포, Gradle/Maven 플러그인, 영속 저장소, source-line·branch 정밀도, "
+        "JaCoCo XML 상호운용, trace id 연계를 순차 추진한다.",
     )
     append_labeled_paragraph(other, "팀 역할·기여", args.team_contributions)
     append_labeled_paragraph(
         other,
         "개발 보조도구",
-        "상용 생성형 AI(Codex)는 일부 코드·테스트·문서의 초안 작성 및 검토 보조에 활용했으며, 팀이 요구사항을 결정하고 결과를 검증·수정하여 "
-        "최종 반영했다. 출품작에는 AI 모델이나 외부 추론 API가 포함되지 않는다.",
+        "상용 생성형 AI(Codex)를 코드·테스트·문서 초안과 검토 보조에 활용했고, 요구사항 결정과 결과 "
+        "검증·수정은 팀이 했다. 출품작에는 AI 모델이나 외부 추론 API가 포함되지 않는다.",
     )
     append_labeled_paragraph(
         other,
         "소감",
-        "요청 수명주기와 reactive context를 bytecode 계측 결과에 안전하게 연결하면서, "
-        "잘못 귀속시키느니 아예 귀속하지 않는 쪽을 택하는 원칙이 중요하다는 것을 확인했다. "
-        "기능 구현뿐 아니라 라이선스, SBOM, 재현 문서가 오픈소스 완성도의 일부임을 학습했다.",
+        "요청 수명주기와 reactive context를 계측 결과에 연결하며, 잘못 귀속시키느니 귀속하지 않는 원칙이 "
+        "중요함을 확인했다. 라이선스·SBOM·재현 문서도 완성도의 일부였다.",
     )
     append_labeled_paragraph(other, "중복수혜 확인", args.duplicate_benefit)
 

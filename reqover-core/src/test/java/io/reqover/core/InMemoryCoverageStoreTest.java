@@ -3,19 +3,12 @@ package io.reqover.core;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-class InMemoryCoverageStoreTest {
-    @Test
-    void flushesSnapshots() {
-        InMemoryCoverageStore store = new InMemoryCoverageStore();
-        CoverageBucket bucket = new CoverageBucket(UnitInfo.httpRequest("req-1", "GET", "/orders/{id}"));
-        bucket.record(10, 3);
-
-        store.flush(bucket);
-
-        assertEquals(1, store.snapshots().size());
-        assertTrue(store.snapshots().get(0).hasHit(10, 3));
+class InMemoryCoverageStoreTest extends CoverageStoreContract {
+    @Override
+    protected CoverageStore newStore() {
+        return new InMemoryCoverageStore();
     }
 
     @Test
@@ -29,14 +22,33 @@ class InMemoryCoverageStoreTest {
         assertEquals(2, store.snapshots().size());
         assertEquals("req-2", store.snapshots().get(0).unitInfo().unitId());
         assertEquals("req-3", store.snapshots().get(1).unitInfo().unitId());
+        assertEquals(SnapshotEvictionPolicy.OLDEST_FIRST, store.evictionPolicy());
+    }
+
+    @Test
+    void rejectWhenFullKeepsExistingWindow() {
+        InMemoryCoverageStore store =
+                new InMemoryCoverageStore(2, SnapshotEvictionPolicy.REJECT_WHEN_FULL);
+
+        store.flush(new CoverageBucket(UnitInfo.httpRequest("req-1", "GET", "/orders/{id}")));
+        store.flush(new CoverageBucket(UnitInfo.httpRequest("req-2", "GET", "/orders/{id}")));
+        store.flush(new CoverageBucket(UnitInfo.httpRequest("req-3", "GET", "/orders/{id}")));
+
+        assertEquals(2, store.snapshots().size());
+        assertEquals("req-1", store.snapshots().get(0).unitInfo().unitId());
+        assertEquals("req-2", store.snapshots().get(1).unitInfo().unitId());
+        assertEquals(SnapshotEvictionPolicy.REJECT_WHEN_FULL, store.evictionPolicy());
     }
 
     @Test
     void rejectsNonPositiveCapacity() {
-        org.junit.jupiter.api.Assertions.assertThrows(
-                IllegalArgumentException.class,
-                () -> new InMemoryCoverageStore(0)
-        );
+        assertThrows(IllegalArgumentException.class, () -> new InMemoryCoverageStore(0));
+    }
+
+    @Test
+    void parsesEvictionPolicyTokens() {
+        assertEquals(SnapshotEvictionPolicy.OLDEST_FIRST, SnapshotEvictionPolicy.fromProperty("oldest-first"));
+        assertEquals(SnapshotEvictionPolicy.REJECT_WHEN_FULL, SnapshotEvictionPolicy.fromProperty("reject-when-full"));
+        assertThrows(IllegalArgumentException.class, () -> SnapshotEvictionPolicy.fromProperty("sample"));
     }
 }
-

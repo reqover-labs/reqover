@@ -51,6 +51,22 @@ class ReqoverMvcAutoConfigurationTest {
     }
 
     @Test
+    void configuresSnapshotEvictionOnTheDefaultStore() {
+        contextRunner
+                .withPropertyValues(
+                        "reqover.mvc.max-snapshots=3",
+                        "reqover.mvc.snapshot-eviction=reject-when-full"
+                )
+                .run(context -> {
+                    InMemoryCoverageStore store = (InMemoryCoverageStore) context.getBean(CoverageStore.class);
+                    assertEquals(3, store.maxSnapshots());
+                    assertEquals(
+                            io.reqover.core.SnapshotEvictionPolicy.REJECT_WHEN_FULL,
+                            store.evictionPolicy());
+                });
+    }
+
+    @Test
     void backsOffWhenTheApplicationSuppliesItsOwnStore() {
         contextRunner
                 .withUserConfiguration(CustomStoreConfiguration.class)

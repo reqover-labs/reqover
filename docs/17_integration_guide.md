@@ -161,10 +161,12 @@ Every property Reqover reads, with the default that applies when you leave it ou
 | `reqover.mvc.enabled` | `true` | Whether request attribution is installed at all. `false` keeps the MVC adapter out of the context |
 | `reqover.mvc.include-path-patterns` | `/**` | Ant path patterns the interceptor attributes. Defaults to everything |
 | `reqover.mvc.exclude-path-patterns` | `/reqover`, `/reqover/**`, `/error` | Paths excluded from attribution. Setting this **replaces** the default list |
-| `reqover.mvc.max-snapshots` | `10000` | How many finished requests the default in-memory store retains before evicting the oldest. Ignored when you supply your own `CoverageStore` bean |
+| `reqover.mvc.max-snapshots` | `10000` | How many finished requests the default in-memory store retains before applying the eviction policy. Ignored when you supply your own `CoverageStore` bean |
+| `reqover.mvc.snapshot-eviction` | `oldest-first` | What happens at the bound: `oldest-first` drops the oldest snapshot (default), `reject-when-full` keeps the existing window and ignores new flushes. Ignored when you supply your own `CoverageStore` bean |
 | `reqover.webflux.enabled` | `true` | Whether the WebFlux adapter is installed. `false` also skips enabling Reactor's automatic context propagation |
 | `reqover.webflux.exclude-path-prefixes` | `/reqover` | Paths excluded from attribution, matched as **prefixes** (not Ant patterns). Setting this replaces the default list |
 | `reqover.webflux.max-snapshots` | `10000` | Same as `reqover.mvc.max-snapshots`, for reactive applications |
+| `reqover.webflux.snapshot-eviction` | `oldest-first` | Same as `reqover.mvc.snapshot-eviction`, for reactive applications |
 | `reqover.report.endpoint.enabled` | **`false`** | Whether the built-in HTTP report endpoint is registered. Off by default — see [step 3](#3-decide-how-you-read-the-report) |
 | `reqover.report.endpoint.path` | `/reqover/report` | Base path for the endpoint. JSON is served here, and the HTML report at the same path with `.html` appended |
 | `reqover.report.export.json-path` | *unset* | Where to write the JSON report when the application context closes. Unset or blank means no JSON export |
@@ -418,13 +420,19 @@ The most common failure is **"the report is empty"**, and the cause is usually `
 
 ### Adjusting retention
 
-Records live in memory only, with a default cap of 10,000 entries; beyond that the oldest are dropped. In `0.2.0` this is a property — no bean needed:
+Records live in memory only, with a default cap of 10,000 entries. Beyond that the store either drops the oldest snapshot (`oldest-first`, the default) or keeps the existing window and ignores new flushes (`reject-when-full`). In `0.2.0` both the bound and the policy are properties — no bean needed:
 
 ```properties
 reqover.mvc.max-snapshots=50000
+reqover.mvc.snapshot-eviction=oldest-first
+# Keep the first N for a long QA session instead of rolling:
+# reqover.mvc.snapshot-eviction=reject-when-full
 # WebFlux:
 # reqover.webflux.max-snapshots=50000
+# reqover.webflux.snapshot-eviction=reject-when-full
 ```
+
+A second `CoverageStore` implementation can pin the same behaviour with the abstract JUnit contract in `reqover-core` tests (`CoverageStoreContract`): extend it, return your store from `newStore()`, and run the suite.
 
 ### Replacing the store
 

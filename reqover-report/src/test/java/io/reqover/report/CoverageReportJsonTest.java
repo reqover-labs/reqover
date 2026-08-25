@@ -103,11 +103,51 @@ class CoverageReportJsonTest {
     @Test
     void rejectsATimestampThatIsNotAnInstant() {
         String json = """
-                {"generatedAt": "yesterday", "completedRequestCount": 0,
+                {"schemaVersion": 1, "generatedAt": "yesterday", "completedRequestCount": 0,
                  "endpoints": [], "reverseIndex": []}
                 """;
 
         assertThrows(IllegalArgumentException.class, () -> CoverageReportJson.read(json));
+    }
+
+    @Test
+    void treatsAMissingSchemaVersionAsVersionOne() {
+        String json = """
+                {"generatedAt": "2026-01-01T00:00:00Z", "completedRequestCount": 0,
+                 "endpoints": [], "reverseIndex": []}
+                """;
+
+        assertEquals(0, CoverageReportJson.read(json).completedRequestCount());
+    }
+
+    @Test
+    void rejectsASchemaVersionBelowOne() {
+        String json = """
+                {"schemaVersion": 0, "generatedAt": "2026-01-01T00:00:00Z",
+                 "completedRequestCount": 0, "endpoints": [], "reverseIndex": []}
+                """;
+
+        assertThrows(IllegalArgumentException.class, () -> CoverageReportJson.read(json));
+    }
+
+    @Test
+    void rejectsASchemaVersionFromTheFuture() {
+        String json = """
+                {"schemaVersion": 99, "generatedAt": "2026-01-01T00:00:00Z",
+                 "completedRequestCount": 0, "endpoints": [], "reverseIndex": []}
+                """;
+
+        IllegalArgumentException thrown =
+                assertThrows(IllegalArgumentException.class, () -> CoverageReportJson.read(json));
+        assertTrue(thrown.getMessage().contains("upgrade Reqover"), thrown.getMessage());
+    }
+
+    @Test
+    void readsADocumentAtTheCurrentSchemaVersion() {
+        String json = CoverageReportJson.write(ReportFixtures.twoEndpointReport());
+
+        assertTrue(json.contains("\"schemaVersion\": " + CoverageReportJson.SCHEMA_VERSION));
+        assertEquals(2, CoverageReportJson.read(json).endpoints().size());
     }
 
     @Test

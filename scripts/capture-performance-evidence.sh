@@ -1,14 +1,33 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+# Measures the latency cost of running the sample application under the Reqover
+# agent, against the same application without it.
+#
+# The two modes are measured in alternating order across several rounds, each
+# round restarting both JVMs. A single baseline-then-agent run cannot separate
+# the agent's cost from cache, JIT, scheduling, and thermal drift that happens
+# to move in the same direction; alternating the order and reporting the median
+# of the per-round paired differences does.
+
 PORT="${1:-18180}"
 WARMUP_REQUESTS="${2:-50}"
 MEASURED_REQUESTS="${3:-300}"
 OUTPUT_DIR="${4:-}"
+ROUNDS="${5:-${REQOVER_BENCHMARK_ROUNDS:-6}}"
 
 if [[ ! "$PORT" =~ ^[0-9]+$ ]] || (( PORT < 1 || PORT > 65535 )); then
     echo "port must be an integer from 1 to 65535" >&2
     exit 1
+fi
+
+if [[ ! "$ROUNDS" =~ ^[1-9][0-9]*$ ]]; then
+    echo "rounds must be a positive integer" >&2
+    exit 1
+fi
+
+if (( ROUNDS < 2 )); then
+    echo "warning: fewer than 2 rounds cannot cancel run-order effects; the result is a smoke check, not an overhead measurement" >&2
 fi
 
 REPO_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
@@ -85,7 +104,7 @@ wait_for_app() {
 
 start_app() {
     local mode="$1"
-    local log_file="$OUTPUT_DIR/${mode}-server.log"
+    local log_file="$2"
     if [[ "$mode" == "baseline" ]]; then
         java -jar "$APP_JAR" \
             --server.address=127.0.0.1 \
@@ -102,39 +121,133 @@ start_app() {
     wait_for_app
 }
 
-start_app baseline
-./scripts/measure-demo-latency.sh \
-    "$ENDPOINT" "$WARMUP_REQUESTS" "$MEASURED_REQUESTS" \
-    "$OUTPUT_DIR/baseline-samples-ms.txt" >"$OUTPUT_DIR/baseline.json"
-stop_app
+# One JVM lifetime: start, warm up, measure, stop. Every round pays the same
+# start-up and warm-up cost in both modes, so neither inherits the other's
+# warmed JIT state.
+measure_mode() {
+    local mode="$1"
+    local round="$2"
+    local round_dir="$OUTPUT_DIR/rounds/round-$(printf '%02d' "$round")"
+    mkdir -p "$round_dir"
+    start_app "$mode" "$round_dir/${mode}-server.log"
+    ./scripts/measure-demo-latency.sh \
+        "$ENDPOINT" "$WARMUP_REQUESTS" "$MEASURED_REQUESTS" \
+        "$round_dir/${mode}-samples-ms.txt" >"$round_dir/${mode}.json"
+    stop_app
+}
 
-start_app agent
-./scripts/measure-demo-latency.sh \
-    "$ENDPOINT" "$WARMUP_REQUESTS" "$MEASURED_REQUESTS" \
-    "$OUTPUT_DIR/agent-samples-ms.txt" >"$OUTPUT_DIR/agent.json"
-stop_app
+for (( round = 1; round <= ROUNDS; round++ )); do
+    if (( round % 2 == 1 )); then
+        order="baseline agent"
+    else
+        order="agent baseline"
+    fi
+    echo "round ${round}/${ROUNDS} (order: ${order})"
+    for mode in $order; do
+        measure_mode "$mode" "$round"
+    done
+done
 
-python3 - "$OUTPUT_DIR/baseline.json" "$OUTPUT_DIR/agent.json" "$OUTPUT_DIR/comparison.json" <<'PY'
-import json, sys
+python3 - "$OUTPUT_DIR" "$ROUNDS" <<'PY'
+import json
+import statistics
+import sys
 from pathlib import Path
 
-baseline = json.loads(Path(sys.argv[1]).read_text())
-agent = json.loads(Path(sys.argv[2]).read_text())
+output_dir = Path(sys.argv[1])
+rounds = int(sys.argv[2])
 metrics = ["averageMs", "p50Ms", "p95Ms", "p99Ms", "minMs", "maxMs"]
-comparison = {"baseline": baseline, "agent": agent, "relativeChangePercent": {}}
+
+
+def nearest_rank(sorted_samples, percent):
+    rank = -(-len(sorted_samples) * percent // 100)
+    return sorted_samples[rank - 1]
+
+
+def summarize(samples):
+    ordered = sorted(samples)
+    return {
+        "measuredRequests": len(ordered),
+        "averageMs": round(statistics.fmean(ordered), 3),
+        "p50Ms": nearest_rank(ordered, 50),
+        "p95Ms": nearest_rank(ordered, 95),
+        "p99Ms": nearest_rank(ordered, 99),
+        "minMs": ordered[0],
+        "maxMs": ordered[-1],
+    }
+
+
+per_round = []
+pooled = {"baseline": [], "agent": []}
+
+for round_number in range(1, rounds + 1):
+    round_dir = output_dir / "rounds" / f"round-{round_number:02d}"
+    entry = {"round": round_number, "orderFirst": "baseline" if round_number % 2 else "agent"}
+    for mode in ("baseline", "agent"):
+        entry[mode] = json.loads((round_dir / f"{mode}.json").read_text())
+        samples = [
+            float(line)
+            for line in (round_dir / f"{mode}-samples-ms.txt").read_text().splitlines()
+            if line.strip()
+        ]
+        pooled[mode].extend(samples)
+    # The paired difference within a round is the number that survives drift:
+    # both modes saw the same machine state minutes apart, in an order that
+    # flips every round.
+    entry["deltaMs"] = {
+        metric: round(float(entry["agent"][metric]) - float(entry["baseline"][metric]), 3)
+        for metric in metrics
+    }
+    per_round.append(entry)
+
+paired = {}
 for metric in metrics:
-    before = baseline[metric]
-    after = agent[metric]
-    comparison["relativeChangePercent"][metric] = round((after - before) / before * 100, 2) if before else None
-Path(sys.argv[3]).write_text(json.dumps(comparison, indent=2) + "\n")
+    deltas = [entry["deltaMs"][metric] for entry in per_round]
+    baselines = [float(entry["baseline"][metric]) for entry in per_round]
+    paired[metric] = {
+        "medianDeltaMs": round(statistics.median(deltas), 3),
+        "minDeltaMs": round(min(deltas), 3),
+        "maxDeltaMs": round(max(deltas), 3),
+        "medianBaselineMs": round(statistics.median(baselines), 3),
+        "medianDeltaPercent": (
+            round(statistics.median(deltas) / statistics.median(baselines) * 100, 2)
+            if statistics.median(baselines)
+            else None
+        ),
+        "roundsWhereAgentSlower": sum(1 for delta in deltas if delta > 0),
+        "rounds": len(deltas),
+    }
+
+report = {
+    "method": {
+        "rounds": rounds,
+        "order": "alternating; odd rounds run baseline first, even rounds run agent first",
+        "jvmRestartsPerMode": rounds,
+        "headline": "medianDeltaMs of p50Ms across rounds",
+        "percentileMethod": "nearest-rank",
+    },
+    "pairedComparison": paired,
+    "pooled": {mode: summarize(samples) for mode, samples in pooled.items()},
+    "perRound": per_round,
+}
+(output_dir / "comparison.json").write_text(json.dumps(report, indent=2) + "\n")
+
+p50 = paired["p50Ms"]
+print(
+    f"median per-round p50 delta: {p50['medianDeltaMs']:+.3f} ms "
+    f"({p50['medianDeltaPercent']:+.2f}% of a {p50['medianBaselineMs']:.3f} ms baseline), "
+    f"agent slower in {p50['roundsWhereAgentSlower']}/{p50['rounds']} rounds"
+)
 PY
 
 {
     printf 'measuredAtUtc=%s\n' "$DATE_UTC"
     printf 'commitSha=%s\n' "$COMMIT_SHA"
     printf 'endpoint=%s\n' "$ENDPOINT"
-    printf 'warmupRequests=%s\n' "$WARMUP_REQUESTS"
-    printf 'measuredRequests=%s\n' "$MEASURED_REQUESTS"
+    printf 'rounds=%s\n' "$ROUNDS"
+    printf 'roundOrder=alternating\n'
+    printf 'warmupRequestsPerRoundPerMode=%s\n' "$WARMUP_REQUESTS"
+    printf 'measuredRequestsPerRoundPerMode=%s\n' "$MEASURED_REQUESTS"
     printf 'percentileMethod=nearest-rank\n'
     if command -v sw_vers >/dev/null 2>&1; then
         printf 'os=%s %s (%s)\n' \
@@ -151,4 +264,3 @@ PY
 } >"$OUTPUT_DIR/environment.txt"
 
 echo "Performance evidence written to $OUTPUT_DIR"
-cat "$OUTPUT_DIR/comparison.json"

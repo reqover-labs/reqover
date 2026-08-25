@@ -520,7 +520,7 @@ Closing the scope finishes the bucket and flushes it exactly once, so leaving th
 - **Report endpoint authentication is your responsibility.** Reqover ships none.
 - **The report only shows what was actually observed.** Absence from the report is not evidence that a relationship doesn't exist — you may simply not have called that API yet. For the same reason, the reverse lookup is a "start looking here" hint, not a complete change-impact analysis.
 
-The scope and limits of the performance measurements are in [local performance results](15_performance_results.md). It is not a formal benchmark.
+The scope and limits of the performance measurements are in [measured agent overhead](15_performance_results.md) — about 24 ns per instrumented method entry, measured over alternating rounds, with the things it does not cover listed.
 
 ---
 

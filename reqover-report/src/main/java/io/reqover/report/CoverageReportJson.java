@@ -50,6 +50,7 @@ public final class CoverageReportJson {
 
     public static CoverageReport read(String json) {
         Map<String, Object> root = Json.object(Json.parse(json), "report");
+        requireReadableSchema(root);
 
         Instant generatedAt;
         try {
@@ -80,6 +81,32 @@ public final class CoverageReportJson {
                 List.copyOf(endpoints),
                 List.copyOf(reverseIndex)
         );
+    }
+
+    /**
+     * A report is written by one JVM and read by another — often a CI job
+     * running a different Reqover version than the one that recorded it. A
+     * document from a newer schema has to fail with an answer rather than
+     * parse into something quietly wrong.
+     */
+    private static void requireReadableSchema(Map<String, Object> root) {
+        // Absent means version 1: that is the only shape that has ever
+        // existed, so a document without the field is readable rather than
+        // suspect. Rejecting it would only break hand-written documents,
+        // which is not the hazard this guard is for.
+        if (!root.containsKey("schemaVersion")) {
+            return;
+        }
+        int schemaVersion = Json.integer(root, "schemaVersion");
+        if (schemaVersion > SCHEMA_VERSION) {
+            throw new IllegalArgumentException(
+                    "report schema version " + schemaVersion + " is newer than this build understands ("
+                            + SCHEMA_VERSION + "); upgrade Reqover to read it");
+        }
+        if (schemaVersion < 1) {
+            throw new IllegalArgumentException(
+                    "field 'schemaVersion' must be a positive integer, was " + schemaVersion);
+        }
     }
 
     private static EndpointCoverage readEndpoint(Map<String, Object> node) {

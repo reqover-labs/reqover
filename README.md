@@ -305,7 +305,7 @@ Written plainly. Using a tool with the wrong expectations wastes everyone's time
 - **The reverse lookup is a "start looking here" hint.** It is not a complete change-impact analysis.
 - **The demo report page has no authentication.** Keep it on `127.0.0.1`.
 
-Performance is published in [local measurement results](docs/15_performance_results.md). It is a sanity check, not a formal benchmark.
+**Overhead is about 24 ns per instrumented method entry**, plus a per-request cost too small to measure here — so a request walking a few hundred instrumented methods pays roughly 10 µs. Method, raw samples, and the things this does *not* cover (concurrency, GC, startup) are in [measured agent overhead](docs/15_performance_results.md) · [한국어판](docs/15_performance_results.ko.md).
 
 ## Support matrix
 
@@ -395,13 +395,17 @@ Issues, pull requests, and commit messages are written in English so contributor
 - [System architecture](docs/02_architecture.md) · [한국어판](docs/02_architecture.ko.md)
 - [Spring integration guide](docs/17_integration_guide.md) · [한국어판](docs/17_integration_guide.ko.md)
 - [Impact analysis in CI](docs/18_ci_impact_analysis.md) · [한국어판](docs/18_ci_impact_analysis.ko.md)
+- [Prior art — and when to use a different tool](docs/19_prior_art.md) · [한국어판](docs/19_prior_art.ko.md)
+- [Versioning, compatibility, and rollback](docs/20_versioning_and_compatibility.md) · [한국어판](docs/20_versioning_and_compatibility.ko.md)
 - [Project plan](docs/00_project_plan.md) (Korean) · [Requirements](docs/01_requirements.md) (Korean)
 - [MVP status](docs/08_phase0_mvp_status.md) · [Agent E2E Demo](docs/09_agent_e2e_demo.md) · [Demo script](docs/10_demo_script.md)
-- [Performance measurement](docs/11_performance_measurement.md) · [Local performance results](docs/15_performance_results.md)
+- [Performance measurement](docs/11_performance_measurement.md) · [Measured agent overhead](docs/15_performance_results.md) · [한국어판](docs/15_performance_results.ko.md)
 - [JaCoCo interop decision](docs/14_jacoco_interop_decision.md) · [README demo capture](docs/16_readme_demo_capture.md)
 - [Competition preparation documents](docs/competition/README.md) (Korean)
 
 Documents marked *(Korean)* have not been translated yet. Translations are welcome contributions.
+
+**Project files** — [Getting help](SUPPORT.md) · [Roadmap](ROADMAP.md) · [Governance](GOVERNANCE.md) · [Contributing](CONTRIBUTING.md) · [Code of Conduct](CODE_OF_CONDUCT.md) · [Security policy](SECURITY.md) · [Changelog](CHANGELOG.md)
 
 ## Team
 

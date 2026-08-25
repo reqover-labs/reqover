@@ -1,0 +1,15 @@
+measuredAtUtc=2026-08-25T11:48:44Z
+commitSha=8a004266710fb684721e717ff77b7d68c59cdb48
+endpoint=http://127.0.0.1:18193/auto/depth/5000
+rounds=6
+roundOrder=alternating
+warmupRequestsPerRoundPerMode=50
+measuredRequestsPerRoundPerMode=300
+percentileMethod=nearest-rank
+os=macOS 26.5.2 (25F84)
+kernel=Darwin 25.5.0 arm64
+cpu=Apple M1 Pro
+memoryBytes=17179869184
+java=openjdk version "21.0.11" 2026-04-21 LTS
+java=OpenJDK Runtime Environment Microsoft-13877178 (build 21.0.11+10-LTS)
+java=OpenJDK 64-Bit Server VM Microsoft-13877178 (build 21.0.11+10-LTS, mixed mode, sharing)

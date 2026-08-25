@@ -63,7 +63,11 @@ fi
 
 AGENT_JAR="reqover-agent/build/libs/reqover-agent-${REQOVER_VERSION}.jar"
 APP_JAR="examples/mvc-sample/build/libs/mvc-sample-${REQOVER_VERSION}.jar"
-ENDPOINT="http://127.0.0.1:${PORT}/auto/orders/1"
+# The default endpoint enters four instrumented methods, which measures the
+# fixed per-request cost. Point this at /auto/depth/N to measure the per-entry
+# cost instead; two depths give the slope.
+ENDPOINT_PATH="${REQOVER_BENCHMARK_ENDPOINT_PATH:-/auto/orders/1}"
+ENDPOINT="http://127.0.0.1:${PORT}${ENDPOINT_PATH}"
 APP_PID=""
 
 stop_app() {

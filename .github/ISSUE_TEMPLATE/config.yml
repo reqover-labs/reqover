@@ -1,5 +1,11 @@
 blank_issues_enabled: false
 contact_links:
+  - name: Ask a question (Q&A)
+    url: https://github.com/reqover-labs/reqover/discussions/categories/q-a
+    about: How do I do X, does Reqover fit my case, is this the tool I want? Questions belong here rather than in an issue.
+  - name: Show what you built with it
+    url: https://github.com/reqover-labs/reqover/discussions/categories/show-and-tell
+    about: Wired it into a real project? We would like to hear how it went, including if it went badly.
   - name: Report a security vulnerability
     url: https://github.com/reqover-labs/reqover/security/advisories/new
     about: Please use GitHub's private vulnerability reporting instead of a public issue.

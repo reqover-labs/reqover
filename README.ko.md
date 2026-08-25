@@ -399,11 +399,15 @@ fork 후 브랜치를 만들고, `./gradlew clean test` 통과를 확인한 뒤 
 - [시스템 아키텍처](docs/02_architecture.ko.md)
 - [Spring 애플리케이션 연동 가이드](docs/17_integration_guide.ko.md)
 - [CI에서 영향도 분석하기](docs/18_ci_impact_analysis.ko.md)
+- [선행 도구와 Reqover의 자리 — 다른 도구를 써야 할 때](docs/19_prior_art.ko.md)
+- [버전, 호환성, 롤백](docs/20_versioning_and_compatibility.ko.md)
 - [프로젝트 기획](docs/00_project_plan.md) · [요구사항](docs/01_requirements.md)
 - [MVP 진행 상태](docs/08_phase0_mvp_status.md) · [Agent E2E Demo](docs/09_agent_e2e_demo.md) · [데모 스크립트](docs/10_demo_script.md)
 - [성능 측정 방법](docs/11_performance_measurement.md) · [로컬 성능 결과](docs/15_performance_results.md)
 - [JaCoCo 연동 관련 결정](docs/14_jacoco_interop_decision.md) · [README 스크린샷 촬영 기록](docs/16_readme_demo_capture.md)
 - [대회 준비 문서](docs/competition/README.md)
+
+**프로젝트 문서** — [도움 받기](SUPPORT.md) · [거버넌스](GOVERNANCE.md) · [기여 가이드](CONTRIBUTING.md) · [행동 강령](CODE_OF_CONDUCT.md) · [보안 정책](SECURITY.md) · [변경 이력](CHANGELOG.md)
 
 ## 만든 사람들
 

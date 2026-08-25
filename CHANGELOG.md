@@ -2,6 +2,39 @@
 
 All notable changes to Reqover are documented in this file.
 
+## Unreleased
+
+### Fixed
+
+- **A report from a newer schema is refused instead of misparsed.** The writer
+  has always stamped `schemaVersion`, but the reader ignored it, so a future
+  document fed to an older build would parse into a silently wrong result. A
+  document with no `schemaVersion` still reads as version 1.
+
+### Changed
+
+- **Agent overhead is measured over alternating rounds** rather than one
+  baseline-then-agent run. The retired 2026-08-10 capture reported the agent as
+  *faster* than the baseline, which is what run-order drift produces. The new
+  measurement gives about 24 ns per instrumented method entry and states what
+  it does not cover. See [docs/15_performance_results.md](docs/15_performance_results.md).
+
+### Added
+
+- **Compatibility policy** ([docs/20_versioning_and_compatibility.md](docs/20_versioning_and_compatibility.md)):
+  what a version number promises, what counts as public API, how the report
+  schema evolves, and what happens when a release is broken. Maven Central is
+  permanent, so this had to exist before the first upload (#4).
+- **Prior art** ([docs/19_prior_art.md](docs/19_prior_art.md)): where Reqover
+  sits next to OpenClover, the commercial test-impact products, APM tracing,
+  and traffic replay — including the cases where one of those is the better
+  answer.
+- **Project governance, roadmap, and support docs**, and GitHub Discussions as
+  the place for questions.
+- **`/auto/depth/{n}`** in the MVC sample: an endpoint that walks a chosen
+  number of instrumented method entries, so overhead can be measured as a
+  function of instrumented surface rather than at a single point.
+
 ## 0.2.0 - 2026-08-21
 
 Reports now outlive the JVM that produced them, which is what lets Reqover

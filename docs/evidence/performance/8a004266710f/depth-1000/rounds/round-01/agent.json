@@ -1,0 +1,12 @@
+{
+  "url": "http://127.0.0.1:18192/auto/depth/1000",
+  "warmupRequests": 50,
+  "measuredRequests": 300,
+  "percentileMethod": "nearest-rank",
+  "averageMs": 1.367,
+  "p50Ms": 1.343000,
+  "p95Ms": 1.603000,
+  "p99Ms": 1.828000,
+  "minMs": 1.018000,
+  "maxMs": 4.423000
+}

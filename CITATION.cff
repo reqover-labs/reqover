@@ -1,0 +1,30 @@
+cff-version: 1.2.0
+title: "Reqover: request-level runtime coverage attribution for Spring MVC and WebFlux"
+message: "If you use Reqover in academic work, please cite it using this metadata."
+type: software
+authors:
+  - family-names: Kim
+    given-names: TaeHui
+    alias: TaeHuiKKIM
+  - family-names: Lee
+    given-names: Sangmin
+    alias: lsmin3388
+repository-code: "https://github.com/reqover-labs/reqover"
+url: "https://github.com/reqover-labs/reqover"
+abstract: >-
+  Reqover attributes runtime coverage to the HTTP request that produced it. A
+  Java agent inserts method-entry probes, per-request buckets keep concurrent
+  requests separate, and Reactor context propagation preserves attribution
+  across WebFlux thread hops. The resulting endpoint-to-code and
+  code-to-endpoint indexes are exported as JSON so a CI job can turn a diff
+  into the list of endpoints to retest.
+keywords:
+  - code-coverage
+  - java-agent
+  - bytecode-instrumentation
+  - spring-boot
+  - webflux
+  - test-impact-analysis
+license: Apache-2.0
+version: 0.2.0
+date-released: "2026-08-21"

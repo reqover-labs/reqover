@@ -1,0 +1,12 @@
+{
+  "url": "http://127.0.0.1:18190/auto/orders/1",
+  "warmupRequests": 50,
+  "measuredRequests": 300,
+  "percentileMethod": "nearest-rank",
+  "averageMs": 1.313,
+  "p50Ms": 1.284000,
+  "p95Ms": 1.579000,
+  "p99Ms": 1.773000,
+  "minMs": 0.988000,
+  "maxMs": 4.093000
+}

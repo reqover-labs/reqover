@@ -21,6 +21,17 @@ All notable changes to Reqover are documented in this file.
 
 ### Added
 
+- **A configurable eviction policy for the in-memory store.**
+  `reqover.mvc.snapshot-eviction` and `reqover.webflux.snapshot-eviction`
+  choose what happens at `max-snapshots`: `oldest-first` (the default, and the
+  only behaviour until now) or `reject-when-full`, which keeps the first N
+  snapshots and ignores later flushes. The slot is reserved with a CAS, so
+  concurrent flushes cannot overshoot the bound.
+- **`CoverageStoreContract`**, an abstract JUnit suite in the `reqover-core`
+  tests that a second `CoverageStore` implementation extends to pin the SPI's
+  invariants — in particular that `snapshots()` stays stable while another
+  thread is flushing. (#14; contributed in #15 by @VedantMadane, the first
+  change to Reqover from outside the team)
 - **Compatibility policy** ([docs/20_versioning_and_compatibility.md](docs/20_versioning_and_compatibility.md)):
   what a version number promises, what counts as public API, how the report
   schema evolves, and what happens when a release is broken. Maven Central is

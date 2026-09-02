@@ -58,4 +58,3 @@ public class ReqoverWebFluxConfiguration implements InitializingBean {
         return new ReqoverWebFilter(coverageStore, requestIdGenerator, properties.getExcludePathPrefixes());
     }
 }
-

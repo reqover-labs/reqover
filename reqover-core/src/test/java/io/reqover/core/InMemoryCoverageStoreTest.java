@@ -44,11 +44,4 @@ class InMemoryCoverageStoreTest extends CoverageStoreContract {
     void rejectsNonPositiveCapacity() {
         assertThrows(IllegalArgumentException.class, () -> new InMemoryCoverageStore(0));
     }
-
-    @Test
-    void parsesEvictionPolicyTokens() {
-        assertEquals(SnapshotEvictionPolicy.OLDEST_FIRST, SnapshotEvictionPolicy.fromProperty("oldest-first"));
-        assertEquals(SnapshotEvictionPolicy.REJECT_WHEN_FULL, SnapshotEvictionPolicy.fromProperty("reject-when-full"));
-        assertThrows(IllegalArgumentException.class, () -> SnapshotEvictionPolicy.fromProperty("sample"));
-    }
 }

@@ -161,10 +161,12 @@ Reqover가 읽는 속성 전부와, 지정하지 않았을 때 적용되는 기�
 | `reqover.mvc.enabled` | `true` | 요청 추적을 아예 붙일지 여부. `false`면 MVC 어댑터가 컨텍스트에 올라오지 않습니다 |
 | `reqover.mvc.include-path-patterns` | `/**` | 인터셉터가 추적할 Ant 경로 패턴. 기본은 전체입니다 |
 | `reqover.mvc.exclude-path-patterns` | `/reqover`, `/reqover/**`, `/error` | 추적에서 제외할 경로. 이 속성을 지정하면 기본 목록을 **대체**합니다 |
-| `reqover.mvc.max-snapshots` | `10000` | 기본 인메모리 저장소가 오래된 것을 지우기 전까지 보관하는 완료 요청 수. 내 `CoverageStore` 빈을 넣으면 무시됩니다 |
+| `reqover.mvc.max-snapshots` | `10000` | 기본 인메모리 저장소가 보관 정책을 적용하기 전까지 보관하는 완료 요청 수. 내 `CoverageStore` 빈을 넣으면 무시됩니다 |
+| `reqover.mvc.snapshot-eviction` | `oldest-first` | 상한에 닿았을 때의 동작: `oldest-first`는 가장 오래된 스냅샷을 지우고(기본), `reject-when-full`은 기존 창을 그대로 두고 새로 들어오는 것을 버립니다. 내 `CoverageStore` 빈을 넣으면 무시됩니다 |
 | `reqover.webflux.enabled` | `true` | WebFlux 어댑터를 붙일지 여부. `false`면 Reactor 컨텍스트 자동 전달을 켜는 것도 건너뜁니다 |
 | `reqover.webflux.exclude-path-prefixes` | `/reqover` | 추적에서 제외할 경로. Ant 패턴이 아니라 **앞부분 일치**로 비교합니다. 지정하면 기본 목록을 대체합니다 |
 | `reqover.webflux.max-snapshots` | `10000` | `reqover.mvc.max-snapshots`와 같고, 리액티브 애플리케이션용입니다 |
+| `reqover.webflux.snapshot-eviction` | `oldest-first` | `reqover.mvc.snapshot-eviction`과 같고, 리액티브 애플리케이션용입니다 |
 | `reqover.report.endpoint.enabled` | **`false`** | 내장 HTTP 리포트 엔드포인트를 등록할지 여부. 기본은 꺼짐 — [3단계](#3-리포트를-어떻게-볼지-정하기) 참고 |
 | `reqover.report.endpoint.path` | `/reqover/report` | 엔드포인트의 기준 경로. 이 경로로 JSON이, 같은 경로에 `.html`을 붙인 경로로 HTML 리포트가 나갑니다 |
 | `reqover.report.export.json-path` | *지정 안 함* | 애플리케이션 컨텍스트가 닫힐 때 JSON 리포트를 쓸 경로. 비워두면 JSON을 내보내지 않습니다 |
@@ -418,13 +420,19 @@ WebFlux라면 하나 더 — 한 API의 기록 안에 **서로 다른 스레드 
 
 ### 보관 개수 조정
 
-기록은 메모리에만 남고 기본 상한이 10,000건입니다. 넘으면 오래된 것부터 지워집니다. `0.2.0`부터는 속성으로 조정합니다 — 빈을 만들 필요가 없습니다.
+기록은 메모리에만 남고 기본 상한이 10,000건입니다. 상한을 넘으면 가장 오래된 스냅샷을 지우거나(`oldest-first`, 기본), 기존 창을 그대로 두고 새로 들어오는 것을 버립니다(`reject-when-full`). 상한과 정책 모두 속성으로 조정합니다 — 빈을 만들 필요가 없습니다.
 
 ```properties
 reqover.mvc.max-snapshots=50000
+reqover.mvc.snapshot-eviction=oldest-first
+# 긴 QA 세션에서 처음 N건을 남기고 싶다면:
+# reqover.mvc.snapshot-eviction=reject-when-full
 # WebFlux라면
 # reqover.webflux.max-snapshots=50000
+# reqover.webflux.snapshot-eviction=reject-when-full
 ```
+
+`CoverageStore`를 직접 구현한다면 `reqover-core` 테스트에 있는 추상 JUnit 계약(`CoverageStoreContract`)으로 같은 동작을 보장할 수 있습니다. 상속해서 `newStore()`가 내 저장소를 돌려주게 하고 테스트를 돌리면 됩니다.
 
 ### 저장소 교체하기
 

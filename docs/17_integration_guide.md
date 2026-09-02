@@ -420,7 +420,7 @@ The most common failure is **"the report is empty"**, and the cause is usually `
 
 ### Adjusting retention
 
-Records live in memory only, with a default cap of 10,000 entries. Beyond that the store either drops the oldest snapshot (`oldest-first`, the default) or keeps the existing window and ignores new flushes (`reject-when-full`). In `0.2.0` both the bound and the policy are properties — no bean needed:
+Records live in memory only, with a default cap of 10,000 entries. Beyond that the store either drops the oldest snapshot (`oldest-first`, the default) or keeps the existing window and ignores new flushes (`reject-when-full`). Both the bound and the policy are properties — no bean needed:
 
 ```properties
 reqover.mvc.max-snapshots=50000

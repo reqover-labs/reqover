@@ -20,7 +20,7 @@ public class ReqoverMvcConfiguration {
     @Bean
     @ConditionalOnMissingBean(CoverageStore.class)
     public CoverageStore reqoverCoverageStore(ReqoverMvcProperties properties) {
-        return new InMemoryCoverageStore(properties.getMaxSnapshots());
+        return new InMemoryCoverageStore(properties.getMaxSnapshots(), properties.getSnapshotEviction());
     }
 
     @Bean

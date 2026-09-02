@@ -39,7 +39,7 @@ public class ReqoverWebFluxConfiguration implements InitializingBean {
     @Bean
     @ConditionalOnMissingBean(CoverageStore.class)
     public CoverageStore reqoverCoverageStore(ReqoverWebFluxProperties properties) {
-        return new InMemoryCoverageStore(properties.getMaxSnapshots());
+        return new InMemoryCoverageStore(properties.getMaxSnapshots(), properties.getSnapshotEviction());
     }
 
     @Bean

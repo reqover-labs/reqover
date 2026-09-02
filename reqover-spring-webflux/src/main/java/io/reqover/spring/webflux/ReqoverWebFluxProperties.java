@@ -1,6 +1,7 @@
 package io.reqover.spring.webflux;
 
 import io.reqover.core.InMemoryCoverageStore;
+import io.reqover.core.SnapshotEvictionPolicy;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 import java.util.ArrayList;
@@ -14,6 +15,7 @@ public class ReqoverWebFluxProperties {
     private boolean enabled = true;
     private List<String> excludePathPrefixes = new ArrayList<>(List.of("/reqover"));
     private int maxSnapshots = InMemoryCoverageStore.DEFAULT_MAX_SNAPSHOTS;
+    private SnapshotEvictionPolicy snapshotEviction = SnapshotEvictionPolicy.OLDEST_FIRST;
 
     /**
      * Whether the adapter is installed. Turning it off also skips enabling
@@ -43,8 +45,8 @@ public class ReqoverWebFluxProperties {
 
     /**
      * How many finished requests the default in-memory store retains before
-     * evicting the oldest. Ignored when the application supplies its own
-     * {@link io.reqover.core.CoverageStore} bean.
+     * applying {@link #getSnapshotEviction()}. Ignored when the application
+     * supplies its own {@link io.reqover.core.CoverageStore} bean.
      */
     public int getMaxSnapshots() {
         return maxSnapshots;
@@ -52,5 +54,20 @@ public class ReqoverWebFluxProperties {
 
     public void setMaxSnapshots(int maxSnapshots) {
         this.maxSnapshots = maxSnapshots;
+    }
+
+    /**
+     * What the default in-memory store does once {@link #getMaxSnapshots()} is
+     * reached: drop the oldest snapshot, or reject new ones. Ignored when the
+     * application supplies its own {@link io.reqover.core.CoverageStore} bean.
+     */
+    public SnapshotEvictionPolicy getSnapshotEviction() {
+        return snapshotEviction;
+    }
+
+    public void setSnapshotEviction(SnapshotEvictionPolicy snapshotEviction) {
+        this.snapshotEviction = snapshotEviction == null
+                ? SnapshotEvictionPolicy.OLDEST_FIRST
+                : snapshotEviction;
     }
 }

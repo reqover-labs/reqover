@@ -9,6 +9,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.web.servlet.AsyncHandlerInterceptor;
 import org.springframework.web.servlet.HandlerMapping;
+import org.springframework.web.servlet.resource.ResourceHttpRequestHandler;
 
 import java.util.Objects;
 
@@ -21,6 +22,10 @@ import java.util.Objects;
  * is cleared as soon as concurrent handling starts so unrelated work on that
  * thread cannot record into a foreign bucket. Application code executed on an
  * async worker thread is not attributed until the request is re-dispatched.
+ *
+ * <p>Requests served by a static resource handler are not recorded. Spring Boot
+ * maps one to {@code /**}, so every URL that matches no controller lands there
+ * and would otherwise pile up under a single {@code GET /**} endpoint.
  */
 public final class ReqoverMvcInterceptor implements AsyncHandlerInterceptor {
     private static final String BUCKET_ATTRIBUTE = ReqoverMvcInterceptor.class.getName() + ".bucket";
@@ -37,6 +42,9 @@ public final class ReqoverMvcInterceptor implements AsyncHandlerInterceptor {
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {
         if (request.getAttribute(BUCKET_ATTRIBUTE) instanceof CoverageBucket existing) {
             CoverageContext.set(existing);
+            return true;
+        }
+        if (handler instanceof ResourceHttpRequestHandler) {
             return true;
         }
 

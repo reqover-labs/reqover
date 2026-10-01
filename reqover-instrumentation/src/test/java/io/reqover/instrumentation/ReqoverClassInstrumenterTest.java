@@ -12,8 +12,11 @@ import java.io.InputStream;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -48,6 +51,32 @@ class ReqoverClassInstrumenterTest {
         ProbeMetadata probe = metadata.get(0);
         assertNotNull(probe.lineNumber());
         assertTrue(ReqoverProbe.globalSnapshot().hasHit(probe.classId(), probe.probeId()));
+    }
+
+    @Test
+    void skipsMethodsThatOnlyReadOrWriteOneOwnField() throws Exception {
+        InstrumentationResult result = new ReqoverClassInstrumenter().instrument(classBytes(AccessorTarget.class));
+
+        assertEquals(
+                Set.of("getDisplayName", "getParentName", "getCountPlusOne", "setNameTrimmed"),
+                instrumentedMethodNames(result)
+        );
+    }
+
+    @Test
+    void skipsRecordComponentAccessorsButKeepsComputedMethods() throws Exception {
+        InstrumentationResult result = new ReqoverClassInstrumenter().instrument(classBytes(RecordTarget.class));
+
+        Set<String> names = instrumentedMethodNames(result);
+        assertTrue(names.contains("label"));
+        assertFalse(names.contains("code"));
+        assertFalse(names.contains("status"));
+    }
+
+    private static Set<String> instrumentedMethodNames(InstrumentationResult result) {
+        return result.metadata().stream()
+                .map(ProbeMetadata::methodName)
+                .collect(Collectors.toSet());
     }
 
     private static byte[] classBytes(Class<?> type) throws IOException {

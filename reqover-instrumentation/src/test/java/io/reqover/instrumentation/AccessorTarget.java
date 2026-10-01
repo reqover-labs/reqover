@@ -1,0 +1,40 @@
+package io.reqover.instrumentation;
+
+public class AccessorTarget {
+    private String name;
+    private boolean active;
+    private long count;
+    private AccessorTarget parent;
+
+    public String getName() {
+        return name;
+    }
+
+    public boolean isActive() {
+        return active;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setCount(long count) {
+        this.count = count;
+    }
+
+    public String getDisplayName() {
+        return name == null ? "anonymous" : name;
+    }
+
+    public String getParentName() {
+        return parent.name;
+    }
+
+    public long getCountPlusOne() {
+        return count + 1;
+    }
+
+    public void setNameTrimmed(String name) {
+        this.name = name.trim();
+    }
+}

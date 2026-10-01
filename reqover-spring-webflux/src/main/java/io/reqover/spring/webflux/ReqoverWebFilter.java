@@ -7,6 +7,7 @@ import io.reqover.core.RequestIdGenerator;
 import io.reqover.core.UnitInfo;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.web.reactive.HandlerMapping;
+import org.springframework.web.reactive.resource.ResourceWebHandler;
 import org.springframework.web.server.ServerWebExchange;
 import org.springframework.web.server.WebFilter;
 import org.springframework.web.server.WebFilterChain;
@@ -19,6 +20,11 @@ import java.util.Objects;
  * Binds a {@link CoverageBucket} to each WebFlux request through the Reactor
  * {@code Context} and flushes it to the store when the request terminates,
  * regardless of which scheduler thread completes it.
+ *
+ * <p>Requests served by a static resource handler are not flushed. Spring Boot
+ * maps one to {@code /**}, so every URL that matches no controller lands there
+ * and would otherwise pile up under a single {@code GET /**} endpoint. The
+ * handler is only known after the chain runs, so the bucket is dropped then.
  */
 public final class ReqoverWebFilter implements WebFilter {
     private final CoverageStore coverageStore;
@@ -56,6 +62,9 @@ public final class ReqoverWebFilter implements WebFilter {
             return chain.filter(exchange)
                     .contextWrite(context -> context.put(ReqoverThreadLocalAccessor.KEY, bucket))
                     .doFinally(signalType -> {
+                        if (servedByResourceHandler(exchange)) {
+                            return;
+                        }
                         try (CoverageContext.Scope ignored = CoverageContext.open(bucket)) {
                             bucket.updateUnitInfo(UnitInfo.httpRequest(
                                     bucket.unitInfo().unitId(),
@@ -81,6 +90,10 @@ public final class ReqoverWebFilter implements WebFilter {
             }
         }
         return false;
+    }
+
+    private static boolean servedByResourceHandler(ServerWebExchange exchange) {
+        return exchange.getAttribute(HandlerMapping.BEST_MATCHING_HANDLER_ATTRIBUTE) instanceof ResourceWebHandler;
     }
 
     private static String endpointPattern(ServerWebExchange exchange) {

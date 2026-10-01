@@ -55,6 +55,19 @@ class AgentOptionsTest {
     }
 
     @Test
+    void runtimeGeneratedProxiesAreNeverInstrumented() {
+        AgentOptions options = AgentOptions.parse("include=com.example.");
+
+        assertTrue(options.shouldInstrument("com.example.OrderService"));
+        assertTrue(options.shouldInstrument("com.example.OrderService$Inner"));
+        assertFalse(options.shouldInstrument("com.example.OrderService$$SpringCGLIB$$0"));
+        assertFalse(options.shouldInstrument("com.example.OrderService$$EnhancerBySpringCGLIB$$a1b2c3"));
+        assertFalse(options.shouldInstrument("com.example.OrderService$$FastClassBySpringCGLIB$$a1b2c3"));
+        assertFalse(options.shouldInstrument("com.example.Order$HibernateProxy$Zx8Kq1"));
+        assertFalse(options.shouldInstrument("com.example.OrderService$ByteBuddy$Mock"));
+    }
+
+    @Test
     void userExcludeOverridesShorterInclude() {
         AgentOptions options = AgentOptions.parse("include=com.example,exclude=com.example.internal.");
 

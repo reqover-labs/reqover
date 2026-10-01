@@ -1,5 +1,6 @@
 package io.reqover.example.webflux;
 
+import io.reqover.core.CoverageStore;
 import io.reqover.report.CoverageReport;
 import io.reqover.report.EndpointCoverage;
 import org.junit.jupiter.api.Test;
@@ -13,6 +14,21 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class WebFluxSampleIntegrationTest {
     @Autowired
     WebTestClient webTestClient;
+
+    @Autowired
+    CoverageStore coverageStore;
+
+    @Test
+    void doesNotRecordRequestsThatMatchNoController() {
+        coverageStore.clear();
+
+        webTestClient.get()
+                .uri("/no-such-endpoint")
+                .exchange()
+                .expectStatus().isNotFound();
+
+        assertTrue(coverageStore.snapshots().isEmpty(), coverageStore.snapshots().toString());
+    }
 
     @Test
     void keepsCoverageBucketAcrossThreadHop() {

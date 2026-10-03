@@ -95,3 +95,27 @@ The existing OSV scan reported Jackson 2.21.5 and Tomcat 10.1.55 advisories on
 PR #25. These are unchanged dependencies, not fixed by this UI/Action work. The
 security gate remains enabled; a passing build must not be described as passing
 all CI while this scan fails.
+
+## Reviewed test drafts
+
+Mapped routes cannot supply missing concrete paths, query values or authentication.
+The editor starts expectations empty and separates observed status/adapter interval
+from manually reviewed assertions. Draft JSON remains `replayable: false` and
+generated JUnit remains disabled even after UI review. Mutating methods cannot
+export executable drafts. No collector, probe, report schema or CLI changes are needed.
+
+A legacy navigation test initially searched for `href="#test-case-drafts"` anywhere
+in HTML and matched the new CSS selector, not an anchor. Assert the actual anchor
+markup (and verify the browser DOM), rather than weakening the legacy contract.
+
+Recorded text is emitted only as escaped Java strings. Control characters use
+bounded octal escapes where needed, and identifiers are generated from numeric
+case IDs. Compilation against the actual JUnit API checks Unicode, quotes,
+comment terminators and literal backslash-u sequences; no generated tests run
+during this verification. Test paths reject unresolved/encoded placeholders,
+authority changes, query/fragment and invalid URI characters.
+
+Browser coverage includes blank expectations, edit-invalidated review, disabled
+export before review, JSON/JUnit contents, multiple independent drafts, mobile
+layout, and all existing graph/filter/legacy/no-script behaviors. Drafts live in
+page memory only and user-specific exports are never staged automatically.

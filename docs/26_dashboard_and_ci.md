@@ -106,8 +106,9 @@ updates to the same comment.
 
 `fail-on-impact` fails when **observed APIs executed changed code**, not when a
 test fails. Leave it off for ordinary review. Zero candidates and unmatched files
-never prove an API is safe. Replay, k6 execution, TPS, method timings, input
-capture, and automated test assertions are separate planned work.
+never prove an API is safe. [Reviewed JSON/JUnit test drafts](27_test_case_drafts.md)
+are available in the preview. Faithful replay, k6 execution, TPS, method timings,
+input capture and automatic test execution remain separate planned work.
 
 ## Security and verification
 

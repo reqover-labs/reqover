@@ -77,6 +77,10 @@ overview, and individual request details. Its offline dashboard also visualizes
 request-to-method associations and shared-code retest candidates, with animation,
 node inspection, and reduced-motion support. It is not included in release `0.2.0`.
 
+Selected observations can also become [reviewed test drafts](docs/27_test_case_drafts.md):
+enter a concrete path and independent expectation, then download JSON or a disabled
+JUnit test. Original inputs are not captured; this is not automatic traffic replay.
+
 ![Unreleased diagnostic dashboard with synthetic MVC requests](docs/assets/reqover-request-diagnostics.png)
 
 ### 1. Execution paths split per API
@@ -405,6 +409,8 @@ Issues, pull requests, and commit messages are written in English so contributor
 </details>
 
 ## Documentation
+
+- [Reviewed test case drafts](docs/27_test_case_drafts.md)
 
 - [Diagnostic dashboard and CI artifacts](docs/26_dashboard_and_ci.md)
 

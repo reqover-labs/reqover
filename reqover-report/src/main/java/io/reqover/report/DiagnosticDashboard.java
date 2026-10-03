@@ -15,7 +15,7 @@ final class DiagnosticDashboard {
     }
 
     static String styles() {
-        return STYLES;
+        return STYLES + TestCaseDraftHtmlRenderer.styles();
     }
 
     static String navigation(boolean hasRequests) {
@@ -26,6 +26,7 @@ final class DiagnosticDashboard {
         nav(out, "request-overview", "layout-dashboard", "Overview");
         if (hasRequests) {
             nav(out, "request-list", "clock", "Requests");
+            nav(out, "test-case-drafts", "flask-conical", "Test drafts");
         }
         nav(out, "endpoint-code", "network", "API to code");
         nav(out, "code-endpoint", "git-pull-request", "Retest candidates");
@@ -98,6 +99,8 @@ final class DiagnosticDashboard {
         return "<script type=\"application/json\" id=\"reqover-map-data\">" + json + "</script>\n"
                 + "<template id=\"reqover-play-icon\">" + icon("play") + "</template>"
                 + "<template id=\"reqover-pause-icon\">" + icon("pause") + "</template>"
+                + "<template id=\"reqover-draft-icon\">" + icon("flask-conical") + "</template>"
+                + TestCaseDraftHtmlRenderer.script()
                 + "<script>" + SCRIPT + "</script>\n"
                 + "<!-- Lucide / Feather icon licenses:\n" + asset("icons/LICENSE").replace("--", "- -") + "\n-->";
     }
@@ -112,11 +115,11 @@ final class DiagnosticDashboard {
                 + "\" aria-label=\"" + label + "\" title=\"" + label + "\">" + icon(name) + "</button>";
     }
 
-    private static String icon(String name) {
+    static String icon(String name) {
         return asset("icons/" + name + ".svg").replace("<svg ", "<svg class=\"ui-icon\" aria-hidden=\"true\" ");
     }
 
-    private static String asset(String name) {
+    static String asset(String name) {
         try (var input = DiagnosticDashboard.class.getResourceAsStream(ROOT + name)) {
             if (input == null) {
                 throw new IllegalStateException("Missing dashboard resource: " + name);

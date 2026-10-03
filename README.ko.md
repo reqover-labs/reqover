@@ -77,6 +77,10 @@ Reqover는 요청이 들어오는 순간부터 응답이 나갈 때까지 **그 
 애니메이션과 노드 상세로 확인합니다. 실제 호출 순서를 추정한 화면은 아닙니다.
 이 기능은 배포된 `0.2.0`에는 포함되지 않은 개발 기능입니다.
 
+선택한 요청에서 [검토 가능한 테스트 초안](docs/27_test_case_drafts.ko.md)도 만듭니다.
+실제 시험 경로와 기대 결과를 직접 확인한 뒤 JSON 또는 비활성화된 JUnit 파일로
+내보냅니다. 원본 입력값은 수집하지 않으므로 자동 재현을 보장하는 기능은 아닙니다.
+
 ![MVC 합성 요청으로 만든 개발 버전 진단 대시보드](docs/assets/reqover-request-diagnostics.png)
 
 ### 1. API별로 나눠 본 실행 경로
@@ -409,6 +413,8 @@ fork 후 브랜치를 만들고, `./gradlew clean test` 통과를 확인한 뒤 
 </details>
 
 ## 문서 목록
+
+- [관측 요청에서 테스트 초안 만들기](docs/27_test_case_drafts.ko.md)
 
 - [대시보드와 CI 연결](docs/26_dashboard_and_ci.ko.md)
 

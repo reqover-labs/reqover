@@ -15,7 +15,7 @@ All notable changes to Reqover are documented in this file.
   latency or method spans; unknown statuses and invalid intervals are explicit.
 - MVC and WebFlux samples add bounded, read-only delay and deliberate 503
   endpoints for the October mentoring demonstration.
-- Input capture, replay generation and k6 integration are follow-up work in the
+- Input capture, faithful replay and k6 integration are follow-up work in the
   mentoring improvement plan; they are not implemented by this preview.
 - The offline report gains sidebar navigation, animated request/method and
   code/API relationship maps, a review queue, node inspection, pause/zoom controls,
@@ -25,6 +25,10 @@ All notable changes to Reqover are documented in this file.
   three explicit diagnostic artifacts, structured candidate/unmatched counts,
   fork-safe marked PR comments, and a gate applied after publishing results.
   The repository CI exercises the source-built Action and real CLI test harness.
+- Selected HTTP observations now create in-memory reviewed test drafts. Export
+  JSON or disabled GET/HEAD JUnit tests after explicit path/status/input review;
+  observed failures never become expected statuses automatically. Generated Java
+  escapes metadata, requires an explicit local/QA origin, and is compiler-tested.
 
 The `CoverageReport` record now has a fifth component, `requests`. Its previous
 constructor remains available, but Java record patterns and reflective code

@@ -11,6 +11,15 @@ the fastest way to change what we work on.
 
 ## Now
 
+**October mentoring track: make problem requests actionable.**
+The [request diagnostics preview](docs/24_request_diagnostics.md) surfaces retained
+request timing and status next to the request's method set. The
+[dated mentoring plan](docs/23_performance_validation_plan.ko.md) (Korean) targets
+October 7 for the first demonstration and November 4–5 for the presentation.
+Replay-case drafts, selective input capture and a k6 runner are planned stages,
+not released capabilities. Validate the single-request discovery/retest workflow
+before expanding to an APM-sized service.
+
 **Make Reqover installable.**
 [#4](https://github.com/reqover-labs/reqover/issues/4) · Maven Central
 publication
@@ -89,8 +98,10 @@ Saying no is part of a roadmap. See
   packages you name and samples nothing. That is affordable in development, QA,
   and staging, and it is the wrong shape for permanent production use — an APM
   is the right tool there.
-- **A hosted backend or dashboard.** The report is a file. Anything that turns
-  Reqover into a service is a different project.
+- **A hosted backend.** The current diagnostic dashboard is still a local,
+  standalone file. Replay and load-test screens will first be validated locally;
+  running a shared hosted service requires a separate storage, access and
+  operating-cost decision.
 - **Claiming a change is safe.** Impact analysis reports observed execution,
   which is a lower bound. A file it cannot match means "not seen", never "not
   affected", and no amount of product polish will change that.

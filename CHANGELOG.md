@@ -4,6 +4,20 @@ All notable changes to Reqover are documented in this file.
 
 ## Unreleased
 
+### Request diagnostics preview
+
+- Report JSON preserves optional individual request observations with resolved
+  code, timestamps, unit type and HTTP status. Older schema-1 reports and the
+  four-argument `CoverageReport` constructor remain supported.
+- The standalone HTML report adds retained HTTP timing/status summaries,
+  cumulative endpoint intervals, searchable request details, and failure/slow
+  filters. Durations are recorded adapter wall-clock intervals, not network
+  latency or method spans; unknown statuses and invalid intervals are explicit.
+- MVC and WebFlux samples add bounded, read-only delay and deliberate 503
+  endpoints for the October mentoring demonstration.
+- Input capture, replay generation and k6 integration are follow-up work in the
+  mentoring improvement plan; they are not implemented by this preview.
+
 ### Fixed
 
 - **A report from a newer schema is refused instead of misparsed.** The writer

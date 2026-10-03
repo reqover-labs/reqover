@@ -42,6 +42,9 @@ public final class CoverageReportJson {
 
         out.append("  \"reverseIndex\": [");
         writeJoined(out, report.reverseIndex(), 2, (item, indent) -> writeReverseEntry(out, item, indent));
+        out.append("],\n");
+        out.append("  \"requests\": [");
+        writeJoined(out, report.requests(), 2, (item, indent) -> writeRequest(out, item, indent));
         out.append("]\n");
 
         out.append("}\n");
@@ -75,11 +78,22 @@ public final class CoverageReportJson {
             ));
         }
 
+        List<RequestObservation> requests = new ArrayList<>();
+        for (Object item : Json.optionalArray(root, "requests")) {
+            Map<String, Object> request = Json.object(item, "requests[]");
+            requests.add(new RequestObservation(
+                    Json.string(request, "requestId"), Json.string(request, "unitType"),
+                    Json.string(request, "endpoint"), readInstant(request, "startedAt"),
+                    request.get("endedAt") == null ? null : readInstant(request, "endedAt"),
+                    Json.integer(request, "statusCode"), Json.strings(request, "threadNames"), readClasses(request)));
+        }
+
         return new CoverageReport(
                 generatedAt,
                 Json.integer(root, "completedRequestCount"),
                 List.copyOf(endpoints),
-                List.copyOf(reverseIndex)
+                List.copyOf(reverseIndex),
+                List.copyOf(requests)
         );
     }
 
@@ -110,6 +124,16 @@ public final class CoverageReportJson {
     }
 
     private static EndpointCoverage readEndpoint(Map<String, Object> node) {
+        return new EndpointCoverage(
+                Json.string(node, "endpoint"),
+                Json.integer(node, "requestCount"),
+                Json.strings(node, "requestIds"),
+                Json.strings(node, "threadNames"),
+                readClasses(node)
+        );
+    }
+
+    private static List<ClassCoverage> readClasses(Map<String, Object> node) {
         List<ClassCoverage> classes = new ArrayList<>();
         for (Object classNode : Json.optionalArray(node, "classes")) {
             Map<String, Object> entry = Json.object(classNode, "classes[]");
@@ -138,13 +162,40 @@ public final class CoverageReportJson {
             ));
         }
 
-        return new EndpointCoverage(
-                Json.string(node, "endpoint"),
-                Json.integer(node, "requestCount"),
-                Json.strings(node, "requestIds"),
-                Json.strings(node, "threadNames"),
-                List.copyOf(classes)
-        );
+        return List.copyOf(classes);
+    }
+
+    private static Instant readInstant(Map<String, Object> node, String field) {
+        try {
+            return Instant.parse(Json.string(node, field));
+        } catch (DateTimeParseException error) {
+            throw new IllegalArgumentException("field '" + field + "' must be an ISO-8601 instant", error);
+        }
+    }
+
+    private static void writeRequest(StringBuilder out, RequestObservation request, String indent) {
+        String inner = indent + "  ";
+        out.append(indent).append("{\n");
+        out.append(inner).append("\"requestId\": ");
+        Json.writeString(out, request.requestId());
+        out.append(",\n").append(inner).append("\"unitType\": ");
+        Json.writeString(out, request.unitType());
+        out.append(",\n").append(inner).append("\"endpoint\": ");
+        Json.writeString(out, request.endpoint());
+        out.append(",\n").append(inner).append("\"startedAt\": ");
+        Json.writeString(out, request.startedAt().toString());
+        out.append(",\n").append(inner).append("\"endedAt\": ");
+        if (request.endedAt() == null) {
+            out.append("null");
+        } else {
+            Json.writeString(out, request.endedAt().toString());
+        }
+        out.append(",\n").append(inner).append("\"statusCode\": ").append(request.statusCode());
+        out.append(",\n").append(inner).append("\"threadNames\": ");
+        writeStringArray(out, request.threadNames());
+        out.append(",\n").append(inner).append("\"classes\": [");
+        writeJoined(out, request.classes(), inner.length(), (item, childIndent) -> writeClass(out, item, childIndent));
+        out.append("]\n").append(indent).append("}");
     }
 
     private static void writeEndpoint(StringBuilder out, EndpointCoverage endpoint, String indent) {

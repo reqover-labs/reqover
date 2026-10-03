@@ -71,6 +71,10 @@ Reqover records, from the moment a request arrives until the response leaves, **
 
 ## Three things the report shows
 
+The current development branch also includes a [request diagnostics preview](docs/24_request_diagnostics.md):
+per-request recorded processing intervals and HTTP status, a retained-request
+overview, and individual request details. It is not included in release `0.2.0`.
+
 ### 1. Execution paths split per API
 
 Call `GET /orders/{id}` and `POST /payments` against the same application, and the controllers and services each request executed are shown **separated by API**. `SharedValidator`, which both requests passed through, appears under both — and methods reached by two or more APIs are highlighted separately. (A signal that changing it affects several places.)
@@ -397,6 +401,8 @@ Issues, pull requests, and commit messages are written in English so contributor
 - [Impact analysis in CI](docs/18_ci_impact_analysis.md) · [한국어판](docs/18_ci_impact_analysis.ko.md)
 - [Prior art — and when to use a different tool](docs/19_prior_art.md) · [한국어판](docs/19_prior_art.ko.md)
 - [Versioning, compatibility, and rollback](docs/20_versioning_and_compatibility.md) · [한국어판](docs/20_versioning_and_compatibility.ko.md)
+- [Request diagnostics preview](docs/24_request_diagnostics.md) · [한국어판](docs/24_request_diagnostics.ko.md)
+- [Mentoring improvement plan toward October 7 and November 4–5](docs/23_performance_validation_plan.ko.md) (Korean)
 - [Project plan](docs/00_project_plan.md) (Korean) · [Requirements](docs/01_requirements.md) (Korean)
 - [MVP status](docs/08_phase0_mvp_status.md) · [Agent E2E Demo](docs/09_agent_e2e_demo.md) · [Demo script](docs/10_demo_script.md)
 - [Performance measurement](docs/11_performance_measurement.md) · [Measured agent overhead](docs/15_performance_results.md) · [한국어판](docs/15_performance_results.ko.md)

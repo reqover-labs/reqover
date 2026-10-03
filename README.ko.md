@@ -71,6 +71,10 @@ Reqover는 요청이 들어오는 순간부터 응답이 나갈 때까지 **그 
 
 ## 리포트가 보여주는 세 가지
 
+현재 개발 브랜치에는 [요청 진단 미리보기](docs/24_request_diagnostics.ko.md)도 있습니다.
+요청별 관측 처리 시간과 HTTP 상태, 전체 관측 요약과 개별 요청 상세를 보여줍니다.
+이 기능은 배포된 `0.2.0`에는 포함되지 않은 개발 기능입니다.
+
 ### 1. API별로 나눠 본 실행 경로
 
 같은 애플리케이션에 `GET /orders/{id}`와 `POST /payments`를 각각 호출하면, 두 요청이 실행한 컨트롤러와 서비스가 **API별로 분리되어** 표시됩니다. 두 요청이 공통으로 지나간 `SharedValidator`는 양쪽에 모두 나타나고, 2개 이상의 API가 도달한 메서드는 따로 강조됩니다. (= 여기를 고치면 여러 곳이 영향받는다는 신호)
@@ -401,6 +405,8 @@ fork 후 브랜치를 만들고, `./gradlew clean test` 통과를 확인한 뒤 
 - [CI에서 영향도 분석하기](docs/18_ci_impact_analysis.ko.md)
 - [선행 도구와 Reqover의 자리 — 다른 도구를 써야 할 때](docs/19_prior_art.ko.md)
 - [버전, 호환성, 롤백](docs/20_versioning_and_compatibility.ko.md)
+- [요청 진단 리포트](docs/24_request_diagnostics.ko.md)
+- [10월 7일 멘토링과 11월 4~5일 발표까지의 개선 계획](docs/23_performance_validation_plan.ko.md)
 - [프로젝트 기획](docs/00_project_plan.md) · [요구사항](docs/01_requirements.md)
 - [MVP 진행 상태](docs/08_phase0_mvp_status.md) · [Agent E2E Demo](docs/09_agent_e2e_demo.md) · [데모 스크립트](docs/10_demo_script.md)
 - [성능 측정 방법](docs/11_performance_measurement.md) · [측정된 agent 오버헤드](docs/15_performance_results.ko.md)

@@ -16,9 +16,10 @@ import java.util.Set;
  * document — so the CLI can render, diff, and analyse it without the
  * {@code ProbeRegistry} that produced it.
  *
- * <p>Output is pretty-printed with sorted collections so that two runs over the
- * same traffic produce byte-identical files apart from {@code generatedAt}.
- * That is deliberate: baseline reports are meant to be committed and diffed.
+ * <p>Output is pretty-printed and deterministic for a given report. Separate
+ * recordings retain their own timestamps and statuses, so their bytes can differ
+ * even when the endpoint coverage is identical. Coverage diff compares the code
+ * relationships rather than these diagnostic observations.
  */
 public final class CoverageReportJson {
     /** Version of the document shape, raised when a field changes meaning. */

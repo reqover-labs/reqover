@@ -61,7 +61,9 @@ Files: `docs/24_request_diagnostics.md`, `.ko.md`, `README.md`, `README.ko.md`, 
 
 - [x] Inspect the diff alone for constructor/schema compatibility, escaped HTML, request attribution and metrics semantics.
 - [x] Record exact checked commands and remaining limitations in a short troubleshooting entry.
-- [ ] Commit only this worktree's scoped changes, push `codex/mentoring-performance-preview`, open an English PR against `main`, and attach the PR to the task.
+- [x] Commit only this worktree's scoped changes, push `codex/mentoring-performance-preview`, open an English PR against `main`, and attach the PR to the task.
+
+Published for maintainer review: [PR #25](https://github.com/reqover-labs/reqover/pull/25).
 
 Subsequent implementation gates are in the dated improvement plan; input capture, test generation and k6 execution are not part of this first PR.
 

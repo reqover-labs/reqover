@@ -33,7 +33,7 @@ No collector, probe ABI, coverage JSON schema, CLI, or deployment changes.
 - [x] Update README, mentoring roadmap, guide and troubleshooting notes.
 - [x] Run Java/Node/browser tests and workflow lint: 157 Java / 20 Node tests pass;
   browser reports zero page errors and external requests.
-- [ ] Review staged files for secrets and publish PR update.
+- [x] Review staged files for secrets and publish PR #25 update without merging.
 
 ## Commands
 

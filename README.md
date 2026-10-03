@@ -81,6 +81,10 @@ Selected observations can also become [reviewed test drafts](docs/27_test_case_d
 enter a concrete path and independent expectation, then download JSON or a disabled
 JUnit test. Original inputs are not captured; this is not automatic traffic replay.
 
+[Recording comparison](docs/28_recording_comparison.md) imports a previous report
+and shows observed endpoint timing/status deltas over all retained samples, with
+missing-data and unmatched-condition warnings. It is not a load-test verdict.
+
 ![Unreleased diagnostic dashboard with synthetic MVC requests](docs/assets/reqover-request-diagnostics.png)
 
 ### 1. Execution paths split per API
@@ -409,6 +413,8 @@ Issues, pull requests, and commit messages are written in English so contributor
 </details>
 
 ## Documentation
+
+- [Compare retained recordings](docs/28_recording_comparison.md)
 
 - [Reviewed test case drafts](docs/27_test_case_drafts.md)
 

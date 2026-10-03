@@ -119,3 +119,23 @@ Browser coverage includes blank expectations, edit-invalidated review, disabled
 export before review, JSON/JUnit contents, multiple independent drafts, mobile
 layout, and all existing graph/filter/legacy/no-script behaviors. Drafts live in
 page memory only and user-specific exports are never staged automatically.
+
+## Retained recording comparison
+
+Comparison cannot reuse the graph's truncated request window. Java computes
+per-endpoint summaries from every retained HTTP observation and embeds only those
+aggregates. A 150-request regression includes a 503 outside the newest-100 window.
+Imported raw timestamps use native calendar validation and BigInt nanosecond
+subtraction; JS Date's millisecond truncation is not used to compute intervals.
+
+Missing measurements remain unknown. Independent known-status denominators yield
+percentage-point changes, not test-failure percentages. Endpoint absence and
+sample-count differences do not prove deletion or regression. Condition review
+does not enable a performance gate. Malformed/oversized imports preserve the last
+valid baseline and never upload or persist the input.
+
+Verification: 157 Java tests and 20 Node tests pass, including Java compilation
+from the previous draft feature. Browser tests cover comparison import, invalid
+and legacy files, filter/reset/export, confirmation, mobile layout and previous
+features. Screenshots use an explicitly named synthetic timing baseline, not
+claimed benchmark results. The existing OSV gate remains unchanged.

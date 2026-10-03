@@ -4,6 +4,12 @@ All notable changes to Reqover are documented in this file.
 
 ## Unreleased
 
+- The offline dashboard compares retained recordings via local JSON import and
+  aggregate-summary export. Current summaries include all retained HTTP units,
+  not just the graph window. Timing/status deltas retain unknown states and
+  surface sample/condition limitations without an automatic performance verdict.
+  Imported timing preserves submillisecond precision and rejects malformed data.
+
 ### Request diagnostics preview
 
 - Report JSON preserves optional individual request observations with resolved

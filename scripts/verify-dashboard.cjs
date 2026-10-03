@@ -65,6 +65,57 @@ const { chromium } = require('playwright');
     await page.locator('.dashboard-link[href="#request-overview"]').click();
     await page.locator('#request-overview').waitFor({ state: 'visible' });
 
+    const currentSummary = await page.locator('#reqover-comparison-data').textContent().then(JSON.parse);
+    const syntheticBaseline = structuredClone(currentSummary);
+    syntheticBaseline.endpoints.forEach(row => {
+      if (row.timedRequestCount) {
+        row.averageMillis *= 2; row.p95Millis *= 2; row.maximumMillis *= 2; row.cumulativeMillis *= 2;
+      }
+    });
+    await page.locator('.dashboard-link[href="#recording-comparison"]').click();
+    await page.locator('#recording-comparison').waitFor({ state: 'visible' });
+    await page.locator('#reqover-baseline-file').setInputFiles({ name: 'synthetic-baseline.json',
+      mimeType: 'application/json', buffer: Buffer.from(JSON.stringify(syntheticBaseline)) });
+    await page.locator('#reqover-comparison-results:not([hidden])').waitFor();
+    assert.equal(await page.locator('#reqover-comparison-rows tr').count(), currentSummary.endpoints.length);
+    assert(await page.locator('#reqover-comparison-context').innerText().then(t => t.includes('No automatic performance verdict')));
+    await page.locator('#reqover-comparison-confirmed').check();
+    assert(await page.locator('#reqover-comparison-context').innerText().then(t => t.includes('Still no automatic')));
+    await page.locator('#reqover-comparison-confirmed').uncheck();
+    await page.locator('#reqover-comparison-filter').fill('/payments');
+    assert.equal(await page.locator('#reqover-comparison-rows tr').count(), 1);
+    await page.locator('#reqover-comparison-filter').fill('no-such-endpoint');
+    assert(await page.locator('#reqover-comparison-no-match').isVisible());
+    await page.locator('#reqover-comparison-filter').fill('');
+    await page.screenshot({ path: path.join(out, 'reqover-recording-comparison.png') });
+    await page.setViewportSize({ width: 390, height: 900 });
+    const comparisonWidth = await page.evaluate(() => ({ scroll: document.documentElement.scrollWidth, client: document.documentElement.clientWidth }));
+    assert(comparisonWidth.scroll <= comparisonWidth.client, 'Comparison view must not overflow mobile');
+    await page.screenshot({ path: path.join(out, 'reqover-comparison-mobile.png') });
+    await page.setViewportSize({ width: 1440, height: 1000 });
+    await page.locator('#reqover-baseline-file').setInputFiles({ name: 'wrong.json', mimeType: 'application/json', buffer: Buffer.from('{"kind":"reqover-http-test-draft"}') });
+    await page.locator('#reqover-comparison-error:not([hidden])').waitFor();
+    assert.equal(await page.locator('#reqover-baseline-name').innerText(), 'synthetic-baseline.json', 'Bad imports must preserve the last valid baseline');
+    const summaryDownload = page.waitForEvent('download');
+    await page.locator('#reqover-comparison-export').click();
+    const summaryFile = await summaryDownload;
+    await summaryFile.saveAs(path.join(out, 'current-summary.json'));
+    const exportedSummary = JSON.parse(fs.readFileSync(path.join(out, 'current-summary.json'), 'utf8'));
+    assert.equal(exportedSummary.kind, 'reqover-recorded-summary');
+    assert.equal(exportedSummary.httpRequestCount, requestCount);
+    assert(!Object.hasOwn(exportedSummary, 'requests'), 'Summary export must not contain raw requests');
+    await page.getByRole('button', { name: 'Clear baseline', exact: true }).click();
+    assert(await page.locator('#reqover-comparison-empty').isVisible());
+    assert(!await page.locator('#reqover-comparison-confirmed').isChecked());
+    await page.locator('#reqover-baseline-file').setInputFiles({ name: 'legacy.json', mimeType: 'application/json',
+      buffer: Buffer.from(JSON.stringify({ schemaVersion: 1, generatedAt: currentSummary.generatedAt,
+        completedRequestCount: 0, endpoints: [], reverseIndex: [] })) });
+    await page.locator('#reqover-comparison-results:not([hidden])').waitFor();
+    assert(await page.locator('#reqover-comparison-notices').innerText().then(t => t.includes('no retained HTTP diagnostics')));
+    assert(await page.locator('#reqover-comparison-rows').innerText().then(t => t.includes('Not comparable')));
+    await page.locator('.dashboard-link[href="#request-overview"]').click();
+    await page.locator('#request-overview').waitFor({ state: 'visible' });
+
     await page.getByRole('button', { name: 'Retest map', exact: true }).click();
     const methodOption = await page.locator('#reqover-map-selection option').evaluateAll(options =>
       options.find(o => o.textContent.includes('SharedValidator#validate'))?.value);
@@ -172,10 +223,11 @@ const { chromium } = require('playwright');
     assert(await fallback.locator('#request-list').isVisible());
     assert(await fallback.locator('#reqover-workspace').isHidden());
     assert(await fallback.locator('.dashboard-link[href="#test-case-drafts"]').isHidden());
+    assert(await fallback.locator('.dashboard-link[href="#recording-comparison"]').isHidden());
     console.log(JSON.stringify({ requestCount, failureStatuses: statuses, graphSelection: true,
       animationPixels: true, zoom: true, filters: true, download: true,
       viewports: [1920, 1280, 760, 390], reducedMotion: true, legacy: true,
-      noScriptFallback: true, reviewedTestDrafts: true, externalRequests: external.length, pageErrors: errors }));
+      noScriptFallback: true, reviewedTestDrafts: true, recordingComparison: true, externalRequests: external.length, pageErrors: errors }));
   } finally {
     await browser.close();
   }

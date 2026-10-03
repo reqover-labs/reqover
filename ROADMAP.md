@@ -20,6 +20,8 @@ explicit artifacts; see [dashboard and CI setup](docs/26_dashboard_and_ci.md). T
 [dated mentoring plan](docs/23_performance_validation_plan.ko.md) (Korean) targets
 October 7 for the first demonstration and November 4–5 for the presentation.
 Reviewed JSON/JUnit [test drafts](docs/27_test_case_drafts.md) are now in the preview.
+[Retained recording comparison](docs/28_recording_comparison.md) adds descriptive
+before/after timing and HTTP-status evidence, not a controlled load-run verdict.
 Faithful replay, selective input capture and a k6 runner remain planned stages,
 not released capabilities. Validate the single-request discovery/retest workflow
 before expanding to an APM-sized service.

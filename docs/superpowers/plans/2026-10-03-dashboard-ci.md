@@ -42,7 +42,7 @@ No subagents. Continue on `codex/mentoring-performance-preview` and update PR #2
   reduced motion, legacy reports, and hostile strings.
 - [x] Update English/Korean guides, README, changelog, and troubleshooting notes.
 - [x] Run build/tests and self-review the diff, including non-HTTP labels and Git history.
-- [ ] Commit/push and update PR #25 without merging.
+- [x] Commit/push and update [PR #25](https://github.com/reqover-labs/reqover/pull/25) without merging.
 
 ## Local Verification
 

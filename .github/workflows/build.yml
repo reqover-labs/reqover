@@ -91,6 +91,7 @@ jobs:
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
+          fetch-depth: 0
 
       - name: Set up JDK
         uses: actions/setup-java@b6effb05e454b25005698d916606bdc6ffcbf961 # v5.7.0
@@ -106,6 +107,25 @@ jobs:
       # script fails if the analysis does not find the endpoint it should.
       - name: Record, export, and analyse
         run: ./scripts/run-impact-demo.sh 18080
+
+      - name: Resolve the source-built CLI
+        run: |
+          version="$(./gradlew properties -q --no-daemon --console=plain | sed -n 's/^version: //p')"
+          test -n "${version}"
+          echo "REQOVER_CLI=reqover-cli/build/libs/reqover-cli-${version}.jar" >> "${GITHUB_ENV}"
+
+      - name: Test the composite analysis script
+        run: python3 scripts/test-impact-action.py --cli "${REQOVER_CLI}"
+
+      - name: Exercise the reusable Action
+        id: reqover
+        uses: ./.github/actions/impact
+        with:
+          report: build/reqover-impact-demo/report.json
+          cli-jar: ${{ env.REQOVER_CLI }}
+          base-ref: ${{ github.event_name == 'pull_request' && format('origin/{0}', github.base_ref) || 'HEAD^' }}
+          comment: "false"
+          artifact-name: reqover-ci-diagnostics
 
       - name: Upload the recorded report
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1

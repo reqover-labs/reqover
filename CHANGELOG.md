@@ -17,6 +17,14 @@ All notable changes to Reqover are documented in this file.
   endpoints for the October mentoring demonstration.
 - Input capture, replay generation and k6 integration are follow-up work in the
   mentoring improvement plan; they are not implemented by this preview.
+- The offline report gains sidebar navigation, animated request/method and
+  code/API relationship maps, a review queue, node inspection, pause/zoom controls,
+  reduced-motion support, and an HTML download. These are observed associations,
+  not invented call edges or measured method timelines.
+- The composite Action supports source-built CLI JARs, a default report path,
+  three explicit diagnostic artifacts, structured candidate/unmatched counts,
+  fork-safe marked PR comments, and a gate applied after publishing results.
+  The repository CI exercises the source-built Action and real CLI test harness.
 
 The `CoverageReport` record now has a fifth component, `requests`. Its previous
 constructor remains available, but Java record patterns and reflective code

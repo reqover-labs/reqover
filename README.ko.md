@@ -73,7 +73,11 @@ Reqover는 요청이 들어오는 순간부터 응답이 나갈 때까지 **그 
 
 현재 개발 브랜치에는 [요청 진단 미리보기](docs/24_request_diagnostics.ko.md)도 있습니다.
 요청별 관측 처리 시간과 HTTP 상태, 전체 관측 요약과 개별 요청 상세를 보여줍니다.
+대시보드에서는 요청과 실행 메서드의 관계, 공통 코드를 수정했을 때 재테스트할 API를
+애니메이션과 노드 상세로 확인합니다. 실제 호출 순서를 추정한 화면은 아닙니다.
 이 기능은 배포된 `0.2.0`에는 포함되지 않은 개발 기능입니다.
+
+![MVC 합성 요청으로 만든 개발 버전 진단 대시보드](docs/assets/reqover-request-diagnostics.png)
 
 ### 1. API별로 나눠 본 실행 경로
 
@@ -257,6 +261,12 @@ git diff --name-only origin/main... \
 
 전체 워크플로 파일을 포함한 자세한 설명: [CI에서 영향도 분석하기](docs/18_ci_impact_analysis.ko.md).
 
+**개발 버전 Action**은 HTML과 영향 분석 파일 자동 저장, 직접 빌드한 `cli-jar` 사용,
+관련 API 수 출력과 fork PR 댓글 처리를 지원합니다.
+[대시보드와 CI 연결](docs/26_dashboard_and_ci.ko.md)에 설정 예제를 적었습니다.
+배포된 `v0.2.0` Action에는 이 추가 입력이 없습니다. 먼저 agent를 붙여 요청을 기록해야
+하며, Action이 앱 설치나 테스트 실행까지 대신하는 것은 아닙니다.
+
 ## 어떻게 동작하나
 
 한 문장으로: **애플리케이션이 시작될 때 코드에 "여기 지나갔다"고 알리는 코드를 자동으로 끼워 넣고, 그 기록을 요청별로 모읍니다.**
@@ -399,6 +409,8 @@ fork 후 브랜치를 만들고, `./gradlew clean test` 통과를 확인한 뒤 
 </details>
 
 ## 문서 목록
+
+- [대시보드와 CI 연결](docs/26_dashboard_and_ci.ko.md)
 
 - [시스템 아키텍처](docs/02_architecture.ko.md)
 - [Spring 애플리케이션 연동 가이드](docs/17_integration_guide.ko.md)

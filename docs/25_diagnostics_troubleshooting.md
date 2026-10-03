@@ -54,3 +54,44 @@ work; those features are not claimed by this implementation.
 October 3 verification: full test/build succeeded with 147 tests and no failures,
 errors or skips. The final report/CLI checks also passed after the legacy
 navigation adjustment. See the implementation plan for live and browser evidence.
+
+## Dashboard and CI follow-up
+
+The visual map branches from a request bucket to independently observed methods;
+there are deliberately no method-to-method call edges. The reverse map connects
+code to its observed API candidates. Java-computed request intervals are reused
+from the sorted native detail rows, avoiding JS Date's submillisecond rounding.
+Graph samples share the detail view's latest-100 ordering and limit.
+
+Browser assertions initially ran before `hashchange` and reduced-motion media
+events completed. The URL had changed but the visible section still reflected
+the previous event. Wait for the target section/control state rather than adding
+arbitrary delays or changing application behavior. Movement checks intentionally
+sample different animation frames, including their actual pixels.
+
+The Action previously applied its failure gate before any artifact/comment step,
+used text matching to parse JSON, and attempted comments on read-only forks.
+It now parses the CLI's JSON structurally, saves three named files, updates only
+its marked bot comment on same-repository PRs, and applies the optional gate last.
+It does not recursively upload the workspace or include `.env`/credentials.
+
+Reverse indexes also retain names from manual non-HTTP scopes. The graph labels
+their fan-out as endpoints rather than asserting every name is an HTTP API.
+An additional regression test preserves these names without counting the
+non-HTTP observation in the HTTP graph or metrics.
+
+Dashboard follow-up verification: 153 Java tests with zero failures/errors/skips;
+six real-CLI Action tests; browser selection, filters, pause/zoom, changing
+animation pixels, download/reopen, no-script and legacy fallback, reduced motion,
+and 1920/1280/760/390 px layouts. External browser requests and page errors were
+zero. Only synthetic sample data is used in documentation images.
+
+An additional Git regression reproduces a PR whose base branch advanced after
+divergence. Fetching that base with `--depth=1` made a previously complete checkout
+shallow and hid the merge base. The Action now fetches without a depth limit and
+the test checks both the correct impact and preserved history.
+
+The existing OSV scan reported Jackson 2.21.5 and Tomcat 10.1.55 advisories on
+PR #25. These are unchanged dependencies, not fixed by this UI/Action work. The
+security gate remains enabled; a passing build must not be described as passing
+all CI while this scan fails.

@@ -6,12 +6,18 @@ counts, average/p95/maximum recorded processing intervals, and an endpoint table
 ranked by cumulative interval. Expand a request to see its timestamps, status,
 thread names and independently resolved method set.
 
-![Request diagnostics from five synthetic requests to the MVC sample](assets/reqover-request-diagnostics.png)
+![Diagnostic dashboard from synthetic requests to the MVC sample](assets/reqover-request-diagnostics.png)
+
+![Shared code and the two observed APIs to retest](assets/reqover-retest-map.png)
 
 ![An actual HTTP failure expanded to show its recorded code and timestamps](assets/reqover-request-detail.png)
 
 Screenshots were captured on October 3, 2026 from the agent-attached MVC sample
 on loopback. Numbers illustrate that recording, not an application benchmark.
+
+The sidebar, animated relationship map and CI artifacts are explained in
+[Dashboard and CI setup](26_dashboard_and_ci.md). The graph does not reconstruct
+method call/return order from the recorded sets.
 
 ## Trying the preview
 

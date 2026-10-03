@@ -1,116 +1,119 @@
 name: Reqover impact analysis
-description: >-
-  Name the observed API endpoints that execute the code a pull request changes,
-  from a Reqover report recorded earlier in the job.
+description: Analyse observed retest candidates, render an offline report, and attach CI artifacts.
 
 inputs:
   report:
-    description: Path to the recorded report JSON, as written by reqover.report.export.json-path.
-    required: true
+    description: Recorded report JSON. Recording with the agent/starter happens before this Action.
+    required: false
+    default: build/reqover-report.json
   version:
-    description: Reqover release to download the CLI from, without the leading v.
+    description: CLI release to download, without the leading v. Ignored when cli-jar is supplied.
     required: false
     default: "0.2.0"
+  cli-jar:
+    description: Optional path to an existing source-built CLI JAR, for unreleased report features.
+    required: false
+    default: ""
   base-ref:
-    description: Git ref the diff is taken against. Defaults to the pull request base.
+    description: Git ref to diff against. Defaults to the PR base; required outside pull requests.
     required: false
     default: ""
   fail-on-impact:
-    description: Fail the step when any observed endpoint runs changed code.
+    description: Fail after publishing results if observed APIs execute changed code. Not a test-failure gate.
     required: false
     default: "false"
   comment:
-    description: Post the analysis as a pull request comment. Needs pull-requests:write.
+    description: Update a marked PR comment. Requires pull-requests write; fork PRs are skipped.
     required: false
     default: "true"
+  upload-artifact:
+    description: Upload only the generated HTML, impact Markdown, and impact JSON.
+    required: false
+    default: "true"
+  artifact-name:
+    description: Artifact name. Use a unique value for each matrix job or Action invocation.
+    required: false
+    default: reqover-report
 
 outputs:
   markdown:
-    description: The analysis as Markdown.
+    description: Analysis as Markdown.
     value: ${{ steps.analyse.outputs.markdown }}
   has-impact:
-    description: "true when at least one observed endpoint runs changed code."
+    description: "true when observed endpoints execute changed code; false does not prove safety."
     value: ${{ steps.analyse.outputs.has-impact }}
+  impacted-endpoint-count:
+    description: Number of observed endpoint retest candidates.
+    value: ${{ steps.analyse.outputs.impacted-endpoint-count }}
+  unmatched-path-count:
+    description: Changed paths without observed coverage, including non-source files.
+    value: ${{ steps.analyse.outputs.unmatched-path-count }}
+  html-path:
+    description: Absolute path to the standalone report on this runner.
+    value: ${{ steps.analyse.outputs.html-path }}
+  json-path:
+    description: Absolute path to the impact JSON on this runner.
+    value: ${{ steps.analyse.outputs.json-path }}
+  markdown-path:
+    description: Absolute path to the impact Markdown on this runner.
+    value: ${{ steps.analyse.outputs.markdown-path }}
+  artifact-url:
+    description: Uploaded artifact URL, or empty when artifact upload is disabled.
+    value: ${{ steps.upload.outputs.artifact-url }}
 
 runs:
   using: composite
   steps:
-    - name: Download the Reqover CLI
-      shell: bash
-      env:
-        REQOVER_VERSION: ${{ inputs.version }}
-      run: |
-        set -euo pipefail
-        curl --silent --show-error --fail --location \
-          --output "${RUNNER_TEMP}/reqover-cli.jar" \
-          "https://github.com/reqover-labs/reqover/releases/download/v${REQOVER_VERSION}/reqover-cli-${REQOVER_VERSION}.jar"
-
-    - name: Collect the changed files
-      shell: bash
-      env:
-        BASE_REF: ${{ inputs.base-ref }}
-        PR_BASE: ${{ github.base_ref }}
-      run: |
-        set -euo pipefail
-        base="${BASE_REF}"
-        if [ -z "${base}" ]; then
-          if [ -z "${PR_BASE}" ]; then
-            echo "base-ref is required outside a pull request" >&2
-            exit 1
-          fi
-          git fetch --no-tags --depth=1 origin "${PR_BASE}"
-          base="FETCH_HEAD"
-        fi
-        # Three-dot: files this branch changed, not files the base moved on.
-        git diff --name-only "${base}...HEAD" > "${RUNNER_TEMP}/reqover-changed.txt"
-        echo "Changed files:"
-        cat "${RUNNER_TEMP}/reqover-changed.txt"
-
-    - name: Analyse impact
+    - name: Analyse and render the recorded report
       id: analyse
       shell: bash
       env:
         REPORT: ${{ inputs.report }}
-        FAIL_ON_IMPACT: ${{ inputs.fail-on-impact }}
-      run: |
-        set -euo pipefail
-        java -jar "${RUNNER_TEMP}/reqover-cli.jar" impact \
-          --report "${REPORT}" \
-          --changed-files "${RUNNER_TEMP}/reqover-changed.txt" \
-          --format markdown \
-          --out "${RUNNER_TEMP}/reqover-impact.md"
+        CLI_JAR: ${{ inputs.cli-jar }}
+        REQOVER_VERSION: ${{ inputs.version }}
+        BASE_REF: ${{ inputs.base-ref }}
+        PR_BASE: ${{ github.base_ref }}
+      run: bash "${GITHUB_ACTION_PATH}/analyse.sh"
 
-        java -jar "${RUNNER_TEMP}/reqover-cli.jar" impact \
-          --report "${REPORT}" \
-          --changed-files "${RUNNER_TEMP}/reqover-changed.txt" \
-          --format json \
-          --out "${RUNNER_TEMP}/reqover-impact.json"
-
-        has_impact="$(grep -o '"hasImpact": [a-z]*' "${RUNNER_TEMP}/reqover-impact.json" | awk '{print $2}')"
-        echo "has-impact=${has_impact}" >> "${GITHUB_OUTPUT}"
-
-        {
-          echo "markdown<<REQOVER_EOF"
-          cat "${RUNNER_TEMP}/reqover-impact.md"
-          echo "REQOVER_EOF"
-        } >> "${GITHUB_OUTPUT}"
-
-        cat "${RUNNER_TEMP}/reqover-impact.md" >> "${GITHUB_STEP_SUMMARY}"
-
-        if [ "${FAIL_ON_IMPACT}" = "true" ] && [ "${has_impact}" = "true" ]; then
-          echo "::error::changed code is reached by observed endpoints" >&2
-          exit 1
-        fi
+    - name: Upload diagnostic artifacts
+      id: upload
+      if: ${{ inputs.upload-artifact == 'true' }}
+      uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+      with:
+        name: ${{ inputs.artifact-name }}
+        path: |
+          ${{ steps.analyse.outputs.html-path }}
+          ${{ steps.analyse.outputs.markdown-path }}
+          ${{ steps.analyse.outputs.json-path }}
+        if-no-files-found: error
+        retention-days: 7
 
     - name: Comment on the pull request
-      if: ${{ inputs.comment == 'true' && github.event_name == 'pull_request' }}
+      if: ${{ inputs.comment == 'true' && github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository }}
+      continue-on-error: true
       shell: bash
       env:
         GH_TOKEN: ${{ github.token }}
         PR_NUMBER: ${{ github.event.pull_request.number }}
         REPO: ${{ github.repository }}
+        MARKDOWN: ${{ steps.analyse.outputs.markdown-path }}
       run: |
         set -euo pipefail
-        gh pr comment "${PR_NUMBER}" --repo "${REPO}" \
-          --body-file "${RUNNER_TEMP}/reqover-impact.md" \
-          --edit-last --create-if-none
+        comment_id="$(gh api "repos/${REPO}/issues/${PR_NUMBER}/comments" --paginate --slurp \
+          --jq '.[][] | select(.user.login == "github-actions[bot]" and (.body | startswith("<!-- reqover-impact -->"))) | .id' | tail -n 1)"
+        if [ -n "${comment_id}" ]; then
+          gh api --method PATCH "repos/${REPO}/issues/comments/${comment_id}" --field "body=@${MARKDOWN}" > /dev/null
+        else
+          gh api --method POST "repos/${REPO}/issues/${PR_NUMBER}/comments" --field "body=@${MARKDOWN}" > /dev/null
+        fi
+
+    - name: Apply the optional impact gate
+      shell: bash
+      env:
+        FAIL_ON_IMPACT: ${{ inputs.fail-on-impact }}
+        HAS_IMPACT: ${{ steps.analyse.outputs.has-impact }}
+      run: |
+        if [ "${FAIL_ON_IMPACT}" = "true" ] && [ "${HAS_IMPACT}" = "true" ]; then
+          echo "::error::Observed APIs execute changed code. Review the saved retest candidates."
+          exit 1
+        fi

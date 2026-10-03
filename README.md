@@ -73,7 +73,11 @@ Reqover records, from the moment a request arrives until the response leaves, **
 
 The current development branch also includes a [request diagnostics preview](docs/24_request_diagnostics.md):
 per-request recorded processing intervals and HTTP status, a retained-request
-overview, and individual request details. It is not included in release `0.2.0`.
+overview, and individual request details. Its offline dashboard also visualizes
+request-to-method associations and shared-code retest candidates, with animation,
+node inspection, and reduced-motion support. It is not included in release `0.2.0`.
+
+![Unreleased diagnostic dashboard with synthetic MVC requests](docs/assets/reqover-request-diagnostics.png)
 
 ### 1. Execution paths split per API
 
@@ -255,6 +259,12 @@ exit code 0 when nothing is affected, 1 when something is, 2 on bad input.
 
 Full walkthrough, including a complete workflow file: [Impact analysis in CI](docs/18_ci_impact_analysis.md).
 
+The **unreleased Action preview** adds automatic HTML/impact artifacts, a
+source-built `cli-jar` option, structured counts, and fork-safe marked comments.
+[Dashboard and CI setup](docs/26_dashboard_and_ci.md) explains prerequisites and
+the preview workflow. These inputs are not available at the `v0.2.0` Action tag;
+the Action analyses an already recorded report, not an uninstrumented application.
+
 ## How it works
 
 In one sentence: **when the application starts, Reqover inserts code that reports "execution passed here", then groups those reports per request.**
@@ -395,6 +405,8 @@ Issues, pull requests, and commit messages are written in English so contributor
 </details>
 
 ## Documentation
+
+- [Diagnostic dashboard and CI artifacts](docs/26_dashboard_and_ci.md)
 
 - [System architecture](docs/02_architecture.md) · [한국어판](docs/02_architecture.ko.md)
 - [Spring integration guide](docs/17_integration_guide.md) · [한국어판](docs/17_integration_guide.ko.md)

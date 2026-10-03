@@ -14,6 +14,9 @@ the fastest way to change what we work on.
 **October mentoring track: make problem requests actionable.**
 The [request diagnostics preview](docs/24_request_diagnostics.md) surfaces retained
 request timing and status next to the request's method set. The
+offline dashboard adds animated observed relationships, shared-code retest
+candidates, and a review queue. The updated CI Action saves its results as
+explicit artifacts; see [dashboard and CI setup](docs/26_dashboard_and_ci.md). The
 [dated mentoring plan](docs/23_performance_validation_plan.ko.md) (Korean) targets
 October 7 for the first demonstration and November 4–5 for the presentation.
 Replay-case drafts, selective input capture and a k6 runner are planned stages,

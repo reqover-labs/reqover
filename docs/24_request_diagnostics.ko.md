@@ -4,12 +4,18 @@
 화면 위쪽에는 관측 HTTP 요청 수, 4xx·5xx, 평균·p95·최대 처리 시간과 endpoint별
 누적 시간을 표시합니다. 요청을 펼치면 그 요청의 시각·상태·스레드·실행 메서드를 확인합니다.
 
-![MVC 데모의 실제 다섯 요청으로 만든 진단 화면](assets/reqover-request-diagnostics.png)
+![MVC 합성 요청으로 만든 진단 대시보드](assets/reqover-request-diagnostics.png)
+
+![공통 코드를 실행한 두 API를 재테스트 후보로 보여주는 화면](assets/reqover-retest-map.png)
 
 ![HTTP 실패 요청의 시각과 실행 코드를 펼친 화면](assets/reqover-request-detail.png)
 
 화면은 2026년 10월 3일 loopback에서 agent를 붙인 MVC 데모로 캡처했습니다.
 이 수치는 합성 데모의 관측 결과입니다.
+
+사이드바, 애니메이션 관계 그래프와 CI 파일 저장은
+[대시보드와 CI 연결](26_dashboard_and_ci.ko.md)에 정리했습니다.
+그래프는 실행 메서드 집합을 보여주며 실제 호출·복귀 순서를 재구성하지 않습니다.
 
 ## 실제 데모
 

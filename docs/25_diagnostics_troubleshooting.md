@@ -139,3 +139,22 @@ from the previous draft feature. Browser tests cover comparison import, invalid
 and legacy files, filter/reset/export, confirmation, mobile layout and previous
 features. Screenshots use an explicitly named synthetic timing baseline, not
 claimed benchmark results. The existing OSV gate remains unchanged.
+
+## Dependency Security Follow-Up
+
+The earlier red Jackson/Tomcat checks were not scanner startup errors. A full
+query reproduced ten advisories across three components. The subsequent
+[dependency remediation](29_osv_dependency_remediation.md) aligns Jackson 2.21.7
+and embedded Tomcat 10.1.60 and regenerates the inventory; local OSV queries now
+return zero affected Maven components. The previous failure descriptions above
+are historical records, not instructions to leave that gate red.
+
+Tomcat 10.1.58 is listed as patched in advisory ranges but was not released after
+a failed vote. Verify actual Maven artifacts rather than configuring a nonexistent
+version. All embedded Tomcat modules are aligned in both the sample and starter
+test scope without imposing a new published-library runtime dependency.
+
+Windows clean failed on the old running demo's locked agent JAR. A separate clean
+validation checkout received only the dependency/SBOM edits, then passed all
+157 Java and 20 Node tests. The user's running demo was not interrupted. The
+existing `fail-on-vuln` policy and full inventory scan were not weakened.

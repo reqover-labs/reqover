@@ -132,5 +132,6 @@ against synthetic recordings. It verifies graph selection, changing animation
 pixels, pause/zoom, filters, download, no external requests, no-script fallback,
 reduced motion, legacy data, and 1920/1280/760/390 px layouts.
 
-The existing OSV dependency scan remains fail-on-vulnerability. Functional test
-success does not resolve existing Jackson/Tomcat advisories or mean all CI is green.
+The OSV dependency scan remains fail-on-vulnerability. The previously reported
+Jackson/Tomcat findings are addressed by the [dependency patch and regenerated
+SBOM](29_osv_dependency_remediation.md); functional tests alone never prove this.

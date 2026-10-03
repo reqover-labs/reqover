@@ -418,6 +418,8 @@ fork 후 브랜치를 만들고, `./gradlew clean test` 통과를 확인한 뒤 
 
 ## 문서 목록
 
+- [OSV 보안 검사 실패 보완](docs/29_osv_dependency_remediation.ko.md)
+
 - [이전 기록과 현재 기록 비교하기](docs/28_recording_comparison.ko.md)
 
 - [관측 요청에서 테스트 초안 만들기](docs/27_test_case_drafts.ko.md)

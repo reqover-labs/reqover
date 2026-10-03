@@ -4,6 +4,10 @@ All notable changes to Reqover are documented in this file.
 
 ## Unreleased
 
+- Patch known dependency vulnerabilities by aligning Jackson to 2.21.7 and
+  embedded Tomcat core/EL/WebSocket to 10.1.60 in the MVC sample and starter
+  tests. Regenerate the complete SBOM. Keep the OSV blocking policy unchanged.
+
 - The offline dashboard compares retained recordings via local JSON import and
   aggregate-summary export. Current summaries include all retained HTTP units,
   not just the graph window. Timing/status deltas retain unknown states and

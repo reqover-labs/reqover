@@ -414,6 +414,8 @@ Issues, pull requests, and commit messages are written in English so contributor
 
 ## Documentation
 
+- [OSV dependency scan remediation](docs/29_osv_dependency_remediation.md)
+
 - [Compare retained recordings](docs/28_recording_comparison.md)
 
 - [Reviewed test case drafts](docs/27_test_case_drafts.md)

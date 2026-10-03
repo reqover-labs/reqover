@@ -18,6 +18,11 @@ All notable changes to Reqover are documented in this file.
 - Input capture, replay generation and k6 integration are follow-up work in the
   mentoring improvement plan; they are not implemented by this preview.
 
+The `CoverageReport` record now has a fifth component, `requests`. Its previous
+constructor remains available, but Java record patterns and reflective code
+depending on four components must be updated. This public model change belongs
+in a minor development release, not a `0.2.x` patch.
+
 ### Fixed
 
 - **A report from a newer schema is refused instead of misparsed.** The writer

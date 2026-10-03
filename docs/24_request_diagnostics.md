@@ -76,6 +76,10 @@ diagnostics**. The previous four-argument `CoverageReport` constructor remains
 available. Endpoint aggregation, reverse lookup, `impact` and `diff` retain their
 existing interpretation; timing/status changes are not added to coverage diff.
 
+The Java record itself now has five components. Record-pattern consumers and
+code inspecting component count must adapt. This is intended for a minor
+development release, even though the JSON extension is additive.
+
 Request methods are an unordered set. This preview does not collect invocation
 order/count, timed method spans, DB intervals, test cases or load-test runs.
 Non-HTTP units remain in the JSON but are excluded from HTTP diagnostics.

@@ -36,7 +36,7 @@ no collector, instrumentation, coverage schema, CLI, or deployment changes.
 - [x] Compile generated Java using the project's actual JUnit API; run Java, JS,
   and desktop/mobile browser regression checks.
 - [x] Update README, mentoring plan, feature guide, and troubleshooting notes.
-- [ ] Review staged files for secrets, push, and update PR #25 without merging.
+- [x] Review staged files for secrets, push, and update PR #25 without merging.
 
 ## Verification
 

@@ -23,12 +23,14 @@ import java.util.Objects;
  * thread cannot record into a foreign bucket. Application code executed on an
  * async worker thread is not attributed until the request is re-dispatched.
  *
- * <p>Requests served by a static resource handler are not recorded. Spring Boot
- * maps one to {@code /**}, so every URL that matches no controller lands there
- * and would otherwise pile up under a single {@code GET /**} endpoint.
+ * <p>Requests served by Spring Boot's catch-all static resource handler are not
+ * recorded. Boot maps it to {@code /**}, so every URL that matches no controller
+ * lands there and would otherwise pile up under a single {@code GET /**}
+ * endpoint. A resource handler mapped to any other pattern is recorded.
  */
 public final class ReqoverMvcInterceptor implements AsyncHandlerInterceptor {
     private static final String BUCKET_ATTRIBUTE = ReqoverMvcInterceptor.class.getName() + ".bucket";
+    private static final String CATCH_ALL_PATTERN = "/**";
 
     private final CoverageStore coverageStore;
     private final RequestIdGenerator requestIdGenerator;
@@ -44,7 +46,7 @@ public final class ReqoverMvcInterceptor implements AsyncHandlerInterceptor {
             CoverageContext.set(existing);
             return true;
         }
-        if (handler instanceof ResourceHttpRequestHandler) {
+        if (isCatchAllResourceHandler(request, handler)) {
             return true;
         }
 
@@ -89,6 +91,12 @@ public final class ReqoverMvcInterceptor implements AsyncHandlerInterceptor {
     private static int statusCode(HttpServletResponse response, Exception ex) {
         int status = response.getStatus();
         return ex != null && status < 400 ? 500 : status;
+    }
+
+    private static boolean isCatchAllResourceHandler(HttpServletRequest request, Object handler) {
+        return handler instanceof ResourceHttpRequestHandler
+                && CATCH_ALL_PATTERN.equals(String.valueOf(
+                        request.getAttribute(HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE)));
     }
 
     private static String endpointPattern(HttpServletRequest request) {

@@ -21,9 +21,10 @@ import java.util.Objects;
  * {@code Context} and flushes it to the store when the request terminates,
  * regardless of which scheduler thread completes it.
  *
- * <p>Requests served by a static resource handler are not flushed. Spring Boot
- * maps one to {@code /**}, so every URL that matches no controller lands there
- * and would otherwise pile up under a single {@code GET /**} endpoint. The
+ * <p>Requests served by Spring Boot's catch-all static resource handler are not
+ * flushed. Boot maps it to {@code /**}, so every URL that matches no controller
+ * lands there and would otherwise pile up under a single {@code GET /**}
+ * endpoint. A resource handler mapped to any other pattern is recorded. The
  * handler is only known after the chain runs, so the bucket is dropped then.
  */
 public final class ReqoverWebFilter implements WebFilter {
@@ -62,7 +63,7 @@ public final class ReqoverWebFilter implements WebFilter {
             return chain.filter(exchange)
                     .contextWrite(context -> context.put(ReqoverThreadLocalAccessor.KEY, bucket))
                     .doFinally(signalType -> {
-                        if (servedByResourceHandler(exchange)) {
+                        if (servedByCatchAllResourceHandler(exchange)) {
                             return;
                         }
                         try (CoverageContext.Scope ignored = CoverageContext.open(bucket)) {
@@ -92,8 +93,10 @@ public final class ReqoverWebFilter implements WebFilter {
         return false;
     }
 
-    private static boolean servedByResourceHandler(ServerWebExchange exchange) {
-        return exchange.getAttribute(HandlerMapping.BEST_MATCHING_HANDLER_ATTRIBUTE) instanceof ResourceWebHandler;
+    private static boolean servedByCatchAllResourceHandler(ServerWebExchange exchange) {
+        return exchange.getAttribute(HandlerMapping.BEST_MATCHING_HANDLER_ATTRIBUTE) instanceof ResourceWebHandler
+                && "/**".equals(String.valueOf(
+                        exchange.getAttribute(HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE)));
     }
 
     private static String endpointPattern(ServerWebExchange exchange) {

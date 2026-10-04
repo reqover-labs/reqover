@@ -1,5 +1,6 @@
 package io.reqover.instrumentation;
 
+import org.objectweb.asm.AnnotationVisitor;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.Handle;
@@ -22,14 +23,26 @@ import java.util.Set;
  * makes a response envelope look like logic shared by every API. The match is
  * on the bytecode shape, not the name, so a getter that computes anything is
  * still recorded.
+ *
+ * <p>A request handler is never an accessor, whatever its body: a method
+ * carrying a Spring web annotation such as {@code @GetMapping}, and every
+ * method of a class annotated {@code @Controller} or {@code @RestController},
+ * is kept.
  */
 final class TrivialAccessorScanner {
+    private static final String SPRING_WEB_ANNOTATION_PREFIX = "Lorg/springframework/web/bind/annotation/";
+    private static final Set<String> CONTROLLER_ANNOTATIONS = Set.of(
+            "Lorg/springframework/stereotype/Controller;",
+            "Lorg/springframework/web/bind/annotation/RestController;"
+    );
+
     private TrivialAccessorScanner() {
     }
 
     /** Returns {@code name + descriptor} of each trivial accessor. */
     static Set<String> scan(ClassReader reader) {
         Set<String> accessors = new HashSet<>();
+        boolean[] controller = new boolean[1];
         reader.accept(new ClassVisitor(Opcodes.ASM9) {
             private String owner;
 
@@ -46,6 +59,14 @@ final class TrivialAccessorScanner {
             }
 
             @Override
+            public AnnotationVisitor visitAnnotation(String descriptor, boolean visible) {
+                if (CONTROLLER_ANNOTATIONS.contains(descriptor)) {
+                    controller[0] = true;
+                }
+                return null;
+            }
+
+            @Override
             public MethodVisitor visitMethod(
                     int access,
                     String name,
@@ -59,7 +80,7 @@ final class TrivialAccessorScanner {
                 return new ShapeRecorder(() -> accessors.add(key(name, descriptor)), owner, descriptor);
             }
         }, ClassReader.SKIP_FRAMES | ClassReader.SKIP_DEBUG);
-        return accessors;
+        return controller[0] ? Set.of() : accessors;
     }
 
     static String key(String name, String descriptor) {
@@ -79,6 +100,14 @@ final class TrivialAccessorScanner {
             this.onTrivial = onTrivial;
             this.owner = owner;
             this.descriptor = descriptor;
+        }
+
+        @Override
+        public AnnotationVisitor visitAnnotation(String annotationDescriptor, boolean visible) {
+            if (annotationDescriptor.startsWith(SPRING_WEB_ANNOTATION_PREFIX)) {
+                complex = true;
+            }
+            return null;
         }
 
         @Override

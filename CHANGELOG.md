@@ -6,6 +6,12 @@ All notable changes to Reqover are documented in this file.
 
 ### Fixed
 
+- **Known Jackson and Tomcat advisories are patched.** Jackson moves to 2.21.7
+  and embedded Tomcat core/EL/WebSocket to 10.1.60 in the MVC sample and the
+  starter's test runtime, clearing the OSV dependency scan. Published starter
+  consumers get no new Tomcat constraint. The SBOM is regenerated and the
+  blocking scan policy is unchanged.
+
 - **A report from a newer schema is refused instead of misparsed.** The writer
   has always stamped `schemaVersion`, but the reader ignored it, so a future
   document fed to an older build would parse into a silently wrong result. A

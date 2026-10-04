@@ -42,13 +42,13 @@ java -javaagent:reqover-agent-0.2.0.jar=include=com.example \
 
 ```groovy
 tasks.named('test') {
-    jvmArgs "-javaagent:${reqoverAgentJar}=include=com.example"
+    jvmArgs "-javaagent:${reqoverAgentJar}=include=com.example,accessors=record"
     systemProperty 'reqover.report.export.json-path',
             layout.buildDirectory.file('reqover-report.json').get().asFile.path
 }
 ```
 
-Spring의 테스트 컨텍스트 캐시는 테스트 설정마다 애플리케이션 컨텍스트를 하나씩 두고, 테스트 JVM이 끝날 때 모두 닫습니다. 컨텍스트마다 내보내기가 실행되고, 파일에는 그 실행의 모든 컨텍스트가 받은 요청이 담깁니다.
+Spring의 테스트 컨텍스트 캐시는 테스트 설정마다 애플리케이션 컨텍스트를 하나씩 두고, 테스트 JVM이 끝날 때 모두 닫습니다. 컨텍스트마다 내보내기가 실행되고, 파일에는 그 실행의 모든 컨텍스트가 받은 요청이 담깁니다. `accessors=record`를 주면 getter와 builder도 기록되어, 요청 DTO를 바꿔도 그 DTO를 읽는 엔드포인트와 연결됩니다([agent 옵션](17_integration_guide.ko.md) 참고).
 
 알아둘 것 두 가지:
 

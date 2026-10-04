@@ -64,6 +64,8 @@ class AgentOptionsTest {
         assertFalse(options.shouldInstrument("com.example.OrderService$$EnhancerBySpringCGLIB$$a1b2c3"));
         assertFalse(options.shouldInstrument("com.example.OrderService$$FastClassBySpringCGLIB$$a1b2c3"));
         assertFalse(options.shouldInstrument("com.example.Order$HibernateProxy$Zx8Kq1"));
+        assertFalse(options.shouldInstrument("com.example.Order$HibernateProxy"));
+        assertFalse(options.shouldInstrument("com.example.PaymentClient$MockitoMock$W0aexnVR"));
         assertFalse(options.shouldInstrument("com.example.OrderService$ByteBuddy$Mock"));
     }
 
@@ -89,5 +91,13 @@ class AgentOptionsTest {
         assertFalse(AgentOptions.parse("   ").shouldInstrument("com.example.OrderService"));
         assertFalse(AgentOptions.parse("verbose,exclude=com.example.generated")
                 .shouldInstrument("com.example.OrderService"));
+    }
+
+    @Test
+    void skipsAccessorsUnlessAskedToRecordThem() {
+        assertFalse(AgentOptions.parse("include=com.example").recordAccessors());
+        assertTrue(AgentOptions.parse("include=com.example,accessors=record").recordAccessors());
+        assertFalse(AgentOptions.parse("include=com.example,accessors=skip").recordAccessors());
+        assertFalse(AgentOptions.parse("include=com.example,accessors=sometimes").recordAccessors());
     }
 }

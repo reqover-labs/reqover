@@ -7,21 +7,32 @@ import java.util.List;
  * Parsed {@code -javaagent} options.
  *
  * <p>Syntax: {@code include=com.example;org.demo,exclude=com.example.generated}.
+ * {@code accessors=record} also instruments trivial accessors, which are
+ * skipped by default (see {@code accessors} below).
  * Prefixes are matched against dotted class names, and the most specific
  * (longest) matching prefix wins, so an explicit include may carve out a
  * subpackage of a default-excluded framework prefix. JDK, ASM, and Reqover
  * runtime packages are always excluded and cannot be enabled by an include.
  * On a tie the exclude wins.
  *
- * <p>Proxy classes generated at runtime (Spring CGLIB, Hibernate, Byte Buddy)
+ * <p>Proxy classes generated at runtime (Spring CGLIB, Hibernate, Byte Buddy, Mockito)
  * are also always excluded. They live in the application's package, so an
  * include matches them, but their methods only delegate to the real method,
  * which is instrumented on its own. Recording both lists every proxied bean
  * twice in the report.
+ *
+ * <p>Trivial accessors (a getter, setter or builder method that only moves one
+ * field) are skipped by default so a shared response envelope does not look
+ * like logic every API runs. The cost is that a class made only of such
+ * methods, typically a request DTO record, never appears in the report, so
+ * impact analysis cannot connect a change to it with the endpoints that use
+ * it. {@code accessors=record} keeps them for a CI recording that feeds impact
+ * analysis.
  */
 public record AgentOptions(
         List<String> includes,
-        List<String> excludes
+        List<String> excludes,
+        boolean recordAccessors
 ) {
     private static final List<String> HARD_EXCLUDES = List.of(
             "java.",
@@ -43,8 +54,10 @@ public record AgentOptions(
             "$$EnhancerBySpringCGLIB$$",
             "$$FastClassBySpringCGLIB$$",
             "$$EnhancerByCGLIB$$",
-            "$HibernateProxy$",
-            "$ByteBuddy$"
+            // Hibernate 6 names the proxy Order$HibernateProxy, 5 adds a suffix.
+            "$HibernateProxy",
+            "$ByteBuddy$",
+            "$MockitoMock$"
     );
 
     private static final List<String> DEFAULT_EXCLUDES = List.of(
@@ -58,9 +71,14 @@ public record AgentOptions(
         excludes = List.copyOf(excludes);
     }
 
+    public AgentOptions(List<String> includes, List<String> excludes) {
+        this(includes, excludes, false);
+    }
+
     public static AgentOptions parse(String args) {
         List<String> includes = new ArrayList<>();
         List<String> excludes = new ArrayList<>(DEFAULT_EXCLUDES);
+        boolean recordAccessors = false;
 
         if (args == null || args.isBlank()) {
             warn("no include configured; instrumentation is disabled (use include=com.example.app)");
@@ -83,6 +101,14 @@ public record AgentOptions(
                 includes.addAll(prefixes(value));
             } else if ("exclude".equals(key)) {
                 excludes.addAll(prefixes(value));
+            } else if ("accessors".equals(key)) {
+                if ("record".equals(value)) {
+                    recordAccessors = true;
+                } else if ("skip".equals(value)) {
+                    recordAccessors = false;
+                } else {
+                    warn("ignoring accessors=" + value + " (expected record or skip)");
+                }
             } else {
                 warn("ignoring unknown agent option \"" + key + "\"");
             }
@@ -91,7 +117,7 @@ public record AgentOptions(
         if (includes.isEmpty()) {
             warn("no valid include configured; instrumentation is disabled (use include=com.example.app)");
         }
-        return new AgentOptions(includes, excludes);
+        return new AgentOptions(includes, excludes, recordAccessors);
     }
 
     public boolean shouldInstrument(String dottedClassName) {

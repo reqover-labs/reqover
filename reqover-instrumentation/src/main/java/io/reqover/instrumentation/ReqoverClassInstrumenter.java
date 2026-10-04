@@ -17,11 +17,22 @@ public final class ReqoverClassInstrumenter {
     private static final String PROBE_METHOD = "hit";
     private static final String PROBE_DESCRIPTOR = "(II)V";
 
+    private final boolean skipTrivialAccessors;
+
+    public ReqoverClassInstrumenter() {
+        this(true);
+    }
+
+    /** {@code skipTrivialAccessors=false} instruments getters, setters and builder methods too. */
+    public ReqoverClassInstrumenter(boolean skipTrivialAccessors) {
+        this.skipTrivialAccessors = skipTrivialAccessors;
+    }
+
     public InstrumentationResult instrument(byte[] originalBytecode) {
         ClassReader reader = new ClassReader(originalBytecode);
         ClassWriter writer = new ClassWriter(reader, ClassWriter.COMPUTE_MAXS);
         List<ProbeMetadata> metadata = new ArrayList<>();
-        Set<String> trivialAccessors = TrivialAccessorScanner.scan(reader);
+        Set<String> trivialAccessors = skipTrivialAccessors ? TrivialAccessorScanner.scan(reader) : Set.of();
         reader.accept(new ReqoverClassVisitor(writer, metadata, trivialAccessors), 0);
 
         if (metadata.isEmpty()) {
@@ -84,6 +95,11 @@ public final class ReqoverClassInstrumenter {
 
         private static boolean instrumentableMethod(int access, String name) {
             if ("<init>".equals(name) || "<clinit>".equals(name)) {
+                return false;
+            }
+            // Lombok's @Builder.Default initializer. Not marked synthetic, but no
+            // one writes it by hand, and it runs on every build() of the entity.
+            if (name.startsWith("$default$")) {
                 return false;
             }
             return (access & (Opcodes.ACC_ABSTRACT | Opcodes.ACC_NATIVE | Opcodes.ACC_SYNTHETIC)) == 0;

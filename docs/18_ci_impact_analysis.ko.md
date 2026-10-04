@@ -38,6 +38,18 @@ java -javaagent:reqover-agent-0.2.0.jar=include=com.example \
   --reqover.report.export.json-path=build/reqover-report.json
 ```
 
+통합 테스트가 애플리케이션을 직접 띄운다면(`@SpringBootTest`), agent를 테스트 JVM에 붙이면 됩니다. Gradle 예시:
+
+```groovy
+tasks.named('test') {
+    jvmArgs "-javaagent:${reqoverAgentJar}=include=com.example"
+    systemProperty 'reqover.report.export.json-path',
+            layout.buildDirectory.file('reqover-report.json').get().asFile.path
+}
+```
+
+Spring의 테스트 컨텍스트 캐시는 테스트 설정마다 애플리케이션 컨텍스트를 하나씩 두고, 테스트 JVM이 끝날 때 모두 닫습니다. 컨텍스트마다 내보내기가 실행되고, 파일에는 그 실행의 모든 컨텍스트가 받은 요청이 담깁니다.
+
 알아둘 것 두 가지:
 
 - 내보내기는 **컨텍스트가 정상적으로 종료될 때** 실행됩니다. `SIGKILL`로 죽인 프로세스는 아무것도 쓰지 않습니다. CI에서는 `SIGTERM`(기본 `kill`)으로 애플리케이션을 멈추고, 프로세스가 끝날 때까지 기다리세요.

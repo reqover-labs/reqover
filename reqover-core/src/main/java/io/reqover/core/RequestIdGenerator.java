@@ -4,10 +4,14 @@ import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * Generates monotonically increasing, human-readable request ids such as
- * {@code req-1}. Thread-safe; ids are unique within one generator instance.
+ * {@code req-1}. Thread-safe.
+ *
+ * <p>The sequence is shared by every generator in the JVM, so ids stay unique
+ * when a test run holds several application contexts whose reports are
+ * exported to one file.
  */
 public final class RequestIdGenerator {
-    private final AtomicLong sequence = new AtomicLong();
+    private static final AtomicLong SEQUENCE = new AtomicLong();
     private final String prefix;
 
     public RequestIdGenerator() {
@@ -22,7 +26,7 @@ public final class RequestIdGenerator {
     }
 
     public String nextId() {
-        return prefix + "-" + sequence.incrementAndGet();
+        return prefix + "-" + SEQUENCE.incrementAndGet();
     }
 }
 

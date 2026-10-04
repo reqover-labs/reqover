@@ -6,6 +6,15 @@ All notable changes to Reqover are documented in this file.
 
 ### Fixed
 
+- **A test run's report covers every application context, not just the last
+  one closed.** Spring's test context cache keeps one context per distinct
+  configuration and closes them all at JVM exit, and each overwrote the
+  others' export. On a real 167-test Spring Boot suite with five contexts, the
+  exported report listed 20 of the 50 endpoints the tests called. Exports to
+  one path in the same JVM now accumulate; the first export of a run still
+  replaces the file. Request ids are unique across the JVM so the merged
+  report does not reuse `req-1`.
+
 - **Known Jackson and Tomcat advisories are patched.** Jackson moves to 2.21.7
   and embedded Tomcat core/EL/WebSocket to 10.1.60 in the MVC sample and the
   starter's test runtime, clearing the OSV dependency scan. Published starter

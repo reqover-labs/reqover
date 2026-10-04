@@ -1,12 +1,18 @@
 package io.reqover.spring.boot;
 
+import io.reqover.core.CoverageBucketSnapshot;
 import org.springframework.beans.factory.DisposableBean;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Objects;
+import java.util.function.Function;
 
 /**
  * Writes the report to disk when the application context closes.
@@ -15,10 +21,21 @@ import java.util.Objects;
  * boot the application with the agent attached, drive traffic through it, let
  * it shut down, then analyse the exported JSON.
  *
+ * <p>A test run usually holds several application contexts at once: Spring's
+ * test context cache keeps one per distinct configuration and closes them all
+ * when the JVM exits. Each would overwrite the others' file, so the report a
+ * CI job reads would cover only whichever closed last. Instead, every export
+ * to a path writes everything exported to that path earlier in the same JVM
+ * plus its own requests. The first export in a JVM still replaces the file,
+ * so a report from a previous run never leaks in.
+ *
  * <p>Export failures are reported on {@code System.err} and swallowed. A
  * measurement tool must not be the reason a shutdown fails.
  */
 public class ReqoverReportExporter implements DisposableBean {
+    /** Guarded by itself: two contexts closing at once must not interleave a read-merge-write. */
+    private static final Map<Path, List<CoverageBucketSnapshot>> EXPORTED_IN_THIS_JVM = new HashMap<>();
+
     private final ReqoverReportService reportService;
     private final ReqoverReportProperties.Export export;
 
@@ -29,29 +46,53 @@ public class ReqoverReportExporter implements DisposableBean {
 
     @Override
     public void destroy() {
-        write(export.getJsonPath(), reportService::json, "JSON");
-        write(export.getHtmlPath(), reportService::html, "HTML");
+        List<CoverageBucketSnapshot> own = reportService.snapshots();
+        write(export.getJsonPath(), own, reportService::json, "JSON");
+        write(export.getHtmlPath(), own, reportService::html, "HTML");
     }
 
-    private void write(String target, ContentSupplier content, String kind) {
+    private void write(
+            String target,
+            List<CoverageBucketSnapshot> own,
+            Function<List<CoverageBucketSnapshot>, String> render,
+            String kind
+    ) {
         if (target == null || target.isBlank()) {
             return;
         }
         Path path = Path.of(target);
+        Path key = path.toAbsolutePath().normalize();
+        synchronized (EXPORTED_IN_THIS_JVM) {
+            writeMerged(path, key, own, render, kind);
+        }
+    }
+
+    private static void writeMerged(
+            Path path,
+            Path key,
+            List<CoverageBucketSnapshot> own,
+            Function<List<CoverageBucketSnapshot>, String> render,
+            String kind
+    ) {
         try {
-            Path parent = path.toAbsolutePath().getParent();
+            List<CoverageBucketSnapshot> merged = new ArrayList<>(EXPORTED_IN_THIS_JVM.getOrDefault(key, List.of()));
+            merged.addAll(own);
+            Path parent = key.getParent();
             if (parent != null) {
                 Files.createDirectories(parent);
             }
-            Files.writeString(path, content.get(), StandardCharsets.UTF_8);
-            System.out.println("[reqover] wrote the " + kind + " report to " + path.toAbsolutePath());
+            Files.writeString(path, render.apply(merged), StandardCharsets.UTF_8);
+            EXPORTED_IN_THIS_JVM.put(key, List.copyOf(merged));
+            System.out.println("[reqover] wrote the " + kind + " report to " + key);
         } catch (IOException | RuntimeException e) {
             System.err.println("[reqover] could not write the " + kind + " report to " + path + ": " + e);
         }
     }
 
-    @FunctionalInterface
-    private interface ContentSupplier {
-        String get();
+    /** Forgets what earlier contexts exported, so each test starts from an empty file. */
+    static void resetForTests() {
+        synchronized (EXPORTED_IN_THIS_JVM) {
+            EXPORTED_IN_THIS_JVM.clear();
+        }
     }
 }

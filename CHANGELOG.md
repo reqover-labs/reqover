@@ -9,9 +9,8 @@ All notable changes to Reqover are documented in this file.
 - **Hibernate 6 and Mockito proxies are excluded too.** Hibernate 6 names its
   proxy `Order$HibernateProxy` with no suffix, which the earlier marker missed,
   and a Mockito mock (`$MockitoMock$`) was recorded as application code.
-- **Builder and fluent setters count as trivial accessors**, and Lombok's
-  `$default$` initializers are not instrumented. On a real Lombok-heavy service
-  builder methods were a fifth of the reverse index.
+- **Builder and fluent setters count as trivial accessors.** On a real
+  Lombok-heavy service builder methods were a fifth of the reverse index.
 
 - **A test run's report covers every application context, not just the last
   one closed.** Spring's test context cache keeps one context per distinct

@@ -65,6 +65,7 @@ class AgentOptionsTest {
         assertFalse(options.shouldInstrument("com.example.OrderService$$FastClassBySpringCGLIB$$a1b2c3"));
         assertFalse(options.shouldInstrument("com.example.Order$HibernateProxy$Zx8Kq1"));
         assertFalse(options.shouldInstrument("com.example.Order$HibernateProxy"));
+        assertTrue(options.shouldInstrument("com.example.Order$HibernateProxyFactory"));
         assertFalse(options.shouldInstrument("com.example.PaymentClient$MockitoMock$W0aexnVR"));
         assertFalse(options.shouldInstrument("com.example.OrderService$ByteBuddy$Mock"));
     }

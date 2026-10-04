@@ -27,7 +27,10 @@ import java.util.function.Function;
  * CI job reads would cover only whichever closed last. Instead, every export
  * to a path writes everything exported to that path earlier in the same JVM
  * plus its own requests. The first export in a JVM still replaces the file,
- * so a report from a previous run never leaks in.
+ * so a report from a previous run never leaks in. What was exported is kept
+ * until the JVM exits: one context in production exports once at shutdown, and
+ * a test JVM ends with the run, so the cost is one copy of each context's
+ * already-bounded snapshot window.
  *
  * <p>Export failures are reported on {@code System.err} and swallowed. A
  * measurement tool must not be the reason a shutdown fails.

@@ -54,8 +54,7 @@ public record AgentOptions(
             "$$EnhancerBySpringCGLIB$$",
             "$$FastClassBySpringCGLIB$$",
             "$$EnhancerByCGLIB$$",
-            // Hibernate 6 names the proxy Order$HibernateProxy, 5 adds a suffix.
-            "$HibernateProxy",
+            "$HibernateProxy$",
             "$ByteBuddy$",
             "$MockitoMock$"
     );
@@ -131,6 +130,11 @@ public record AgentOptions(
     }
 
     private static boolean isGeneratedProxy(String dottedClassName) {
+        // Hibernate 6 names the proxy Order$HibernateProxy with no suffix. Match
+        // the end only, so a class such as Order$HibernateProxyFactory is kept.
+        if (dottedClassName.endsWith("$HibernateProxy")) {
+            return true;
+        }
         for (String marker : GENERATED_PROXY_MARKERS) {
             if (dottedClassName.contains(marker)) {
                 return true;

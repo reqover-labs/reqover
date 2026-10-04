@@ -47,10 +47,6 @@ public class AccessorTarget {
         return this;
     }
 
-    public static String $default$name() {
-        return "anonymous";
-    }
-
     public void setNameTrimmed(String name) {
         this.name = name.trim();
     }

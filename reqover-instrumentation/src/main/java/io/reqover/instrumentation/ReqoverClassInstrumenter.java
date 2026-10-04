@@ -97,11 +97,6 @@ public final class ReqoverClassInstrumenter {
             if ("<init>".equals(name) || "<clinit>".equals(name)) {
                 return false;
             }
-            // Lombok's @Builder.Default initializer. Not marked synthetic, but no
-            // one writes it by hand, and it runs on every build() of the entity.
-            if (name.startsWith("$default$")) {
-                return false;
-            }
             return (access & (Opcodes.ACC_ABSTRACT | Opcodes.ACC_NATIVE | Opcodes.ACC_SYNTHETIC)) == 0;
         }
     }

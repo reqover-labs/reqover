@@ -12,9 +12,9 @@ is published as the CycloneDX SBOM at `sbom/reqover.cdx.json`.
 | Reactor Netty | 1.2.18 | Apache-2.0 | https://github.com/reactor/reactor-netty | WebFlux sample HTTP runtime |
 | Micrometer Context Propagation | 1.1.4 | Apache-2.0 | https://github.com/micrometer-metrics/context-propagation | Reactor Context to ThreadLocal propagation |
 | Jakarta Servlet API | 6.0.0 | EPL-2.0 OR GPL-2.0-with-classpath-exception | https://github.com/jakartaee/servlet | Compile-only servlet API for the MVC adapter |
-| Jackson | 2.21.5 | Apache-2.0 | https://github.com/FasterXML/jackson | Sample JSON serialization and E2E report parsing |
+| Jackson | 2.21.7 | Apache-2.0 | https://github.com/FasterXML/jackson | Sample JSON serialization and E2E report parsing; annotations follow the BOM's 2.21 version |
 | Netty | 4.1.136.Final | Apache-2.0 | https://github.com/netty/netty | WebFlux sample network runtime |
-| Apache Tomcat | 10.1.55 | Apache-2.0 | https://github.com/apache/tomcat | MVC sample embedded server |
+| Apache Tomcat | 10.1.60 | Apache-2.0 | https://github.com/apache/tomcat | MVC sample embedded server and starter test runtime |
 | Logback | 1.5.34 | EPL-2.0 OR LGPL-2.1-only | https://github.com/qos-ch/logback | Sample application logging |
 | ASM | 9.10.1 | BSD-3-Clause | https://gitlab.ow2.org/asm/asm | Method-entry bytecode instrumentation; redistributed in the agent JAR |
 | JUnit 5 | 5.12.2 | EPL-2.0 | https://github.com/junit-team/junit5 | Unit and integration tests |

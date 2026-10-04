@@ -34,6 +34,19 @@ public class AccessorTarget {
         return count + 1;
     }
 
+    public AccessorTarget withName(String name) {
+        this.name = name;
+        return this;
+    }
+
+    public AccessorTarget withCountChecked(long count) {
+        if (count < 0) {
+            throw new IllegalArgumentException("count");
+        }
+        this.count = count;
+        return this;
+    }
+
     public void setNameTrimmed(String name) {
         this.name = name.trim();
     }

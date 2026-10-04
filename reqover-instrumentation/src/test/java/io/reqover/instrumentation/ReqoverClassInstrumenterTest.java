@@ -61,9 +61,18 @@ class ReqoverClassInstrumenterTest {
         InstrumentationResult result = new ReqoverClassInstrumenter().instrument(classBytes(AccessorTarget.class));
 
         assertEquals(
-                Set.of("getDisplayName", "getParentName", "getCountPlusOne", "setNameTrimmed"),
+                Set.of("getDisplayName", "getParentName", "getCountPlusOne", "setNameTrimmed", "withCountChecked"),
                 instrumentedMethodNames(result)
         );
+    }
+
+    @Test
+    void instrumentsAccessorsWhenAskedTo() throws Exception {
+        InstrumentationResult result = new ReqoverClassInstrumenter(false).instrument(classBytes(RecordTarget.class));
+
+        Set<String> names = instrumentedMethodNames(result);
+        assertTrue(names.contains("code"));
+        assertTrue(names.contains("status"));
     }
 
     @Test

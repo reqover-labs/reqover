@@ -6,6 +6,21 @@ All notable changes to Reqover are documented in this file.
 
 ### Fixed
 
+- **Hibernate 6 and Mockito proxies are excluded too.** Hibernate 6 names its
+  proxy `Order$HibernateProxy` with no suffix, which the earlier marker missed,
+  and a Mockito mock (`$MockitoMock$`) was recorded as application code.
+- **Builder and fluent setters count as trivial accessors.** On a real
+  Lombok-heavy service builder methods were a fifth of the reverse index.
+
+- **A test run's report covers every application context, not just the last
+  one closed.** Spring's test context cache keeps one context per distinct
+  configuration and closes them all at JVM exit, and each overwrote the
+  others' export. On a real 167-test Spring Boot suite with five contexts, the
+  exported report listed 20 of the 50 endpoints the tests called. Exports to
+  one path in the same JVM now accumulate; the first export of a run still
+  replaces the file. Request ids are unique across the JVM so the merged
+  report does not reuse `req-1`.
+
 - **Known Jackson and Tomcat advisories are patched.** Jackson moves to 2.21.7
   and embedded Tomcat core/EL/WebSocket to 10.1.60 in the MVC sample and the
   starter's test runtime, clearing the OSV dependency scan. Published starter
@@ -18,6 +33,10 @@ All notable changes to Reqover are documented in this file.
   document with no `schemaVersion` still reads as version 1.
 
 ### Changed
+
+- **`accessors=record` agent option.** Skipping trivial accessors hides a class
+  made only of them, such as a request DTO record, from impact analysis.
+  Recording for CI can keep them; the default is unchanged.
 
 - **Reports no longer list each Spring bean twice.** Runtime proxy classes
   (`$$SpringCGLIB$$`, `$HibernateProxy$`, `$ByteBuddy$`) sit in the

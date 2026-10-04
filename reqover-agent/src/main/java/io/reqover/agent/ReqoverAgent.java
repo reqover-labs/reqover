@@ -17,6 +17,7 @@ public final class ReqoverAgent {
             return;
         }
         instrumentation.addTransformer(new ReqoverClassFileTransformer(options));
-        System.err.println("[reqover] agent started; includes=" + options.includes() + ", excludes=" + options.excludes());
+        System.err.println("[reqover] agent started; includes=" + options.includes() + ", excludes=" + options.excludes()
+                + ", accessors=" + (options.recordAccessors() ? "record" : "skip"));
     }
 }

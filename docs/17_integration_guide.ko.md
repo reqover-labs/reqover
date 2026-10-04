@@ -375,6 +375,18 @@ include=org.springframework.samples
 
 `include`는 좁게 쓰는 편이 좋습니다. 넓게 잡으면 리포트가 읽기 힘들어지고 시작 시간도 늘어납니다.
 
+### `accessors`: 영향 분석용으로 getter와 builder도 기록하기
+
+agent는 기본적으로 단순 accessor를 계측하지 않습니다. 몸체 전체가 필드 하나를 옮기기만 하는 getter, setter, record accessor, builder 메서드가 여기에 해당합니다. 응답 envelope가 모든 API가 실행하는 로직처럼 보이지 않게 하려는 것입니다. 대신 이런 메서드로만 이뤄진 클래스(대표적으로 요청 DTO record)는 리포트에 나타나지 않아서, 그 클래스를 바꿨을 때 영향 분석이 어느 엔드포인트와도 연결하지 못합니다.
+
+[CI 영향 분석](18_ci_impact_analysis.ko.md)에 쓸 기록이라면 남겨 두세요.
+
+```text
+include=com.example,accessors=record
+```
+
+테스트 167개짜리 Spring Boot 서비스의 최근 커밋 12개에서, 영향 분석이 연결하지 못한 소스 파일이 33개에서 21개로 줄었고 역인덱스는 세 배가 됐습니다. 사람이 읽는 리포트에는 기본값(`accessors=skip`)을 쓰세요.
+
 ---
 
 ## 5. 잘 됐는지 확인하기
@@ -402,7 +414,7 @@ WebFlux라면 하나 더 — 한 API의 기록 안에 **서로 다른 스레드 
 | `[reqover] no include configured` | `include=`를 안 줬음 | `include=내.패키지` 추가. 이 상태에서는 의도적으로 아무것도 계측하지 않습니다 |
 | `[reqover] no valid include configured` | `include`를 줬지만 값이 비어 있음 | `include=` 뒤에 값이 있는지, 쉼표/세미콜론을 헷갈리지 않았는지 확인 |
 | `[reqover] ignoring malformed agent option` | `key=value` 형태가 아님 | `include=com.example` 처럼 `=`를 넣었는지 확인 |
-| `[reqover] ignoring unknown agent option` | `include`/`exclude` 외의 키를 씀 | 오타 확인 (`includes`, `packages` 등은 인식하지 않습니다) |
+| `[reqover] ignoring unknown agent option` | `include`/`exclude`/`accessors` 외의 키를 씀 | 오타 확인 (`includes`, `packages` 등은 인식하지 않습니다) |
 | 엔드포인트는 나오는데 클래스 목록이 비어 있음 | `include`가 내 클래스와 안 맞음 | 클래스가 아니라 **패키지 접두사**를 주는지, 기본 제외(`org.springframework.` 등)에 걸리지 않는지 확인 |
 | `/reqover/report`가 404 | **엔드포인트는 기본이 꺼짐** | `reqover.report.endpoint.enabled=true`를 넣거나 직접 컨트롤러를 만드세요. 아무 설정도 안 한 상태에서는 이게 정상 동작입니다 |
 | 엔드포인트를 켰는데도 404 | 어댑터가 안 켜져서 `CoverageStore`도 리포트 서비스도 없음 | 웹 애플리케이션이 맞는지, `reqover.mvc.enabled=false` / `reqover.webflux.enabled=false`로 꺼두지 않았는지 확인 |

@@ -17,11 +17,22 @@ public final class ReqoverClassInstrumenter {
     private static final String PROBE_METHOD = "hit";
     private static final String PROBE_DESCRIPTOR = "(II)V";
 
+    private final boolean skipTrivialAccessors;
+
+    public ReqoverClassInstrumenter() {
+        this(true);
+    }
+
+    /** {@code skipTrivialAccessors=false} instruments getters, setters and builder methods too. */
+    public ReqoverClassInstrumenter(boolean skipTrivialAccessors) {
+        this.skipTrivialAccessors = skipTrivialAccessors;
+    }
+
     public InstrumentationResult instrument(byte[] originalBytecode) {
         ClassReader reader = new ClassReader(originalBytecode);
         ClassWriter writer = new ClassWriter(reader, ClassWriter.COMPUTE_MAXS);
         List<ProbeMetadata> metadata = new ArrayList<>();
-        Set<String> trivialAccessors = TrivialAccessorScanner.scan(reader);
+        Set<String> trivialAccessors = skipTrivialAccessors ? TrivialAccessorScanner.scan(reader) : Set.of();
         reader.accept(new ReqoverClassVisitor(writer, metadata, trivialAccessors), 0);
 
         if (metadata.isEmpty()) {

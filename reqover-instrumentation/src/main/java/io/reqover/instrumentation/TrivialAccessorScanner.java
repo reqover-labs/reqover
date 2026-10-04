@@ -17,7 +17,8 @@ import java.util.Set;
 /**
  * Finds the methods of a class whose whole body reads or writes one of its own
  * instance fields and nothing else: a Lombok {@code @Getter}/{@code @Setter},
- * a record accessor, or a hand-written equivalent.
+ * a record accessor, a builder or fluent setter that stores its argument and
+ * returns {@code this}, or a hand-written equivalent.
  *
  * <p>These run on every request that serializes the object, so recording them
  * makes a response envelope look like logic shared by every API. The match is
@@ -184,7 +185,7 @@ final class TrivialAccessorScanner {
 
         @Override
         public void visitEnd() {
-            if (!complex && (isGetter() || isSetter())) {
+            if (!complex && (isGetter() || isSetter() || isFluentSetter())) {
                 onTrivial.run();
             }
         }
@@ -198,6 +199,21 @@ final class TrivialAccessorScanner {
                     && opcodes.get(0) == Opcodes.ALOAD && varIndexes.get(0) == 0
                     && opcodes.get(1) == Opcodes.GETFIELD
                     && opcodes.get(2) == returnType.getOpcode(Opcodes.IRETURN);
+        }
+
+        /** {@code (T)Self}: {@code aload_0; xload_1; putfield this.f; aload_0; areturn}. */
+        private boolean isFluentSetter() {
+            Type[] arguments = Type.getArgumentTypes(descriptor);
+            Type returnType = Type.getReturnType(descriptor);
+            return arguments.length == 1
+                    && returnType.getSort() == Type.OBJECT
+                    && returnType.getInternalName().equals(owner)
+                    && opcodes.size() == 5
+                    && opcodes.get(0) == Opcodes.ALOAD && varIndexes.get(0) == 0
+                    && opcodes.get(1) == arguments[0].getOpcode(Opcodes.ILOAD) && varIndexes.get(1) == 1
+                    && opcodes.get(2) == Opcodes.PUTFIELD
+                    && opcodes.get(3) == Opcodes.ALOAD && varIndexes.get(3) == 0
+                    && opcodes.get(4) == Opcodes.ARETURN;
         }
 
         /** {@code (T)V}: {@code aload_0; xload_1; putfield this.f; return}. */

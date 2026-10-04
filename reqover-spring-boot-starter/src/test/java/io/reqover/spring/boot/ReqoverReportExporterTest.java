@@ -7,6 +7,7 @@ import io.reqover.core.ProbeRegistry;
 import io.reqover.core.UnitInfo;
 import io.reqover.report.CoverageReport;
 import io.reqover.report.CoverageReportJson;
+import io.reqover.report.EndpointCoverage;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -15,6 +16,7 @@ import org.junit.jupiter.api.io.TempDir;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -30,6 +32,7 @@ class ReqoverReportExporterTest {
 
     @BeforeEach
     void recordOneRequest() {
+        ReqoverReportExporter.resetForTests();
         ProbeRegistry.register(new ProbeMetadata(10, 1, "sample.OrderService", "find", "()V", 12));
         CoverageBucket bucket = new CoverageBucket(UnitInfo.httpRequest("req-1", "GET", "/orders/{id}"));
         bucket.record(10, 1);
@@ -40,6 +43,7 @@ class ReqoverReportExporterTest {
     @AfterEach
     void clearRegistry() {
         ProbeRegistry.clear();
+        ReqoverReportExporter.resetForTests();
     }
 
     @Test
@@ -102,6 +106,54 @@ class ReqoverReportExporterTest {
         exporter().destroy();
 
         assertFalse(Files.exists(unwritable));
+    }
+
+    @Test
+    void keepsEveryContextsRequestsWhenSeveralExportToOnePath() throws Exception {
+        // Spring's test context cache closes several contexts at JVM exit; the
+        // file must hold all of them, not just whichever closed last.
+        Path json = workspace.resolve("report.json");
+        properties.getExport().setJsonPath(json.toString());
+        InMemoryCoverageStore otherStore = new InMemoryCoverageStore();
+        CoverageBucket payment = new CoverageBucket(UnitInfo.httpRequest("req-2", "POST", "/payments"));
+        payment.record(10, 1);
+        payment.finish(201);
+        otherStore.flush(payment);
+
+        exporter().destroy();
+        new ReqoverReportExporter(new ReqoverReportService(otherStore), properties.getExport()).destroy();
+
+        CoverageReport report = CoverageReportJson.read(Files.readString(json, StandardCharsets.UTF_8));
+        assertEquals(2, report.completedRequestCount());
+        assertEquals(
+                List.of("GET /orders/{id}", "POST /payments"),
+                report.endpoints().stream().map(EndpointCoverage::endpoint).sorted().toList()
+        );
+    }
+
+    @Test
+    void replacesAReportLeftByAnEarlierRun() throws Exception {
+        Path json = workspace.resolve("report.json");
+        Files.writeString(json, "stale");
+        properties.getExport().setJsonPath(json.toString());
+
+        exporter().destroy();
+
+        assertEquals(1, CoverageReportJson.read(Files.readString(json, StandardCharsets.UTF_8)).completedRequestCount());
+    }
+
+    @Test
+    void doesNotMixReportsExportedToDifferentPaths() throws Exception {
+        Path first = workspace.resolve("first.json");
+        Path second = workspace.resolve("second.json");
+        properties.getExport().setJsonPath(first.toString());
+        exporter().destroy();
+
+        ReqoverReportProperties other = new ReqoverReportProperties();
+        other.getExport().setJsonPath(second.toString());
+        new ReqoverReportExporter(reportService, other.getExport()).destroy();
+
+        assertEquals(1, CoverageReportJson.read(Files.readString(second, StandardCharsets.UTF_8)).completedRequestCount());
     }
 
     private ReqoverReportExporter exporter() {

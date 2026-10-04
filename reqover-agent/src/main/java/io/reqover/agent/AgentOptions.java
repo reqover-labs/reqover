@@ -12,6 +12,12 @@ import java.util.List;
  * subpackage of a default-excluded framework prefix. JDK, ASM, and Reqover
  * runtime packages are always excluded and cannot be enabled by an include.
  * On a tie the exclude wins.
+ *
+ * <p>Proxy classes generated at runtime (Spring CGLIB, Hibernate, Byte Buddy)
+ * are also always excluded. They live in the application's package, so an
+ * include matches them, but their methods only delegate to the real method,
+ * which is instrumented on its own. Recording both lists every proxied bean
+ * twice in the report.
  */
 public record AgentOptions(
         List<String> includes,
@@ -30,6 +36,15 @@ public record AgentOptions(
             "io.reqover.instrumentation.",
             "io.reqover.report.",
             "io.reqover.spring."
+    );
+
+    private static final List<String> GENERATED_PROXY_MARKERS = List.of(
+            "$$SpringCGLIB$$",
+            "$$EnhancerBySpringCGLIB$$",
+            "$$FastClassBySpringCGLIB$$",
+            "$$EnhancerByCGLIB$$",
+            "$HibernateProxy$",
+            "$ByteBuddy$"
     );
 
     private static final List<String> DEFAULT_EXCLUDES = List.of(
@@ -80,11 +95,22 @@ public record AgentOptions(
     }
 
     public boolean shouldInstrument(String dottedClassName) {
-        if (includes.isEmpty() || longestMatch(HARD_EXCLUDES, dottedClassName) >= 0) {
+        if (includes.isEmpty()
+                || longestMatch(HARD_EXCLUDES, dottedClassName) >= 0
+                || isGeneratedProxy(dottedClassName)) {
             return false;
         }
         int longestExclude = longestMatch(excludes, dottedClassName);
         return longestMatch(includes, dottedClassName) > longestExclude;
+    }
+
+    private static boolean isGeneratedProxy(String dottedClassName) {
+        for (String marker : GENERATED_PROXY_MARKERS) {
+            if (dottedClassName.contains(marker)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private static int longestMatch(List<String> prefixes, String dottedClassName) {

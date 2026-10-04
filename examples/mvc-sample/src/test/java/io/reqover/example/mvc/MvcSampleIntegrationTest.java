@@ -67,6 +67,14 @@ class MvcSampleIntegrationTest {
     }
 
     @Test
+    void doesNotRecordRequestsThatMatchNoController() {
+        ResponseEntity<String> response = rest.getForEntity("/no-such-endpoint", String.class);
+        assertEquals(404, response.getStatusCode().value());
+
+        assertTrue(coverageStore.snapshots().isEmpty(), coverageStore.snapshots().toString());
+    }
+
+    @Test
     void keepsBucketsSeparateForConcurrentRequests() throws Exception {
         int iterations = 10;
         ExecutorService executor = Executors.newFixedThreadPool(2);

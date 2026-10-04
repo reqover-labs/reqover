@@ -19,6 +19,26 @@ All notable changes to Reqover are documented in this file.
 
 ### Changed
 
+- **Reports no longer list each Spring bean twice.** Runtime proxy classes
+  (`$$SpringCGLIB$$`, `$HibernateProxy$`, `$ByteBuddy$`) sit in the
+  application's package, so an `include` matched them and every proxied service
+  appeared next to its own `$$SpringCGLIB$$0` twin. They are now always
+  excluded; the real method behind the proxy is still recorded.
+- **Trivial accessors are not instrumented.** A method whose whole body reads
+  or writes one of its own instance fields — a Lombok `@Getter`/`@Setter` or a
+  record accessor — runs whenever Jackson serializes the object, so a shared
+  response envelope topped the reverse lookup as "used by every API". The
+  match is on the bytecode shape, not the name: a getter that computes
+  anything is still recorded, and so is a request handler — a method with a
+  Spring web annotation, or any method of a `@Controller`/`@RestController`.
+  A DTO with only field accessors no longer appears in the reverse lookup.
+- **Requests that match no controller are not recorded.** Spring Boot maps a
+  static resource handler to `/**`, so every unmapped URL piled up under one
+  `GET /**` endpoint. The MVC interceptor and the WebFlux filter now skip
+  requests served by `ResourceHttpRequestHandler` / `ResourceWebHandler` under
+  that catch-all pattern. A resource handler you map yourself, such as
+  `/downloads/**`, is still recorded.
+
 - **Agent overhead is measured over alternating rounds** rather than one
   baseline-then-agent run. The retired 2026-08-10 capture reported the agent as
   *faster* than the baseline, which is what run-order drift produces. The new

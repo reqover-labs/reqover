@@ -2,6 +2,7 @@ val springBootVersion: String by project
 val junitVersion: String by project
 val jacksonVersion: String by project
 val log4jVersion: String by project
+val tomcatVersion: String by project
 
 dependencies {
     api(project(":reqover-core"))
@@ -24,4 +25,11 @@ dependencies {
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("org.springframework.boot:spring-boot-starter-web")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+
+    constraints {
+        // Test-only: do not impose the sample server on published starter users.
+        testImplementation("org.apache.tomcat.embed:tomcat-embed-core:$tomcatVersion")
+        testImplementation("org.apache.tomcat.embed:tomcat-embed-el:$tomcatVersion")
+        testImplementation("org.apache.tomcat.embed:tomcat-embed-websocket:$tomcatVersion")
+    }
 }

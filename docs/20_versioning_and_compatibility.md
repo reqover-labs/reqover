@@ -164,9 +164,11 @@ the acceptance criteria for
       `.asc` that verifies, and the bundle holds sources, Javadoc and checksums
 - [x] The `io.github.reqover-labs` namespace verified on the Central Portal
       (2026-10-06)
-- [ ] `PUBLISH_TO_MAVEN_CENTRAL` enabled with the signing and Portal secrets
-- [ ] A consumer smoke test: a project outside this repository resolving the
-      starter from Central and recording one request
+- [x] `PUBLISH_TO_MAVEN_CENTRAL` enabled with the signing and Portal secrets;
+      0.3.0 published on 2026-10-06, signatures verify against the public key
+- [x] A consumer smoke test: a project outside this repository resolving the
+      starter from Central and recording one request — a Spring Boot service's
+      test suite, with only `mavenCentral()`, recorded 20 endpoints
 
 The last one is not paperwork. A starter nobody has resolved from outside this
 build is how a permanent mistake gets made.

@@ -108,4 +108,16 @@ class HtmlCoverageReportRendererTest {
             from = at + needle.length();
         }
     }
+
+    @Test
+    void rendersReferenceProbeDescriptorsReadably() {
+        // Reference probes (agent references=record) carry field descriptors or none.
+        assertEquals(": PubErrorCode",
+                HtmlCoverageReportRenderer.readableSignature("Lkr/ac/knu/groove/global/exception/PubErrorCode;"));
+        assertEquals(": int", HtmlCoverageReportRenderer.readableSignature("I"));
+        assertEquals("", HtmlCoverageReportRenderer.readableSignature(""));
+        assertEquals("(long): OrderResponse",
+                HtmlCoverageReportRenderer.readableSignature("(J)Lcom/example/OrderResponse;"));
+        assertEquals("not a descriptor", HtmlCoverageReportRenderer.readableSignature("not a descriptor"));
+    }
 }

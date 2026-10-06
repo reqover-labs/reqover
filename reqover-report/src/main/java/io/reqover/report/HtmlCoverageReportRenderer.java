@@ -622,15 +622,19 @@ public final class HtmlCoverageReportRenderer {
 
     /**
      * Turns a JVM descriptor such as {@code (J)Lcom/example/OrderResponse;} into
-     * {@code (long): OrderResponse}. Unparseable input is returned unchanged so
-     * the report never hides what the agent actually recorded.
+     * {@code (long): OrderResponse}, and a field descriptor such as
+     * {@code Lcom/example/OrderStatus;} (a reference probe on an enum constant)
+     * into {@code : OrderStatus}. Unparseable input is returned unchanged so the
+     * report never hides what the agent actually recorded.
      */
     static String readableSignature(String descriptor) {
         if (descriptor == null || descriptor.isEmpty()) {
             return "";
         }
         if (descriptor.charAt(0) != '(') {
-            return descriptor;
+            return typeEnd(descriptor, 0, descriptor.length()) == descriptor.length()
+                    ? ": " + typeName(descriptor)
+                    : descriptor;
         }
         int close = descriptor.indexOf(')');
         if (close < 0) {

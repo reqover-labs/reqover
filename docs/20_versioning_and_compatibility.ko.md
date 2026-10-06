@@ -103,8 +103,8 @@ Maven Central은 불변입니다. 배포 취소도, yank도, 릴리스된 아티
 - [x] 리포트 JSON이 `schemaVersion`을 담고, 읽는 쪽이 더 새로운 스키마 문서를 잘못 해석하는 대신 거부한다
 - [x] 서명된 스테이징 번들 dry-run (`REQOVER_SIGNING_KEY=... ./gradlew centralBundle`) — 2026-10-06 일회용 키로 실행했다. 6개 모듈의 jar·POM 24개에 모두 검증되는 `.asc`가 붙고, 번들에 sources·Javadoc·체크섬이 들어 있다
 - [x] Central Portal에서 `io.github.reqover-labs` 네임스페이스를 검증했다 (2026-10-06)
-- [ ] 서명·Portal 시크릿을 넣고 `PUBLISH_TO_MAVEN_CENTRAL`을 활성화한다
-- [ ] 소비자 스모크 테스트: 이 저장소 바깥의 프로젝트가 Central에서 starter를 받아 요청 하나를 기록한다
+- [x] 서명·Portal 시크릿을 넣고 `PUBLISH_TO_MAVEN_CENTRAL`을 활성화한다. 0.3.0을 2026-10-06에 배포했고 서명이 공개 키로 검증된다
+- [x] 소비자 스모크 테스트: 이 저장소 바깥의 프로젝트가 Central에서 starter를 받아 요청 하나를 기록한다. Spring Boot 서비스의 테스트가 `mavenCentral()`만으로 엔드포인트 20개를 기록했다
 
 마지막 항목은 형식적인 절차가 아닙니다. 이 빌드 바깥의 누구도 받아 본 적 없는 starter를 배포하는 것이야말로 영구적인 실수가 만들어지는 경로입니다.
 

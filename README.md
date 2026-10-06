@@ -69,6 +69,14 @@ Reqover records, from the moment a request arrives until the response leaves, **
 - **Reading unfamiliar code** — you joined an undocumented service and want to see how deep one API actually reaches
 - **Debugging WebFlux** — request handling is scattered across threads and the flow is hard to follow
 
+## Preview
+
+The unreleased [request diagnostics preview](docs/24_request_diagnostics.md)
+adds retained HTTP status counts, recorded processing intervals and individual
+request details. These are adapter observations, not method spans, CPU usage,
+network response times or whole-service TPS. JSON details default to the newest
+100 units; endpoint unions and reverse lookup still cover all retained units.
+
 ## Three things the report shows
 
 ### 1. Execution paths split per API

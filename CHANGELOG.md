@@ -66,6 +66,13 @@ All notable changes to Reqover are documented in this file.
 
 ### Added
 
+- **Retained request diagnostics.** HTTP status counts, average/p95/maximum
+  adapter-observed intervals and per-request method sets are available in the
+  report. JSON exports default to the newest 100 unit details and report the
+  omitted count, without truncating endpoint unions or the reverse index. The
+  four-argument `CoverageReport` constructor remains available; Java record
+  patterns must adapt to its new fifth component in the next minor release.
+
 - **A configurable eviction policy for the in-memory store.**
   `reqover.mvc.snapshot-eviction` and `reqover.webflux.snapshot-eviction`
   choose what happens at `max-snapshots`: `oldest-first` (the default, and the

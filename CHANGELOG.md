@@ -4,6 +4,16 @@ All notable changes to Reqover are documented in this file.
 
 ## Unreleased
 
+### Added
+
+- **Retained request diagnostics.** HTTP status counts, average/p95/maximum
+  adapter-observed intervals and per-request method sets are available in the
+  report. JSON exports default to the newest 100 unit details, HTTP first, and
+  carry the omitted count, which survives reading the JSON back; endpoint
+  unions and the reverse index are never truncated. `CoverageReport` gains
+  `requests` and `omittedRequestDetails`; its four-argument constructor
+  remains, but Java record patterns must adapt.
+
 ## 0.3.0 — 2026-10-06
 
 First release on Maven Central, as `io.github.reqover-labs`. The changes below

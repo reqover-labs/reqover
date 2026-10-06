@@ -33,7 +33,7 @@ reqover.report.export.html-path=build/reqover-report.html
 agent를 붙인 채로 애플리케이션을 실행하고, 통합 테스트를 그 위로 흘려보낸 다음, 정상적으로 종료시킵니다.
 
 ```bash
-java -javaagent:reqover-agent-0.2.0.jar=include=com.example \
+java -javaagent:reqover-agent-0.3.0.jar=include=com.example \
   -jar build/libs/your-app.jar \
   --reqover.report.export.json-path=build/reqover-report.json
 ```
@@ -67,7 +67,7 @@ curl -sf http://127.0.0.1:8080/reqover/report > build/reqover-report.json
 
 ```bash
 git diff --name-only origin/main...HEAD \
-  | java -jar reqover-cli-0.2.0.jar impact \
+  | java -jar reqover-cli-0.3.0.jar impact \
       --report build/reqover-report.json \
       --changed-files -
 ```
@@ -126,7 +126,7 @@ jobs:
       - name: Record a report
         run: ./scripts/record-reqover-report.sh
 
-      - uses: reqover-labs/reqover/.github/actions/impact@v0.2.0
+      - uses: reqover-labs/reqover/.github/actions/impact@v0.3.0
         with:
           report: build/reqover-report.json
 ```
@@ -138,7 +138,7 @@ action의 입력값:
 | 입력값            | 기본값     | 하는 일                                                          |
 | ---------------- | --------- | ---------------------------------------------------------------- |
 | `report`         | *필수*     | 기록된 리포트 JSON 파일 경로                                        |
-| `version`        | `0.2.0`   | CLI를 받아올 릴리스                                                |
+| `version`        | `0.3.0`   | CLI를 받아올 릴리스                                                |
 | `base-ref`       | PR의 base | diff 기준이 되는 Git ref. Pull Request 밖에서는 필수                 |
 | `fail-on-impact` | `false`   | 관측된 엔드포인트가 바뀐 코드를 실행하면 스텝을 실패시킴                 |
 | `comment`        | `true`    | 분석 결과를 Pull Request 코멘트로 남김                              |
@@ -149,7 +149,7 @@ action의 입력값:
 
 ## 명령 레퍼런스
 
-아래에서 `reqover`는 `java -jar reqover-cli-0.2.0.jar`를 뜻합니다.
+아래에서 `reqover`는 `java -jar reqover-cli-0.3.0.jar`를 뜻합니다.
 
 ### `render`
 

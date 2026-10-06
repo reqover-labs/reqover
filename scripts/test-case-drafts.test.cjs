@@ -43,7 +43,7 @@ test('requires explicit path, expected status, and review before generating JUni
 
 test('blocks authority changes, fragments, queries, unresolved patterns, and malformed paths', () => {
   for (const path of ['https://example.invalid', '//evil.invalid/path', '/\\evil', '/orders/{id}',
-    '/**', '/items?q=private', '/items#part', '/space here', '/bad\npath', '/bad%0a', '/bad%', '/%7Bid%7D', '/bad|path', '/bad%7cpath']) {
+    '/**', '/items?q=private', '/items#part', '/space here', '/bad\npath', '/bad%0a', '/bad%', '/%7Bid%7D', '/bad|path', '/bad%7cpath', '/bad\u0085path', '/bad%C2%80path']) {
     assert(drafts.problems(reviewed({ path })).length > 0, 'must reject ' + JSON.stringify(path));
   }
 });

@@ -42,7 +42,7 @@ Run the application with the agent attached, drive your integration tests
 through it, and let it shut down normally.
 
 ```bash
-java -javaagent:reqover-agent-0.2.0.jar=include=com.example \
+java -javaagent:reqover-agent-0.3.0.jar=include=com.example \
   -jar build/libs/your-app.jar \
   --reqover.report.export.json-path=build/reqover-report.json
 ```
@@ -89,7 +89,7 @@ so nothing needs the recording JVM to read it back.
 
 ```bash
 git diff --name-only origin/main...HEAD \
-  | java -jar reqover-cli-0.2.0.jar impact \
+  | java -jar reqover-cli-0.3.0.jar impact \
       --report build/reqover-report.json \
       --changed-files -
 ```
@@ -151,7 +151,7 @@ jobs:
       - name: Record a report
         run: ./scripts/record-reqover-report.sh
 
-      - uses: reqover-labs/reqover/.github/actions/impact@v0.2.0
+      - uses: reqover-labs/reqover/.github/actions/impact@v0.3.0
         with:
           report: build/reqover-report.json
 ```
@@ -163,7 +163,7 @@ The action's inputs:
 | Input            | Default   | What it does                                                     |
 | ---------------- | --------- | ---------------------------------------------------------------- |
 | `report`         | *required* | Path to the recorded report JSON                                  |
-| `version`        | `0.2.0`   | Release to download the CLI from                                  |
+| `version`        | `0.3.0`   | Release to download the CLI from                                  |
 | `base-ref`       | PR base   | Git ref to diff against; required outside a pull request          |
 | `fail-on-impact` | `false`   | Fail the step when any observed endpoint runs changed code        |
 | `comment`        | `true`    | Post the analysis as a pull request comment                       |
@@ -178,7 +178,7 @@ and updates its previous comment rather than adding a new one each push.
 
 ## Command reference
 
-`reqover` below means `java -jar reqover-cli-0.2.0.jar`.
+`reqover` below means `java -jar reqover-cli-0.3.0.jar`.
 
 ### `render`
 

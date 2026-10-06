@@ -11,17 +11,17 @@
 화면은 2026년 10월 3일 loopback에서 agent를 붙인 MVC 데모로 캡처했습니다.
 이 수치는 합성 데모의 관측 결과입니다.
 
-## 0.4.0에서 사용하기
+## 0.4.x에서 사용하기
 
 요청 진단만을 위한 별도 설정은 없습니다. Maven Central의 starter를 추가하고
-[v0.4.0 릴리스](https://github.com/reqover-labs/reqover/releases/tag/v0.4.0)의 agent를 붙입니다.
+[v0.4.1 릴리스](https://github.com/reqover-labs/reqover/releases/tag/v0.4.1)의 agent를 붙입니다.
 
 ```kotlin
-implementation("io.github.reqover-labs:reqover-spring-boot-starter:0.4.0")
+implementation("io.github.reqover-labs:reqover-spring-boot-starter:0.4.1")
 ```
 
 ```bash
-java -javaagent:reqover-agent-0.4.0.jar=include=com.example -jar build/libs/your-app.jar
+java -javaagent:reqover-agent-0.4.1.jar=include=com.example -jar build/libs/your-app.jar
 ```
 
 리포트를 읽는 방법은 기본적으로 꺼져 있으므로 하나를 켭니다.
@@ -31,7 +31,7 @@ java -javaagent:reqover-agent-0.4.0.jar=include=com.example -jar build/libs/your
 
 ### 실제 데모
 
-저장소를 checkout한 상태(예: `v0.4.0` 태그)에서 데모 스크립트가 agent와 샘플을 빌드해 함께 실행합니다.
+저장소를 checkout한 상태(예: `v0.4.1` 태그)에서 데모 스크립트가 agent와 샘플을 빌드해 함께 실행합니다.
 
 ```powershell
 .\scripts\run-agent-demo.ps1 -App mvc -Port 8080
@@ -82,7 +82,7 @@ endpoint, 시작·끝 시각, 상태, 스레드와 메서드를 보존합니다.
 유지합니다. `impact`와 `diff`는 이전 코드 관계 분석을 유지하며 시간·상태 비교는 별도 후속 기능입니다.
 
 Java record 구성 요소는 다섯 개로 늘었습니다. 네 요소 record pattern과 구성 요소
-수를 검사하는 소비자는 수정해야 하므로, JSON 추가와 별개로 0.4.0 마이너 릴리스에 포함한 변경입니다.
+수를 검사하는 소비자는 수정해야 하므로, JSON 추가와 별개로 0.4.1 마이너 릴리스에 포함한 변경입니다.
 
 입력 파라미터, 헤더, 토큰, 예외 메시지는 수집하지 않습니다. 메서드 목록은 집합이며
 호출 순서·횟수·span 시간이 아닙니다. 비HTTP 작업은 JSON에 보존하지만 HTTP 통계에서 제외합니다.

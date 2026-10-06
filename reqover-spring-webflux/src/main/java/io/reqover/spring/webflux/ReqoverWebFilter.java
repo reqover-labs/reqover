@@ -112,9 +112,12 @@ public final class ReqoverWebFilter implements WebFilter {
     }
 
     private static boolean servedByCatchAllResourceHandler(ServerWebExchange exchange) {
+        // getAttribute is generic; read it as Object so String.valueOf does not
+        // bind to the char[] overload and throw on the PathPattern stored here.
+        Object pattern = exchange.getAttribute(HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE);
         return exchange.getAttribute(HandlerMapping.BEST_MATCHING_HANDLER_ATTRIBUTE) instanceof ResourceWebHandler
-                && "/**".equals(String.valueOf(
-                        exchange.getAttribute(HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE)));
+                && pattern != null
+                && "/**".equals(pattern.toString());
     }
 
     private static String endpointPattern(ServerWebExchange exchange) {

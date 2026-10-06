@@ -4,6 +4,16 @@ All notable changes to Reqover are documented in this file.
 
 ## Unreleased
 
+### Added
+
+- **Retained request diagnostics.** HTTP status counts, average/p95/maximum
+  adapter-observed intervals and per-request method sets are available in the
+  report. JSON exports default to the newest 100 unit details, HTTP first, and
+  carry the omitted count, which survives reading the JSON back; endpoint
+  unions and the reverse index are never truncated. `CoverageReport` gains
+  `requests` and `omittedRequestDetails`; its four-argument constructor
+  remains, but Java record patterns must adapt.
+
 ## 0.3.0 — 2026-10-06
 
 First release on Maven Central, as `io.github.reqover-labs`. The changes below
@@ -93,13 +103,6 @@ came from applying Reqover to a production Spring Boot service.
   it does not cover. See [docs/15_performance_results.md](docs/15_performance_results.md).
 
 ### Added
-
-- **Retained request diagnostics.** HTTP status counts, average/p95/maximum
-  adapter-observed intervals and per-request method sets are available in the
-  report. JSON exports default to the newest 100 unit details and report the
-  omitted count, without truncating endpoint unions or the reverse index. The
-  four-argument `CoverageReport` constructor remains available; Java record
-  patterns must adapt to its new fifth component in the next minor release.
 
 - **A configurable eviction policy for the in-memory store.**
   `reqover.mvc.snapshot-eviction` and `reqover.webflux.snapshot-eviction`

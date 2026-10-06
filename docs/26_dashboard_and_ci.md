@@ -2,8 +2,8 @@
 
 # Diagnostic dashboard and CI artifacts
 
-Available since **0.4.1**. The `v0.4.1` Action downloads the released
-`reqover-cli-0.4.1.jar`, whose `render` produces this dashboard; no source build
+Available since **0.4.1**. The `v0.4.2` Action downloads the released
+`reqover-cli-0.4.2.jar`, whose `render` produces this dashboard; no source build
 is needed. Request details only appear when the recording itself was made with
 the 0.4.1 agent/starter. Older JSON still renders, without per-request diagnostics.
 
@@ -41,8 +41,8 @@ attached and have produced `build/reqover-report.json` from a relevant integrati
 scenario. The Action does not launch or install instrumentation in your application.
 See [the recording guide](18_ci_impact_analysis.md) and
 [Spring integration](17_integration_guide.md). The starter is on Maven Central as
-`io.github.reqover-labs:reqover-spring-boot-starter:0.4.1`; the agent JAR comes
-from the [v0.4.1 GitHub Release](https://github.com/reqover-labs/reqover/releases/tag/v0.4.1).
+`io.github.reqover-labs:reqover-spring-boot-starter:0.4.2`; the agent JAR comes
+from the [v0.4.2 GitHub Release](https://github.com/reqover-labs/reqover/releases/tag/v0.4.2).
 
 Prerequisites: Ubuntu runner, Java 17+ (21 for the example), Python 3, Bash,
 and `actions/checkout` with `fetch-depth: 0`. The example belongs after recording
@@ -55,7 +55,7 @@ that prerequisite and shallow history before downloading the CLI or fetching a b
 ```yaml
 - name: Retest candidates and dashboard
   id: reqover
-  uses: reqover-labs/reqover/.github/actions/impact@v0.4.1
+  uses: reqover-labs/reqover/.github/actions/impact@v0.4.2
   with:
     report: build/reqover-report.json
     comment: "false"
@@ -65,7 +65,7 @@ that prerequisite and shallow history before downloading the CLI or fetching a b
 ```
 
 The checkout of **your application repository** needs `fetch-depth: 0`. The
-Action downloads the CLI matching its `version` input (`0.4.1` by default).
+Action downloads the CLI matching its `version` input (`0.4.2` by default).
 To try an unreleased build instead, build the CLI yourself and pass its path as
 `cli-jar`; `version` is then ignored. This repository's own CI does that with its
 local Action, as shown in [.github/workflows/build.yml](../.github/workflows/build.yml).
@@ -85,7 +85,7 @@ copy the original report JSON. Download and open `report.html` locally.
 | Input | Default | Purpose |
 | --- | --- | --- |
 | `report` | `build/reqover-report.json` | Previously recorded JSON |
-| `version` | `0.4.1` | Release to download the CLI from |
+| `version` | `0.4.2` | Release to download the CLI from |
 | `cli-jar` | empty | Use an existing CLI JAR (e.g. an unreleased build) instead of downloading |
 | `base-ref` | PR base | Explicit Git ref required on push/manual runs |
 | `comment` | `true` | Update only the marked Reqover bot comment |
@@ -125,7 +125,7 @@ base branch advancing after a PR diverged:
 
 ```bash
 ./gradlew :reqover-cli:shadowJar
-python3 scripts/test-impact-action.py --cli reqover-cli/build/libs/reqover-cli-0.4.1.jar
+python3 scripts/test-impact-action.py --cli reqover-cli/build/libs/reqover-cli-0.4.2.jar
 ```
 
 For visual checks, install Playwright in your test environment and run

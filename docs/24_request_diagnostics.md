@@ -16,14 +16,14 @@ on loopback. Numbers illustrate that recording, not an application benchmark.
 ## Using it with 0.4.x
 
 Request diagnostics need no extra switch of their own. Add the starter from Maven Central and
-attach the agent from the [v0.4.1 release](https://github.com/reqover-labs/reqover/releases/tag/v0.4.1):
+attach the agent from the [v0.4.2 release](https://github.com/reqover-labs/reqover/releases/tag/v0.4.2):
 
 ```kotlin
-implementation("io.github.reqover-labs:reqover-spring-boot-starter:0.4.1")
+implementation("io.github.reqover-labs:reqover-spring-boot-starter:0.4.2")
 ```
 
 ```bash
-java -javaagent:reqover-agent-0.4.1.jar=include=com.example -jar build/libs/your-app.jar
+java -javaagent:reqover-agent-0.4.2.jar=include=com.example -jar build/libs/your-app.jar
 ```
 
 Turn on a way to read the report, which is off by default: either
@@ -34,7 +34,7 @@ for Maven and the full property list.
 
 ### Bundled demo
 
-From a checkout of the repository (for example the `v0.4.1` tag), the demo
+From a checkout of the repository (for example the `v0.4.2` tag), the demo
 script builds the agent and a sample and runs them together:
 
 ```powershell

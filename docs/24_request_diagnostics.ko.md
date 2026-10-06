@@ -14,14 +14,14 @@
 ## 0.4.x에서 사용하기
 
 요청 진단만을 위한 별도 설정은 없습니다. Maven Central의 starter를 추가하고
-[v0.4.1 릴리스](https://github.com/reqover-labs/reqover/releases/tag/v0.4.1)의 agent를 붙입니다.
+[v0.4.2 릴리스](https://github.com/reqover-labs/reqover/releases/tag/v0.4.2)의 agent를 붙입니다.
 
 ```kotlin
-implementation("io.github.reqover-labs:reqover-spring-boot-starter:0.4.1")
+implementation("io.github.reqover-labs:reqover-spring-boot-starter:0.4.2")
 ```
 
 ```bash
-java -javaagent:reqover-agent-0.4.1.jar=include=com.example -jar build/libs/your-app.jar
+java -javaagent:reqover-agent-0.4.2.jar=include=com.example -jar build/libs/your-app.jar
 ```
 
 리포트를 읽는 방법은 기본적으로 꺼져 있으므로 하나를 켭니다.
@@ -31,7 +31,7 @@ java -javaagent:reqover-agent-0.4.1.jar=include=com.example -jar build/libs/your
 
 ### 실제 데모
 
-저장소를 checkout한 상태(예: `v0.4.1` 태그)에서 데모 스크립트가 agent와 샘플을 빌드해 함께 실행합니다.
+저장소를 checkout한 상태(예: `v0.4.2` 태그)에서 데모 스크립트가 agent와 샘플을 빌드해 함께 실행합니다.
 
 ```powershell
 .\scripts\run-agent-demo.ps1 -App mvc -Port 8080

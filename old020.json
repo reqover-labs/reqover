@@ -1,0 +1,179 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-10-06T11:32:19.008497Z",
+  "completedRequestCount": 2,
+  "endpoints": [
+    {
+      "endpoint": "GET /auto/orders/{id}",
+      "requestCount": 1,
+      "requestIds": ["req-1"],
+      "threadNames": ["http-nio-127.0.0.1-18304-exec-2"],
+      "classes": [
+        {
+          "classId": 1082804479,
+          "className": "io.reqover.example.mvc.auto.AutoOrderController",
+          "probeIds": [0],
+          "methods": [
+            {"probeId": 0, "methodName": "find", "descriptor": "(J)Lio/reqover/example/mvc/auto/AutoOrderResponse;", "lineNumber": 17}
+          ]
+        },
+        {
+          "classId": 1227629728,
+          "className": "io.reqover.example.mvc.auto.AutoOrderResponse",
+          "probeIds": [3, 4],
+          "methods": [
+            {"probeId": 3, "methodName": "id", "descriptor": "()J", "lineNumber": 3},
+            {"probeId": 4, "methodName": "status", "descriptor": "()Ljava/lang/String;", "lineNumber": 3}
+          ]
+        },
+        {
+          "classId": 1676869398,
+          "className": "io.reqover.example.mvc.auto.AutoOrderService",
+          "probeIds": [0, 1],
+          "methods": [
+            {"probeId": 0, "methodName": "find", "descriptor": "(J)Lio/reqover/example/mvc/auto/AutoOrderResponse;", "lineNumber": 8},
+            {"probeId": 1, "methodName": "validate", "descriptor": "(J)V", "lineNumber": 13}
+          ]
+        }
+      ]
+    },
+    {
+      "endpoint": "POST /payments",
+      "requestCount": 1,
+      "requestIds": ["req-2"],
+      "threadNames": ["http-nio-127.0.0.1-18304-exec-4"],
+      "classes": [
+        {
+          "classId": 200,
+          "className": "PaymentController",
+          "probeIds": [1],
+          "methods": [
+            {"probeId": 1, "methodName": "pay", "descriptor": "()", "lineNumber": null}
+          ]
+        },
+        {
+          "classId": 201,
+          "className": "PaymentService",
+          "probeIds": [1],
+          "methods": [
+            {"probeId": 1, "methodName": "pay", "descriptor": "()", "lineNumber": null}
+          ]
+        },
+        {
+          "classId": 300,
+          "className": "SharedValidator",
+          "probeIds": [1],
+          "methods": [
+            {"probeId": 1, "methodName": "validate", "descriptor": "(String)", "lineNumber": null}
+          ]
+        },
+        {
+          "classId": 737787044,
+          "className": "io.reqover.example.mvc.SharedValidator",
+          "probeIds": [0],
+          "methods": [
+            {"probeId": 0, "methodName": "validate", "descriptor": "(Ljava/lang/String;)V", "lineNumber": 9}
+          ]
+        },
+        {
+          "classId": 812671263,
+          "className": "io.reqover.example.mvc.payment.PaymentController",
+          "probeIds": [0],
+          "methods": [
+            {"probeId": 0, "methodName": "pay", "descriptor": "()Lio/reqover/example/mvc/payment/PaymentResponse;", "lineNumber": 18}
+          ]
+        },
+        {
+          "classId": 1468132544,
+          "className": "io.reqover.example.mvc.payment.PaymentResponse",
+          "probeIds": [3],
+          "methods": [
+            {"probeId": 3, "methodName": "status", "descriptor": "()Ljava/lang/String;", "lineNumber": 3}
+          ]
+        },
+        {
+          "classId": 1195529398,
+          "className": "io.reqover.example.mvc.payment.PaymentService",
+          "probeIds": [0],
+          "methods": [
+            {"probeId": 0, "methodName": "pay", "descriptor": "()Lio/reqover/example/mvc/payment/PaymentResponse;", "lineNumber": 17}
+          ]
+        }
+      ]
+    }
+  ],
+  "reverseIndex": [
+    {
+      "className": "PaymentController",
+      "methodName": "pay",
+      "descriptor": "()",
+      "endpoints": ["POST /payments"]
+    },
+    {
+      "className": "PaymentService",
+      "methodName": "pay",
+      "descriptor": "()",
+      "endpoints": ["POST /payments"]
+    },
+    {
+      "className": "SharedValidator",
+      "methodName": "validate",
+      "descriptor": "(String)",
+      "endpoints": ["POST /payments"]
+    },
+    {
+      "className": "io.reqover.example.mvc.SharedValidator",
+      "methodName": "validate",
+      "descriptor": "(Ljava/lang/String;)V",
+      "endpoints": ["POST /payments"]
+    },
+    {
+      "className": "io.reqover.example.mvc.auto.AutoOrderController",
+      "methodName": "find",
+      "descriptor": "(J)Lio/reqover/example/mvc/auto/AutoOrderResponse;",
+      "endpoints": ["GET /auto/orders/{id}"]
+    },
+    {
+      "className": "io.reqover.example.mvc.auto.AutoOrderResponse",
+      "methodName": "id",
+      "descriptor": "()J",
+      "endpoints": ["GET /auto/orders/{id}"]
+    },
+    {
+      "className": "io.reqover.example.mvc.auto.AutoOrderResponse",
+      "methodName": "status",
+      "descriptor": "()Ljava/lang/String;",
+      "endpoints": ["GET /auto/orders/{id}"]
+    },
+    {
+      "className": "io.reqover.example.mvc.auto.AutoOrderService",
+      "methodName": "find",
+      "descriptor": "(J)Lio/reqover/example/mvc/auto/AutoOrderResponse;",
+      "endpoints": ["GET /auto/orders/{id}"]
+    },
+    {
+      "className": "io.reqover.example.mvc.auto.AutoOrderService",
+      "methodName": "validate",
+      "descriptor": "(J)V",
+      "endpoints": ["GET /auto/orders/{id}"]
+    },
+    {
+      "className": "io.reqover.example.mvc.payment.PaymentController",
+      "methodName": "pay",
+      "descriptor": "()Lio/reqover/example/mvc/payment/PaymentResponse;",
+      "endpoints": ["POST /payments"]
+    },
+    {
+      "className": "io.reqover.example.mvc.payment.PaymentResponse",
+      "methodName": "status",
+      "descriptor": "()Ljava/lang/String;",
+      "endpoints": ["POST /payments"]
+    },
+    {
+      "className": "io.reqover.example.mvc.payment.PaymentService",
+      "methodName": "pay",
+      "descriptor": "()Lio/reqover/example/mvc/payment/PaymentResponse;",
+      "endpoints": ["POST /payments"]
+    }
+  ]
+}

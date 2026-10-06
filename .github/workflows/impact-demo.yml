@@ -27,7 +27,7 @@ jobs:
       - name: Record the MVC sample and export a report
         run: ./scripts/run-impact-demo.sh 18080
       - name: Reqover impact analysis
-        uses: reqover-labs/reqover/.github/actions/impact@v0.4.0
+        uses: reqover-labs/reqover/.github/actions/impact@v0.4.1
         with:
           report: build/reqover-impact-demo/report.json
           analysis-name: demo
@@ -50,7 +50,7 @@ jobs:
       - name: Record the MVC sample and export a report
         run: ./scripts/run-impact-demo.sh 18081
       - name: Reqover impact gate
-        uses: reqover-labs/reqover/.github/actions/impact@v0.4.0
+        uses: reqover-labs/reqover/.github/actions/impact@v0.4.1
         with:
           report: build/reqover-impact-demo/report.json
           comment: "false"

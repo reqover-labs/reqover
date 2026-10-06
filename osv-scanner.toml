@@ -1,0 +1,17 @@
+# Known-vulnerability exceptions for the OSV gate (build.yml and
+# scripts/check-sbom-osv.py). Every entry needs a reason, why no fix can be
+# taken today, and an expiry; the gate fails again once ignoreUntil passes.
+# Policy: SECURITY.md, "Dependency advisories".
+
+[[IgnoredVulns]]
+id = "GHSA-pc63-qcmh-9cmg" # CVE-2026-47884, spring-webmvc XsltView path limitation
+ignoreUntil = 2026-12-31T00:00:00Z
+reason = """
+No open-source fix exists for Spring Framework 6.2.x: OSV lists 6.2.19 (the
+latest 6.2 release, brought in by Spring Boot 3.5.16) as last affected, and
+the only fixed line is 7.0.9 (Spring Boot 4). Reqover's published modules
+declare spring-webmvc compileOnly, so they ship no Spring and users run their
+own version; the affected copy is in the MVC sample and test runtimes only,
+neither of which uses XsltView. Revisit when Spring Boot 3.5 gets a fixed
+Framework release or the samples move to Spring Boot 4.
+"""

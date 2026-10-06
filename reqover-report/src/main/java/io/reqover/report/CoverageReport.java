@@ -8,15 +8,30 @@ public record CoverageReport(
         int completedRequestCount,
         List<EndpointCoverage> endpoints,
         List<CodeEndpointCoverage> reverseIndex,
-        List<RequestObservation> requests
+        List<RequestObservation> requests,
+        int omittedRequestDetails
 ) {
+    /**
+     * @param requests              retained request details, possibly truncated
+     * @param omittedRequestDetails details left out of {@code requests} by an
+     *                              earlier export, so a report read back from
+     *                              JSON still knows how many it does not show
+     */
     public CoverageReport {
-        requests = List.copyOf(requests);
+        requests = requests == null ? List.of() : List.copyOf(requests);
+        if (omittedRequestDetails < 0) {
+            throw new IllegalArgumentException("omittedRequestDetails must not be negative");
+        }
     }
 
     /** Preserves the existing four-argument constructor for compiled callers and fixtures. */
     public CoverageReport(Instant generatedAt, int completedRequestCount,
                           List<EndpointCoverage> endpoints, List<CodeEndpointCoverage> reverseIndex) {
-        this(generatedAt, completedRequestCount, endpoints, reverseIndex, List.of());
+        this(generatedAt, completedRequestCount, endpoints, reverseIndex, List.of(), 0);
+    }
+
+    public CoverageReport(Instant generatedAt, int completedRequestCount, List<EndpointCoverage> endpoints,
+                          List<CodeEndpointCoverage> reverseIndex, List<RequestObservation> requests) {
+        this(generatedAt, completedRequestCount, endpoints, reverseIndex, requests, 0);
     }
 }

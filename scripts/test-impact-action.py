@@ -77,8 +77,18 @@ class ImpactActionTest(unittest.TestCase):
         self.assertIn("GET /orders/{id}", self.summary.read_text(encoding="utf-8"))
         self.assertIn("reqover-workspace", Path(outputs["html-path"]).read_text(encoding="utf-8"))
         self.assertTrue(Path(outputs["markdown-path"]).read_text(encoding="utf-8").startswith("<!-- reqover-impact -->"))
+        self.assertEqual("<!-- reqover-impact -->", outputs["comment-marker"])
         self.assertNotIn("SENTINEL_DO_NOT_UPLOAD", "".join(p.read_text(encoding="utf-8")
                                                         for p in Path(outputs["artifact-directory"]).iterdir()))
+
+    def test_analysis_name_scopes_the_comment_marker(self):
+        result = self.run_analysis(ANALYSIS_NAME="orders-service")
+        self.assertEqual(0, result.returncode, result.stderr)
+        outputs = self.values()
+        self.assertEqual("<!-- reqover-impact:orders-service -->", outputs["comment-marker"])
+        self.assertTrue(Path(outputs["markdown-path"]).read_text(encoding="utf-8")
+                        .startswith("<!-- reqover-impact:orders-service -->"))
+        self.assertEqual(2, self.run_analysis(ANALYSIS_NAME="bad name -->").returncode)
 
     def test_unobserved_change_stays_visible_and_is_not_a_safety_verdict(self):
         self.report.write_text(json.dumps({"schemaVersion": 1, "generatedAt": "2026-10-03T00:00:00Z",

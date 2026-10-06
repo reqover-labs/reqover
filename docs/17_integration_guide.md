@@ -7,7 +7,7 @@ To see per-request execution records in **your own application** rather than the
 If you haven't run the demo yet, we recommend starting with ["Try it in 5 minutes"](../README.md#try-it-in-5-minutes) in the README. Seeing the demo work first makes problems much easier to isolate.
 
 > [!IMPORTANT]
-> Reqover `0.2.0` is **not on Maven Central yet.** The signed publication pipeline exists (`./gradlew centralBundle`, plus a release job that is inert until the repository opts in), but it has not been run, so there is nothing to resolve from Central today. You either build from source into your local Maven repository or take the jars from a GitHub Release. Reqover is designed for development, QA, and staging — not for running permanently in production.
+> The libraries are on Maven Central under `io.github.reqover-labs` (up to 0.2.0 they were only available from source or a GitHub Release, under `io.reqover`). The agent and CLI jars come from the GitHub Release. Reqover is designed for development, QA, and staging — not for running permanently in production.
 
 ---
 
@@ -17,7 +17,7 @@ Wiring it in takes four steps. **None of them modify your source code.**
 
 | Step | What you do | Why it's needed |
 | --- | --- | --- |
-| 1 | Get the libraries | Not on Maven Central yet |
+| 1 | Get the libraries | Maven Central, or a source build |
 | 2 | Add one dependency | The part that links requests to execution records |
 | 3 | Decide how you read the report | Both ways of reading it are off by default |
 | 4 | Run with the Java agent attached | The part that actually records execution |
@@ -32,12 +32,16 @@ Wiring it in takes four steps. **None of them modify your source code.**
 
 ## 1. Get the libraries
 
-### Option A — build from source (recommended)
+### Option A — Maven Central (recommended)
 
-Check out the `v0.2.0` tag and install into your local Maven repository:
+Nothing to install: `mavenCentral()` in step 2 resolves the starter. Go on to [step 2](#2-add-the-dependency).
+
+### Option B — build from source
+
+For an unreleased change, check out the `v0.3.0` tag and install into your local Maven repository:
 
 ```bash
-git clone --branch v0.2.0 --depth 1 https://github.com/reqover-labs/reqover.git
+git clone --branch v0.3.0 --depth 1 https://github.com/reqover-labs/reqover.git
 cd reqover
 ./gradlew clean publishToMavenLocal
 ```
@@ -48,30 +52,30 @@ This installs the library modules under the `io.github.reqover-labs` group:
 
 | Artifact | Version |
 | --- | --- |
-| `io.github.reqover-labs:reqover-core` | `0.2.0` |
-| `io.github.reqover-labs:reqover-instrumentation` | `0.2.0` |
-| `io.github.reqover-labs:reqover-report` | `0.2.0` |
-| `io.github.reqover-labs:reqover-spring-mvc` | `0.2.0` |
-| `io.github.reqover-labs:reqover-spring-webflux` | `0.2.0` |
-| `io.github.reqover-labs:reqover-spring-boot-starter` | `0.2.0` |
+| `io.github.reqover-labs:reqover-core` | `0.3.0` |
+| `io.github.reqover-labs:reqover-instrumentation` | `0.3.0` |
+| `io.github.reqover-labs:reqover-report` | `0.3.0` |
+| `io.github.reqover-labs:reqover-spring-mvc` | `0.3.0` |
+| `io.github.reqover-labs:reqover-spring-webflux` | `0.3.0` |
+| `io.github.reqover-labs:reqover-spring-boot-starter` | `0.3.0` |
 
 **`reqover-agent` and `reqover-cli` are not among them.** Both are shaded executables (so their dependencies don't collide with yours) rather than libraries you compile against, so neither is published. You download them as files from the GitHub Release → [step 4](#4-run-with-the-java-agent-attached).
 
 Confirm the install:
 
 ```bash
-ls ~/.m2/repository/io/reqover        # macOS / Linux
+ls ~/.m2/repository/io/github/reqover-labs        # macOS / Linux
 ```
 
 ```powershell
-Get-ChildItem "$env:USERPROFILE\.m2\repository\io\reqover"   # Windows
+Get-ChildItem "$env:USERPROFILE\.m2\repository\io\github\reqover-labs"   # Windows
 ```
 
-### Option B — the GitHub Release bundle
+### Option C — the GitHub Release bundle
 
-The [v0.2.0 release](https://github.com/reqover-labs/reqover/releases/tag/v0.2.0) ships `reqover-0.2.0.zip`, which contains the same library jars under `lib/`, their sources under `sources/`, plus `reqover-agent-0.2.0.jar` and `reqover-cli-0.2.0.jar` at the root. Use this if you cannot build from source; you will have to put the `lib/` jars somewhere your build can resolve them (a flat-dir repository or your internal Nexus/Artifactory).
+The [v0.3.0 release](https://github.com/reqover-labs/reqover/releases/tag/v0.3.0) ships `reqover-0.3.0.zip`, which contains the same library jars under `lib/`, their sources under `sources/`, plus `reqover-agent-0.3.0.jar` and `reqover-cli-0.3.0.jar` at the root. Use this if you can reach neither Maven Central nor a source build; you will have to put the `lib/` jars somewhere your build can resolve them (a flat-dir repository or your internal Nexus/Artifactory).
 
-Either way, verify the download against `reqover-0.2.0-SHA256SUMS.txt` from the same release.
+Either way, verify the download against `reqover-0.3.0-SHA256SUMS.txt` from the same release.
 
 ---
 
@@ -81,37 +85,35 @@ Either way, verify the download against `reqover-0.2.0-SHA256SUMS.txt` from the 
 
 **One dependency.** `reqover-spring-boot-starter` brings `reqover-core`, `reqover-report`, and both adapters, and adds the Spring Boot auto-configuration for the report endpoint and the shutdown export.
 
-You need `mavenLocal()` in your repository list, placed before `mavenCentral()` so what you installed in step 1 is found first.
+`mavenCentral()` is all you need. If you built from source (Option B), add `mavenLocal()` before it so your build is found first.
 
 ```kotlin
 repositories {
-    mavenLocal()
     mavenCentral()
 }
 
 dependencies {
-    implementation("io.github.reqover-labs:reqover-spring-boot-starter:0.2.0")
+    implementation("io.github.reqover-labs:reqover-spring-boot-starter:0.3.0")
 }
 ```
 
 ```groovy
 repositories {
-    mavenLocal()
     mavenCentral()
 }
 
 dependencies {
-    implementation 'io.github.reqover-labs:reqover-spring-boot-starter:0.2.0'
+    implementation 'io.github.reqover-labs:reqover-spring-boot-starter:0.3.0'
 }
 ```
 
-Maven uses the local repository by default, so no repository configuration is needed:
+Maven resolves from Central by default (and from the local repository after a source build), so no repository configuration is needed:
 
 ```xml
 <dependency>
-  <groupId>io.reqover</groupId>
+  <groupId>io.github.reqover-labs</groupId>
   <artifactId>reqover-spring-boot-starter</artifactId>
-  <version>0.2.0</version>
+  <version>0.3.0</version>
 </dependency>
 ```
 
@@ -124,12 +126,12 @@ If you want only one adapter and no starter, depend on the adapter and the repor
 ```kotlin
 dependencies {
     // For a Spring MVC project
-    implementation("io.github.reqover-labs:reqover-spring-mvc:0.2.0")
+    implementation("io.github.reqover-labs:reqover-spring-mvc:0.3.0")
 
     // For a Spring WebFlux project (instead of the line above)
-    // implementation("io.github.reqover-labs:reqover-spring-webflux:0.2.0")
+    // implementation("io.github.reqover-labs:reqover-spring-webflux:0.3.0")
 
-    implementation("io.github.reqover-labs:reqover-report:0.2.0")
+    implementation("io.github.reqover-labs:reqover-report:0.3.0")
 }
 ```
 
@@ -268,7 +270,7 @@ public class InternalReqoverReportController {
 Without the starter, inject `CoverageStore` and build the report yourself with `CoverageReportGenerator` and `HtmlCoverageReportRenderer` from `reqover-report`.
 
 > [!IMPORTANT]
-> **Inject `CoverageStore`, not `InMemoryCoverageStore`.** This changed in `0.2.0` — see [Replacing the store](#replacing-the-store).
+> **Inject `CoverageStore`, not `InMemoryCoverageStore`.** This changed in `0.3.0` — see [Replacing the store](#replacing-the-store).
 
 Complete working examples are in [`examples/mvc-sample`](../examples/mvc-sample) and [`examples/webflux-sample`](../examples/webflux-sample).
 
@@ -288,7 +290,7 @@ Either property on its own is enough; setting neither disables the export entire
 **This is how a CI job gets a report file out of an integration test run.** Boot the application with the agent attached, drive your tests through it, let it stop, and the file is there:
 
 ```bash
-java -javaagent:reqover-agent-0.2.0.jar=include=com.example \
+java -javaagent:reqover-agent-0.3.0.jar=include=com.example \
   -jar build/libs/your-app.jar \
   --reqover.report.export.json-path=build/reqover-report.json
 ```
@@ -309,15 +311,15 @@ This is the part that actually records execution.
 
 ### 4-1. Download the agent JAR
 
-Download `reqover-agent-0.2.0.jar` from the [v0.2.0 release](https://github.com/reqover-labs/reqover/releases/tag/v0.2.0). You can verify the file with `reqover-0.2.0-SHA256SUMS.txt` from the same release.
+Download `reqover-agent-0.3.0.jar` from the [v0.3.0 release](https://github.com/reqover-labs/reqover/releases/tag/v0.3.0). You can verify the file with `reqover-0.3.0-SHA256SUMS.txt` from the same release.
 
 ```bash
-shasum -a 256 reqover-agent-0.2.0.jar          # macOS
-sha256sum reqover-agent-0.2.0.jar              # Linux
+shasum -a 256 reqover-agent-0.3.0.jar          # macOS
+sha256sum reqover-agent-0.3.0.jar              # Linux
 ```
 
 ```powershell
-Get-FileHash reqover-agent-0.2.0.jar -Algorithm SHA256   # Windows
+Get-FileHash reqover-agent-0.3.0.jar -Algorithm SHA256   # Windows
 ```
 
 ### 4-2. Run
@@ -326,7 +328,7 @@ Get-FileHash reqover-agent-0.2.0.jar -Algorithm SHA256   # Windows
 
 ```bash
 java \
-  -javaagent:reqover-agent-0.2.0.jar=include=com.example.orders \
+  -javaagent:reqover-agent-0.3.0.jar=include=com.example.orders \
   -jar app.jar
 ```
 
@@ -433,7 +435,7 @@ The most common failure is **"the report is empty"**, and the cause is usually `
 | No file after shutdown | The process was killed with `SIGKILL`, or the write failed | Stop it with `SIGTERM` and wait. Look for `[reqover] wrote the` on stdout and `[reqover] could not write` on stderr |
 | `InMemoryCoverageStore` injection fails after upgrading from `0.1.1` | The adapters now contribute a `CoverageStore` bean | Change the injection point to `CoverageStore`. See [Replacing the store](#replacing-the-store) |
 | `CoverageStore` injection fails | The adapter dependency is missing, or the web type doesn't match | Use the starter, or confirm `reqover-spring-mvc` in an MVC app and `reqover-spring-webflux` in a WebFlux app |
-| Dependency not found (`Could not find io.github.reqover-labs:...`) | Step 1 wasn't done, or `mavenLocal()` is missing | Re-run `publishToMavenLocal`, and check `mavenLocal()` comes before `mavenCentral()` |
+| Dependency not found (`Could not find io.github.reqover-labs:...`) | A typo in the coordinate, or, for a source build, `mavenLocal()` is missing | Check `io.github.reqover-labs:reqover-spring-boot-starter`; after a source build, re-run `publishToMavenLocal` and put `mavenLocal()` before `mavenCentral()` |
 | Old request ids disappear after a while | The retention cap (10,000 by default) was reached | This is expected: endpoints, counts and executed methods are kept per endpoint; only per-request detail is dropped. See [Adjusting retention](#adjusting-retention) |
 
 ---

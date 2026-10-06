@@ -9,7 +9,7 @@ inputs:
   version:
     description: CLI release to download, without the leading v. Ignored when cli-jar is supplied.
     required: false
-    default: "0.2.0"
+    default: "0.3.0"
   cli-jar:
     description: Optional path to an existing source-built CLI JAR, for unreleased report features.
     required: false
@@ -34,6 +34,10 @@ inputs:
     description: Artifact name. Use a unique value for each matrix job or Action invocation.
     required: false
     default: reqover-report
+  analysis-name:
+    description: Names this analysis in its PR comment marker, so several analyses in one PR (a matrix, several services) each keep their own comment. Letters, digits, '.', '_' and '-'.
+    required: false
+    default: ""
 
 outputs:
   markdown:
@@ -69,6 +73,7 @@ runs:
       shell: bash
       env:
         REPORT: ${{ inputs.report }}
+        ANALYSIS_NAME: ${{ inputs.analysis-name }}
         CLI_JAR: ${{ inputs.cli-jar }}
         REQOVER_VERSION: ${{ inputs.version }}
         BASE_REF: ${{ inputs.base-ref }}
@@ -97,10 +102,12 @@ runs:
         PR_NUMBER: ${{ github.event.pull_request.number }}
         REPO: ${{ github.repository }}
         MARKDOWN: ${{ steps.analyse.outputs.markdown-path }}
+        MARKER: ${{ steps.analyse.outputs.comment-marker }}
       run: |
         set -euo pipefail
-        comment_id="$(gh api "repos/${REPO}/issues/${PR_NUMBER}/comments" --paginate --slurp \
-          --jq '.[][] | select(.user.login == "github-actions[bot]" and (.body | startswith("<!-- reqover-impact -->"))) | .id' | tail -n 1)"
+        # --jq runs per page with --paginate; gh rejects it together with --slurp.
+        comment_id="$(gh api "repos/${REPO}/issues/${PR_NUMBER}/comments" --paginate \
+          --jq '.[] | select(.user.login == "github-actions[bot]" and (.body | startswith(env.MARKER))) | .id' | tail -n 1)"
         if [ -n "${comment_id}" ]; then
           gh api --method PATCH "repos/${REPO}/issues/comments/${comment_id}" --field "body=@${MARKDOWN}" > /dev/null
         else

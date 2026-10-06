@@ -1,10 +1,10 @@
 {
     "bomFormat": "CycloneDX",
     "specVersion": "1.6",
-    "serialNumber": "urn:uuid:6205552a-91ab-4eff-91ce-f1730c66ccb7",
+    "serialNumber": "urn:uuid:1abc4311-2c3d-48eb-8271-02ce6ae76c32",
     "version": 1,
     "metadata": {
-        "timestamp": "2026-10-06T06:52:36Z",
+        "timestamp": "2026-10-06T08:41:38Z",
         "tools": {
             "components": [
                 {
@@ -17,11 +17,11 @@
         },
         "component": {
             "type": "library",
-            "bom-ref": "pkg:maven/io.github.reqover-labs/reqover@0.2.0?project_path=%3A",
+            "bom-ref": "pkg:maven/io.github.reqover-labs/reqover@0.3.0?project_path=%3A",
             "group": "io.github.reqover-labs",
             "name": "reqover",
-            "version": "0.2.0",
-            "purl": "pkg:maven/io.github.reqover-labs/reqover@0.2.0?project_path=%3A",
+            "version": "0.3.0",
+            "purl": "pkg:maven/io.github.reqover-labs/reqover@0.3.0?project_path=%3A",
             "modified": false,
             "externalReferences": [
                 {
@@ -828,11 +828,11 @@
         },
         {
             "type": "library",
-            "bom-ref": "pkg:maven/io.github.reqover-labs/examples@0.2.0?project_path=%3Aexamples",
+            "bom-ref": "pkg:maven/io.github.reqover-labs/examples@0.3.0?project_path=%3Aexamples",
             "group": "io.github.reqover-labs",
             "name": "examples",
-            "version": "0.2.0",
-            "purl": "pkg:maven/io.github.reqover-labs/examples@0.2.0?project_path=%3Aexamples",
+            "version": "0.3.0",
+            "purl": "pkg:maven/io.github.reqover-labs/examples@0.3.0?project_path=%3Aexamples",
             "modified": false,
             "properties": [
                 {
@@ -851,11 +851,11 @@
         },
         {
             "type": "library",
-            "bom-ref": "pkg:maven/io.github.reqover-labs/mvc-sample@0.2.0?project_path=%3Aexamples%3Amvc-sample",
+            "bom-ref": "pkg:maven/io.github.reqover-labs/mvc-sample@0.3.0?project_path=%3Aexamples%3Amvc-sample",
             "group": "io.github.reqover-labs",
             "name": "mvc-sample",
-            "version": "0.2.0",
-            "purl": "pkg:maven/io.github.reqover-labs/mvc-sample@0.2.0?project_path=%3Aexamples%3Amvc-sample",
+            "version": "0.3.0",
+            "purl": "pkg:maven/io.github.reqover-labs/mvc-sample@0.3.0?project_path=%3Aexamples%3Amvc-sample",
             "modified": false,
             "properties": [
                 {
@@ -874,11 +874,11 @@
         },
         {
             "type": "library",
-            "bom-ref": "pkg:maven/io.github.reqover-labs/reqover-agent@0.2.0?project_path=%3Areqover-agent",
+            "bom-ref": "pkg:maven/io.github.reqover-labs/reqover-agent@0.3.0?project_path=%3Areqover-agent",
             "group": "io.github.reqover-labs",
             "name": "reqover-agent",
-            "version": "0.2.0",
-            "purl": "pkg:maven/io.github.reqover-labs/reqover-agent@0.2.0?project_path=%3Areqover-agent",
+            "version": "0.3.0",
+            "purl": "pkg:maven/io.github.reqover-labs/reqover-agent@0.3.0?project_path=%3Areqover-agent",
             "modified": false,
             "properties": [
                 {
@@ -897,11 +897,11 @@
         },
         {
             "type": "library",
-            "bom-ref": "pkg:maven/io.github.reqover-labs/reqover-cli@0.2.0?project_path=%3Areqover-cli",
+            "bom-ref": "pkg:maven/io.github.reqover-labs/reqover-cli@0.3.0?project_path=%3Areqover-cli",
             "group": "io.github.reqover-labs",
             "name": "reqover-cli",
-            "version": "0.2.0",
-            "purl": "pkg:maven/io.github.reqover-labs/reqover-cli@0.2.0?project_path=%3Areqover-cli",
+            "version": "0.3.0",
+            "purl": "pkg:maven/io.github.reqover-labs/reqover-cli@0.3.0?project_path=%3Areqover-cli",
             "modified": false,
             "properties": [
                 {
@@ -920,11 +920,11 @@
         },
         {
             "type": "library",
-            "bom-ref": "pkg:maven/io.github.reqover-labs/reqover-core@0.2.0?project_path=%3Areqover-core",
+            "bom-ref": "pkg:maven/io.github.reqover-labs/reqover-core@0.3.0?project_path=%3Areqover-core",
             "group": "io.github.reqover-labs",
             "name": "reqover-core",
-            "version": "0.2.0",
-            "purl": "pkg:maven/io.github.reqover-labs/reqover-core@0.2.0?project_path=%3Areqover-core",
+            "version": "0.3.0",
+            "purl": "pkg:maven/io.github.reqover-labs/reqover-core@0.3.0?project_path=%3Areqover-core",
             "modified": false,
             "properties": [
                 {
@@ -943,11 +943,11 @@
         },
         {
             "type": "library",
-            "bom-ref": "pkg:maven/io.github.reqover-labs/reqover-instrumentation@0.2.0?project_path=%3Areqover-instrumentation",
+            "bom-ref": "pkg:maven/io.github.reqover-labs/reqover-instrumentation@0.3.0?project_path=%3Areqover-instrumentation",
             "group": "io.github.reqover-labs",
             "name": "reqover-instrumentation",
-            "version": "0.2.0",
-            "purl": "pkg:maven/io.github.reqover-labs/reqover-instrumentation@0.2.0?project_path=%3Areqover-instrumentation",
+            "version": "0.3.0",
+            "purl": "pkg:maven/io.github.reqover-labs/reqover-instrumentation@0.3.0?project_path=%3Areqover-instrumentation",
             "modified": false,
             "properties": [
                 {
@@ -966,11 +966,11 @@
         },
         {
             "type": "library",
-            "bom-ref": "pkg:maven/io.github.reqover-labs/reqover-report@0.2.0?project_path=%3Areqover-report",
+            "bom-ref": "pkg:maven/io.github.reqover-labs/reqover-report@0.3.0?project_path=%3Areqover-report",
             "group": "io.github.reqover-labs",
             "name": "reqover-report",
-            "version": "0.2.0",
-            "purl": "pkg:maven/io.github.reqover-labs/reqover-report@0.2.0?project_path=%3Areqover-report",
+            "version": "0.3.0",
+            "purl": "pkg:maven/io.github.reqover-labs/reqover-report@0.3.0?project_path=%3Areqover-report",
             "modified": false,
             "properties": [
                 {
@@ -989,11 +989,11 @@
         },
         {
             "type": "library",
-            "bom-ref": "pkg:maven/io.github.reqover-labs/reqover-spring-boot-starter@0.2.0?project_path=%3Areqover-spring-boot-starter",
+            "bom-ref": "pkg:maven/io.github.reqover-labs/reqover-spring-boot-starter@0.3.0?project_path=%3Areqover-spring-boot-starter",
             "group": "io.github.reqover-labs",
             "name": "reqover-spring-boot-starter",
-            "version": "0.2.0",
-            "purl": "pkg:maven/io.github.reqover-labs/reqover-spring-boot-starter@0.2.0?project_path=%3Areqover-spring-boot-starter",
+            "version": "0.3.0",
+            "purl": "pkg:maven/io.github.reqover-labs/reqover-spring-boot-starter@0.3.0?project_path=%3Areqover-spring-boot-starter",
             "modified": false,
             "properties": [
                 {
@@ -1012,11 +1012,11 @@
         },
         {
             "type": "library",
-            "bom-ref": "pkg:maven/io.github.reqover-labs/reqover-spring-mvc@0.2.0?project_path=%3Areqover-spring-mvc",
+            "bom-ref": "pkg:maven/io.github.reqover-labs/reqover-spring-mvc@0.3.0?project_path=%3Areqover-spring-mvc",
             "group": "io.github.reqover-labs",
             "name": "reqover-spring-mvc",
-            "version": "0.2.0",
-            "purl": "pkg:maven/io.github.reqover-labs/reqover-spring-mvc@0.2.0?project_path=%3Areqover-spring-mvc",
+            "version": "0.3.0",
+            "purl": "pkg:maven/io.github.reqover-labs/reqover-spring-mvc@0.3.0?project_path=%3Areqover-spring-mvc",
             "modified": false,
             "properties": [
                 {
@@ -1035,11 +1035,11 @@
         },
         {
             "type": "library",
-            "bom-ref": "pkg:maven/io.github.reqover-labs/reqover-spring-webflux@0.2.0?project_path=%3Areqover-spring-webflux",
+            "bom-ref": "pkg:maven/io.github.reqover-labs/reqover-spring-webflux@0.3.0?project_path=%3Areqover-spring-webflux",
             "group": "io.github.reqover-labs",
             "name": "reqover-spring-webflux",
-            "version": "0.2.0",
-            "purl": "pkg:maven/io.github.reqover-labs/reqover-spring-webflux@0.2.0?project_path=%3Areqover-spring-webflux",
+            "version": "0.3.0",
+            "purl": "pkg:maven/io.github.reqover-labs/reqover-spring-webflux@0.3.0?project_path=%3Areqover-spring-webflux",
             "modified": false,
             "properties": [
                 {
@@ -1058,11 +1058,11 @@
         },
         {
             "type": "library",
-            "bom-ref": "pkg:maven/io.github.reqover-labs/webflux-sample@0.2.0?project_path=%3Aexamples%3Awebflux-sample",
+            "bom-ref": "pkg:maven/io.github.reqover-labs/webflux-sample@0.3.0?project_path=%3Aexamples%3Awebflux-sample",
             "group": "io.github.reqover-labs",
             "name": "webflux-sample",
-            "version": "0.2.0",
-            "purl": "pkg:maven/io.github.reqover-labs/webflux-sample@0.2.0?project_path=%3Aexamples%3Awebflux-sample",
+            "version": "0.3.0",
+            "purl": "pkg:maven/io.github.reqover-labs/webflux-sample@0.3.0?project_path=%3Aexamples%3Awebflux-sample",
             "modified": false,
             "properties": [
                 {
@@ -6917,16 +6917,16 @@
             ]
         },
         {
-            "ref": "pkg:maven/io.github.reqover-labs/examples@0.2.0?project_path=%3Aexamples",
+            "ref": "pkg:maven/io.github.reqover-labs/examples@0.3.0?project_path=%3Aexamples",
             "dependsOn": [
                 
             ]
         },
         {
-            "ref": "pkg:maven/io.github.reqover-labs/mvc-sample@0.2.0?project_path=%3Aexamples%3Amvc-sample",
+            "ref": "pkg:maven/io.github.reqover-labs/mvc-sample@0.3.0?project_path=%3Aexamples%3Amvc-sample",
             "dependsOn": [
                 "pkg:maven/com.fasterxml.jackson/jackson-bom@2.21.7?type=pom",
-                "pkg:maven/io.github.reqover-labs/reqover-spring-boot-starter@0.2.0?project_path=%3Areqover-spring-boot-starter",
+                "pkg:maven/io.github.reqover-labs/reqover-spring-boot-starter@0.3.0?project_path=%3Areqover-spring-boot-starter",
                 "pkg:maven/org.apache.logging.log4j/log4j-bom@2.25.5?type=pom",
                 "pkg:maven/org.junit.platform/junit-platform-launcher@1.12.2?type=jar",
                 "pkg:maven/org.springframework.boot/spring-boot-dependencies@3.5.16?type=pom",
@@ -6935,27 +6935,27 @@
             ]
         },
         {
-            "ref": "pkg:maven/io.github.reqover-labs/reqover-agent@0.2.0?project_path=%3Areqover-agent",
+            "ref": "pkg:maven/io.github.reqover-labs/reqover-agent@0.3.0?project_path=%3Areqover-agent",
             "dependsOn": [
                 "pkg:maven/com.fasterxml.jackson.core/jackson-databind@2.21.7?type=jar",
-                "pkg:maven/io.github.reqover-labs/reqover-core@0.2.0?project_path=%3Areqover-core",
-                "pkg:maven/io.github.reqover-labs/reqover-instrumentation@0.2.0?project_path=%3Areqover-instrumentation",
+                "pkg:maven/io.github.reqover-labs/reqover-core@0.3.0?project_path=%3Areqover-core",
+                "pkg:maven/io.github.reqover-labs/reqover-instrumentation@0.3.0?project_path=%3Areqover-instrumentation",
                 "pkg:maven/org.junit.jupiter/junit-jupiter@5.12.2?type=jar",
                 "pkg:maven/org.junit.platform/junit-platform-launcher@1.12.2?type=jar",
                 "pkg:maven/org.junit/junit-bom@5.12.2?type=pom"
             ]
         },
         {
-            "ref": "pkg:maven/io.github.reqover-labs/reqover-cli@0.2.0?project_path=%3Areqover-cli",
+            "ref": "pkg:maven/io.github.reqover-labs/reqover-cli@0.3.0?project_path=%3Areqover-cli",
             "dependsOn": [
-                "pkg:maven/io.github.reqover-labs/reqover-report@0.2.0?project_path=%3Areqover-report",
+                "pkg:maven/io.github.reqover-labs/reqover-report@0.3.0?project_path=%3Areqover-report",
                 "pkg:maven/org.junit.jupiter/junit-jupiter@5.12.2?type=jar",
                 "pkg:maven/org.junit.platform/junit-platform-launcher@1.12.2?type=jar",
                 "pkg:maven/org.junit/junit-bom@5.12.2?type=pom"
             ]
         },
         {
-            "ref": "pkg:maven/io.github.reqover-labs/reqover-core@0.2.0?project_path=%3Areqover-core",
+            "ref": "pkg:maven/io.github.reqover-labs/reqover-core@0.3.0?project_path=%3Areqover-core",
             "dependsOn": [
                 "pkg:maven/org.junit.jupiter/junit-jupiter@5.12.2?type=jar",
                 "pkg:maven/org.junit.platform/junit-platform-launcher@1.12.2?type=jar",
@@ -6963,9 +6963,9 @@
             ]
         },
         {
-            "ref": "pkg:maven/io.github.reqover-labs/reqover-instrumentation@0.2.0?project_path=%3Areqover-instrumentation",
+            "ref": "pkg:maven/io.github.reqover-labs/reqover-instrumentation@0.3.0?project_path=%3Areqover-instrumentation",
             "dependsOn": [
-                "pkg:maven/io.github.reqover-labs/reqover-core@0.2.0?project_path=%3Areqover-core",
+                "pkg:maven/io.github.reqover-labs/reqover-core@0.3.0?project_path=%3Areqover-core",
                 "pkg:maven/org.junit.jupiter/junit-jupiter@5.12.2?type=jar",
                 "pkg:maven/org.junit.platform/junit-platform-launcher@1.12.2?type=jar",
                 "pkg:maven/org.junit/junit-bom@5.12.2?type=pom",
@@ -6973,22 +6973,22 @@
             ]
         },
         {
-            "ref": "pkg:maven/io.github.reqover-labs/reqover-report@0.2.0?project_path=%3Areqover-report",
+            "ref": "pkg:maven/io.github.reqover-labs/reqover-report@0.3.0?project_path=%3Areqover-report",
             "dependsOn": [
-                "pkg:maven/io.github.reqover-labs/reqover-core@0.2.0?project_path=%3Areqover-core",
+                "pkg:maven/io.github.reqover-labs/reqover-core@0.3.0?project_path=%3Areqover-core",
                 "pkg:maven/org.junit.jupiter/junit-jupiter@5.12.2?type=jar",
                 "pkg:maven/org.junit.platform/junit-platform-launcher@1.12.2?type=jar",
                 "pkg:maven/org.junit/junit-bom@5.12.2?type=pom"
             ]
         },
         {
-            "ref": "pkg:maven/io.github.reqover-labs/reqover-spring-boot-starter@0.2.0?project_path=%3Areqover-spring-boot-starter",
+            "ref": "pkg:maven/io.github.reqover-labs/reqover-spring-boot-starter@0.3.0?project_path=%3Areqover-spring-boot-starter",
             "dependsOn": [
                 "pkg:maven/com.fasterxml.jackson/jackson-bom@2.21.7?type=pom",
-                "pkg:maven/io.github.reqover-labs/reqover-core@0.2.0?project_path=%3Areqover-core",
-                "pkg:maven/io.github.reqover-labs/reqover-report@0.2.0?project_path=%3Areqover-report",
-                "pkg:maven/io.github.reqover-labs/reqover-spring-mvc@0.2.0?project_path=%3Areqover-spring-mvc",
-                "pkg:maven/io.github.reqover-labs/reqover-spring-webflux@0.2.0?project_path=%3Areqover-spring-webflux",
+                "pkg:maven/io.github.reqover-labs/reqover-core@0.3.0?project_path=%3Areqover-core",
+                "pkg:maven/io.github.reqover-labs/reqover-report@0.3.0?project_path=%3Areqover-report",
+                "pkg:maven/io.github.reqover-labs/reqover-spring-mvc@0.3.0?project_path=%3Areqover-spring-mvc",
+                "pkg:maven/io.github.reqover-labs/reqover-spring-webflux@0.3.0?project_path=%3Areqover-spring-webflux",
                 "pkg:maven/jakarta.servlet/jakarta.servlet-api@6.0.0?type=jar",
                 "pkg:maven/org.apache.logging.log4j/log4j-bom@2.25.5?type=pom",
                 "pkg:maven/org.junit.platform/junit-platform-launcher@1.12.2?type=jar",
@@ -7002,9 +7002,9 @@
             ]
         },
         {
-            "ref": "pkg:maven/io.github.reqover-labs/reqover-spring-mvc@0.2.0?project_path=%3Areqover-spring-mvc",
+            "ref": "pkg:maven/io.github.reqover-labs/reqover-spring-mvc@0.3.0?project_path=%3Areqover-spring-mvc",
             "dependsOn": [
-                "pkg:maven/io.github.reqover-labs/reqover-core@0.2.0?project_path=%3Areqover-core",
+                "pkg:maven/io.github.reqover-labs/reqover-core@0.3.0?project_path=%3Areqover-core",
                 "pkg:maven/jakarta.servlet/jakarta.servlet-api@6.0.0?type=jar",
                 "pkg:maven/org.assertj/assertj-core@3.27.7?type=jar",
                 "pkg:maven/org.junit.jupiter/junit-jupiter@5.12.2?type=jar",
@@ -7018,9 +7018,9 @@
             ]
         },
         {
-            "ref": "pkg:maven/io.github.reqover-labs/reqover-spring-webflux@0.2.0?project_path=%3Areqover-spring-webflux",
+            "ref": "pkg:maven/io.github.reqover-labs/reqover-spring-webflux@0.3.0?project_path=%3Areqover-spring-webflux",
             "dependsOn": [
-                "pkg:maven/io.github.reqover-labs/reqover-core@0.2.0?project_path=%3Areqover-core",
+                "pkg:maven/io.github.reqover-labs/reqover-core@0.3.0?project_path=%3Areqover-core",
                 "pkg:maven/io.micrometer/context-propagation@1.1.4?type=jar",
                 "pkg:maven/io.projectreactor/reactor-core@3.7.19?type=jar",
                 "pkg:maven/org.assertj/assertj-core@3.27.7?type=jar",
@@ -7035,26 +7035,26 @@
             ]
         },
         {
-            "ref": "pkg:maven/io.github.reqover-labs/reqover@0.2.0?project_path=%3A",
+            "ref": "pkg:maven/io.github.reqover-labs/reqover@0.3.0?project_path=%3A",
             "dependsOn": [
-                "pkg:maven/io.github.reqover-labs/examples@0.2.0?project_path=%3Aexamples",
-                "pkg:maven/io.github.reqover-labs/mvc-sample@0.2.0?project_path=%3Aexamples%3Amvc-sample",
-                "pkg:maven/io.github.reqover-labs/reqover-agent@0.2.0?project_path=%3Areqover-agent",
-                "pkg:maven/io.github.reqover-labs/reqover-cli@0.2.0?project_path=%3Areqover-cli",
-                "pkg:maven/io.github.reqover-labs/reqover-core@0.2.0?project_path=%3Areqover-core",
-                "pkg:maven/io.github.reqover-labs/reqover-instrumentation@0.2.0?project_path=%3Areqover-instrumentation",
-                "pkg:maven/io.github.reqover-labs/reqover-report@0.2.0?project_path=%3Areqover-report",
-                "pkg:maven/io.github.reqover-labs/reqover-spring-boot-starter@0.2.0?project_path=%3Areqover-spring-boot-starter",
-                "pkg:maven/io.github.reqover-labs/reqover-spring-mvc@0.2.0?project_path=%3Areqover-spring-mvc",
-                "pkg:maven/io.github.reqover-labs/reqover-spring-webflux@0.2.0?project_path=%3Areqover-spring-webflux",
-                "pkg:maven/io.github.reqover-labs/webflux-sample@0.2.0?project_path=%3Aexamples%3Awebflux-sample"
+                "pkg:maven/io.github.reqover-labs/examples@0.3.0?project_path=%3Aexamples",
+                "pkg:maven/io.github.reqover-labs/mvc-sample@0.3.0?project_path=%3Aexamples%3Amvc-sample",
+                "pkg:maven/io.github.reqover-labs/reqover-agent@0.3.0?project_path=%3Areqover-agent",
+                "pkg:maven/io.github.reqover-labs/reqover-cli@0.3.0?project_path=%3Areqover-cli",
+                "pkg:maven/io.github.reqover-labs/reqover-core@0.3.0?project_path=%3Areqover-core",
+                "pkg:maven/io.github.reqover-labs/reqover-instrumentation@0.3.0?project_path=%3Areqover-instrumentation",
+                "pkg:maven/io.github.reqover-labs/reqover-report@0.3.0?project_path=%3Areqover-report",
+                "pkg:maven/io.github.reqover-labs/reqover-spring-boot-starter@0.3.0?project_path=%3Areqover-spring-boot-starter",
+                "pkg:maven/io.github.reqover-labs/reqover-spring-mvc@0.3.0?project_path=%3Areqover-spring-mvc",
+                "pkg:maven/io.github.reqover-labs/reqover-spring-webflux@0.3.0?project_path=%3Areqover-spring-webflux",
+                "pkg:maven/io.github.reqover-labs/webflux-sample@0.3.0?project_path=%3Aexamples%3Awebflux-sample"
             ]
         },
         {
-            "ref": "pkg:maven/io.github.reqover-labs/webflux-sample@0.2.0?project_path=%3Aexamples%3Awebflux-sample",
+            "ref": "pkg:maven/io.github.reqover-labs/webflux-sample@0.3.0?project_path=%3Aexamples%3Awebflux-sample",
             "dependsOn": [
                 "pkg:maven/com.fasterxml.jackson/jackson-bom@2.21.7?type=pom",
-                "pkg:maven/io.github.reqover-labs/reqover-spring-boot-starter@0.2.0?project_path=%3Areqover-spring-boot-starter",
+                "pkg:maven/io.github.reqover-labs/reqover-spring-boot-starter@0.3.0?project_path=%3Areqover-spring-boot-starter",
                 "pkg:maven/io.netty/netty-bom@4.1.137.Final?type=pom",
                 "pkg:maven/io.projectreactor/reactor-test@3.7.19?type=jar",
                 "pkg:maven/org.apache.logging.log4j/log4j-bom@2.25.5?type=pom",

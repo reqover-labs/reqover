@@ -9,6 +9,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -147,5 +148,40 @@ class RequestDiagnosticsTest {
         assertEquals(150, Json.integer(root, "completedRequestCount"));
         assertEquals(150, report.endpoints().get(0).requestCount());
         assertEquals(50, Json.integer(root, "omittedRequestDetails"));
+    }
+
+    @Test
+    void keepsTheOmittedCountThroughAJsonRoundTrip() {
+        List<CoverageBucketSnapshot> observations = IntStream.range(0, 150).mapToObj(i ->
+                new CoverageBucketSnapshot(UnitInfo.httpRequest("r" + i, "GET", "/bounded"),
+                        START.plusSeconds(i), START.plusSeconds(i).plusMillis(1), 200,
+                        Map.<Integer, Set<Integer>>of(), Set.of())).toList();
+        CoverageReport report = new CoverageReportGenerator().generate(observations);
+
+        CoverageReport readBack = CoverageReportJson.read(CoverageReportJson.write(report));
+        assertEquals(100, readBack.requests().size());
+        assertEquals(50, readBack.omittedRequestDetails());
+
+        Map<String, Object> rewritten = Json.object(
+                Json.parse(CoverageReportJson.write(readBack, 40)), "report");
+        assertEquals(110, Json.integer(rewritten, "omittedRequestDetails"),
+                "a second truncation adds to what the first left out");
+        assertTrue(new HtmlCoverageReportRenderer().render(readBack).contains("50 older request details"));
+    }
+
+    @Test
+    void keepsHttpDetailsAheadOfOtherUnitsInTheBudget() {
+        List<CoverageBucketSnapshot> observations = new ArrayList<>();
+        observations.add(new CoverageBucketSnapshot(UnitInfo.httpRequest("http", "GET", "/kept"),
+                START, START.plusMillis(1), 200, Map.<Integer, Set<Integer>>of(), Set.of()));
+        for (int i = 0; i < 5; i++) {
+            observations.add(new CoverageBucketSnapshot(UnitInfo.scheduledJob("job-" + i, "nightly"),
+                    START.plusSeconds(10 + i), START.plusSeconds(10 + i).plusMillis(1), 0,
+                    Map.<Integer, Set<Integer>>of(), Set.of()));
+        }
+        CoverageReport report = new CoverageReportGenerator().generate(observations);
+
+        CoverageReport readBack = CoverageReportJson.read(CoverageReportJson.write(report, 1));
+        assertEquals("http", readBack.requests().get(0).requestId());
     }
 }

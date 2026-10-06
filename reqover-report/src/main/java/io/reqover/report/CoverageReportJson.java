@@ -49,7 +49,9 @@ public final class CoverageReportJson {
         if (requestDetailsLimit < 0) {
             throw new IllegalArgumentException("requestDetailsLimit must not be negative");
         }
-        Comparator<RequestObservation> newest = Comparator.comparing(RequestObservation::startedAt).reversed()
+        // HTTP details first, so a busy scheduled job cannot crowd them out of the budget.
+        Comparator<RequestObservation> newest = Comparator.comparing((RequestObservation request) -> !request.isHttp())
+                .thenComparing(Comparator.comparing(RequestObservation::startedAt).reversed())
                 .thenComparing(RequestObservation::requestId);
         Set<Integer> selected = IntStream.range(0, report.requests().size()).boxed()
                 .sorted((a, b) -> newest.compare(report.requests().get(a), report.requests().get(b)))
@@ -71,7 +73,7 @@ public final class CoverageReportJson {
         out.append("  \"reverseIndex\": [");
         writeJoined(out, report.reverseIndex(), 2, (item, indent) -> writeReverseEntry(out, item, indent));
         out.append("],\n");
-        out.append("  \"omittedRequestDetails\": ").append(report.requests().size() - details.size()).append(",\n");
+        out.append("  \"omittedRequestDetails\": ").append(report.omittedRequestDetails() + report.requests().size() - details.size()).append(",\n");
         out.append("  \"requests\": [");
         writeJoined(out, details, 2, (item, indent) -> writeRequest(out, item, indent));
         out.append("]\n");
@@ -122,7 +124,8 @@ public final class CoverageReportJson {
                 Json.integer(root, "completedRequestCount"),
                 List.copyOf(endpoints),
                 List.copyOf(reverseIndex),
-                List.copyOf(requests)
+                List.copyOf(requests),
+                root.get("omittedRequestDetails") == null ? 0 : Json.integer(root, "omittedRequestDetails")
         );
     }
 

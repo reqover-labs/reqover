@@ -87,6 +87,13 @@ subprojects {
         extensions.configure<JavaPluginExtension> {
             withJavadocJar()
         }
+
+        // Every published artifact (classes, sources, Javadoc) carries the
+        // project license and notice, as Apache-2.0 section 4 expects.
+        tasks.withType<Jar>().configureEach {
+            from(rootProject.file("LICENSE")) { into("META-INF") }
+            from(rootProject.file("NOTICE")) { into("META-INF") }
+        }
         tasks.withType<Javadoc>().configureEach {
             (options as StandardJavadocDocletOptions).apply {
                 addStringOption("Xdoclint:all,-missing", "-quiet")

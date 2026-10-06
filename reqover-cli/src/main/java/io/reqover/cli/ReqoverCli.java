@@ -233,7 +233,7 @@ public final class ReqoverCli {
                   reqover version
 
                 Reports come from a running application: point
-                reqover.report.export.path at a file, or save the JSON your report
+                reqover.report.export.json-path at a file, or save the JSON your report
                 endpoint serves.
 
                 impact answers "which observed APIs executed the code this change

@@ -4,6 +4,19 @@ All notable changes to Reqover are documented in this file.
 
 ## Unreleased
 
+## 0.4.1 — 2026-10-07
+
+License readiness and one WebFlux fix.
+
+### Fixed
+
+- **WebFlux no longer logs a `ClassCastException` for unmapped URLs.** The
+  catch-all resource check passed the matched pattern (a `PathPattern`) to
+  `String.valueOf`, which bound to the `char[]` overload. The response was
+  still a 404, but the filter logged an error for every unmatched request.
+- **CLI help names the real export property**, `reqover.report.export.json-path`
+  (it said `reqover.report.export.path`).
+
 ### Changed
 
 - **License readiness.** Every first-party source file (Java, Gradle Kotlin

@@ -13,17 +13,17 @@ thread names and independently resolved method set.
 Screenshots were captured on October 3, 2026 from the agent-attached MVC sample
 on loopback. Numbers illustrate that recording, not an application benchmark.
 
-## Using it with 0.4.0
+## Using it with 0.4.x
 
 Request diagnostics need no extra switch of their own. Add the starter from Maven Central and
-attach the agent from the [v0.4.0 release](https://github.com/reqover-labs/reqover/releases/tag/v0.4.0):
+attach the agent from the [v0.4.1 release](https://github.com/reqover-labs/reqover/releases/tag/v0.4.1):
 
 ```kotlin
-implementation("io.github.reqover-labs:reqover-spring-boot-starter:0.4.0")
+implementation("io.github.reqover-labs:reqover-spring-boot-starter:0.4.1")
 ```
 
 ```bash
-java -javaagent:reqover-agent-0.4.0.jar=include=com.example -jar build/libs/your-app.jar
+java -javaagent:reqover-agent-0.4.1.jar=include=com.example -jar build/libs/your-app.jar
 ```
 
 Turn on a way to read the report, which is off by default: either
@@ -34,7 +34,7 @@ for Maven and the full property list.
 
 ### Bundled demo
 
-From a checkout of the repository (for example the `v0.4.0` tag), the demo
+From a checkout of the repository (for example the `v0.4.1` tag), the demo
 script builds the agent and a sample and runs them together:
 
 ```powershell
@@ -101,7 +101,7 @@ available. Endpoint aggregation, reverse lookup, `impact` and `diff` retain thei
 existing interpretation; timing/status changes are not added to coverage diff.
 
 The Java record itself now has five components. Record-pattern consumers and
-code inspecting component count must adapt. This is why it shipped in the 0.4.0
+code inspecting component count must adapt. This is why it shipped in the 0.4.1
 minor release, even though the JSON extension is additive.
 
 Request methods are an unordered set. Reqover does not collect invocation

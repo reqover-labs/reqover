@@ -38,10 +38,10 @@ Nothing to install: `mavenCentral()` in step 2 resolves the starter. Go on to [s
 
 ### Option B — build from source
 
-To build the release yourself, check out the `v0.4.0` tag (or `main` for unreleased changes) and install into your local Maven repository:
+To build the release yourself, check out the `v0.4.1` tag (or `main` for unreleased changes) and install into your local Maven repository:
 
 ```bash
-git clone --branch v0.4.0 --depth 1 https://github.com/reqover-labs/reqover.git
+git clone --branch v0.4.1 --depth 1 https://github.com/reqover-labs/reqover.git
 cd reqover
 ./gradlew clean publishToMavenLocal
 ```
@@ -52,12 +52,12 @@ This installs the library modules under the `io.github.reqover-labs` group:
 
 | Artifact | Version |
 | --- | --- |
-| `io.github.reqover-labs:reqover-core` | `0.4.0` |
-| `io.github.reqover-labs:reqover-instrumentation` | `0.4.0` |
-| `io.github.reqover-labs:reqover-report` | `0.4.0` |
-| `io.github.reqover-labs:reqover-spring-mvc` | `0.4.0` |
-| `io.github.reqover-labs:reqover-spring-webflux` | `0.4.0` |
-| `io.github.reqover-labs:reqover-spring-boot-starter` | `0.4.0` |
+| `io.github.reqover-labs:reqover-core` | `0.4.1` |
+| `io.github.reqover-labs:reqover-instrumentation` | `0.4.1` |
+| `io.github.reqover-labs:reqover-report` | `0.4.1` |
+| `io.github.reqover-labs:reqover-spring-mvc` | `0.4.1` |
+| `io.github.reqover-labs:reqover-spring-webflux` | `0.4.1` |
+| `io.github.reqover-labs:reqover-spring-boot-starter` | `0.4.1` |
 
 **`reqover-agent` and `reqover-cli` are not among them.** Both are shaded executables (so their dependencies don't collide with yours) rather than libraries you compile against, so neither is published. You download them as files from the GitHub Release → [step 4](#4-run-with-the-java-agent-attached).
 
@@ -73,9 +73,9 @@ Get-ChildItem "$env:USERPROFILE\.m2\repository\io\github\reqover-labs"   # Windo
 
 ### Option C — the GitHub Release bundle
 
-The [v0.4.0 release](https://github.com/reqover-labs/reqover/releases/tag/v0.4.0) ships `reqover-0.4.0.zip`, which contains the same library jars under `lib/`, their sources under `sources/`, plus `reqover-agent-0.4.0.jar` and `reqover-cli-0.4.0.jar` at the root. Use this if you can reach neither Maven Central nor a source build; you will have to put the `lib/` jars somewhere your build can resolve them (a flat-dir repository or your internal Nexus/Artifactory).
+The [v0.4.1 release](https://github.com/reqover-labs/reqover/releases/tag/v0.4.1) ships `reqover-0.4.1.zip`, which contains the same library jars under `lib/`, their sources under `sources/`, plus `reqover-agent-0.4.1.jar` and `reqover-cli-0.4.1.jar` at the root. Use this if you can reach neither Maven Central nor a source build; you will have to put the `lib/` jars somewhere your build can resolve them (a flat-dir repository or your internal Nexus/Artifactory).
 
-Either way, verify the download against `reqover-0.4.0-SHA256SUMS.txt` from the same release.
+Either way, verify the download against `reqover-0.4.1-SHA256SUMS.txt` from the same release.
 
 ---
 
@@ -93,7 +93,7 @@ repositories {
 }
 
 dependencies {
-    implementation("io.github.reqover-labs:reqover-spring-boot-starter:0.4.0")
+    implementation("io.github.reqover-labs:reqover-spring-boot-starter:0.4.1")
 }
 ```
 
@@ -103,7 +103,7 @@ repositories {
 }
 
 dependencies {
-    implementation 'io.github.reqover-labs:reqover-spring-boot-starter:0.4.0'
+    implementation 'io.github.reqover-labs:reqover-spring-boot-starter:0.4.1'
 }
 ```
 
@@ -113,7 +113,7 @@ Maven resolves from Central by default (and from the local repository after a so
 <dependency>
   <groupId>io.github.reqover-labs</groupId>
   <artifactId>reqover-spring-boot-starter</artifactId>
-  <version>0.4.0</version>
+  <version>0.4.1</version>
 </dependency>
 ```
 
@@ -126,12 +126,12 @@ If you want only one adapter and no starter, depend on the adapter and the repor
 ```kotlin
 dependencies {
     // For a Spring MVC project
-    implementation("io.github.reqover-labs:reqover-spring-mvc:0.4.0")
+    implementation("io.github.reqover-labs:reqover-spring-mvc:0.4.1")
 
     // For a Spring WebFlux project (instead of the line above)
-    // implementation("io.github.reqover-labs:reqover-spring-webflux:0.4.0")
+    // implementation("io.github.reqover-labs:reqover-spring-webflux:0.4.1")
 
-    implementation("io.github.reqover-labs:reqover-report:0.4.0")
+    implementation("io.github.reqover-labs:reqover-report:0.4.1")
 }
 ```
 
@@ -270,7 +270,7 @@ public class InternalReqoverReportController {
 Without the starter, inject `CoverageStore` and build the report yourself with `CoverageReportGenerator` and `HtmlCoverageReportRenderer` from `reqover-report`.
 
 > [!IMPORTANT]
-> **Inject `CoverageStore`, not `InMemoryCoverageStore`.** This changed in `0.4.0` — see [Replacing the store](#replacing-the-store).
+> **Inject `CoverageStore`, not `InMemoryCoverageStore`.** This changed in `0.4.1` — see [Replacing the store](#replacing-the-store).
 
 Complete working examples are in [`examples/mvc-sample`](../examples/mvc-sample) and [`examples/webflux-sample`](../examples/webflux-sample).
 
@@ -290,7 +290,7 @@ Either property on its own is enough; setting neither disables the export entire
 **This is how a CI job gets a report file out of an integration test run.** Boot the application with the agent attached, drive your tests through it, let it stop, and the file is there:
 
 ```bash
-java -javaagent:reqover-agent-0.4.0.jar=include=com.example \
+java -javaagent:reqover-agent-0.4.1.jar=include=com.example \
   -jar build/libs/your-app.jar \
   --reqover.report.export.json-path=build/reqover-report.json
 ```
@@ -311,15 +311,15 @@ This is the part that actually records execution.
 
 ### 4-1. Download the agent JAR
 
-Download `reqover-agent-0.4.0.jar` from the [v0.4.0 release](https://github.com/reqover-labs/reqover/releases/tag/v0.4.0). You can verify the file with `reqover-0.4.0-SHA256SUMS.txt` from the same release.
+Download `reqover-agent-0.4.1.jar` from the [v0.4.1 release](https://github.com/reqover-labs/reqover/releases/tag/v0.4.1). You can verify the file with `reqover-0.4.1-SHA256SUMS.txt` from the same release.
 
 ```bash
-shasum -a 256 reqover-agent-0.4.0.jar          # macOS
-sha256sum reqover-agent-0.4.0.jar              # Linux
+shasum -a 256 reqover-agent-0.4.1.jar          # macOS
+sha256sum reqover-agent-0.4.1.jar              # Linux
 ```
 
 ```powershell
-Get-FileHash reqover-agent-0.4.0.jar -Algorithm SHA256   # Windows
+Get-FileHash reqover-agent-0.4.1.jar -Algorithm SHA256   # Windows
 ```
 
 ### 4-2. Run
@@ -328,7 +328,7 @@ Get-FileHash reqover-agent-0.4.0.jar -Algorithm SHA256   # Windows
 
 ```bash
 java \
-  -javaagent:reqover-agent-0.4.0.jar=include=com.example.orders \
+  -javaagent:reqover-agent-0.4.1.jar=include=com.example.orders \
   -jar app.jar
 ```
 

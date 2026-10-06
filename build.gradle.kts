@@ -32,7 +32,7 @@ plugins {
 
 allprojects {
     group = "io.github.reqover-labs"
-    version = "0.4.0"
+    version = "0.4.1"
 
     tasks.withType<org.cyclonedx.gradle.BaseCyclonedxTask>().configureEach {
         licenseChoice.set(LicenseChoice().apply {

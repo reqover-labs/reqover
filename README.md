@@ -39,7 +39,7 @@ recorded per request, answerable in reverse, and checkable in CI.</p>
 </p>
 
 > [!IMPORTANT]
-> Reqover `0.4.0` is an **early development release**. The libraries are on Maven Central as `io.github.reqover-labs`, and the agent and CLI jars are on [GitHub Releases](https://github.com/reqover-labs/reqover/releases). Reqover is designed for development, QA, and staging — not for running permanently in production.
+> Reqover `0.4.1` is an **early development release**. The libraries are on Maven Central as `io.github.reqover-labs`, and the agent and CLI jars are on [GitHub Releases](https://github.com/reqover-labs/reqover/releases). Reqover is designed for development, QA, and staging — not for running permanently in production.
 
 
 ## What problem it solves
@@ -203,13 +203,13 @@ is the same sequence the [CI section](#use-it-in-ci) describes, in one command.
 One dependency brings the adapters, the report, and the Spring wiring:
 
 ```kotlin
-implementation("io.github.reqover-labs:reqover-spring-boot-starter:0.4.0")
+implementation("io.github.reqover-labs:reqover-spring-boot-starter:0.4.1")
 ```
 
 Then attach the agent and name the packages to record:
 
 ```bash
-java -javaagent:reqover-agent-0.4.0.jar=include=com.example.orders -jar your-app.jar
+java -javaagent:reqover-agent-0.4.1.jar=include=com.example.orders -jar your-app.jar
 ```
 
 See the [Spring integration guide](docs/17_integration_guide.md) for the full
@@ -256,7 +256,7 @@ git diff --name-only origin/main... \
 | `POST /payments`   | `SharedValidator#validate(String)` |
 ```
 
-`reqover` here is `java -jar reqover-cli-0.4.0.jar` from the release. The CLI
+`reqover` here is `java -jar reqover-cli-0.4.1.jar` from the release. The CLI
 also has `render` (report JSON to a standalone page) and `diff` (what changed
 between two recordings). `--fail-on-impact` turns the analysis into a gate:
 exit code 0 when nothing is affected, 1 when something is, 2 on bad input.
@@ -264,7 +264,7 @@ exit code 0 when nothing is affected, 1 when something is, 2 on bad input.
 ### 3. Have it comment on the pull request
 
 ```yaml
-- uses: reqover-labs/reqover/.github/actions/impact@v0.4.0
+- uses: reqover-labs/reqover/.github/actions/impact@v0.4.1
   with:
     report: build/reqover-report.json
 ```
@@ -337,7 +337,7 @@ Written plainly. Using a tool with the wrong expectations wastes everyone's time
 
 | Item                      | Current                       |
 | ------------------------- | ----------------------------- |
-| Version                   | `0.4.0`                       |
+| Version                   | `0.4.1`                       |
 | JDK required to build     | 17 or 21                      |
 | Bytecode target           | Java 17                       |
 | CI                        | Ubuntu + Temurin 17 / 21      |

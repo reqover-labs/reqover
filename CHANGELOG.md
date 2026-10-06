@@ -4,6 +4,10 @@ All notable changes to Reqover are documented in this file.
 
 ## Unreleased
 
+## 0.4.2 — 2026-10-07
+
+Dashboard keyboard fix found during the functional-test dry run.
+
 ### Fixed
 
 - **Dashboard: typing `/` inside a text field no longer jumps to the search box.**

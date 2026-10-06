@@ -2,7 +2,7 @@
 
 # 02. 시스템 아키텍처
 
-이 문서는 Reqover `0.4.1`의 실제 구현을 설명합니다. 향후 아이디어가 아니라
+이 문서는 Reqover `0.4.2`의 실제 구현을 설명합니다. 향후 아이디어가 아니라
 현재 코드와 자동 테스트가 보장하는 범위만 포함합니다.
 
 ## 전체 흐름
@@ -86,7 +86,7 @@ starter가 등록하는 bean은 모두 `@ConditionalOnMissingBean`이라, applic
 실행 형식은 다음과 같습니다.
 
 ```text
--javaagent:reqover-agent-0.4.1.jar=include=com.example.app
+-javaagent:reqover-agent-0.4.2.jar=include=com.example.app
 ```
 
 - `include=`는 필수이며 여러 prefix는 `;`, 옵션 사이는 `,`로 구분합니다.

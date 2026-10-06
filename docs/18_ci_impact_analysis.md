@@ -38,12 +38,12 @@ reqover.report.export.json-path=build/reqover-report.json
 reqover.report.export.html-path=build/reqover-report.html
 ```
 
-Run the application with the agent attached (`reqover-agent-0.4.1.jar` from the
-[v0.4.1 release](https://github.com/reqover-labs/reqover/releases/tag/v0.4.1)),
+Run the application with the agent attached (`reqover-agent-0.4.2.jar` from the
+[v0.4.2 release](https://github.com/reqover-labs/reqover/releases/tag/v0.4.2)),
 drive your integration tests through it, and let it shut down normally.
 
 ```bash
-java -javaagent:reqover-agent-0.4.1.jar=include=com.example \
+java -javaagent:reqover-agent-0.4.2.jar=include=com.example \
   -jar build/libs/your-app.jar \
   --reqover.report.export.json-path=build/reqover-report.json
 ```
@@ -90,7 +90,7 @@ so nothing needs the recording JVM to read it back.
 
 ```bash
 git diff --name-only origin/main...HEAD \
-  | java -jar reqover-cli-0.4.1.jar impact \
+  | java -jar reqover-cli-0.4.2.jar impact \
       --report build/reqover-report.json \
       --changed-files -
 ```
@@ -151,7 +151,7 @@ jobs:
       - name: Record a report
         run: ./scripts/record-reqover-report.sh
 
-      - uses: reqover-labs/reqover/.github/actions/impact@v0.4.1
+      - uses: reqover-labs/reqover/.github/actions/impact@v0.4.2
         with:
           report: build/reqover-report.json
 ```
@@ -163,7 +163,7 @@ The action's inputs:
 | Input            | Default   | What it does                                                     |
 | ---------------- | --------- | ---------------------------------------------------------------- |
 | `report`         | `build/reqover-report.json` | Path to the recorded report JSON                |
-| `version`        | `0.4.1`   | Release to download the CLI from                                  |
+| `version`        | `0.4.2`   | Release to download the CLI from                                  |
 | `cli-jar`        | empty     | Use an existing CLI JAR (e.g. an unreleased build) instead        |
 | `base-ref`       | PR base   | Git ref to diff against; required outside a pull request          |
 | `fail-on-impact` | `false`   | Fail the step when any observed endpoint runs changed code        |
@@ -184,7 +184,7 @@ Bash and full Git history on the runner.
 
 ## Command reference
 
-`reqover` below means `java -jar reqover-cli-0.4.1.jar`.
+`reqover` below means `java -jar reqover-cli-0.4.2.jar`.
 
 ### `render`
 

@@ -30,10 +30,10 @@ reqover.report.export.json-path=build/reqover-report.json
 reqover.report.export.html-path=build/reqover-report.html
 ```
 
-agent(`reqover-agent-0.4.1.jar`, [v0.4.1 릴리스](https://github.com/reqover-labs/reqover/releases/tag/v0.4.1)에서 받음)를 붙인 채로 애플리케이션을 실행하고, 통합 테스트를 그 위로 흘려보낸 다음, 정상적으로 종료시킵니다.
+agent(`reqover-agent-0.4.2.jar`, [v0.4.2 릴리스](https://github.com/reqover-labs/reqover/releases/tag/v0.4.2)에서 받음)를 붙인 채로 애플리케이션을 실행하고, 통합 테스트를 그 위로 흘려보낸 다음, 정상적으로 종료시킵니다.
 
 ```bash
-java -javaagent:reqover-agent-0.4.1.jar=include=com.example \
+java -javaagent:reqover-agent-0.4.2.jar=include=com.example \
   -jar build/libs/your-app.jar \
   --reqover.report.export.json-path=build/reqover-report.json
 ```
@@ -67,7 +67,7 @@ curl -sf http://127.0.0.1:8080/reqover/report > build/reqover-report.json
 
 ```bash
 git diff --name-only origin/main...HEAD \
-  | java -jar reqover-cli-0.4.1.jar impact \
+  | java -jar reqover-cli-0.4.2.jar impact \
       --report build/reqover-report.json \
       --changed-files -
 ```
@@ -124,7 +124,7 @@ jobs:
       - name: Record a report
         run: ./scripts/record-reqover-report.sh
 
-      - uses: reqover-labs/reqover/.github/actions/impact@v0.4.1
+      - uses: reqover-labs/reqover/.github/actions/impact@v0.4.2
         with:
           report: build/reqover-report.json
 ```
@@ -136,7 +136,7 @@ action의 입력값:
 | 입력값            | 기본값     | 하는 일                                                          |
 | ---------------- | --------- | ---------------------------------------------------------------- |
 | `report`         | `build/reqover-report.json` | 기록된 리포트 JSON 파일 경로                     |
-| `version`        | `0.4.1`   | CLI를 받아올 릴리스                                                |
+| `version`        | `0.4.2`   | CLI를 받아올 릴리스                                                |
 | `cli-jar`        | 비어 있음  | 릴리스 대신 이미 있는 CLI JAR(예: 미배포 빌드)를 사용                  |
 | `base-ref`       | PR의 base | diff 기준이 되는 Git ref. Pull Request 밖에서는 필수                 |
 | `fail-on-impact` | `false`   | 관측된 엔드포인트가 바뀐 코드를 실행하면 스텝을 실패시킴                 |
@@ -151,7 +151,7 @@ action의 입력값:
 
 ## 명령 레퍼런스
 
-아래에서 `reqover`는 `java -jar reqover-cli-0.4.1.jar`를 뜻합니다.
+아래에서 `reqover`는 `java -jar reqover-cli-0.4.2.jar`를 뜻합니다.
 
 ### `render`
 

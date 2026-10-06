@@ -2,7 +2,7 @@
 
 # 02. System architecture
 
-This document describes what Reqover `0.4.1` actually implements. It covers only
+This document describes what Reqover `0.4.2` actually implements. It covers only
 what the current code and automated tests guarantee — not planned ideas.
 
 ## Overall flow
@@ -87,7 +87,7 @@ application: it only consumes a report that was already written to disk.
 The invocation form is:
 
 ```text
--javaagent:reqover-agent-0.4.1.jar=include=com.example.app
+-javaagent:reqover-agent-0.4.2.jar=include=com.example.app
 ```
 
 - `include=` is required. Multiple prefixes are separated by `;`, and separate

@@ -39,7 +39,7 @@
 </p>
 
 > [!IMPORTANT]
-> Reqover `0.4.1`은 **초기 개발 단계**입니다. 라이브러리는 Maven Central에 `io.github.reqover-labs`로 올라가 있고, agent와 CLI jar는 [GitHub Releases](https://github.com/reqover-labs/reqover/releases)에서 받습니다. 개발·QA·스테이징 환경에서 써보는 것을 전제로 만들었고, 운영 환경에 상시로 켜두는 용도는 아닙니다.
+> Reqover `0.4.2`은 **초기 개발 단계**입니다. 라이브러리는 Maven Central에 `io.github.reqover-labs`로 올라가 있고, agent와 CLI jar는 [GitHub Releases](https://github.com/reqover-labs/reqover/releases)에서 받습니다. 개발·QA·스테이징 환경에서 써보는 것을 전제로 만들었고, 운영 환경에 상시로 켜두는 용도는 아닙니다.
 
 
 ## 무슨 문제를 푸나
@@ -199,13 +199,13 @@ GET /auto/orders/{id}          3 classes · 3 methods · 1 thread
 의존성 하나면 어댑터와 리포트, Spring 연결이 함께 들어옵니다.
 
 ```kotlin
-implementation("io.github.reqover-labs:reqover-spring-boot-starter:0.4.1")
+implementation("io.github.reqover-labs:reqover-spring-boot-starter:0.4.2")
 ```
 
 그다음 agent를 붙이고 기록할 패키지를 지정합니다.
 
 ```bash
-java -javaagent:reqover-agent-0.4.1.jar=include=com.example.orders -jar your-app.jar
+java -javaagent:reqover-agent-0.4.2.jar=include=com.example.orders -jar your-app.jar
 ```
 
 전체 속성 목록은 [Spring 애플리케이션 연동 가이드](docs/17_integration_guide.ko.md)를
@@ -254,7 +254,7 @@ git diff --name-only origin/main... \
 | `POST /payments`   | `SharedValidator#validate(String)` |
 ```
 
-여기서 `reqover`는 릴리스에 들어 있는 `java -jar reqover-cli-0.4.1.jar`입니다. CLI에는
+여기서 `reqover`는 릴리스에 들어 있는 `java -jar reqover-cli-0.4.2.jar`입니다. CLI에는
 `render`(리포트 JSON을 단독 실행 페이지로)와 `diff`(두 기록 사이에 무엇이 달라졌는지)도
 있습니다. `--fail-on-impact`를 주면 이 분석이 게이트가 됩니다. 영향받는 것이 없으면 종료
 코드 0, 있으면 1, 입력이 잘못됐으면 2입니다.
@@ -262,7 +262,7 @@ git diff --name-only origin/main... \
 ### 3. Pull Request에 코멘트로 남기기
 
 ```yaml
-- uses: reqover-labs/reqover/.github/actions/impact@v0.4.1
+- uses: reqover-labs/reqover/.github/actions/impact@v0.4.2
   with:
     report: build/reqover-report.json
 ```
@@ -335,7 +335,7 @@ flowchart LR
 
 | 항목                 | 현재                            |
 | ------------------ | ----------------------------- |
-| 버전                 | `0.4.1`                       |
+| 버전                 | `0.4.2`                       |
 | 빌드에 필요한 JDK        | 17 또는 21                      |
 | 컴파일 결과물 대상         | Java 17                       |
 | CI                 | Ubuntu + Temurin 17 / 21      |

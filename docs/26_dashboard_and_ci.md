@@ -56,7 +56,7 @@ that prerequisite and shallow history before downloading the CLI or fetching a b
 - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
   with:
     repository: reqover-labs/reqover
-    ref: codex/mentoring-performance-preview
+    ref: e1976b7bd7ebb8d009540b388bedbaeefbe58337
     path: .reqover-tool
     persist-credentials: false
 

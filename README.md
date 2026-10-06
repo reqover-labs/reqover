@@ -80,9 +80,9 @@ The unreleased implementation is split for review: [request diagnostics #34](htt
 The last two are draft proposals. These do not claim measured call order,
 faithful replay, whole-service TPS or a load-test verdict, and are not in `0.2.0`.
 See [review corrections](docs/30_review_corrections.md) for boundaries and checks.
-Current OSV scans still flag a separate Spring MVC advisory; see the
-[security status](docs/29_osv_dependency_remediation.md). Feature test success
-does not mean the security gate has passed.
+A Spring MVC advisory is handled under main's expiring exception policy; see
+the [security status](docs/29_osv_dependency_remediation.md). Passing that policy
+does not mean the dependency has been patched.
 
 ## Three things the report shows
 

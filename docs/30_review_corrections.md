@@ -45,7 +45,7 @@ calls, not a CPU/resource estimate or all-traffic frequency metric.
 ## Verification
 
 The full build and SBOM generation passed on the corrected latest-main snapshot.
-The stack tip's runtime, workflows and test files exactly match that snapshot.
+The initial stack tip's runtime, workflows and test files matched that snapshot.
 Each split was also checked with its focused Java tests. The Action suite passed
 all 8 cases, Node passed all 23 cases (including actual generated-Java compilation),
 and Playwright covered graph animation pixels, filters, drafts, comparison,
@@ -56,13 +56,19 @@ A first full Windows run hit two temporary-log deletion locks in E2E cleanup.
 The agent suite passed on rerun, followed by a successful full build. No
 production code or unrelated cleanup logic was changed to hide that failure.
 
-GitHub Java 17/21 and export/impact jobs passed on all four split PRs. The newer
-OSV scans on #35-#37 remain blocked by Spring MVC 6.2.19 and
-GHSA-pc63-qcmh-9cmg, independently reproduced by a full local query. The earlier
-#34 scan passed but does not override the newer finding. See the
-[updated security record](29_osv_dependency_remediation.md) for verified patch
-availability and the required compatibility decision. This is not an all-green
-or security-complete claim.
+Initial GitHub Java 17/21 and export/impact jobs passed on all four split PRs.
+The #35-#37 scans then failed on Spring MVC 6.2.19 and GHSA-pc63-qcmh-9cmg,
+independently reproduced by a full local query. A subsequent main update added
+the maintainers' expiring exception policy. It was preserved during the final
+synchronization; passing that policy does not mean the dependency is patched.
+See the [security record](29_osv_dependency_remediation.md).
+
+Main `935d3db` additionally merged endpoint-wide recording aggregates (#30),
+reference probes (#31) and publication coordinates (#33). All split branches
+were synchronized without rewriting history. A new regression verifies that
+recording-wide endpoint counts/code stay complete while request timing/status
+and method details stay limited to retained snapshots. No timings are invented
+for evicted observations. The new publication group and SBOM are preserved.
 
 Latest main was synchronized without rewriting the shared feature history; its
 dependency patches, accessor/proxy handling, multi-context exports and workflow

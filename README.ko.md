@@ -80,8 +80,8 @@ Reqover는 요청이 들어오는 순간부터 응답이 나갈 때까지 **그 
 마지막 두 PR은 Draft이며, 배포된 `0.2.0`에는 포함되지 않습니다.
 실제 호출 순서, 원본 재현, 전체 서비스 TPS나 부하 시험 판정을 보장하지 않습니다.
 [리뷰 보완 기록](docs/30_review_corrections.md)에 범위와 검증을 정리했습니다.
-현재 보안 검사에는 별도 Spring MVC 경고가 남아 있습니다.
-[보안 상태](docs/29_osv_dependency_remediation.ko.md)에서 확인하며 기능 검사 통과와 구분합니다.
+Spring MVC 경고는 main의 기한 있는 예외 정책으로 관리합니다.
+[보안 상태](docs/29_osv_dependency_remediation.ko.md)에서 확인하며 검사 통과와 실제 패치를 구분합니다.
 
 ## 리포트가 보여주는 세 가지
 

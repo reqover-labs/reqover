@@ -3,13 +3,14 @@
 Original check: October 4, 2026; updated October 6. The Jackson/Tomcat patch is
 already on main through [PR #26](https://github.com/reqover-labs/reqover/pull/26).
 PR #25 now adds documentation only, not another dependency upgrade. Existing
-release binaries are unchanged. Security checks remain blocking.
+release binaries are unchanged. Security checks remain blocking under main's
+documented, expiring exception policy.
 
-## Current Blocking Finding
+## Current Finding and Policy
 
 The [October 6 stack-tip scan](https://github.com/reqover-labs/reqover/actions/runs/37428486980/job/112154025632)
 and a fresh local OSV query of all 104 external Maven coordinates report one
-remaining finding: `org.springframework:spring-webmvc:6.2.19`,
+finding before the latest main synchronization: `org.springframework:spring-webmvc:6.2.19`,
 [GHSA-pc63-qcmh-9cmg](https://github.com/advisories/GHSA-pc63-qcmh-9cmg),
 CVE-2026-47884. Its OSV record was updated October 5. This is separate from the
 Jackson/Tomcat findings below; the old zero-finding result is historical.
@@ -24,7 +25,16 @@ A follow-up compatibility/security decision is required: obtain a legitimately
 supported patched 6.2 release, or validate migration of the Spring/Boot stack to
 the supported OSS line. Overriding only MVC to 7.x inside a Boot 3.5 application
 is not a safe patch. This review does not silently perform that major migration,
-add ignored advisories, relabel SBOM packages, or weaken `fail-on-vuln`.
+relabel SBOM packages, or weaken `fail-on-vuln`.
+
+Main `935d3db` now includes the maintainers' existing `osv-scanner.toml` exception
+for this advisory until December 31, 2026. Its rationale is limited to samples
+and test runtimes that do not configure XsltView; published adapters use Spring
+as `compileOnly`, leaving the application owner's version choice intact. The
+latest synchronization preserves that upstream policy without broadening it.
+CI can therefore pass under the exception while the dependency is still
+unpatched. Exception-aware query results distinguish `exceptions` from
+`findings`; a green gate must not be described as zero underlying advisories.
 
 ## Cause and Patch
 
@@ -63,8 +73,9 @@ checked directly.
   10.1.60 and the same full OSV query reports zero affected components.
 - `sbom/reqover.cdx.json` is regenerated from Gradle, including actual versions,
   hashes and dependency relationships. It is not manually relabelled.
-- Existing `fail-on-vuln: true` remains; no ignored advisories, severity exclusions,
-  removed components or `continue-on-error` are added to the security gate.
+- The October 4 patch kept `fail-on-vuln: true` without adding ignored advisories,
+  severity exclusions, removed components or `continue-on-error`. The subsequent
+  main exception is documented above and is not a dependency fix.
 - The October 4 isolated `clean build` passed 157 Java tests without failures/errors/skips;
   all 20 Node tests, including generated Java compilation, pass with the patch.
   GitHub's actual security job is checked separately before calling the PR green.
@@ -84,6 +95,9 @@ python3 scripts/check-sbom-osv.py sbom/reqover.cdx.json
 
 Zero known findings at the check time is not a blanket security guarantee.
 Consumers must still maintain their application dependencies and access policy.
+
+The October 6 exception-aware query returned zero unexcepted findings and one
+explicit exception expiring December 31. It did not return zero advisories.
 
 Sources: [Jackson maintainer advisory](https://github.com/FasterXML/jackson-core/security/advisories/GHSA-7hhh-6rmp-j9qf),
 [Jackson databind advisory](https://github.com/advisories/GHSA-cxp5-3px4-pw24),

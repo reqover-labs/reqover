@@ -1,0 +1,57 @@
+name: impact action demo
+
+# Demonstration only, for the contest functional test: runs the released
+# Action (@v0.4.0) on the demo pull request. Do not merge.
+on:
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  impact:
+    if: github.head_ref == 'demo/impact-action'
+    name: retest candidates (comment, artifact, summary)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-java@de7274f081f381c8f8158605e0321c36c376e2e6 # v6.0.1
+        with:
+          distribution: temurin
+          java-version: 21
+      - uses: gradle/actions/setup-gradle@3f5f9adaf7d9fecd50b5935e54106014257a94e6 # v6.4.0
+      - name: Record the MVC sample and export a report
+        run: ./scripts/run-impact-demo.sh 18080
+      - name: Reqover impact analysis
+        uses: reqover-labs/reqover/.github/actions/impact@v0.4.0
+        with:
+          report: build/reqover-impact-demo/report.json
+          analysis-name: demo
+          upload-artifact: "true"
+          artifact-name: reqover-dashboard-demo
+
+  gate:
+    if: github.head_ref == 'demo/impact-action'
+    name: impact gate (expected to fail)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-java@de7274f081f381c8f8158605e0321c36c376e2e6 # v6.0.1
+        with:
+          distribution: temurin
+          java-version: 21
+      - uses: gradle/actions/setup-gradle@3f5f9adaf7d9fecd50b5935e54106014257a94e6 # v6.4.0
+      - name: Record the MVC sample and export a report
+        run: ./scripts/run-impact-demo.sh 18081
+      - name: Reqover impact gate
+        uses: reqover-labs/reqover/.github/actions/impact@v0.4.0
+        with:
+          report: build/reqover-impact-demo/report.json
+          comment: "false"
+          fail-on-impact: "true"

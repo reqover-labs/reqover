@@ -2,6 +2,7 @@ package io.reqover.example.mvc.auto;
 
 import org.springframework.stereotype.Service;
 
+// Demo change for the impact Action demonstration (pull request is not merged).
 @Service
 public class AutoOrderService {
     public AutoOrderResponse find(long id) {

@@ -92,6 +92,10 @@ aggregate summaries with explicit comparability confirmation. Floating-point
 noise is suppressed; unfinished and legacy observations stay unmeasured.
 Truncated detail exports are not accepted as complete timing baselines.
 
+The [performance validation plan](docs/23_performance_validation_plan.ko.md)
+(Korean) and the [review notes](docs/30_review_corrections.md) record the scope
+and its boundaries.
+
 ## Three things the report shows
 
 ### 1. Execution paths split per API
@@ -414,6 +418,10 @@ Issues, pull requests, and commit messages are written in English so contributor
 </details>
 
 ## Documentation
+
+- [Performance validation plan](docs/23_performance_validation_plan.ko.md) (Korean)
+- [Preview review corrections](docs/30_review_corrections.md)
+- [OSV dependency remediation](docs/29_osv_dependency_remediation.md)
 
 - [System architecture](docs/02_architecture.md) · [한국어판](docs/02_architecture.ko.md)
 - [Spring integration guide](docs/17_integration_guide.md) · [한국어판](docs/17_integration_guide.ko.md)

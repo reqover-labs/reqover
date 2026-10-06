@@ -90,6 +90,9 @@ JUnit 파일로 옮깁니다. 기대 결과와 안전한 GET/HEAD 경로를 직�
 비교 가능한지 직접 확인해야 합니다. 부동소수점 오차는 차이에서 제외하고 미완료 기록은
 미측정으로 둡니다. 상세가 생략된 JSON을 완전한 시간 기준선으로 사용하지 않습니다.
 
+[개선 계획](docs/23_performance_validation_plan.ko.md)과
+[리뷰 보완 기록](docs/30_review_corrections.md)에 범위와 한계를 정리했습니다.
+
 ## 리포트가 보여주는 세 가지
 
 ### 1. API별로 나눠 본 실행 경로
@@ -416,6 +419,10 @@ fork 후 브랜치를 만들고, `./gradlew clean test` 통과를 확인한 뒤 
 </details>
 
 ## 문서 목록
+
+- [성능 검증 개선 계획](docs/23_performance_validation_plan.ko.md)
+- [미리보기 리뷰 보완 기록](docs/30_review_corrections.md)
+- [OSV 보안 검사 보완](docs/29_osv_dependency_remediation.ko.md)
 
 - [시스템 아키텍처](docs/02_architecture.ko.md)
 - [Spring 애플리케이션 연동 가이드](docs/17_integration_guide.ko.md)

@@ -1,7 +1,7 @@
 # Roadmap
 
 What we intend to do next, in the order we intend to do it, and why. There are
-no dates — this is a side project maintained by two people, and a date we
+no release promises — this is a side project maintained by two people, and a date we
 cannot keep is worse than no date.
 
 Everything here is open to argument. If something below matters to you, or the
@@ -10,6 +10,15 @@ order looks wrong for how you would use Reqover, say so in the issue or in
 the fastest way to change what we work on.
 
 ## Now
+
+**Performance validation preview (Oct-Nov 2026).** The
+[plan](docs/23_performance_validation_plan.ko.md) (Korean) sets the scope for
+this preview; it is not a promised release date. On main for the next release:
+[request diagnostics #34](https://github.com/reqover-labs/reqover/pull/34),
+[dashboard/CI #35](https://github.com/reqover-labs/reqover/pull/35),
+[test drafts #36](https://github.com/reqover-labs/reqover/pull/36) and
+[recording comparison #37](https://github.com/reqover-labs/reqover/pull/37). Faithful replay, selective input capture,
+method spans and k6 execution are follow-up work, not current capabilities.
 
 **Make Reqover installable.**
 [#4](https://github.com/reqover-labs/reqover/issues/4) · Maven Central
@@ -89,8 +98,9 @@ Saying no is part of a roadmap. See
   packages you name and samples nothing. That is affordable in development, QA,
   and staging, and it is the wrong shape for permanent production use — an APM
   is the right tool there.
-- **A hosted backend or dashboard.** The report is a file. Anything that turns
-  Reqover into a service is a different project.
+- **A hosted backend or shared dashboard service.** A local standalone HTML
+  dashboard is in scope; hosted or multi-user services are not. Storage, access
+  control and operating costs would require a separate project decision.
 - **Claiming a change is safe.** Impact analysis reports observed execution,
   which is a lower bound. A file it cannot match means "not seen", never "not
   affected", and no amount of product polish will change that.

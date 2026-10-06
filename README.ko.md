@@ -191,7 +191,7 @@ GET /auto/orders/{id}          3 classes · 3 methods · 1 thread
 의존성 하나면 어댑터와 리포트, Spring 연결이 함께 들어옵니다.
 
 ```kotlin
-implementation("io.reqover:reqover-spring-boot-starter:0.2.0")
+implementation("io.github.reqover-labs:reqover-spring-boot-starter:0.2.0")
 ```
 
 그다음 agent를 붙이고 기록할 패키지를 지정합니다.
@@ -312,7 +312,7 @@ flowchart LR
 
 - **몇 번째 줄까지 실행했는지는 모릅니다.** 메서드 단위로만 봅니다. 줄·분기 단위 정밀도가 필요하면 JaCoCo를 쓰세요.
 - **컴파일러가 자동 생성한 메서드**는 기록하지 않습니다. **런타임 프록시**(Spring CGLIB, Hibernate, Byte Buddy)와, 필드 하나를 읽거나 쓰기만 하는 **단순 getter·setter**(record accessor 포함)도 기록하지 않습니다. 어떤 컨트롤러에도 매칭되지 않아 정적 리소스 핸들러로 넘어간 요청도 기록하지 않습니다.
-- **기록은 메모리에만 남습니다.** 기본 상한은 10,000건이고(`reqover.mvc.max-snapshots` / `reqover.webflux.max-snapshots`로 조정), 넘으면 오래된 것부터 지웁니다. 애플리케이션을 재시작하면 사라집니다. 다른 곳에 저장하고 싶다면 `CoverageStore`가 확장 지점이지만, Reqover가 제공하는 영속 구현체는 없습니다 — 대신 리포트를 파일로 내보내세요.
+- **기록은 메모리에만 남습니다.** 요청별 기록의 기본 상한은 10,000건이고(`reqover.mvc.max-snapshots` / `reqover.webflux.max-snapshots`로 조정), 넘으면 오래된 것부터 지웁니다. 어떤 엔드포인트가 몇 번 실행됐고 무엇을 실행했는지는 엔드포인트별로 따로 쌓기 때문에, 긴 기록 초반에만 호출된 엔드포인트도 리포트에 남습니다. 애플리케이션을 재시작하면 사라집니다. 다른 곳에 저장하고 싶다면 `CoverageStore`가 확장 지점이지만, Reqover가 제공하는 영속 구현체는 없습니다 — 대신 리포트를 파일로 내보내세요.
 - **영향도 분석은 기록된 범위 안에서만 동작합니다.** 바뀐 파일을, 리포트가 실행을 관측한 코드와 맞춰볼 뿐입니다. 맞출 수 없는 파일은 매칭 실패로 보고되는데, 이는 "영향 없음"이 아니라 "본 적 없음"이라는 뜻입니다.
 - **MVC의 비동기 처리 구간**은 자동 연결이 끊깁니다. 별도 스레드로 넘어간 부분은 기록되지 않고, 요청 처리가 다시 돌아오는 시점부터 이어집니다.
 - **WebFlux 어댑터는 JVM 전체에 영향을 주는 설정 하나를 켭니다.** (Reactor의 컨텍스트 자동 전달 기능. 스레드를 넘어 요청 정보를 옮기기 위해 필요합니다.) 원하지 않으면 애플리케이션 시작 전에 `reqover.webflux.enabled=false`로 어댑터를 끄세요.

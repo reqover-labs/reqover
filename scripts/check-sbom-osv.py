@@ -6,6 +6,7 @@ from __future__ import annotations
 import argparse
 import json
 import sys
+import tomllib
 import urllib.error
 import urllib.request
 from datetime import datetime, timezone
@@ -19,6 +20,12 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("sbom", type=Path, help="CycloneDX JSON file")
     parser.add_argument("--output", type=Path, help="Optional JSON evidence output")
     parser.add_argument("--timeout", type=int, default=30)
+    parser.add_argument(
+        "--config",
+        type=Path,
+        default=Path(__file__).resolve().parent.parent / "osv-scanner.toml",
+        help="osv-scanner.toml whose unexpired IgnoredVulns entries are honoured, as in CI",
+    )
     return parser.parse_args()
 
 
@@ -30,7 +37,7 @@ def maven_components(sbom: dict) -> list[dict[str, str]]:
         name = component.get("name")
         version = component.get("version")
         purl = component.get("purl", "")
-        if not group or group == "io.reqover" or not name or not version:
+        if not group or group in ("io.reqover", "io.github.reqover-labs") or not name or not version:
             continue
         if purl and not purl.startswith("pkg:maven/"):
             continue
@@ -41,6 +48,23 @@ def maven_components(sbom: dict) -> list[dict[str, str]]:
         seen.add(key)
         components.append({"coordinate": coordinate, "version": version, "purl": purl})
     return components
+
+
+def active_exceptions(config: Path) -> dict[str, str]:
+    """IgnoredVulns ids that have not expired, mapped to their expiry."""
+    if not config.exists():
+        return {}
+    with config.open("rb") as handle:
+        entries = tomllib.load(handle).get("IgnoredVulns", [])
+    now = datetime.now(timezone.utc)
+    active = {}
+    for entry in entries:
+        until = entry.get("ignoreUntil")
+        if until is None or not entry.get("reason", "").strip():
+            raise SystemExit(f"{config}: exception {entry.get('id')} needs both ignoreUntil and reason")
+        if until > now:
+            active[entry["id"]] = until.isoformat()
+    return active
 
 
 def query_osv(components: list[dict[str, str]], timeout: int) -> dict:
@@ -79,9 +103,16 @@ def main() -> int:
             f"OSV returned {len(results)} results for {len(components)} queries; refusing a partial verdict"
         )
 
+    exceptions = active_exceptions(args.config)
     findings = []
+    excepted = []
     for component, result in zip(components, results, strict=True):
-        vulnerabilities = result.get("vulns", [])
+        vulnerabilities = []
+        for item in result.get("vulns", []):
+            if item.get("id") in exceptions:
+                excepted.append({**component, "id": item.get("id"), "ignoreUntil": exceptions[item.get("id")]})
+            else:
+                vulnerabilities.append(item)
         if vulnerabilities:
             findings.append(
                 {
@@ -100,6 +131,7 @@ def main() -> int:
         "componentQueries": len(components),
         "vulnerableComponents": len(findings),
         "findings": findings,
+        "exceptions": excepted,
     }
 
     if args.output:

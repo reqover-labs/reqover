@@ -13,7 +13,7 @@ plugins {
 }
 
 allprojects {
-    group = "io.reqover"
+    group = "io.github.reqover-labs"
     version = "0.2.0"
 
     tasks.withType<org.cyclonedx.gradle.BaseCyclonedxTask>().configureEach {

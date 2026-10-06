@@ -10,4 +10,4 @@
 - [13. Result Report Draft](13_result_report_draft.md)
 - [18. 최종 제출 계획](18_final_submission_plan.md)
 - [19. 3분 시연영상 대본](19_demo_video_script.md)
-- [submission/](submission/) — 결과보고서 DOCX 초안 (`python3 ../../scripts/build-result-report-docx.py`로 재생성)
+- `submission/` — 결과보고서 DOCX 생성기의 기본 출력 위치. 공식 양식에서 파생된 산출물이라 저장소에는 커밋하지 않습니다(`python3 ../../scripts/build-result-report-docx.py`로 재생성, 최종본은 비공개 제출 보관소에 보관).

@@ -69,19 +69,29 @@ Reqover는 요청이 들어오는 순간부터 응답이 나갈 때까지 **그 
 - **레거시 코드 읽기** — 문서 없는 서비스에 들어와서, API 하나가 어디까지 파고드는지 눈으로 확인할 때
 - **WebFlux 디버깅** — 요청 처리가 여러 스레드로 흩어져서 흐름을 따라가기 어려울 때
 
-## 성능 검증 미리보기 (2026년 10~11월)
+## 미리보기
 
-[개선 계획](docs/23_performance_validation_plan.ko.md)은 문제 요청을 찾고 실행 근거를
-확인한 뒤 검토 가능한 테스트로 옮기는 흐름을 목표로 합니다. 미배포 구현은
-[요청 진단 #34](https://github.com/reqover-labs/reqover/pull/34),
-[대시보드·CI #35](https://github.com/reqover-labs/reqover/pull/35),
-[테스트 초안 #36](https://github.com/reqover-labs/reqover/pull/36),
-[기록 비교 #37](https://github.com/reqover-labs/reqover/pull/37)로 나누어 검토합니다.
-마지막 두 PR은 Draft이며, 배포된 `0.2.0`에는 포함되지 않습니다.
-실제 호출 순서, 원본 재현, 전체 서비스 TPS나 부하 시험 판정을 보장하지 않습니다.
-[리뷰 보완 기록](docs/30_review_corrections.md)에 범위와 검증을 정리했습니다.
-Spring MVC 경고는 main의 기한 있는 예외 정책으로 관리합니다.
-[보안 상태](docs/29_osv_dependency_remediation.ko.md)에서 확인하며 검사 통과와 실제 패치를 구분합니다.
+미배포 [요청 진단 기능](docs/24_request_diagnostics.ko.md)은 보관된 HTTP 상태,
+관측 처리 구간과 개별 요청 상세를 보여줍니다. 메서드 span, CPU 사용량, 네트워크
+응답시간이나 전체 서비스 TPS를 측정하는 기능은 아닙니다. JSON 상세는 기본적으로 최근
+작업 100개로 제한하며, API별 합집합과 역조회는 저장소의 전체 기록 집계를 유지합니다.
+시간·상태 통계는 남아 있는 상세 기록의 범위입니다.
+
+[오프라인 대시보드·CI 안내](docs/26_dashboard_and_ci.ko.md)에서 움직이는 요청·코드
+관계도, 재테스트 맵과 근거 파일을 확인할 수 있습니다. 애니메이션은 관측 관계를 설명하며
+실제 호출 순서를 재생하지 않습니다. 새 Action은 전체 Git 이력과 Python 3이 필요하고,
+artifact 업로드는 명시적으로 켠 경우에만 수행하며 작업마다 다른 이름을 지정합니다.
+
+[테스트 초안](docs/27_test_case_drafts.ko.md)은 선택한 관측 기록을 JSON 또는 비활성화된
+JUnit 파일로 옮깁니다. 기대 결과와 안전한 GET/HEAD 경로를 직접 검토해야 하며,
+원래 입력값을 복원하거나 요청을 자동 재실행하는 기능은 아닙니다.
+
+[기록 비교](docs/28_recording_comparison.ko.md)는 보관된 요약을 비교하며, 두 실행 조건이
+비교 가능한지 직접 확인해야 합니다. 부동소수점 오차는 차이에서 제외하고 미완료 기록은
+미측정으로 둡니다. 상세가 생략된 JSON을 완전한 시간 기준선으로 사용하지 않습니다.
+
+[개선 계획](docs/23_performance_validation_plan.ko.md)과
+[리뷰 보완 기록](docs/30_review_corrections.md)에 범위와 한계를 정리했습니다.
 
 ## 리포트가 보여주는 세 가지
 

@@ -13,10 +13,8 @@ import java.util.Set;
  * Renders a {@link CoverageReport} as a standalone HTML page. All dynamic
  * values are HTML-escaped.
  *
- * <p>The page is deliberately shaped like an engineering report rather than a
- * dashboard: one accent dimension (the HTTP verb), hairline rules instead of
- * stacked cards, and a single derived figure — how many methods are reached by
- * more than one endpoint — because that is the number a reader acts on.
+ * <p>Retained HTTP request diagnostics precede the endpoint coverage and reverse
+ * lookup. Request method sets are resolved independently of endpoint unions.
  */
 public final class HtmlCoverageReportRenderer {
     private static final int MAX_IDS = 12;
@@ -38,6 +36,12 @@ public final class HtmlCoverageReportRenderer {
               var rows = [].slice.call(document.querySelectorAll('tr[data-search]'));
               var noEndpoint = document.getElementById('reqover-no-endpoint');
               var noCode = document.getElementById('reqover-no-code');
+              var requestDetails = [].slice.call(document.querySelectorAll('details.request-detail'));
+              var requestTools = document.getElementById('reqover-request-tools');
+              var mode = document.getElementById('reqover-request-mode');
+              var threshold = document.getElementById('reqover-slow-ms');
+              var requestCount = document.getElementById('reqover-request-count');
+              var noRequest = document.getElementById('reqover-no-request');
 
               function apply() {
                 var query = input.value.trim().toLowerCase();
@@ -57,6 +61,25 @@ public final class HtmlCoverageReportRenderer {
 
                 if (noEndpoint) { noEndpoint.hidden = endpoints.length === 0 || shownEndpoints > 0; }
                 if (noCode) { noCode.hidden = rows.length === 0 || shownRows > 0; }
+                var visibleRequests = 0;
+                var slowMs = threshold ? Number(threshold.value) : 1000;
+                if (!Number.isFinite(slowMs) || slowMs <= 0) { slowMs = 1000; }
+                for (var k = 0; k < requestDetails.length; k++) {
+                  var detail = requestDetails[k];
+                  var status = Number(detail.getAttribute('data-request-status'));
+                  var durationText = detail.getAttribute('data-request-duration');
+                  var duration = durationText === '' ? null : Number(durationText);
+                  var kind = mode ? mode.value : 'all';
+                  var matchesMode = kind === 'all'
+                    || (kind === 'failure' && status >= 400 && status <= 599)
+                    || (kind === 'slow' && duration !== null && duration >= slowMs)
+                    || (kind === 'unknown' && status === -1);
+                  var matchesText = query === '' || detail.getAttribute('data-request-search').indexOf(query) !== -1;
+                  detail.hidden = !(matchesMode && matchesText);
+                  if (!detail.hidden) { visibleRequests++; }
+                }
+                if (requestCount) { requestCount.textContent = visibleRequests + ' of ' + requestDetails.length + ' shown'; }
+                if (noRequest) { noRequest.hidden = visibleRequests > 0; }
 
                 count.textContent = query === ''
                   ? endpoints.length + ' endpoints, ' + rows.length + ' methods'
@@ -65,6 +88,8 @@ public final class HtmlCoverageReportRenderer {
               }
 
               input.addEventListener('input', apply);
+              if (mode) { mode.addEventListener('change', apply); }
+              if (threshold) { threshold.addEventListener('input', apply); }
               input.addEventListener('keydown', function (event) {
                 if (event.key === 'Escape') { input.value = ''; apply(); }
               });
@@ -76,6 +101,7 @@ public final class HtmlCoverageReportRenderer {
               });
 
               box.hidden = false;
+              if (requestTools) { requestTools.hidden = false; }
               apply();
             })();
             </script>
@@ -152,7 +178,7 @@ public final class HtmlCoverageReportRenderer {
                       gap: 12px;
                       height: 56px;
                     }
-                    .wordmark { font-size: 15px; font-weight: 700; letter-spacing: -0.01em; }
+                    .wordmark { font-size: 15px; font-weight: 700; letter-spacing: 0; }
                     .doctype { color: var(--ink-3); font-size: 13px; }
                     .stamp { margin-left: auto; color: var(--ink-3); font-size: 12px; }
 
@@ -170,7 +196,7 @@ public final class HtmlCoverageReportRenderer {
                       margin: 0 0 4px;
                       font-size: 12px;
                       font-weight: 650;
-                      letter-spacing: 0.06em;
+                      letter-spacing: 0;
                       text-transform: uppercase;
                       color: var(--ink-3);
                     }
@@ -184,7 +210,7 @@ public final class HtmlCoverageReportRenderer {
                       font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
                       font-size: 19px;
                       font-weight: 650;
-                      letter-spacing: -0.01em;
+                      letter-spacing: 0;
                     }
                     .verb { font-weight: 700; }
                     .verb-get { color: var(--verb-get); }
@@ -210,7 +236,7 @@ public final class HtmlCoverageReportRenderer {
                       text-align: left;
                       font-size: 11px;
                       font-weight: 650;
-                      letter-spacing: 0.06em;
+                      letter-spacing: 0;
                       text-transform: uppercase;
                       color: var(--ink-3);
                       border-bottom: 1px solid var(--rule-strong);
@@ -237,7 +263,7 @@ public final class HtmlCoverageReportRenderer {
                       margin-top: 4px;
                       font-size: 11px;
                       font-weight: 650;
-                      letter-spacing: 0.04em;
+                      letter-spacing: 0;
                       text-transform: uppercase;
                       color: var(--ink-2);
                     }
@@ -305,11 +331,15 @@ public final class HtmlCoverageReportRenderer {
                   </style>
                 </head>
                 <body>
+                """);
+        html.append(DiagnosticDashboard.navigation(report.requests().stream().anyMatch(RequestObservation::isHttp)));
+        html.append("""
                 <header class="topbar">
                   <div class="wrap">
-                    <span class="wordmark">Reqover</span>
-                    <span class="doctype">coverage report</span>
+                    <span class="wordmark" id="reqover-view-title">Validation overview</span>
+                    <span class="doctype">Recorded data</span>
                 """);
+        html.insert(html.indexOf("</style>"), RequestDiagnosticsHtmlRenderer.STYLES + DiagnosticDashboard.styles());
         html.append("    <span class=\"stamp\">")
                 .append(escape(report.generatedAt().toString()))
                 .append("</span>\n");
@@ -327,17 +357,18 @@ public final class HtmlCoverageReportRenderer {
         appendCount(html, sharedCode.size(), "method reached by 2+ endpoints", "methods reached by 2+ endpoints");
         html.append("</p>\n");
 
+        html.append(RequestDiagnosticsHtmlRenderer.render(report));
+
         html.append("""
                 <div class="filter" id="reqover-filter-box" hidden>
                   <label class="sr-only" for="reqover-filter">Filter</label>
                   <input type="search" id="reqover-filter" autocomplete="off" spellcheck="false"
                          placeholder="Filter by endpoint, class, or method">
                   <span class="filter-count" id="reqover-filter-count"></span>
-                  <span class="filter-hint">Press <kbd>/</kbd> to focus, <kbd>Esc</kbd> to clear.</span>
                 </div>
                 """);
 
-        html.append("<section class=\"section\">\n");
+        html.append("<section class=\"section\" id=\"endpoint-code\">\n");
         html.append("<h2 class=\"section-label\">Endpoint to Code</h2>\n");
         html.append("<p class=\"section-note\">What each observed request actually executed.</p>\n");
 
@@ -351,7 +382,7 @@ public final class HtmlCoverageReportRenderer {
                 + "No endpoint matches this filter.</p>\n");
         html.append("</section>\n");
 
-        html.append("<section class=\"section\">\n");
+        html.append("<section class=\"section\" id=\"code-endpoint\">\n");
         html.append("<h2 class=\"section-label\">Code to Endpoint Index</h2>\n");
         html.append("<p class=\"section-note\">Which observed APIs to retest after a code change. "
                 + "Highlighted rows are reached by more than one endpoint.</p>\n");
@@ -385,10 +416,14 @@ public final class HtmlCoverageReportRenderer {
                 + "No code matches this filter.</p>\n");
         html.append("</section>\n");
 
+        html.append(DiagnosticDashboard.artifacts(report));
+        html.append(TestCaseDraftHtmlRenderer.render(report.requests().stream().anyMatch(RequestObservation::isHttp)));
+        html.append(RecordingComparisonHtmlRenderer.render());
         html.append("<footer>Reqover records method-entry hits per observed request. "
                 + "It reports what ran, not line or branch coverage.</footer>\n");
         html.append("</main>\n");
         html.append(FILTER_SCRIPT);
+        html.append(DiagnosticDashboard.script(report));
         html.append("</body></html>\n");
         return html.toString();
     }

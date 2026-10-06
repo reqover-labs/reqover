@@ -69,20 +69,32 @@ Reqover records, from the moment a request arrives until the response leaves, **
 - **Reading unfamiliar code** — you joined an undocumented service and want to see how deep one API actually reaches
 - **Debugging WebFlux** — request handling is scattered across threads and the flow is hard to follow
 
-## Performance Validation Preview (Oct-Nov 2026)
+## Preview
+
+The unreleased [request diagnostics preview](docs/24_request_diagnostics.md)
+adds retained HTTP status counts, recorded processing intervals and individual
+request details. These are adapter observations, not method spans, CPU usage,
+network response times or whole-service TPS. JSON details default to the newest
+100 units; endpoint unions and reverse lookup preserve the store's recording-wide
+aggregates, while timing/status statistics remain limited to retained details.
+
+The [offline dashboard and CI guide](docs/26_dashboard_and_ci.md) adds animated
+request/code associations, a retest map and downloadable evidence. Animation is
+illustrative, not measured call order. The updated Action requires full Git
+history and Python 3; artifact upload is opt-in with distinct names per job.
+
+[Reviewed test drafts](docs/27_test_case_drafts.md) turn a selected observation
+into a JSON draft or a disabled JUnit test. Expected results and safe concrete
+GET/HEAD paths require manual review; no original inputs or replay are implied.
+
+[Recording comparison](docs/28_recording_comparison.md) compares retained
+aggregate summaries with explicit comparability confirmation. Floating-point
+noise is suppressed; unfinished and legacy observations stay unmeasured.
+Truncated detail exports are not accepted as complete timing baselines.
 
 The [performance validation plan](docs/23_performance_validation_plan.ko.md)
-(Korean) connects problem requests, execution evidence and reviewed test cases.
-The unreleased implementation is split for review: [request diagnostics #34](https://github.com/reqover-labs/reqover/pull/34),
-[offline dashboard and CI #35](https://github.com/reqover-labs/reqover/pull/35),
-[test drafts #36](https://github.com/reqover-labs/reqover/pull/36) and
-[recording comparison #37](https://github.com/reqover-labs/reqover/pull/37).
-The last two are draft proposals. These do not claim measured call order,
-faithful replay, whole-service TPS or a load-test verdict, and are not in `0.2.0`.
-See [review corrections](docs/30_review_corrections.md) for boundaries and checks.
-A Spring MVC advisory is handled under main's expiring exception policy; see
-the [security status](docs/29_osv_dependency_remediation.md). Passing that policy
-does not mean the dependency has been patched.
+(Korean) and the [review notes](docs/30_review_corrections.md) record the scope
+and its boundaries.
 
 ## Three things the report shows
 

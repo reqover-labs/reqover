@@ -2,7 +2,7 @@
 
 # 02. System architecture
 
-This document describes what Reqover `0.3.0` actually implements. It covers only
+This document describes what Reqover `0.4.0` actually implements. It covers only
 what the current code and automated tests guarantee — not planned ideas.
 
 ## Overall flow
@@ -50,7 +50,7 @@ Reqover is split into four layers.
 | `reqover-cli` | Shaded executable JAR: `render`, `diff`, `impact` over a report read from disk |
 | `examples/*` | E2E samples for manual probes and agent auto-instrumentation |
 
-`reqover-report` outgrew its name in `0.3.0`. Besides rendering, it now owns JSON
+`reqover-report` outgrew its name in `0.4.0`. Besides rendering, it now owns JSON
 persistence (`CoverageReportJson`), report comparison (`CoverageReportDiff`), and
 impact analysis (`ImpactAnalyzer`). It still declares exactly one dependency,
 `reqover-core` — the JSON reader and writer are hand-written for that reason, so
@@ -87,7 +87,7 @@ application: it only consumes a report that was already written to disk.
 The invocation form is:
 
 ```text
--javaagent:reqover-agent-0.3.0.jar=include=com.example.app
+-javaagent:reqover-agent-0.4.0.jar=include=com.example.app
 ```
 
 - `include=` is required. Multiple prefixes are separated by `;`, and separate
@@ -137,7 +137,7 @@ The correctness principle is **unattributed is better than misattributed.**
 
 Every bucket belongs to a `UnitInfo`: a unit ID, a unit type, a display name, and
 an attribute map. That record was always generic — the five types it names are
-`http-request`, `scheduled-job`, `message`, `test`, and `global`. What `0.3.0`
+`http-request`, `scheduled-job`, `message`, `test`, and `global`. What `0.4.0`
 adds is `UnitScope`, which makes the non-HTTP ones usable without writing an
 adapter:
 
@@ -182,7 +182,7 @@ sequenceDiagram
 The normalized endpoint pattern uses Spring's best-matching pattern, falling back
 to the request URI when no pattern is available yet. Servlet async re-dispatch
 reuses the existing bucket, but application execution on the async worker thread
-before re-dispatch is **not** propagated automatically in `0.3.0`.
+before re-dispatch is **not** propagated automatically in `0.4.0`.
 
 ## Spring WebFlux lifecycle
 
@@ -329,6 +329,6 @@ same document to a path of your choosing; treat that file as the report it is.
   recording is reported as unmatched, which is not the same as unaffected.
 - Context on unmanaged threads and MVC async workers is not guaranteed
   automatically; a second thread needs `UnitScope.join`.
-- `0.3.0` prioritizes development, QA, and CI use. Retention is in memory by
+- `0.4.0` prioritizes development, QA, and CI use. Retention is in memory by
   default and a report leaves the JVM only when it is exported or served; it does
   not claim to be a production always-on agent.

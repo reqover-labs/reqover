@@ -4,6 +4,12 @@ All notable changes to Reqover are documented in this file.
 
 ## Unreleased
 
+## 0.4.0 — 2026-10-06
+
+Request diagnostics and an offline dashboard: find slow and failing requests
+before you deploy, compare recordings, and turn an observation into a reviewed
+test. Validated against a production Spring Boot service's traffic mix.
+
 ### Added
 
 - **Retained request diagnostics.** HTTP status counts, average/p95/maximum
@@ -38,6 +44,13 @@ All notable changes to Reqover are documented in this file.
   `<!-- reqover-impact:NAME -->` with the new `analysis-name` input), and the
   Action edits its own earlier comment instead of adding one per run. Give
   each analysis in one pull request its own `analysis-name`.
+
+### Fixed
+
+- **Dashboard and report signatures are readable for every probe.** The
+  retest map showed raw JVM descriptors (`validate(Ljava/lang/String;)V`), and
+  enum-constant reference probes rendered as `NAMELcom/x/Type;`. Both now read
+  like `validate(String)` and `NAME: Type`.
 
 ## 0.3.0 — 2026-10-06
 

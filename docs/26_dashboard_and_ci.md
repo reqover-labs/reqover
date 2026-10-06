@@ -2,10 +2,10 @@
 
 # Diagnostic dashboard and CI artifacts
 
-This is an **unreleased development preview**, not part of `v0.3.0`.
-The updated Action and source-built CLI are both needed for the new dashboard.
-Using the default `version: 0.3.0` downloads the released CLI and renders its older
-report; it does not acquire unreleased UI or request collection features.
+Available since **0.4.0**. The `v0.4.0` Action downloads the released
+`reqover-cli-0.4.0.jar`, whose `render` produces this dashboard; no source build
+is needed. Request details only appear when the recording itself was made with
+the 0.4.0 agent/starter. Older JSON still renders, without per-request diagnostics.
 
 ## What to review first
 
@@ -40,8 +40,9 @@ Before this step, your application must already have the Reqover agent/starter
 attached and have produced `build/reqover-report.json` from a relevant integration
 scenario. The Action does not launch or install instrumentation in your application.
 See [the recording guide](18_ci_impact_analysis.md) and
-[Spring integration](17_integration_guide.md). Maven Central artifacts are not
-published yet; use source builds or released JARs.
+[Spring integration](17_integration_guide.md). The starter is on Maven Central as
+`io.github.reqover-labs:reqover-spring-boot-starter:0.4.0`; the agent JAR comes
+from the [v0.4.0 GitHub Release](https://github.com/reqover-labs/reqover/releases/tag/v0.4.0).
 
 Prerequisites: Ubuntu runner, Java 17+ (21 for the example), Python 3, Bash,
 and `actions/checkout` with `fetch-depth: 0`. The example belongs after recording
@@ -52,32 +53,22 @@ Python. Install Python 3 in the container before the Action. The script checks
 that prerequisite and shallow history before downloading the CLI or fetching a base.
 
 ```yaml
-# Unreleased preview. For a long-lived workflow, pin a reviewed commit SHA.
-- uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
-  with:
-    repository: reqover-labs/reqover
-    ref: main  # replace with the commit SHA you reviewed
-    path: .reqover-tool
-    persist-credentials: false
-
-- name: Build the preview CLI
-  run: ./.reqover-tool/gradlew -p .reqover-tool :reqover-cli:shadowJar
-
 - name: Retest candidates and dashboard
   id: reqover
-  uses: ./.reqover-tool/.github/actions/impact
+  uses: reqover-labs/reqover/.github/actions/impact@v0.4.0
   with:
     report: build/reqover-report.json
-    cli-jar: .reqover-tool/reqover-cli/build/libs/reqover-cli-0.3.0.jar
     comment: "false"
     upload-artifact: "true"
     artifact-name: reqover-${{ github.job }}-${{ strategy.job-index || 'single' }}
+    analysis-name: ${{ github.job }}
 ```
 
-The first checkout of **your application repository** still needs
-`fetch-depth: 0`. The nested checkout above only supplies the tool. For this
-repository itself, use `./.github/actions/impact` and its local built CLI, as
-demonstrated by [.github/workflows/build.yml](../.github/workflows/build.yml).
+The checkout of **your application repository** needs `fetch-depth: 0`. The
+Action downloads the CLI matching its `version` input (`0.4.0` by default).
+To try an unreleased build instead, build the CLI yourself and pass its path as
+`cli-jar`; `version` is then ignored. This repository's own CI does that with its
+local Action, as shown in [.github/workflows/build.yml](../.github/workflows/build.yml).
 
 Start with `permissions: contents: read` and `comment: "false"`. For same-repository
 PR comments, grant `pull-requests: write` and opt into comments. Fork PR comments
@@ -94,8 +85,8 @@ copy the original report JSON. Download and open `report.html` locally.
 | Input | Default | Purpose |
 | --- | --- | --- |
 | `report` | `build/reqover-report.json` | Previously recorded JSON |
-| `cli-jar` | empty | Use a built CLI instead of downloading a release |
-| `version` | `0.3.0` | Release CLI fallback, not the preview |
+| `version` | `0.4.0` | Release to download the CLI from |
+| `cli-jar` | empty | Use an existing CLI JAR (e.g. an unreleased build) instead of downloading |
 | `base-ref` | PR base | Explicit Git ref required on push/manual runs |
 | `comment` | `true` | Update only the marked Reqover bot comment |
 | `upload-artifact` | `false` | Opt in to save the three named output files |
@@ -116,15 +107,17 @@ names are never uploaded unless the caller explicitly opts in.
 
 `fail-on-impact` fails when **observed APIs executed changed code**, not when a
 test fails. Leave it off for ordinary review. Zero candidates and unmatched files
-never prove an API is safe. Test draft generation, faithful replay, k6 execution, TPS, method timings,
-input capture and automatic test execution remain separate planned work.
+never prove an API is safe. Faithful replay, k6 execution, TPS, method timings,
+input capture and automatic test execution remain separate planned work. Reviewed
+test drafts are created by hand in the dashboard ([guide](27_test_case_drafts.md));
+the Action does not generate or run them.
 
 ## Security and verification
 
 Only use synthetic or authorized QA recordings. HTML still contains code names,
 request IDs, and thread names: artifacts are not inherently safe to publish.
-No `.env`, API keys, headers, body inputs, or credentials are collected by this
-preview. The Action cannot sanitize arbitrary secrets injected into report fields.
+No `.env`, API keys, headers, body inputs, or credentials are collected by
+Reqover. The Action cannot sanitize arbitrary secrets injected into report fields.
 
 Local Action tests execute the real CLI in temporary Git repositories, including
 spaces in paths, changed/unobserved code, missing report/base-ref errors, and a
@@ -132,7 +125,7 @@ base branch advancing after a PR diverged:
 
 ```bash
 ./gradlew :reqover-cli:shadowJar
-python3 scripts/test-impact-action.py --cli reqover-cli/build/libs/reqover-cli-0.3.0.jar
+python3 scripts/test-impact-action.py --cli reqover-cli/build/libs/reqover-cli-0.4.0.jar
 ```
 
 For visual checks, install Playwright in your test environment and run

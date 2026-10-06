@@ -2,12 +2,12 @@
 
 # Reviewed test case drafts
 
-Unreleased preview: a selected recorded request can now become a reviewed JSON
+Since 0.4.0, a selected recorded request can become a reviewed JSON
 draft and a disabled JUnit 5 test. This connects a diagnostic observation to a
 workflow: **find a problem, retain its evidence, prepare a regression test**.
 It is not faithful traffic replay, a test runner, or a load generator.
 
-![A recorded 503 with a manually reviewed expected 200](assets/reqover-test-case-draft.png)
+![A slow recorded request turned into a reviewed draft with an expected 200 and a 500 ms limit](assets/reqover-test-case-draft.png)
 
 ## Workflow
 
@@ -26,7 +26,7 @@ remain JSON drafts only; they need a separate reset/idempotency/safety design.
 Concrete paths must start with one slash and cannot contain queries, fragments,
 unresolved `{id}` or wildcard patterns, controls, pipes (`|`, including encoded
 forms), or authority-changing forms.
-The current preview has no query/body/authentication editor.
+There is currently no query/body/authentication editor.
 
 Drafts live **only in the open page's memory**. No localStorage, cloud save or
 background request is used. Refreshing loses edits; downloaded drafts remain

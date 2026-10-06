@@ -2,7 +2,7 @@
 
 # 02. 시스템 아키텍처
 
-이 문서는 Reqover `0.3.0`의 실제 구현을 설명합니다. 향후 아이디어가 아니라
+이 문서는 Reqover `0.4.0`의 실제 구현을 설명합니다. 향후 아이디어가 아니라
 현재 코드와 자동 테스트가 보장하는 범위만 포함합니다.
 
 ## 전체 흐름
@@ -50,7 +50,7 @@ Reqover는 네 층으로 나뉩니다.
 | `reqover-cli` | shaded 실행 JAR. disk에서 읽은 report에 `render`, `diff`, `impact` 수행 |
 | `examples/*` | manual probe와 agent 자동계측 E2E sample |
 
-`reqover-report`는 `0.3.0`에서 렌더링 범위를 넘어섰습니다. JSON 영속화
+`reqover-report`는 `0.4.0`에서 렌더링 범위를 넘어섰습니다. JSON 영속화
 (`CoverageReportJson`), report 비교(`CoverageReportDiff`), impact 분석
 (`ImpactAnalyzer`)까지 이 모듈이 담당합니다. 그러면서도 의존성은 여전히
 `reqover-core` 하나뿐입니다. JSON reader/writer를 직접 구현한 이유가 바로
@@ -86,7 +86,7 @@ starter가 등록하는 bean은 모두 `@ConditionalOnMissingBean`이라, applic
 실행 형식은 다음과 같습니다.
 
 ```text
--javaagent:reqover-agent-0.3.0.jar=include=com.example.app
+-javaagent:reqover-agent-0.4.0.jar=include=com.example.app
 ```
 
 - `include=`는 필수이며 여러 prefix는 `;`, 옵션 사이는 `,`로 구분합니다.
@@ -133,7 +133,7 @@ ReqoverProbe.hit(classId, probeId);
 모든 bucket은 `UnitInfo`에 속합니다. unit ID, unit type, 표시 이름, attribute
 map으로 이루어진 record이며, 원래부터 HTTP에 묶이지 않은 형태였습니다. 정의된
 타입은 `http-request`, `scheduled-job`, `message`, `test`, `global` 다섯
-가지입니다. `0.3.0`이 더한 것은 `UnitScope`로, adapter를 새로 만들지 않고도
+가지입니다. `0.4.0`이 더한 것은 `UnitScope`로, adapter를 새로 만들지 않고도
 HTTP가 아닌 작업 단위를 쓸 수 있게 합니다.
 
 ```java
@@ -175,7 +175,7 @@ sequenceDiagram
 normalized endpoint pattern은 Spring의 best-matching pattern을 사용하고, pattern이
 아직 없으면 request URI로 fallback합니다. Servlet async re-dispatch에는 기존
 bucket을 재사용하지만, re-dispatch 전 async worker thread의 application 실행은
-현재 `0.3.0`에서 자동 전파하지 않습니다.
+현재 `0.4.0`에서 자동 전파하지 않습니다.
 
 ## Spring WebFlux lifecycle
 
@@ -317,6 +317,6 @@ starter의 HTTP report endpoint는 기본 비활성이고 자체 인증을 제�
   파일은 unmatched로 보고되며, 이는 영향이 없다는 뜻이 아닙니다.
 - unmanaged thread와 MVC async worker의 context는 자동 보장하지 않습니다. 다른
   thread에는 `UnitScope.join`이 필요합니다.
-- `0.3.0`은 개발·QA·CI 활용을 우선합니다. 보관은 기본적으로 in-memory이고
+- `0.4.0`은 개발·QA·CI 활용을 우선합니다. 보관은 기본적으로 in-memory이고
   report는 export하거나 제공할 때만 JVM 밖으로 나가며, production always-on
   agent를 주장하지 않습니다.

@@ -85,11 +85,36 @@
       ['Started', r.startedAt], ['Inputs', 'Not collected'], ['Exceptions', 'Not collected']]);
     inspector.append(el('p', 'inspector-foot', 'HTTP errors and recorded intervals only. No method timing or call order.'));
   }
+  // Same rendering as HtmlCoverageReportRenderer.readableSignature: (J)Lcom/x/Order; -> (long): Order.
+  function typeName(t) {
+    var dims = 0; while (t.charAt(dims) === '[') { dims++; }
+    var base = t.substring(dims);
+    var names = { B: 'byte', C: 'char', D: 'double', F: 'float', I: 'int', J: 'long', S: 'short', Z: 'boolean', V: 'void' };
+    var name = base.charAt(0) === 'L' ? base.substring(base.lastIndexOf('/') + 1, base.length - 1).replace(/^.*\$/, '') : names[base];
+    return name + new Array(dims + 1).join('[]');
+  }
+  function splitTypes(s) {
+    var out = [], i = 0;
+    while (i < s.length) {
+      var j = i; while (s.charAt(j) === '[') { j++; }
+      if (s.charAt(j) === 'L') { j = s.indexOf(';', j); if (j < 0) { return null; } }
+      else if ('BCDFIJSZV'.indexOf(s.charAt(j)) < 0) { return null; }
+      out.push(s.substring(i, j + 1)); i = j + 1;
+    }
+    return out;
+  }
+  function readableSignature(d) {
+    if (!d) { return ''; }
+    if (d.charAt(0) !== '(') { var field = splitTypes(d); return field && field.length === 1 ? ': ' + typeName(d) : d; }
+    var close = d.indexOf(')'), params = close > 0 ? splitTypes(d.substring(1, close)) : null, ret = close > 0 ? d.substring(close + 1) : '';
+    if (!params) { return d; }
+    return '(' + params.map(typeName).join(', ') + ')' + (ret && ret !== 'V' ? ': ' + typeName(ret) : '');
+  }
   function inspectCode(c) {
     var linked = codeIndex.get(key(c));
     var endpoints = linked ? linked.endpoints : [];
     heading(endpoints.length > 1 ? 'SHARED CODE' : 'OBSERVED METHOD', shortCode(c));
-    fields([['Class', c.className], ['Signature', c.methodName + c.descriptor], ['Endpoints', String(endpoints.length)]]);
+    fields([['Class', c.className], ['Signature', c.methodName + readableSignature(c.descriptor)], ['Endpoints', String(endpoints.length)]]);
     inspector.append(el('p', 'inspector-subtitle', 'Observed retest candidates'));
     endpoints.forEach(function (endpoint) { inspector.append(endpointLink(endpoint)); });
     inspector.append(el('p', 'inspector-foot', 'Unobserved callers may also depend on this code. This is not proof of complete impact.'));

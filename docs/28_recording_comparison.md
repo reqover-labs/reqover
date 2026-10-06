@@ -2,13 +2,13 @@
 
 # Compare retained recordings
 
-The unreleased dashboard now compares a previous Reqover JSON recording or
+Since 0.4.0, the dashboard compares a previous Reqover JSON recording or
 exported aggregate summary with its current retained HTTP recording. It shows
 endpoint counts, average/p95 adapter intervals, and HTTP error-percentage changes.
 This is descriptive before/after evidence, **not a controlled load-test result or
 automatic performance pass/fail**.
 
-![Comparison using a deliberately modified synthetic baseline](assets/reqover-recording-comparison.png)
+![Two dummy recordings of the same traffic, the second with a slower endpoint](assets/reqover-recording-comparison.png)
 
 The screenshot baseline doubles the sample recording's timing values to exercise
 the UI. It is explicitly named `synthetic-baseline.json`. These numbers do not

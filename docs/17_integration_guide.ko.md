@@ -38,10 +38,10 @@
 
 ### 방법 B — 소스에서 빌드
 
-아직 릴리스되지 않은 변경을 쓰려면 `v0.3.0` 태그를 받아서 로컬 Maven 저장소에 설치합니다.
+릴리스를 직접 빌드하려면 `v0.4.0` 태그를(아직 릴리스되지 않은 변경이라면 `main`을) 받아서 로컬 Maven 저장소에 설치합니다.
 
 ```bash
-git clone --branch v0.3.0 --depth 1 https://github.com/reqover-labs/reqover.git
+git clone --branch v0.4.0 --depth 1 https://github.com/reqover-labs/reqover.git
 cd reqover
 ./gradlew clean publishToMavenLocal
 ```
@@ -52,12 +52,12 @@ Windows는 `.\gradlew.bat clean publishToMavenLocal`입니다.
 
 | 아티팩트 | 버전 |
 | --- | --- |
-| `io.github.reqover-labs:reqover-core` | `0.3.0` |
-| `io.github.reqover-labs:reqover-instrumentation` | `0.3.0` |
-| `io.github.reqover-labs:reqover-report` | `0.3.0` |
-| `io.github.reqover-labs:reqover-spring-mvc` | `0.3.0` |
-| `io.github.reqover-labs:reqover-spring-webflux` | `0.3.0` |
-| `io.github.reqover-labs:reqover-spring-boot-starter` | `0.3.0` |
+| `io.github.reqover-labs:reqover-core` | `0.4.0` |
+| `io.github.reqover-labs:reqover-instrumentation` | `0.4.0` |
+| `io.github.reqover-labs:reqover-report` | `0.4.0` |
+| `io.github.reqover-labs:reqover-spring-mvc` | `0.4.0` |
+| `io.github.reqover-labs:reqover-spring-webflux` | `0.4.0` |
+| `io.github.reqover-labs:reqover-spring-boot-starter` | `0.4.0` |
 
 **`reqover-agent`와 `reqover-cli`는 여기 없습니다.** 둘 다 의존성이 섞이지 않게 따로 묶은(shaded) 실행 파일이고 컴파일할 때 참조하는 라이브러리가 아니라서 배포 대상이 아닙니다. GitHub Release에서 파일로 받습니다 → [4단계](#4-java-agent-붙여서-실행).
 
@@ -73,9 +73,9 @@ Get-ChildItem "$env:USERPROFILE\.m2\repository\io\github\reqover-labs"   # Windo
 
 ### 방법 C — GitHub Release 번들
 
-[v0.3.0 릴리스](https://github.com/reqover-labs/reqover/releases/tag/v0.3.0)에는 `reqover-0.3.0.zip`이 있고, 그 안에 같은 라이브러리 jar가 `lib/`에, 소스가 `sources/`에, 그리고 `reqover-agent-0.3.0.jar`와 `reqover-cli-0.3.0.jar`가 최상위에 들어 있습니다. Maven Central도 소스 빌드도 쓸 수 없는 상황이면 이 방법을 쓰되, `lib/`의 jar를 빌드가 찾을 수 있는 곳(flat-dir 저장소나 사내 Nexus/Artifactory)에 직접 올려야 합니다.
+[v0.4.0 릴리스](https://github.com/reqover-labs/reqover/releases/tag/v0.4.0)에는 `reqover-0.4.0.zip`이 있고, 그 안에 같은 라이브러리 jar가 `lib/`에, 소스가 `sources/`에, 그리고 `reqover-agent-0.4.0.jar`와 `reqover-cli-0.4.0.jar`가 최상위에 들어 있습니다. Maven Central도 소스 빌드도 쓸 수 없는 상황이면 이 방법을 쓰되, `lib/`의 jar를 빌드가 찾을 수 있는 곳(flat-dir 저장소나 사내 Nexus/Artifactory)에 직접 올려야 합니다.
 
-어느 쪽이든 같은 릴리스의 `reqover-0.3.0-SHA256SUMS.txt`로 파일이 온전한지 확인할 수 있습니다.
+어느 쪽이든 같은 릴리스의 `reqover-0.4.0-SHA256SUMS.txt`로 파일이 온전한지 확인할 수 있습니다.
 
 ---
 
@@ -93,7 +93,7 @@ repositories {
 }
 
 dependencies {
-    implementation("io.github.reqover-labs:reqover-spring-boot-starter:0.3.0")
+    implementation("io.github.reqover-labs:reqover-spring-boot-starter:0.4.0")
 }
 ```
 
@@ -103,7 +103,7 @@ repositories {
 }
 
 dependencies {
-    implementation 'io.github.reqover-labs:reqover-spring-boot-starter:0.3.0'
+    implementation 'io.github.reqover-labs:reqover-spring-boot-starter:0.4.0'
 }
 ```
 
@@ -113,7 +113,7 @@ Maven은 기본으로 Central에서(소스 빌드 후에는 로컬 저장소에�
 <dependency>
   <groupId>io.github.reqover-labs</groupId>
   <artifactId>reqover-spring-boot-starter</artifactId>
-  <version>0.3.0</version>
+  <version>0.4.0</version>
 </dependency>
 ```
 
@@ -126,12 +126,12 @@ Maven은 기본으로 Central에서(소스 빌드 후에는 로컬 저장소에�
 ```kotlin
 dependencies {
     // Spring MVC 프로젝트라면
-    implementation("io.github.reqover-labs:reqover-spring-mvc:0.3.0")
+    implementation("io.github.reqover-labs:reqover-spring-mvc:0.4.0")
 
     // Spring WebFlux 프로젝트라면 (위 대신)
-    // implementation("io.github.reqover-labs:reqover-spring-webflux:0.3.0")
+    // implementation("io.github.reqover-labs:reqover-spring-webflux:0.4.0")
 
-    implementation("io.github.reqover-labs:reqover-report:0.3.0")
+    implementation("io.github.reqover-labs:reqover-report:0.4.0")
 }
 ```
 
@@ -270,7 +270,7 @@ public class InternalReqoverReportController {
 스타터를 안 쓴다면 `CoverageStore`를 주입받아서 `reqover-report`의 `CoverageReportGenerator`, `HtmlCoverageReportRenderer`로 리포트를 직접 만들면 됩니다.
 
 > [!IMPORTANT]
-> **`InMemoryCoverageStore`가 아니라 `CoverageStore`를 주입받으세요.** `0.3.0`에서 바뀐 부분입니다 — [저장소 교체하기](#저장소-교체하기) 참고.
+> **`InMemoryCoverageStore`가 아니라 `CoverageStore`를 주입받으세요.** `0.4.0`에서 바뀐 부분입니다 — [저장소 교체하기](#저장소-교체하기) 참고.
 
 동작하는 전체 예시는 [`examples/mvc-sample`](../examples/mvc-sample)과 [`examples/webflux-sample`](../examples/webflux-sample)에 있습니다.
 
@@ -290,7 +290,7 @@ reqover.report.export.html-path=build/reqover-report.html
 **CI 작업이 통합 테스트 실행 결과를 리포트 파일로 받아 가는 방법이 바로 이것입니다.** agent를 붙여서 애플리케이션을 띄우고, 테스트를 흘려보내고, 정상 종료시키면 파일이 남습니다.
 
 ```bash
-java -javaagent:reqover-agent-0.3.0.jar=include=com.example \
+java -javaagent:reqover-agent-0.4.0.jar=include=com.example \
   -jar build/libs/your-app.jar \
   --reqover.report.export.json-path=build/reqover-report.json
 ```
@@ -311,15 +311,15 @@ java -javaagent:reqover-agent-0.3.0.jar=include=com.example \
 
 ### 4-1. agent JAR 받기
 
-[v0.3.0 릴리스](https://github.com/reqover-labs/reqover/releases/tag/v0.3.0)에서 `reqover-agent-0.3.0.jar`를 받습니다. 같은 릴리스의 `reqover-0.3.0-SHA256SUMS.txt`로 파일이 온전한지 확인할 수 있습니다.
+[v0.4.0 릴리스](https://github.com/reqover-labs/reqover/releases/tag/v0.4.0)에서 `reqover-agent-0.4.0.jar`를 받습니다. 같은 릴리스의 `reqover-0.4.0-SHA256SUMS.txt`로 파일이 온전한지 확인할 수 있습니다.
 
 ```bash
-shasum -a 256 reqover-agent-0.3.0.jar          # macOS
-sha256sum reqover-agent-0.3.0.jar              # Linux
+shasum -a 256 reqover-agent-0.4.0.jar          # macOS
+sha256sum reqover-agent-0.4.0.jar              # Linux
 ```
 
 ```powershell
-Get-FileHash reqover-agent-0.3.0.jar -Algorithm SHA256   # Windows
+Get-FileHash reqover-agent-0.4.0.jar -Algorithm SHA256   # Windows
 ```
 
 ### 4-2. 실행
@@ -328,7 +328,7 @@ Get-FileHash reqover-agent-0.3.0.jar -Algorithm SHA256   # Windows
 
 ```bash
 java \
-  -javaagent:reqover-agent-0.3.0.jar=include=com.example.orders \
+  -javaagent:reqover-agent-0.4.0.jar=include=com.example.orders \
   -jar app.jar
 ```
 

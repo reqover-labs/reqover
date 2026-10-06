@@ -2,11 +2,11 @@
 
 # 이전 기록과 현재 기록 비교하기
 
-개선 전후의 관측을 확인하기 위해 개발 버전에 **Compare recordings**를 추가했습니다.
+개선 전후의 관측을 확인하기 위해 0.4.0 대시보드에 **Compare recordings**를 추가했습니다.
 예전 Reqover JSON을 불러오면 API별 관측 건수, 평균·p95 처리 구간과 HTTP 오류 비율이
 현재 기록에서 얼마나 달라졌는지 보여줍니다. 통제된 부하 테스트나 자동 합격 판정은 아닙니다.
 
-![기능 확인용 합성 baseline을 불러온 비교 화면](assets/reqover-recording-comparison.png)
+![같은 트래픽의 더미 기록 둘을 비교한 화면. 두 번째 기록에서 한 엔드포인트가 느려짐](assets/reqover-recording-comparison.png)
 
 이 스크린샷의 baseline은 기능 검사를 위해 기존 관측 시간에 2를 곱한 합성 데이터입니다.
 파일 이름도 `synthetic-baseline.json`으로 표시합니다. 실제 성능 개선이나 벤치마크의

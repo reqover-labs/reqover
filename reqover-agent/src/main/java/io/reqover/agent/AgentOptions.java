@@ -8,7 +8,8 @@ import java.util.List;
  *
  * <p>Syntax: {@code include=com.example;org.demo,exclude=com.example.generated}.
  * {@code accessors=record} also instruments trivial accessors, which are
- * skipped by default (see {@code accessors} below).
+ * skipped by default (see {@code accessors} below), and {@code references=record}
+ * records uses of interfaces and enum constants (see {@code references} below).
  * Prefixes are matched against dotted class names, and the most specific
  * (longest) matching prefix wins, so an explicit include may carve out a
  * subpackage of a default-excluded framework prefix. JDK, ASM, and Reqover
@@ -28,11 +29,19 @@ import java.util.List;
  * impact analysis cannot connect a change to it with the endpoints that use
  * it. {@code accessors=record} keeps them for a CI recording that feeds impact
  * analysis.
+ *
+ * <p>An application interface (a Spring Data repository, a port) and an enum
+ * constant have no method body that runs, so by default a change to them maps
+ * to no endpoint. {@code references=record} records each call to an included
+ * interface and each read of an included class's static field at the call
+ * site, attributed to the referenced class. It is off by default because a
+ * widely used enum then appears under every endpoint.
  */
 public record AgentOptions(
         List<String> includes,
         List<String> excludes,
-        boolean recordAccessors
+        boolean recordAccessors,
+        boolean recordReferences
 ) {
     private static final List<String> HARD_EXCLUDES = List.of(
             "java.",
@@ -71,13 +80,18 @@ public record AgentOptions(
     }
 
     public AgentOptions(List<String> includes, List<String> excludes) {
-        this(includes, excludes, false);
+        this(includes, excludes, false, false);
+    }
+
+    public AgentOptions(List<String> includes, List<String> excludes, boolean recordAccessors) {
+        this(includes, excludes, recordAccessors, false);
     }
 
     public static AgentOptions parse(String args) {
         List<String> includes = new ArrayList<>();
         List<String> excludes = new ArrayList<>(DEFAULT_EXCLUDES);
         boolean recordAccessors = false;
+        boolean recordReferences = false;
 
         if (args == null || args.isBlank()) {
             warn("no include configured; instrumentation is disabled (use include=com.example.app)");
@@ -108,6 +122,14 @@ public record AgentOptions(
                 } else {
                     warn("ignoring accessors=" + value + " (expected record or skip)");
                 }
+            } else if ("references".equals(key)) {
+                if ("record".equals(value)) {
+                    recordReferences = true;
+                } else if ("skip".equals(value)) {
+                    recordReferences = false;
+                } else {
+                    warn("ignoring references=" + value + " (expected record or skip)");
+                }
             } else {
                 warn("ignoring unknown agent option \"" + key + "\"");
             }
@@ -116,7 +138,7 @@ public record AgentOptions(
         if (includes.isEmpty()) {
             warn("no valid include configured; instrumentation is disabled (use include=com.example.app)");
         }
-        return new AgentOptions(includes, excludes, recordAccessors);
+        return new AgentOptions(includes, excludes, recordAccessors, recordReferences);
     }
 
     public boolean shouldInstrument(String dottedClassName) {

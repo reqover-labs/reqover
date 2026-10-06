@@ -14,7 +14,7 @@ record only. Runtime changes were preserved in smaller stacked PRs:
 3. [#36 Reviewed test drafts](https://github.com/reqover-labs/reqover/pull/36), draft, base #35.
 4. [#37 Recording comparison](https://github.com/reqover-labs/reqover/pull/37), draft, base #36.
 
-Nothing was merged, and the original shared branch history was not rewritten.
+None of these split PRs was merged, and the original shared branch history was not rewritten.
 Feature guides and public troubleshooting notes travel with their owning PRs.
 
 ## Corrections
@@ -69,6 +69,12 @@ were synchronized without rewriting history. A new regression verifies that
 recording-wide endpoint counts/code stay complete while request timing/status
 and method details stay limited to retained snapshots. No timings are invented
 for evicted observations. The new publication group and SBOM are preserved.
+
+Final verification against that main update passed 185 Java tests with no
+failures/errors/skips, the full build and SBOM lock check, all 23 Node and 8
+Action cases, and the complete Playwright flow with zero external requests/errors.
+The exception-aware full OSV query reports zero unexcepted findings and one
+explicitly dated exception, as explained in the security record.
 
 Latest main was synchronized without rewriting the shared feature history; its
 dependency patches, accessor/proxy handling, multi-context exports and workflow

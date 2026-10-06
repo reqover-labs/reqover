@@ -20,10 +20,6 @@ this preview; it is not a promised release date. On main for the next release:
 [recording comparison #37](https://github.com/reqover-labs/reqover/pull/37). Faithful replay, selective input capture,
 method spans and k6 execution are follow-up work, not current capabilities.
 
-**Make Reqover installable.**
-[#4](https://github.com/reqover-labs/reqover/issues/4) · Maven Central
-publication
-
 Today nobody can depend on Reqover by coordinate. The pipeline is built and
 signs on demand; what remains is a namespace, a key, and a smoke test from
 outside this build. Everything else on this list matters less than this,

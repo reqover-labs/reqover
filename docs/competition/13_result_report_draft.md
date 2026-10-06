@@ -1,5 +1,7 @@
 # 13. Result Report Draft
 
+> Historical pre-Central report draft. Its release and publication statements describe that time, not the current 0.4.1 release. Use the [current documentation](../README.md) for installation and shipped features.
+
 > Working source only. The official A4 DOCX/PDF generated from the contest template is the submission artifact. Numeric claims in this Markdown file must be refreshed from the final release candidate before use.
 
 ## Project Information

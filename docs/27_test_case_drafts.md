@@ -1,4 +1,4 @@
-**English** | [한국어](27_test_case_drafts.ko.md)
+**English** | [한국어](27_test_case_drafts.ko.md) | [Documentation](README.md)
 
 # Reviewed test case drafts
 

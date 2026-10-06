@@ -1,3 +1,5 @@
+**English** | [한국어](ROADMAP.ko.md)
+
 # Roadmap
 
 What we intend to do next, in the order we intend to do it, and why. There are
@@ -17,24 +19,26 @@ offline dashboard, reviewed test drafts and recording comparison
 input capture with masking, method-level timing, and a k6 run/import loop.
 Faithful replay and production APM remain non-goals.
 
-Today nobody can depend on Reqover by coordinate. The pipeline is built and
-signs on demand; what remains is a namespace, a key, and a smoke test from
-outside this build. Everything else on this list matters less than this,
-because a tool nobody can install has no users, and a tool with no users cannot
-learn what is wrong with it.
+**Improve installation and real-project feedback.** Libraries are already
+published on Maven Central as `io.github.reqover-labs`, with agent/CLI JARs on
+GitHub Releases. Validate integration beyond our samples and keep the
+[current guides](docs/README.md) accurate. The
+[compatibility policy](docs/20_versioning_and_compatibility.md) applies to those releases.
 
-The compatibility promises this requires are written down in
-[docs/20_versioning_and_compatibility.md](docs/20_versioning_and_compatibility.md);
-Central is permanent, so those had to exist first.
+**Validate retention and impact scope on larger recordings.** The store SPI
+contract tests, configurable eviction policy and recording-wide endpoint
+aggregates are implemented. Next, measure their memory cost with more distinct
+endpoints/probes, verify custom-store behavior and distinguish retained timing
+from full-recording code relationships.
 
-**Hold the storage SPI to a contract.**
-[#14](https://github.com/reqover-labs/reqover/issues/14) · `CoverageStore`
-contract test and eviction policy
+## Delivered in the Current Release
 
-`CoverageStore` shipped as an extension point without a way for an
-implementation to check it behaves like the built-in one. A reusable contract
-test fixes that, and a configurable bound policy makes the in-memory store
-usable for a long QA session rather than only a rolling window.
+- Six Maven Central libraries; standalone agent and CLI release artifacts.
+- Optional accessor/reference recording, multi-context exports and endpoint aggregates.
+- Offline dashboard, reviewed disabled test drafts, retained-summary comparison and opt-in CI artifacts.
+- WebFlux catch-all pattern handling fixed in 0.4.1.
+
+See [CHANGELOG](CHANGELOG.md) for release boundaries; completed work is not a future promise.
 
 ## Next
 

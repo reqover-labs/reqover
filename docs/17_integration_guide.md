@@ -183,7 +183,7 @@ Two things the table cannot show:
 
 ## 3. Decide how you read the report
 
-There are two ways to get the report out, and **both are off by default.** Turn on whichever fits: the HTTP endpoint for looking at it while the application runs, the shutdown export for getting a file out of a CI run. They can be on at the same time, and they produce the same document.
+There are two ways to get the report out, and **both are off by default.** Turn on whichever fits: the HTTP endpoint for looking at it while the application runs, the shutdown export for getting a file out of a CI run. They can be on at the same time and use the same format; a multi-context export can cover more data than one live endpoint.
 
 ### 3-1. The HTTP report endpoint
 
@@ -299,7 +299,7 @@ Three things to know:
 
 - **The export runs when the application context closes.** A process killed with `SIGKILL` writes nothing. In CI, stop the application with `SIGTERM` (plain `kill`) and wait for it to exit.
 - **Export failures are logged to standard error and swallowed.** A measurement tool must not be the reason a shutdown fails — which also means a missing file is a quiet failure. Check that the file exists before you analyse it.
-- **The exported document is byte-for-byte what the endpoint would have served.** Both go through the same `ReqoverReportService`.
+- **Export and the endpoint share a model and renderers, not a byte-identity guarantee.** Exports to one path in the same JVM accumulate application contexts; an endpoint reads its active store. Check capture scope and detail limits as well as file format.
 
 The full loop — exporting a report, asking it which endpoints a diff affects, and commenting the answer on a pull request — is in [Impact analysis in CI](18_ci_impact_analysis.md).
 
@@ -469,13 +469,14 @@ CoverageStore reqoverCoverageStore() {
 }
 ```
 
-The interface is three methods:
+The interface has three required methods and a default `aggregates()` extension:
 
 | Method | Contract |
 | --- | --- |
 | `flush(CoverageBucket)` | Records a finished bucket. Call `bucket.snapshot()` immediately — the bucket may keep receiving hits from stray threads after the call returns |
 | `snapshots()` | The retained snapshots, oldest first. The returned list is a copy and is safe to iterate while other threads flush |
-| `clear()` | Discards every retained snapshot |
+| `aggregates()` | Optional recording-wide counts and code unions. The default empty list falls back to retained snapshots |
+| `clear()` | Discards every retained snapshot and aggregate |
 
 Implementations must be safe for concurrent use, and `flush` is called on the thread that completed the unit of work — an HTTP worker in the common case — so it must not block for long.
 

@@ -1,5 +1,7 @@
 # 09. Agent E2E Demo
 
+> Historical E2E capture and implementation notes. For current commands and defaults, use [Examples](../examples/README.md) and the [integration guide](17_integration_guide.md); do not treat old counts as current-release output.
+
 ## Purpose
 
 This demo proves that Reqover can attribute automatically inserted probe hits to the active HTTP request bucket.

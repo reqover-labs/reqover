@@ -130,7 +130,9 @@ otherwise.
   reactive stack that we missed? Tell us in an issue — we would rather cite it
   than claim a gap that isn't there.
 - Does the reverse index stay useful on a codebase far larger than our samples?
-  We do not know yet, and only contact with real repositories will answer it.
+  The [integration guide](17_integration_guide.md) now records an application with
+  167 tests and the effects of accessor/reference recording. That is evidence
+  from one project, not general proof; more independent applications are needed.
 
 ## Sources
 

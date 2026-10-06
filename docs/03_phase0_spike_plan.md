@@ -1,5 +1,7 @@
 # 03. Phase 0 PoC 계획
 
+> 초기 PoC 계획을 보존한 문서입니다. 실행·설치 안내는 현재 [문서 목차](README.ko.md)와 [예제 README](../examples/README.ko.md)를 사용합니다.
+
 ## 목적
 
 Phase 0의 목적은 제품을 완성하는 것이 아니라 가장 위험한 가정을 빠르게 검증하는 것입니다.
@@ -230,4 +232,3 @@ Phase 1 목표:
 - endpoint normalization
 - request별 JSON report
 - README quickstart 작성
-

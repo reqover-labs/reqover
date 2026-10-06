@@ -1,4 +1,4 @@
-[English](28_recording_comparison.md) | **한국어**
+[English](28_recording_comparison.md) | **한국어** | [문서 목차](README.ko.md)
 
 # 이전 기록과 현재 기록 비교하기
 

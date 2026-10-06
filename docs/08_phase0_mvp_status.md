@@ -1,5 +1,7 @@
 # 08. Phase 0 MVP Status
 
+> Historical Phase 0 result, not the current release status. Original findings remain intact; use the [current documentation](README.md) for released behavior and setup.
+
 ## Current Result
 
 Reqover now has a working Phase 0 MVP.

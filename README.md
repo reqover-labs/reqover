@@ -25,17 +25,17 @@ recorded per request, answerable in reverse, and checkable in CI.</p>
   <a href="#how-it-works">How it works</a> ·
   <a href="docs/17_integration_guide.md">Integration</a> ·
   <a href="https://youtu.be/N62BEzVchSM">Demo video</a> ·
-  <a href="#documentation">Docs</a> ·
+  <a href="docs/README.md">Docs</a> ·
   <a href="README.ko.md">한국어</a>
 </p>
 
 </div>
 
-![Reqover report separating executed code by HTTP endpoint](docs/assets/reqover-mvc-request-attribution.png)
+![Reqover dashboard with request diagnostics and observed code relationships](docs/assets/reqover-request-diagnostics.png)
 
 <p align="center">
   <a href="https://youtu.be/N62BEzVchSM"><b>▶&nbsp; Watch the 2-minute demo</b></a><br>
-  <sub>Request separation, the reverse lookup, WebFlux thread hops, and the pull request comment — running, not slides.</sub>
+  <sub>Recorded on v0.2.0: request separation, reverse lookup, WebFlux thread hops and PR comments. For the current dashboard, use the quickstart below.</sub>
 </p>
 
 > [!IMPORTANT]
@@ -50,7 +50,7 @@ A test coverage tool (JaCoCo, for example) tells you this:
 
 One thing it does not tell you: **who** executed it. Was it `GET /orders/{id}`? An admin batch job? Both? Coverage numbers alone cannot say, so you usually end up tracing through the code by hand.
 
-Reqover records, from the moment a request arrives until the response leaves, **the methods that request actually walked through — kept separate per request.** That makes the following possible:
+Reqover records **the methods observed during each request's adapter scope, kept separate per request**. In MVC that scope begins after handler mapping; it is not the entire network round trip or an ordered call trace. That makes the following possible:
 
 |                                                        | Ordinary coverage tools | Reqover                |
 | ------------------------------------------------------ | ----------------------- | ---------------------- |
@@ -84,16 +84,18 @@ from the file the application exports on shutdown, or with `reqover render`.
   which endpoints got slower or started failing. It shows the deltas and leaves
   the verdict to you. [Details](docs/28_recording_comparison.md)
 - **Test drafts** — turn an observed request into a reviewed JSON draft or a
-  JUnit test. Generated tests are disabled until you set a local or QA base URL.
+  disabled GET/HEAD JUnit test. Review it, set an explicit local/QA base URL and
+  remove `@Disabled` yourself before running it in your existing test suite.
   [Details](docs/27_test_case_drafts.md)
-- **In CI** — the Action uploads the dashboard as an artifact and keeps one
-  marked comment per analysis. [Details](docs/26_dashboard_and_ci.md)
+- **In CI** — the Action analyses an existing recording and keeps one marked
+  comment per analysis. Set `upload-artifact: "true"` to retain the dashboard;
+  upload is off by default. [Details](docs/26_dashboard_and_ci.md)
 
-![Recording comparison: the same traffic recorded twice, one endpoint slower the second time](docs/assets/reqover-recording-comparison.png)
+![Descriptive timing and HTTP-status comparison using a synthetic baseline](docs/assets/reqover-recording-comparison.png)
 
 These are what the adapter observed: no method timings, call order, client-side
 latency or whole-service TPS. Timing statistics cover the retained requests,
-while endpoint counts and executed code cover the whole recording.
+while the default store's endpoint counts and executed code cover the whole recording.
 
 ## Three things the report shows
 
@@ -135,6 +137,7 @@ Before wiring Reqover into your own project, we recommend running the demo appli
 ```bash
 git clone https://github.com/reqover-labs/reqover.git
 cd reqover
+git checkout v0.4.1
 
 ./gradlew test
 ./scripts/run-agent-demo.sh mvc 8080
@@ -145,6 +148,7 @@ cd reqover
 ```powershell
 git clone https://github.com/reqover-labs/reqover.git
 Set-Location .\reqover
+git checkout v0.4.1
 
 # JAVA_HOME must point at JDK 17 or 21
 $env:Path = "$env:JAVA_HOME\bin;$env:Path"
@@ -161,32 +165,46 @@ When the script prints an address and waits, open this in your browser:
 http://127.0.0.1:8080/reqover/report.html
 ```
 
-If the report groups the executed classes under the endpoint like this, it worked:
+Open **Requests** to inspect the recorded request, or **API to code** to see
+its endpoint's executed code. With the default accessor-skipping policy:
 
 ```
-GET /auto/orders/{id}          3 classes · 3 methods · 1 thread
+GET /auto/orders/{id}          2 classes · 3 methods · 1 thread
   AutoOrderController          io.reqover.example.mvc.auto
   AutoOrderService             io.reqover.example.mvc.auto
-  AutoOrderResponse            io.reqover.example.mvc.auto
 ```
 
-Press `Enter` in the terminal running the script to shut it down. To capture the report and exit without waiting — useful in scripts and CI — pass a third argument:
+Press `Enter` in the terminal running the script to shut it down. To print the
+JSON and stop without waiting, pass a third argument. This does not save an HTML
+file; use the report export settings or the HTML download button to keep one.
 
 ```bash
 ./scripts/run-agent-demo.sh mvc 8080 --stop-after-report
 ```
 
+For failure/slow-request examples while the MVC demo is running, use a second
+terminal. These read-only demo endpoints have a maximum delay of 2000 ms:
+
+```bash
+curl -s http://127.0.0.1:8080/auto/diagnostics/delay/1200
+curl -s -o /dev/null -w '%{http_code}\n' http://127.0.0.1:8080/auto/diagnostics/failure
+```
+
+Refresh the dashboard: the second request deliberately returns 503. On
+PowerShell, use `curl.exe`. [Request guide](docs/24_request_diagnostics.md).
+
 ### To see the WebFlux version
 
 ```bash
-./scripts/run-agent-demo.sh webflux 8080
+./scripts/run-agent-demo.sh webflux 8081
 ```
 
 ```powershell
-.\scripts\run-agent-demo.ps1 -App webflux -Port 8080
+.\scripts\run-agent-demo.ps1 -App webflux -Port 8081
 ```
 
 This time you should see `GET /auto/reactive/orders/{id}` together with **two or more distinct thread names.** That is the evidence that tracking survived the thread hop.
+Open `http://127.0.0.1:8081/reqover/report.html` for this sample.
 
 ### To see the whole CI loop at once
 
@@ -242,7 +260,7 @@ nothing.) Commit that file as a baseline, or keep it as a CI artifact.
 
 ```bash
 git diff --name-only origin/main... \
-  | reqover impact --report build/reqover-report.json --changed-files - --format markdown
+  | java -jar reqover-cli-0.4.1.jar impact --report build/reqover-report.json --changed-files - --format markdown
 ```
 
 ```
@@ -256,7 +274,9 @@ git diff --name-only origin/main... \
 | `POST /payments`   | `SharedValidator#validate(String)` |
 ```
 
-`reqover` here is `java -jar reqover-cli-0.4.1.jar` from the release. The CLI
+The example assumes the downloaded CLI JAR is in the current directory;
+otherwise use its full path. In a source build, use
+`reqover-cli/build/libs/reqover-cli-0.4.1.jar`. The CLI
 also has `render` (report JSON to a standalone page) and `diff` (what changed
 between two recordings). `--fail-on-impact` turns the analysis into a gate:
 exit code 0 when nothing is affected, 1 when something is, 2 on bad input.
@@ -267,7 +287,16 @@ exit code 0 when nothing is affected, 1 when something is, 2 on bad input.
 - uses: reqover-labs/reqover/.github/actions/impact@v0.4.1
   with:
     report: build/reqover-report.json
+    upload-artifact: "true"
+    artifact-name: reqover-${{ github.job }}-${{ strategy.job-index || 'single' }}
+    analysis-name: ${{ github.job }}-${{ strategy.job-index || 'single' }}
 ```
+
+This belongs after recording and Java setup in a `pull_request` job. Checkout
+needs `fetch-depth: 0`; the runner needs Java 17+, Bash, Git, curl and Python 3.
+Same-repository comments require `pull-requests: write`; set `comment: "false"`
+without that permission. Fork comments are skipped. Use distinct artifact and
+analysis names for multiple invocations; the Action does not launch tests.
 
 > [!NOTE]
 > Impact analysis can only speak about code it **observed running**. A file it
@@ -306,6 +335,9 @@ Written plainly. Using a tool with the wrong expectations wastes everyone's time
 ### What works
 
 - Per-request execution records for Spring MVC and WebFlux
+- Offline dashboard, animated observed associations, status/slow filters and request details
+- Retained HTTP timing/status summary comparison, separate from the CLI's code diff
+- Reviewed JSON drafts and disabled GET/HEAD JUnit exports, without original-input replay
 - Automatic recording at method entry (no source changes)
 - API → code report, and the code → API reverse lookup
 - Reports written to and read back from JSON, so they outlive the JVM
@@ -321,8 +353,9 @@ Written plainly. Using a tool with the wrong expectations wastes everyone's time
 ### What doesn't / Things to know
 
 - **It does not know which lines ran.** Method granularity only. If you need line and branch precision, use JaCoCo.
-- **Compiler-generated methods** are not recorded, and neither are **runtime proxies** (Spring CGLIB, Hibernate, Byte Buddy) or **trivial accessors** — a getter or setter that only reads or writes one field, including record accessors. Requests that match no controller and fall through to the static resource handler are not recorded either.
+- **Compiler-generated methods and runtime proxies** (Spring CGLIB, Hibernate, Byte Buddy, Mockito) are excluded. Trivial getters, setters, builders and record accessors are skipped by default; `accessors=record` keeps them for impact recordings. `references=record` additionally observes included interface calls/static-field reads, not the referenced implementation's execution. Requests served by the unmapped catch-all resource handler are excluded.
 - **Records live in memory only.** The default cap is 10,000 per-request records (`reqover.mvc.max-snapshots` / `reqover.webflux.max-snapshots`); beyond that the oldest are dropped. Which endpoints ran, how often and what they executed is kept separately per endpoint, so an endpoint called only early in a long recording stays in the report. Restarting the application clears everything. `CoverageStore` is the extension point for storing them elsewhere, but Reqover ships no persistent implementation — export the report to a file instead.
+- **Exported details have their own bound.** JSON defaults to the newest 100 unit details and reports `omittedRequestDetails`; endpoint aggregates remain complete. Live HTML timing summaries use retained HTTP snapshots, while HTML rendered from exported JSON can use only that file's details. For a complete retained timing baseline, export the live dashboard's summary.
 - **Impact analysis is bounded by what was recorded.** It matches changed files against code the report observed running. A file it cannot match is reported as unmatched, which means "not seen", not "not affected".
 - **MVC async sections are not linked automatically.** Work handed to a separate thread is not recorded; attribution resumes when request handling returns.
 - **The WebFlux adapter turns on one JVM-wide setting.** (Reactor's automatic context propagation — needed to carry request information across threads.) If you don't want that, disable the adapter entirely with `reqover.webflux.enabled=false` before the application starts.
@@ -331,7 +364,7 @@ Written plainly. Using a tool with the wrong expectations wastes everyone's time
 - **The reverse lookup is a "start looking here" hint.** It is not a complete change-impact analysis.
 - **The demo report page has no authentication.** Keep it on `127.0.0.1`.
 
-**Overhead is about 24 ns per instrumented method entry**, plus a per-request cost too small to measure here — so a request walking a few hundred instrumented methods pays roughly 10 µs. Method, raw samples, and the things this does *not* cover (concurrency, GC, startup) are in [measured agent overhead](docs/15_performance_results.md) · [한국어판](docs/15_performance_results.ko.md).
+The published [method-entry benchmark](docs/15_performance_results.md) · [한국어판](docs/15_performance_results.ko.md) measured about 24 ns per entry under its stated setup. This is a dated, narrow measurement, not a full 0.4.1 dashboard/export/reference-probe or production-overhead guarantee. Check its raw samples and excluded costs before applying it to your application.
 
 ## Support matrix
 
@@ -354,14 +387,14 @@ Knowing what each directory does makes the code much faster to read.
 
 | Directory                 | What it does                                              |
 | ------------------------- | --------------------------------------------------------- |
-| `reqover-core`            | Per-request buckets and the record store — **this is the heart** |
-| `reqover-instrumentation` | Inserting recording code into classes (uses ASM)          |
-| `reqover-agent`           | Packaging the above for use as a `-javaagent`             |
-| `reqover-spring-mvc`      | Finding "which request is this" in MVC                    |
-| `reqover-spring-webflux`  | The same for WebFlux, including thread hops               |
-| `reqover-spring-boot-starter` | One dependency that wires it all up, plus the report endpoint and export |
-| `reqover-report`          | Aggregation, reverse lookup, impact analysis, diffing, JSON/HTML rendering |
-| `reqover-cli`             | `render`, `diff`, and `impact` over a recorded report      |
+| [reqover-core](reqover-core/README.md) | Buckets, bounded snapshots and recording-wide aggregates |
+| [reqover-instrumentation](reqover-instrumentation/README.md) | ASM method-entry and optional reference probes |
+| [reqover-agent](reqover-agent/README.md) | Standalone `-javaagent` JAR and recording options |
+| [reqover-spring-mvc](reqover-spring-mvc/README.md) | MVC request lifecycle and attribution |
+| [reqover-spring-webflux](reqover-spring-webflux/README.md) | Reactive request attribution across thread hops |
+| [reqover-spring-boot-starter](reqover-spring-boot-starter/README.md) | Application wiring, opt-in report endpoint and exports |
+| [reqover-report](reqover-report/README.md) | Dashboard, diagnostics, drafts, summaries, code diff and impact |
+| [reqover-cli](reqover-cli/README.md) | Offline `render`, `diff`, `impact`, `version` and `help` |
 | `examples/mvc-sample`     | MVC demo application                                      |
 | `examples/webflux-sample` | WebFlux demo application                                  |
 | `docs`                    | Design, measurement, and decision records                 |
@@ -418,20 +451,23 @@ Issues, pull requests, and commit messages are written in English so contributor
 
 ## Documentation
 
-- [Performance validation plan](docs/23_performance_validation_plan.ko.md) (Korean)
-- [Review notes for the 0.4.0 diagnostics](docs/30_review_corrections.md)
-- [OSV dependency remediation](docs/29_osv_dependency_remediation.md)
+- [Current documentation index](docs/README.md) · [한국어판](docs/README.ko.md)
+- [Request diagnostics](docs/24_request_diagnostics.md) · [한국어판](docs/24_request_diagnostics.ko.md)
+- [Dashboard and CI artifacts](docs/26_dashboard_and_ci.md) · [한국어판](docs/26_dashboard_and_ci.ko.md)
+- [Reviewed test drafts](docs/27_test_case_drafts.md) · [한국어판](docs/27_test_case_drafts.ko.md)
+- [Recording comparison](docs/28_recording_comparison.md) · [한국어판](docs/28_recording_comparison.ko.md)
 
 - [System architecture](docs/02_architecture.md) · [한국어판](docs/02_architecture.ko.md)
 - [Spring integration guide](docs/17_integration_guide.md) · [한국어판](docs/17_integration_guide.ko.md)
 - [Impact analysis in CI](docs/18_ci_impact_analysis.md) · [한국어판](docs/18_ci_impact_analysis.ko.md)
 - [Prior art — and when to use a different tool](docs/19_prior_art.md) · [한국어판](docs/19_prior_art.ko.md)
 - [Versioning, compatibility, and rollback](docs/20_versioning_and_compatibility.md) · [한국어판](docs/20_versioning_and_compatibility.ko.md)
-- [Project plan](docs/00_project_plan.md) (Korean) · [Requirements](docs/01_requirements.md) (Korean)
-- [MVP status](docs/08_phase0_mvp_status.md) · [Agent E2E Demo](docs/09_agent_e2e_demo.md) · [Demo script](docs/10_demo_script.md)
 - [Performance measurement](docs/11_performance_measurement.md) · [Measured agent overhead](docs/15_performance_results.md) · [한국어판](docs/15_performance_results.ko.md)
 - [JaCoCo interop decision](docs/14_jacoco_interop_decision.md) · [README demo capture](docs/16_readme_demo_capture.md)
 - [Competition preparation documents](docs/competition/README.md) (Korean)
+
+Original plans, Phase 0 notes, old video scripts and review records remain as
+historical material in the index; they are not the current installation guide.
 
 Documents marked *(Korean)* have not been translated yet. Translations are welcome contributions.
 

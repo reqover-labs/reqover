@@ -1,7 +1,10 @@
+**English** | [한국어](README.ko.md)
+
 # Software Bill of Materials
 
-`reqover.cdx.json` is the checked-in CycloneDX 1.6 inventory for the current
-release candidate. It includes build, test, sample-runtime, and project modules;
+`reqover.cdx.json` is the checked-in CycloneDX 1.6 inventory for the repository's
+resolved build. A published release has its own pinned copy in GitHub Releases.
+It includes build, test, sample-runtime, and project modules;
 it is therefore broader than the dependencies redistributed inside the shaded
 Java agent JAR.
 
@@ -30,3 +33,7 @@ The lock verifier compares every component, version, license, property, and
 dependency edge. It intentionally normalizes only volatile SBOM provenance: the
 serial number, generation timestamp, GitHub Actions run URL, and the equivalent
 presence or absence of a trailing `.git` in the root VCS URL.
+
+The OSV checker distinguishes unexcepted `findings` from documented, expiring
+`exceptions`. A passing gate under that policy is not a patched dependency or
+a blanket security guarantee. See [SECURITY.md](../SECURITY.md).

@@ -1,4 +1,4 @@
-[English](27_test_case_drafts.md) | **한국어**
+[English](27_test_case_drafts.md) | **한국어** | [문서 목차](README.ko.md)
 
 # 관측 요청에서 테스트 초안 만들기
 

@@ -1,4 +1,4 @@
-**English** | [한국어](28_recording_comparison.ko.md)
+**English** | [한국어](28_recording_comparison.ko.md) | [Documentation](README.md)
 
 # Compare retained recordings
 
@@ -22,7 +22,7 @@ uploaded or written to localStorage, and are limited to 10 MiB / 50,000 raw
 observations. Clearing the baseline removes the comparison and manual confirmation.
 Invalid imports keep the last valid baseline and show an error.
 
-Raw exports with `omittedRequestDetails` are incomplete and cannot be used for
+Raw exports with a positive `omittedRequestDetails` count are incomplete and cannot be used for
 full retained comparisons. Import the live report's aggregate summary instead.
 Floating-point changes within an absolute/relative epsilon are displayed as
 zero; meaningful submillisecond changes remain visible.

@@ -13,12 +13,11 @@ the fastest way to change what we work on.
 
 **Performance validation preview (Oct-Nov 2026).** The
 [plan](docs/23_performance_validation_plan.ko.md) (Korean) sets the scope for
-this preview; it is not a promised release date. Review is
-split into [request diagnostics #34](https://github.com/reqover-labs/reqover/pull/34),
+this preview; it is not a promised release date. On main for the next release:
+[request diagnostics #34](https://github.com/reqover-labs/reqover/pull/34),
 [dashboard/CI #35](https://github.com/reqover-labs/reqover/pull/35),
 [test drafts #36](https://github.com/reqover-labs/reqover/pull/36) and
-[recording comparison #37](https://github.com/reqover-labs/reqover/pull/37).
-The last two remain draft for feedback. Faithful replay, selective input capture,
+[recording comparison #37](https://github.com/reqover-labs/reqover/pull/37). Faithful replay, selective input capture,
 method spans and k6 execution are follow-up work, not current capabilities.
 
 **Make Reqover installable.**

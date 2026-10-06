@@ -2,9 +2,9 @@
 
 # 대시보드와 CI 연결
 
-이번 기능은 **개발 브랜치의 미리보기**입니다. 배포된 `v0.2.0`에는 없습니다.
+이번 기능은 **개발 브랜치의 미리보기**입니다. 배포된 `v0.3.0`에는 없습니다.
 새 Action과 현재 소스로 빌드한 CLI를 함께 사용해야 새 대시보드가 나옵니다.
-`version: 0.2.0`만 지정하면 예전 배포 CLI를 내려받습니다. 새 화면이나 요청 수집
+`version: 0.3.0`만 지정하면 예전 배포 CLI를 내려받습니다. 새 화면이나 요청 수집
 기능까지 자동으로 설치되는 것은 아닙니다.
 
 ## 무엇부터 보나
@@ -56,7 +56,7 @@ Python 3을 설치합니다. 이 조건과 얕은 checkout을 네트워크 작�
 - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
   with:
     repository: reqover-labs/reqover
-    ref: e1976b7bd7ebb8d009540b388bedbaeefbe58337
+    ref: main  # replace with the commit SHA you reviewed
     path: .reqover-tool
     persist-credentials: false
 
@@ -68,7 +68,7 @@ Python 3을 설치합니다. 이 조건과 얕은 checkout을 네트워크 작�
   uses: ./.reqover-tool/.github/actions/impact
   with:
     report: build/reqover-report.json
-    cli-jar: .reqover-tool/reqover-cli/build/libs/reqover-cli-0.2.0.jar
+    cli-jar: .reqover-tool/reqover-cli/build/libs/reqover-cli-0.3.0.jar
     comment: "false"
     upload-artifact: "true"
     artifact-name: reqover-${{ github.job }}-${{ strategy.job-index || 'single' }}
@@ -99,7 +99,7 @@ PR이 아닌 push·수동 실행에서는 `base-ref`를 직접 지정합니다. 
 끄는 것이 기본값이며 `upload-artifact: "true"`로 켭니다. 같은 job에서 여러 번
 호출한다면 각 호출의 `artifact-name`도 다르게 지정합니다.
 
-매트릭스 작업이라면 PR 댓글은 한 작업에서만 작성해 같은 댓글의 동시 수정을 피합니다.
+한 PR에서 분석을 여러 번 돌린다면(매트릭스, 서비스 여러 개) 각각 `analysis-name`을 다르게 줘야 서로의 댓글을 덮어쓰지 않습니다. 이름이 같으면 PR 댓글은 한 작업에서만 작성해 같은 댓글의 동시 수정을 피합니다.
 
 | 출력 | 의미 |
 | --- | --- |

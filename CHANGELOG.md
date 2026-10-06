@@ -4,6 +4,42 @@ All notable changes to Reqover are documented in this file.
 
 ## Unreleased
 
+### Added
+
+- **Retained request diagnostics.** HTTP status counts, average/p95/maximum
+  adapter-observed intervals and per-request method sets are available in the
+  report. JSON exports default to the newest 100 unit details, HTTP first, and
+  carry the omitted count, which survives reading the JSON back; endpoint
+  unions and the reverse index are never truncated. `CoverageReport` gains
+  `requests` and `omittedRequestDetails`; its four-argument constructor
+  remains, but Java record patterns must adapt.
+- **Offline diagnostic dashboard and CI artifacts.** Animated observed
+  associations and retest candidates preserve the table fallback; downloadable
+  HTML includes icon notices. The Action can render HTML, expose impact outputs
+  and retain evidence before an optional impact gate.
+- **Reviewed test drafts.** Selected observations can produce JSON drafts and
+  disabled JUnit 5 tests for manually reviewed GET/HEAD requests. No original
+  inputs or faithful replay are assumed. Raw and encoded pipe characters and
+  C0/C1 controls are rejected before URI generation, with actual Java
+  compilation coverage.
+
+### Changed
+
+- **Impact Action artifact upload is opt-in.** `upload-artifact` defaults to
+  `false` to avoid fixed-name collisions in matrix or repeated invocations.
+  Explicit uploads must use distinct names. The Action requires Python 3 and
+  fails early on shallow history, before any base fetch or CLI download.
+- **The impact comment is marked and updated in place.** The `markdown` output
+  now starts with an HTML comment marker (`<!-- reqover-impact -->`, or
+  `<!-- reqover-impact:NAME -->` with the new `analysis-name` input), and the
+  Action edits its own earlier comment instead of adding one per run. Give
+  each analysis in one pull request its own `analysis-name`.
+
+## 0.3.0 — 2026-10-06
+
+First release on Maven Central, as `io.github.reqover-labs`. The changes below
+came from applying Reqover to a production Spring Boot service.
+
 ### Fixed
 
 - **A long recording no longer forgets endpoints.** The report used to be built
@@ -42,11 +78,6 @@ All notable changes to Reqover are documented in this file.
   document with no `schemaVersion` still reads as version 1.
 
 ### Changed
-
-- **Impact Action artifact upload is opt-in.** `upload-artifact` defaults to
-  `false` to avoid fixed-name collisions in matrix or repeated invocations.
-  Explicit uploads must use distinct names. The Action requires Python 3 and
-  fails early on shallow history, before any base fetch or CLI download.
 
 - **Maven coordinates move to `io.github.reqover-labs`.** Maven Central
   verifies a namespace by domain or by GitHub organisation, and `reqover.io`
@@ -93,23 +124,6 @@ All notable changes to Reqover are documented in this file.
   it does not cover. See [docs/15_performance_results.md](docs/15_performance_results.md).
 
 ### Added
-
-- **Reviewed test drafts.** Selected observations can produce JSON drafts and
-  disabled JUnit 5 tests for manually reviewed GET/HEAD requests. No original
-  inputs or faithful replay are assumed. Raw and encoded pipe characters are
-  rejected before URI generation, with actual Java compilation coverage.
-
-- **Offline diagnostic dashboard and CI artifacts.** Animated observed
-  associations and retest candidates preserve the table fallback; downloadable
-  HTML includes icon notices. The Action can render HTML, expose impact outputs
-  and retain evidence before an optional impact gate.
-
-- **Retained request diagnostics.** HTTP status counts, average/p95/maximum
-  adapter-observed intervals and per-request method sets are available in the
-  report. JSON exports default to the newest 100 unit details and report the
-  omitted count, without truncating endpoint unions or the reverse index. The
-  four-argument `CoverageReport` constructor remains available; Java record
-  patterns must adapt to its new fifth component in the next minor release.
 
 - **A configurable eviction policy for the in-memory store.**
   `reqover.mvc.snapshot-eviction` and `reqover.webflux.snapshot-eviction`

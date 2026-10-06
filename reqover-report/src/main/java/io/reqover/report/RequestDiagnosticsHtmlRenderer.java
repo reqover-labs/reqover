@@ -90,7 +90,7 @@ final class RequestDiagnosticsHtmlRenderer {
             byEndpoint.computeIfAbsent(request.endpoint(), ignored -> new java.util.ArrayList<>()).add(request);
         }
         html.append("<div class=\"diagnostic-scroll\"><table class=\"diagnostic-table\"><thead><tr>"
-                + "<th scope=\"col\">Endpoint</th><th scope=\"col\">Requests</th><th scope=\"col\">4xx / 5xx</th>"
+                + "<th scope=\"col\">Endpoint</th><th scope=\"col\">Retained requests</th><th scope=\"col\">4xx / 5xx</th>"
                 + "<th scope=\"col\">Average</th><th scope=\"col\">p95</th><th scope=\"col\">Cumulative</th>"
                 + "</tr></thead><tbody>");
         Map<String, RequestSummary> endpointSummaries = new TreeMap<>();
@@ -112,6 +112,12 @@ final class RequestDiagnosticsHtmlRenderer {
         html.append("<p class=\"section-note\">Most recent ").append(Math.min(requests.size(), MAX_DETAIL_ROWS))
                 .append(" of ").append(requests.size()).append(" retained HTTP observations. "
                         + "Expanded code is this request's method set, not call order or a timed trace.</p>");
+        if (report.omittedRequestDetails() > 0) {
+            html.append("<p class=\"section-note\">").append(report.omittedRequestDetails())
+                    .append(" older request details were left out of this report file, so the statistics above "
+                            + "cover only the details it contains. Endpoint counts and code below cover the whole "
+                            + "recording.</p>");
+        }
         html.append("""
                 <div class="request-tools" id="reqover-request-tools" hidden>
                   <label for="reqover-request-mode">Requests

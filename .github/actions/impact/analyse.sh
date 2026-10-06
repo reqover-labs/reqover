@@ -60,10 +60,20 @@ java -jar "${cli}" impact --report "${REPORT}" --changed-files "${work}/changed.
 java -jar "${cli}" impact --report "${REPORT}" --changed-files "${work}/changed.txt" \
     --format json --out "${artifacts}/impact.json"
 java -jar "${cli}" render --report "${REPORT}" --out "${artifacts}/report.html"
+if [ -n "${ANALYSIS_NAME:-}" ]; then
+    if ! [[ "${ANALYSIS_NAME}" =~ ^[A-Za-z0-9._-]+$ ]]; then
+        echo "::error::analysis-name may contain only letters, digits, '.', '_' and '-'" >&2
+        exit 2
+    fi
+    marker="<!-- reqover-impact:${ANALYSIS_NAME} -->"
+else
+    marker='<!-- reqover-impact -->'
+fi
 {
-    echo '<!-- reqover-impact -->'
+    echo "${marker}"
     cat "${work}/impact-body.md"
 } > "${artifacts}/impact.md"
+echo "comment-marker=${marker}" >> "${GITHUB_OUTPUT}"
 
 export REQOVER_ARTIFACT_DIRECTORY="${artifacts}"
 "${REQOVER_PYTHON:-python3}" - <<'PY'

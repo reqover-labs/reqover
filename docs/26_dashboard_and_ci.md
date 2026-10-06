@@ -2,9 +2,9 @@
 
 # Diagnostic dashboard and CI artifacts
 
-This is an **unreleased development preview**, not part of `v0.2.0`.
+This is an **unreleased development preview**, not part of `v0.3.0`.
 The updated Action and source-built CLI are both needed for the new dashboard.
-Using the default `version: 0.2.0` downloads the released CLI and renders its older
+Using the default `version: 0.3.0` downloads the released CLI and renders its older
 report; it does not acquire unreleased UI or request collection features.
 
 ## What to review first
@@ -56,7 +56,7 @@ that prerequisite and shallow history before downloading the CLI or fetching a b
 - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
   with:
     repository: reqover-labs/reqover
-    ref: e1976b7bd7ebb8d009540b388bedbaeefbe58337
+    ref: main  # replace with the commit SHA you reviewed
     path: .reqover-tool
     persist-credentials: false
 
@@ -68,7 +68,7 @@ that prerequisite and shallow history before downloading the CLI or fetching a b
   uses: ./.reqover-tool/.github/actions/impact
   with:
     report: build/reqover-report.json
-    cli-jar: .reqover-tool/reqover-cli/build/libs/reqover-cli-0.2.0.jar
+    cli-jar: .reqover-tool/reqover-cli/build/libs/reqover-cli-0.3.0.jar
     comment: "false"
     upload-artifact: "true"
     artifact-name: reqover-${{ github.job }}-${{ strategy.job-index || 'single' }}
@@ -95,11 +95,12 @@ copy the original report JSON. Download and open `report.html` locally.
 | --- | --- | --- |
 | `report` | `build/reqover-report.json` | Previously recorded JSON |
 | `cli-jar` | empty | Use a built CLI instead of downloading a release |
-| `version` | `0.2.0` | Release CLI fallback, not the preview |
+| `version` | `0.3.0` | Release CLI fallback, not the preview |
 | `base-ref` | PR base | Explicit Git ref required on push/manual runs |
 | `comment` | `true` | Update only the marked Reqover bot comment |
 | `upload-artifact` | `false` | Opt in to save the three named output files |
 | `artifact-name` | `reqover-report` | Use distinct names in a matrix |
+| `analysis-name` | empty | Names the comment marker; give each analysis in one PR its own |
 | `fail-on-impact` | `false` | Optional gate, applied after publishing evidence |
 
 Outputs are `markdown`, `has-impact`, `impacted-endpoint-count`,
@@ -107,8 +108,9 @@ Outputs are `markdown`, `has-impact`, `impacted-endpoint-count`,
 and `artifact-url` (empty if upload is disabled). Each invocation uses an isolated
 temporary output directory. The original `markdown` and `has-impact` remain.
 
-For matrix jobs, publish the PR comment from one job only to avoid competing
-updates to the same comment.
+When one pull request runs several analyses (a matrix, several services), give
+each its own `analysis-name` so each keeps its own comment. Analyses that share
+a name should comment from one job only, to avoid competing updates.
 Set distinct artifact names for repeated invocations in one job as well; fixed
 names are never uploaded unless the caller explicitly opts in.
 
@@ -130,7 +132,7 @@ base branch advancing after a PR diverged:
 
 ```bash
 ./gradlew :reqover-cli:shadowJar
-python3 scripts/test-impact-action.py --cli reqover-cli/build/libs/reqover-cli-0.2.0.jar
+python3 scripts/test-impact-action.py --cli reqover-cli/build/libs/reqover-cli-0.3.0.jar
 ```
 
 For visual checks, install Playwright in your test environment and run

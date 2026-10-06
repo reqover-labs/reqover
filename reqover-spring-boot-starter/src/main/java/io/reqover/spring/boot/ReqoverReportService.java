@@ -1,13 +1,11 @@
 package io.reqover.spring.boot;
 
-import io.reqover.core.CoverageBucketSnapshot;
 import io.reqover.core.CoverageStore;
 import io.reqover.report.CoverageReport;
 import io.reqover.report.CoverageReportGenerator;
 import io.reqover.report.CoverageReportJson;
 import io.reqover.report.HtmlCoverageReportRenderer;
 
-import java.util.List;
 import java.util.Objects;
 
 /**
@@ -26,30 +24,30 @@ public class ReqoverReportService {
     }
 
     public CoverageReport report() {
-        return report(snapshots());
+        return report(recording());
     }
 
     public String json() {
-        return json(snapshots());
+        return json(recording());
     }
 
     public String html() {
-        return html(snapshots());
+        return html(recording());
     }
 
-    List<CoverageBucketSnapshot> snapshots() {
-        return coverageStore.snapshots();
+    Recording recording() {
+        return new Recording(coverageStore.snapshots(), coverageStore.aggregates());
     }
 
-    CoverageReport report(List<CoverageBucketSnapshot> snapshots) {
-        return generator.generate(snapshots);
+    CoverageReport report(Recording recording) {
+        return generator.generate(recording.snapshots(), recording.aggregates());
     }
 
-    String json(List<CoverageBucketSnapshot> snapshots) {
-        return CoverageReportJson.write(report(snapshots));
+    String json(Recording recording) {
+        return CoverageReportJson.write(report(recording));
     }
 
-    String html(List<CoverageBucketSnapshot> snapshots) {
-        return htmlRenderer.render(report(snapshots));
+    String html(Recording recording) {
+        return htmlRenderer.render(report(recording));
     }
 }

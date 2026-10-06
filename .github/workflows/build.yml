@@ -42,7 +42,7 @@ jobs:
         run: ./gradlew clean build --no-daemon --console=plain
 
       - name: Test offline case generation and generated Java
-        run: node --test scripts/test-case-drafts.test.cjs
+        run: node --test scripts/test-case-drafts.test.cjs scripts/recording-comparison.test.cjs
 
       - name: Generate CycloneDX SBOM
         if: matrix.java == 21

@@ -87,6 +87,11 @@ history and Python 3; artifact upload is opt-in with distinct names per job.
 into a JSON draft or a disabled JUnit test. Expected results and safe concrete
 GET/HEAD paths require manual review; no original inputs or replay are implied.
 
+[Recording comparison](docs/28_recording_comparison.md) compares retained
+aggregate summaries with explicit comparability confirmation. Floating-point
+noise is suppressed; unfinished and legacy observations stay unmeasured.
+Truncated detail exports are not accepted as complete timing baselines.
+
 ## Three things the report shows
 
 ### 1. Execution paths split per API

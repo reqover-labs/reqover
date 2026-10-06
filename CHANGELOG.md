@@ -22,6 +22,10 @@ All notable changes to Reqover are documented in this file.
   inputs or faithful replay are assumed. Raw and encoded pipe characters and
   C0/C1 controls are rejected before URI generation, with actual Java
   compilation coverage.
+- **Retained recording comparison.** Import/export aggregate HTTP summaries
+  without executing requests. Explicit comparability confirmation is required.
+  Arithmetic-only drift is suppressed with an epsilon; missing `endedAt` marks
+  unfinished observations. Truncated detail exports are rejected as baselines.
 
 ### Changed
 

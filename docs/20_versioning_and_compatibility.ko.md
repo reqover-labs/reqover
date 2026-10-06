@@ -8,19 +8,21 @@ Maven Central 배포는 영구적입니다. 한 번 릴리스된 버전은 바�
 
 ## 좌표
 
-모든 모듈은 `io.reqover` 그룹으로 배포되며 버전을 공유합니다.
+모든 모듈은 `io.github.reqover-labs` 그룹으로 배포되며 버전을 공유합니다.
 
 | 좌표 | 이럴 때 쓰세요 |
 | --- | --- |
-| `io.reqover:reqover-spring-boot-starter` | Spring Boot 애플리케이션이 있을 때. 여기서 시작하면 필요한 것을 알아서 끌어옵니다. |
-| `io.reqover:reqover-core` | `CoverageStore`를 직접 구현하거나 `UnitScope`를 직접 열 때. |
-| `io.reqover:reqover-report` | 리포트를 코드로 읽고, 렌더링하고, 비교하고, 분석할 때. |
-| `io.reqover:reqover-spring-mvc` / `-spring-webflux` | starter 대신 어댑터를 직접 배선할 때. |
-| `io.reqover:reqover-instrumentation` | ASM transformer 위에 직접 무언가를 만들 때. |
-| `io.reqover:reqover-agent` | `-javaagent` JAR. 보통 의존이 아니라 내려받아 씁니다. |
-| `io.reqover:reqover-cli` | 릴리스 JAR 대신 빌드에서 `render`·`diff`·`impact`를 돌릴 때. |
+| `io.github.reqover-labs:reqover-spring-boot-starter` | Spring Boot 애플리케이션이 있을 때. 여기서 시작하면 필요한 것을 알아서 끌어옵니다. |
+| `io.github.reqover-labs:reqover-core` | `CoverageStore`를 직접 구현하거나 `UnitScope`를 직접 열 때. |
+| `io.github.reqover-labs:reqover-report` | 리포트를 코드로 읽고, 렌더링하고, 비교하고, 분석할 때. |
+| `io.github.reqover-labs:reqover-spring-mvc` / `-spring-webflux` | starter 대신 어댑터를 직접 배선할 때. |
+| `io.github.reqover-labs:reqover-instrumentation` | ASM transformer 위에 직접 무언가를 만들 때. |
+| `io.github.reqover-labs:reqover-agent` | `-javaagent` JAR. 보통 의존이 아니라 내려받아 씁니다. |
+| `io.github.reqover-labs:reqover-cli` | 릴리스 JAR 대신 빌드에서 `render`·`diff`·`impact`를 돌릴 때. |
 
-모든 모듈은 같은 버전으로 나갑니다. `io.reqover` 모듈 간 버전을 섞는 것은 지원하지 않으며 테스트하지도 않습니다.
+그룹은 GitHub 조직의 Maven Central 네임스페이스이고, Central은 조직을 통해 소유를 확인합니다. 0.2.0까지는 `io.reqover`를 썼지만 Central에 배포한 적이 없어서, 바뀐 배포 좌표는 없습니다. Java 패키지 이름은 그대로 `io.reqover.*`입니다.
+
+모든 모듈은 같은 버전으로 나갑니다. `io.github.reqover-labs` 모듈 간 버전을 섞는 것은 지원하지 않으며 테스트하지도 않습니다.
 
 ## 버전 번호가 약속하는 것
 
@@ -99,8 +101,19 @@ Maven Central은 불변입니다. 배포 취소도, yank도, 릴리스된 아티
 - [x] 이 문서가 존재하고, 여기 적힌 약속이 우리가 지킬 수 있는 것들이다
 - [x] 위 공개 API 목록이 코드가 실제로 노출하는 것과 일치한다
 - [x] 리포트 JSON이 `schemaVersion`을 담고, 읽는 쪽이 더 새로운 스키마 문서를 잘못 해석하는 대신 거부한다
-- [ ] 서명된 스테이징 번들 dry-run (`REQOVER_SIGNING_KEY=... ./gradlew centralBundle`) — 파이프라인은 존재하고 서명 없는 번들은 정상 생성되지만, 키를 넣고 돌린 적은 없다
-- [ ] Central Portal에서 `io.reqover` 네임스페이스를 검증하고 `PUBLISH_TO_MAVEN_CENTRAL`을 활성화한다
+- [x] 서명된 스테이징 번들 dry-run (`REQOVER_SIGNING_KEY=... ./gradlew centralBundle`) — 2026-10-06 일회용 키로 실행했다. 6개 모듈의 jar·POM 24개에 모두 검증되는 `.asc`가 붙고, 번들에 sources·Javadoc·체크섬이 들어 있다
+- [ ] Central Portal에서 `io.github.reqover-labs` 네임스페이스를 검증하고 `PUBLISH_TO_MAVEN_CENTRAL`을 활성화한다
 - [ ] 소비자 스모크 테스트: 이 저장소 바깥의 프로젝트가 Central에서 starter를 받아 요청 하나를 기록한다
 
 마지막 항목은 형식적인 절차가 아닙니다. 이 빌드 바깥의 누구도 받아 본 적 없는 starter를 배포하는 것이야말로 영구적인 실수가 만들어지는 경로입니다.
+
+### 첫 배포 때 메인테이너가 할 일
+
+메인테이너 본인의 계정과 키가 필요해서 자동화하지 않았습니다.
+
+1. [Central Portal](https://central.sonatype.com)에 GitHub로 로그인해 네임스페이스 `io.github.reqover-labs`를 추가하고, Portal이 알려주는 이름의 공개 저장소를 `reqover-labs` 조직에 만들어 검증합니다(검증 후 삭제).
+2. Portal 사용자 토큰(사용자명·비밀번호 쌍)을 발급합니다.
+3. 서명 키를 만들고(`gpg --quick-gen-key "Reqover <...>" rsa4096 sign 2y`) 공개 키를 `keys.openpgp.org`와 `keyserver.ubuntu.com`에 올립니다.
+4. 저장소 시크릿 `MAVEN_CENTRAL_USERNAME`, `MAVEN_CENTRAL_PASSWORD`, `MAVEN_CENTRAL_SIGNING_KEY`(armor 형식 개인 키), `MAVEN_CENTRAL_SIGNING_PASSWORD`를 넣고, 변수 `PUBLISH_TO_MAVEN_CENTRAL=true`를 설정합니다.
+5. 릴리스 태그를 겁니다. 릴리스 워크플로가 `USER_MANAGED` 배포를 올리면 Portal에서 검증 통과를 확인하고 Publish를 누릅니다. 보통 30분 안에 Central에서 받을 수 있고, 검색 색인은 더 걸립니다.
+6. 위의 소비자 스모크 테스트를 돌리고 마지막 칸을 체크합니다.

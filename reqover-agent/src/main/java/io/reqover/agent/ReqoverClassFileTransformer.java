@@ -13,7 +13,10 @@ public final class ReqoverClassFileTransformer implements ClassFileTransformer {
 
     public ReqoverClassFileTransformer(AgentOptions options) {
         this.options = options;
-        this.instrumenter = new ReqoverClassInstrumenter(!options.recordAccessors());
+        this.instrumenter = new ReqoverClassInstrumenter(
+                !options.recordAccessors(),
+                options.recordReferences() ? options::shouldInstrument : null
+        );
     }
 
     @Override

@@ -37,7 +37,7 @@ def maven_components(sbom: dict) -> list[dict[str, str]]:
         name = component.get("name")
         version = component.get("version")
         purl = component.get("purl", "")
-        if not group or group == "io.reqover" or not name or not version:
+        if not group or group in ("io.reqover", "io.github.reqover-labs") or not name or not version:
             continue
         if purl and not purl.startswith("pkg:maven/"):
             continue

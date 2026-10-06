@@ -43,6 +43,12 @@ All notable changes to Reqover are documented in this file.
 
 ### Changed
 
+- **Maven coordinates move to `io.github.reqover-labs`.** Maven Central
+  verifies a namespace by domain or by GitHub organisation, and `reqover.io`
+  is not ours. Nothing was published under `io.reqover`, so no published
+  coordinate changes; a `mavenLocal()` build of 0.2.0 still resolves under
+  the old group. Java packages stay `io.reqover.*`.
+
 - **`accessors=record` agent option.** Skipping trivial accessors hides a class
   made only of them, such as a request DTO record, from impact analysis.
   Recording for CI can keep them; the default is unchanged.

@@ -44,16 +44,16 @@ cd reqover
 
 On Windows use `.\gradlew.bat clean publishToMavenLocal`.
 
-This installs the library modules under the `io.reqover` group:
+This installs the library modules under the `io.github.reqover-labs` group:
 
 | Artifact | Version |
 | --- | --- |
-| `io.reqover:reqover-core` | `0.2.0` |
-| `io.reqover:reqover-instrumentation` | `0.2.0` |
-| `io.reqover:reqover-report` | `0.2.0` |
-| `io.reqover:reqover-spring-mvc` | `0.2.0` |
-| `io.reqover:reqover-spring-webflux` | `0.2.0` |
-| `io.reqover:reqover-spring-boot-starter` | `0.2.0` |
+| `io.github.reqover-labs:reqover-core` | `0.2.0` |
+| `io.github.reqover-labs:reqover-instrumentation` | `0.2.0` |
+| `io.github.reqover-labs:reqover-report` | `0.2.0` |
+| `io.github.reqover-labs:reqover-spring-mvc` | `0.2.0` |
+| `io.github.reqover-labs:reqover-spring-webflux` | `0.2.0` |
+| `io.github.reqover-labs:reqover-spring-boot-starter` | `0.2.0` |
 
 **`reqover-agent` and `reqover-cli` are not among them.** Both are shaded executables (so their dependencies don't collide with yours) rather than libraries you compile against, so neither is published. You download them as files from the GitHub Release → [step 4](#4-run-with-the-java-agent-attached).
 
@@ -90,7 +90,7 @@ repositories {
 }
 
 dependencies {
-    implementation("io.reqover:reqover-spring-boot-starter:0.2.0")
+    implementation("io.github.reqover-labs:reqover-spring-boot-starter:0.2.0")
 }
 ```
 
@@ -101,7 +101,7 @@ repositories {
 }
 
 dependencies {
-    implementation 'io.reqover:reqover-spring-boot-starter:0.2.0'
+    implementation 'io.github.reqover-labs:reqover-spring-boot-starter:0.2.0'
 }
 ```
 
@@ -124,12 +124,12 @@ If you want only one adapter and no starter, depend on the adapter and the repor
 ```kotlin
 dependencies {
     // For a Spring MVC project
-    implementation("io.reqover:reqover-spring-mvc:0.2.0")
+    implementation("io.github.reqover-labs:reqover-spring-mvc:0.2.0")
 
     // For a Spring WebFlux project (instead of the line above)
-    // implementation("io.reqover:reqover-spring-webflux:0.2.0")
+    // implementation("io.github.reqover-labs:reqover-spring-webflux:0.2.0")
 
-    implementation("io.reqover:reqover-report:0.2.0")
+    implementation("io.github.reqover-labs:reqover-report:0.2.0")
 }
 ```
 
@@ -423,7 +423,7 @@ The most common failure is **"the report is empty"**, and the cause is usually `
 | No file after shutdown | The process was killed with `SIGKILL`, or the write failed | Stop it with `SIGTERM` and wait. Look for `[reqover] wrote the` on stdout and `[reqover] could not write` on stderr |
 | `InMemoryCoverageStore` injection fails after upgrading from `0.1.1` | The adapters now contribute a `CoverageStore` bean | Change the injection point to `CoverageStore`. See [Replacing the store](#replacing-the-store) |
 | `CoverageStore` injection fails | The adapter dependency is missing, or the web type doesn't match | Use the starter, or confirm `reqover-spring-mvc` in an MVC app and `reqover-spring-webflux` in a WebFlux app |
-| Dependency not found (`Could not find io.reqover:...`) | Step 1 wasn't done, or `mavenLocal()` is missing | Re-run `publishToMavenLocal`, and check `mavenLocal()` comes before `mavenCentral()` |
+| Dependency not found (`Could not find io.github.reqover-labs:...`) | Step 1 wasn't done, or `mavenLocal()` is missing | Re-run `publishToMavenLocal`, and check `mavenLocal()` comes before `mavenCentral()` |
 | Old request ids disappear after a while | The retention cap (10,000 by default) was reached | This is expected: endpoints, counts and executed methods are kept per endpoint; only per-request detail is dropped. See [Adjusting retention](#adjusting-retention) |
 
 ---

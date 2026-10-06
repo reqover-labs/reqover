@@ -75,7 +75,8 @@ The unreleased [request diagnostics preview](docs/24_request_diagnostics.md)
 adds retained HTTP status counts, recorded processing intervals and individual
 request details. These are adapter observations, not method spans, CPU usage,
 network response times or whole-service TPS. JSON details default to the newest
-100 units; endpoint unions and reverse lookup still cover all retained units.
+100 units; endpoint unions and reverse lookup preserve the store's recording-wide
+aggregates, while timing/status statistics remain limited to retained details.
 
 ## Three things the report shows
 

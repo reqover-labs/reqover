@@ -44,16 +44,16 @@ cd reqover
 
 Windows는 `.\gradlew.bat clean publishToMavenLocal`입니다.
 
-설치되는 것은 `io.reqover` 그룹의 라이브러리 모듈입니다.
+설치되는 것은 `io.github.reqover-labs` 그룹의 라이브러리 모듈입니다.
 
 | 아티팩트 | 버전 |
 | --- | --- |
-| `io.reqover:reqover-core` | `0.2.0` |
-| `io.reqover:reqover-instrumentation` | `0.2.0` |
-| `io.reqover:reqover-report` | `0.2.0` |
-| `io.reqover:reqover-spring-mvc` | `0.2.0` |
-| `io.reqover:reqover-spring-webflux` | `0.2.0` |
-| `io.reqover:reqover-spring-boot-starter` | `0.2.0` |
+| `io.github.reqover-labs:reqover-core` | `0.2.0` |
+| `io.github.reqover-labs:reqover-instrumentation` | `0.2.0` |
+| `io.github.reqover-labs:reqover-report` | `0.2.0` |
+| `io.github.reqover-labs:reqover-spring-mvc` | `0.2.0` |
+| `io.github.reqover-labs:reqover-spring-webflux` | `0.2.0` |
+| `io.github.reqover-labs:reqover-spring-boot-starter` | `0.2.0` |
 
 **`reqover-agent`와 `reqover-cli`는 여기 없습니다.** 둘 다 의존성이 섞이지 않게 따로 묶은(shaded) 실행 파일이고 컴파일할 때 참조하는 라이브러리가 아니라서 배포 대상이 아닙니다. GitHub Release에서 파일로 받습니다 → [4단계](#4-java-agent-붙여서-실행).
 
@@ -90,7 +90,7 @@ repositories {
 }
 
 dependencies {
-    implementation("io.reqover:reqover-spring-boot-starter:0.2.0")
+    implementation("io.github.reqover-labs:reqover-spring-boot-starter:0.2.0")
 }
 ```
 
@@ -101,7 +101,7 @@ repositories {
 }
 
 dependencies {
-    implementation 'io.reqover:reqover-spring-boot-starter:0.2.0'
+    implementation 'io.github.reqover-labs:reqover-spring-boot-starter:0.2.0'
 }
 ```
 
@@ -124,12 +124,12 @@ dependencies {
 ```kotlin
 dependencies {
     // Spring MVC 프로젝트라면
-    implementation("io.reqover:reqover-spring-mvc:0.2.0")
+    implementation("io.github.reqover-labs:reqover-spring-mvc:0.2.0")
 
     // Spring WebFlux 프로젝트라면 (위 대신)
-    // implementation("io.reqover:reqover-spring-webflux:0.2.0")
+    // implementation("io.github.reqover-labs:reqover-spring-webflux:0.2.0")
 
-    implementation("io.reqover:reqover-report:0.2.0")
+    implementation("io.github.reqover-labs:reqover-report:0.2.0")
 }
 ```
 
@@ -433,7 +433,7 @@ WebFlux라면 하나 더 — 한 API의 기록 안에 **서로 다른 스레드 
 | 종료했는데 파일이 없음 | `SIGKILL`로 죽였거나 쓰기가 실패함 | `SIGTERM`으로 멈추고 종료를 기다리세요. stdout의 `[reqover] wrote the`와 stderr의 `[reqover] could not write` 확인 |
 | `0.1.1`에서 올린 뒤 `InMemoryCoverageStore` 주입 실패 | 어댑터가 이제 `CoverageStore` 빈을 만듦 | 주입 지점을 `CoverageStore`로 바꾸세요. [저장소 교체하기](#저장소-교체하기) 참고 |
 | `CoverageStore` 빈 주입 실패 | 어댑터 의존성이 없거나 웹 타입이 안 맞음 | 스타터를 쓰거나, MVC 앱에 `reqover-spring-mvc`, WebFlux 앱에 `reqover-spring-webflux`가 들어갔는지 확인 |
-| 의존성을 못 찾음 (`Could not find io.reqover:...`) | 1단계를 안 했거나 `mavenLocal()`이 없음 | `publishToMavenLocal` 재실행, `mavenLocal()`이 `mavenCentral()`보다 앞인지 확인 |
+| 의존성을 못 찾음 (`Could not find io.github.reqover-labs:...`) | 1단계를 안 했거나 `mavenLocal()`이 없음 | `publishToMavenLocal` 재실행, `mavenLocal()`이 `mavenCentral()`보다 앞인지 확인 |
 | 한참 뒤 오래된 요청 id가 사라짐 | 보관 개수 상한(기본 10,000)에 도달 | 정상 동작입니다. 엔드포인트, 호출 횟수, 실행한 메서드는 엔드포인트별로 남고 요청 단위 세부만 지워집니다. [보관 개수 조정](#보관-개수-조정) 참고 |
 
 ---

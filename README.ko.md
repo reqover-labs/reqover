@@ -177,7 +177,7 @@ GET /auto/orders/{id}          3 classes · 3 methods · 1 thread
 의존성 하나면 어댑터와 리포트, Spring 연결이 함께 들어옵니다.
 
 ```kotlin
-implementation("io.reqover:reqover-spring-boot-starter:0.2.0")
+implementation("io.github.reqover-labs:reqover-spring-boot-starter:0.2.0")
 ```
 
 그다음 agent를 붙이고 기록할 패키지를 지정합니다.

@@ -177,7 +177,7 @@ is the same sequence the [CI section](#use-it-in-ci) describes, in one command.
 One dependency brings the adapters, the report, and the Spring wiring:
 
 ```kotlin
-implementation("io.reqover:reqover-spring-boot-starter:0.2.0")
+implementation("io.github.reqover-labs:reqover-spring-boot-starter:0.2.0")
 ```
 
 Then attach the agent and name the packages to record:

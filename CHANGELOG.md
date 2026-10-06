@@ -43,6 +43,12 @@ All notable changes to Reqover are documented in this file.
 
 ### Changed
 
+- **Maven coordinates move to `io.github.reqover-labs`.** Maven Central
+  verifies a namespace by domain or by GitHub organisation, and `reqover.io`
+  is not ours. Nothing was published under `io.reqover`, so no published
+  coordinate changes; a `mavenLocal()` build of 0.2.0 still resolves under
+  the old group. Java packages stay `io.reqover.*`.
+
 - **`references=record` agent option.** A repository interface or an enum
   constant has no method body that runs, so a change to one mapped to no
   endpoint. The agent can now record each call to an included interface and

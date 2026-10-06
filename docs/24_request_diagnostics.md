@@ -62,8 +62,10 @@ The overview totals stay fixed while a text or status/slow filter narrows the
 list. HTML expands at most the most recent 100 HTTP observations. JSON exports
 also default to the newest 100 unit details, preserving their original order,
 and include `omittedRequestDetails` when older details were left out. Endpoint
-unions, the reverse index and completed request count still cover all retained
-units. Statistics rendered from exported JSON cover only its exported detail
+unions, the reverse index and completed request count still preserve the full
+recording aggregates supplied by the store, including evicted observations.
+Timing/status statistics cover only retained details, not those aggregates.
+Statistics rendered from exported JSON cover only its exported detail
 window. A trusted local caller can select a different cap with
 `CoverageReportJson.write(report, requestDetailsLimit)`, including zero to omit
 details. Use small package scopes and an appropriate store bound.

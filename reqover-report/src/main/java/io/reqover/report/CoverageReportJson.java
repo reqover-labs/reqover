@@ -25,7 +25,15 @@ import java.util.stream.IntStream;
  * relationships rather than these diagnostic observations.
  */
 public final class CoverageReportJson {
-    /** Version of the document shape, raised when a field changes meaning. */
+    /**
+     * Version of the document shape, raised when a field changes meaning.
+     *
+     * <p>{@code requestCount} and {@code completedRequestCount} have always meant
+     * requests observed; since per-endpoint aggregates they cover the whole
+     * recording rather than the snapshot window, which is a fix, not a new
+     * meaning. {@code requestIds} lists only requests still retained, so it may
+     * be shorter than {@code requestCount}.
+     */
     public static final int SCHEMA_VERSION = 1;
     public static final int DEFAULT_REQUEST_DETAILS_LIMIT = 100;
 

@@ -1,10 +1,10 @@
 {
     "bomFormat": "CycloneDX",
     "specVersion": "1.6",
-    "serialNumber": "urn:uuid:76425fd1-9061-4ca5-b3ce-e1c94e88bc95",
+    "serialNumber": "urn:uuid:6205552a-91ab-4eff-91ce-f1730c66ccb7",
     "version": 1,
     "metadata": {
-        "timestamp": "2026-10-04T10:08:09Z",
+        "timestamp": "2026-10-06T06:52:36Z",
         "tools": {
             "components": [
                 {
@@ -17,11 +17,11 @@
         },
         "component": {
             "type": "library",
-            "bom-ref": "pkg:maven/io.reqover/reqover@0.2.0?project_path=%3A",
-            "group": "io.reqover",
+            "bom-ref": "pkg:maven/io.github.reqover-labs/reqover@0.2.0?project_path=%3A",
+            "group": "io.github.reqover-labs",
             "name": "reqover",
             "version": "0.2.0",
-            "purl": "pkg:maven/io.reqover/reqover@0.2.0?project_path=%3A",
+            "purl": "pkg:maven/io.github.reqover-labs/reqover@0.2.0?project_path=%3A",
             "modified": false,
             "externalReferences": [
                 {
@@ -823,6 +823,259 @@
                 {
                     "name": "cdx:maven:package:test",
                     "value": "true"
+                }
+            ]
+        },
+        {
+            "type": "library",
+            "bom-ref": "pkg:maven/io.github.reqover-labs/examples@0.2.0?project_path=%3Aexamples",
+            "group": "io.github.reqover-labs",
+            "name": "examples",
+            "version": "0.2.0",
+            "purl": "pkg:maven/io.github.reqover-labs/examples@0.2.0?project_path=%3Aexamples",
+            "modified": false,
+            "properties": [
+                {
+                    "name": "cdx:maven:package:test",
+                    "value": "false"
+                }
+            ],
+            "licenses": [
+                {
+                    "license": {
+                        "id": "Apache-2.0",
+                        "url": "https://www.apache.org/licenses/LICENSE-2.0.txt"
+                    }
+                }
+            ]
+        },
+        {
+            "type": "library",
+            "bom-ref": "pkg:maven/io.github.reqover-labs/mvc-sample@0.2.0?project_path=%3Aexamples%3Amvc-sample",
+            "group": "io.github.reqover-labs",
+            "name": "mvc-sample",
+            "version": "0.2.0",
+            "purl": "pkg:maven/io.github.reqover-labs/mvc-sample@0.2.0?project_path=%3Aexamples%3Amvc-sample",
+            "modified": false,
+            "properties": [
+                {
+                    "name": "cdx:maven:package:test",
+                    "value": "false"
+                }
+            ],
+            "licenses": [
+                {
+                    "license": {
+                        "id": "Apache-2.0",
+                        "url": "https://www.apache.org/licenses/LICENSE-2.0.txt"
+                    }
+                }
+            ]
+        },
+        {
+            "type": "library",
+            "bom-ref": "pkg:maven/io.github.reqover-labs/reqover-agent@0.2.0?project_path=%3Areqover-agent",
+            "group": "io.github.reqover-labs",
+            "name": "reqover-agent",
+            "version": "0.2.0",
+            "purl": "pkg:maven/io.github.reqover-labs/reqover-agent@0.2.0?project_path=%3Areqover-agent",
+            "modified": false,
+            "properties": [
+                {
+                    "name": "cdx:maven:package:test",
+                    "value": "false"
+                }
+            ],
+            "licenses": [
+                {
+                    "license": {
+                        "id": "Apache-2.0",
+                        "url": "https://www.apache.org/licenses/LICENSE-2.0.txt"
+                    }
+                }
+            ]
+        },
+        {
+            "type": "library",
+            "bom-ref": "pkg:maven/io.github.reqover-labs/reqover-cli@0.2.0?project_path=%3Areqover-cli",
+            "group": "io.github.reqover-labs",
+            "name": "reqover-cli",
+            "version": "0.2.0",
+            "purl": "pkg:maven/io.github.reqover-labs/reqover-cli@0.2.0?project_path=%3Areqover-cli",
+            "modified": false,
+            "properties": [
+                {
+                    "name": "cdx:maven:package:test",
+                    "value": "false"
+                }
+            ],
+            "licenses": [
+                {
+                    "license": {
+                        "id": "Apache-2.0",
+                        "url": "https://www.apache.org/licenses/LICENSE-2.0.txt"
+                    }
+                }
+            ]
+        },
+        {
+            "type": "library",
+            "bom-ref": "pkg:maven/io.github.reqover-labs/reqover-core@0.2.0?project_path=%3Areqover-core",
+            "group": "io.github.reqover-labs",
+            "name": "reqover-core",
+            "version": "0.2.0",
+            "purl": "pkg:maven/io.github.reqover-labs/reqover-core@0.2.0?project_path=%3Areqover-core",
+            "modified": false,
+            "properties": [
+                {
+                    "name": "cdx:maven:package:test",
+                    "value": "false"
+                }
+            ],
+            "licenses": [
+                {
+                    "license": {
+                        "id": "Apache-2.0",
+                        "url": "https://www.apache.org/licenses/LICENSE-2.0.txt"
+                    }
+                }
+            ]
+        },
+        {
+            "type": "library",
+            "bom-ref": "pkg:maven/io.github.reqover-labs/reqover-instrumentation@0.2.0?project_path=%3Areqover-instrumentation",
+            "group": "io.github.reqover-labs",
+            "name": "reqover-instrumentation",
+            "version": "0.2.0",
+            "purl": "pkg:maven/io.github.reqover-labs/reqover-instrumentation@0.2.0?project_path=%3Areqover-instrumentation",
+            "modified": false,
+            "properties": [
+                {
+                    "name": "cdx:maven:package:test",
+                    "value": "false"
+                }
+            ],
+            "licenses": [
+                {
+                    "license": {
+                        "id": "Apache-2.0",
+                        "url": "https://www.apache.org/licenses/LICENSE-2.0.txt"
+                    }
+                }
+            ]
+        },
+        {
+            "type": "library",
+            "bom-ref": "pkg:maven/io.github.reqover-labs/reqover-report@0.2.0?project_path=%3Areqover-report",
+            "group": "io.github.reqover-labs",
+            "name": "reqover-report",
+            "version": "0.2.0",
+            "purl": "pkg:maven/io.github.reqover-labs/reqover-report@0.2.0?project_path=%3Areqover-report",
+            "modified": false,
+            "properties": [
+                {
+                    "name": "cdx:maven:package:test",
+                    "value": "false"
+                }
+            ],
+            "licenses": [
+                {
+                    "license": {
+                        "id": "Apache-2.0",
+                        "url": "https://www.apache.org/licenses/LICENSE-2.0.txt"
+                    }
+                }
+            ]
+        },
+        {
+            "type": "library",
+            "bom-ref": "pkg:maven/io.github.reqover-labs/reqover-spring-boot-starter@0.2.0?project_path=%3Areqover-spring-boot-starter",
+            "group": "io.github.reqover-labs",
+            "name": "reqover-spring-boot-starter",
+            "version": "0.2.0",
+            "purl": "pkg:maven/io.github.reqover-labs/reqover-spring-boot-starter@0.2.0?project_path=%3Areqover-spring-boot-starter",
+            "modified": false,
+            "properties": [
+                {
+                    "name": "cdx:maven:package:test",
+                    "value": "false"
+                }
+            ],
+            "licenses": [
+                {
+                    "license": {
+                        "id": "Apache-2.0",
+                        "url": "https://www.apache.org/licenses/LICENSE-2.0.txt"
+                    }
+                }
+            ]
+        },
+        {
+            "type": "library",
+            "bom-ref": "pkg:maven/io.github.reqover-labs/reqover-spring-mvc@0.2.0?project_path=%3Areqover-spring-mvc",
+            "group": "io.github.reqover-labs",
+            "name": "reqover-spring-mvc",
+            "version": "0.2.0",
+            "purl": "pkg:maven/io.github.reqover-labs/reqover-spring-mvc@0.2.0?project_path=%3Areqover-spring-mvc",
+            "modified": false,
+            "properties": [
+                {
+                    "name": "cdx:maven:package:test",
+                    "value": "false"
+                }
+            ],
+            "licenses": [
+                {
+                    "license": {
+                        "id": "Apache-2.0",
+                        "url": "https://www.apache.org/licenses/LICENSE-2.0.txt"
+                    }
+                }
+            ]
+        },
+        {
+            "type": "library",
+            "bom-ref": "pkg:maven/io.github.reqover-labs/reqover-spring-webflux@0.2.0?project_path=%3Areqover-spring-webflux",
+            "group": "io.github.reqover-labs",
+            "name": "reqover-spring-webflux",
+            "version": "0.2.0",
+            "purl": "pkg:maven/io.github.reqover-labs/reqover-spring-webflux@0.2.0?project_path=%3Areqover-spring-webflux",
+            "modified": false,
+            "properties": [
+                {
+                    "name": "cdx:maven:package:test",
+                    "value": "false"
+                }
+            ],
+            "licenses": [
+                {
+                    "license": {
+                        "id": "Apache-2.0",
+                        "url": "https://www.apache.org/licenses/LICENSE-2.0.txt"
+                    }
+                }
+            ]
+        },
+        {
+            "type": "library",
+            "bom-ref": "pkg:maven/io.github.reqover-labs/webflux-sample@0.2.0?project_path=%3Aexamples%3Awebflux-sample",
+            "group": "io.github.reqover-labs",
+            "name": "webflux-sample",
+            "version": "0.2.0",
+            "purl": "pkg:maven/io.github.reqover-labs/webflux-sample@0.2.0?project_path=%3Aexamples%3Awebflux-sample",
+            "modified": false,
+            "properties": [
+                {
+                    "name": "cdx:maven:package:test",
+                    "value": "false"
+                }
+            ],
+            "licenses": [
+                {
+                    "license": {
+                        "id": "Apache-2.0",
+                        "url": "https://www.apache.org/licenses/LICENSE-2.0.txt"
+                    }
                 }
             ]
         },
@@ -2269,259 +2522,6 @@
                 {
                     "name": "cdx:maven:package:test",
                     "value": "true"
-                }
-            ]
-        },
-        {
-            "type": "library",
-            "bom-ref": "pkg:maven/io.reqover/examples@0.2.0?project_path=%3Aexamples",
-            "group": "io.reqover",
-            "name": "examples",
-            "version": "0.2.0",
-            "purl": "pkg:maven/io.reqover/examples@0.2.0?project_path=%3Aexamples",
-            "modified": false,
-            "properties": [
-                {
-                    "name": "cdx:maven:package:test",
-                    "value": "false"
-                }
-            ],
-            "licenses": [
-                {
-                    "license": {
-                        "id": "Apache-2.0",
-                        "url": "https://www.apache.org/licenses/LICENSE-2.0.txt"
-                    }
-                }
-            ]
-        },
-        {
-            "type": "library",
-            "bom-ref": "pkg:maven/io.reqover/mvc-sample@0.2.0?project_path=%3Aexamples%3Amvc-sample",
-            "group": "io.reqover",
-            "name": "mvc-sample",
-            "version": "0.2.0",
-            "purl": "pkg:maven/io.reqover/mvc-sample@0.2.0?project_path=%3Aexamples%3Amvc-sample",
-            "modified": false,
-            "properties": [
-                {
-                    "name": "cdx:maven:package:test",
-                    "value": "false"
-                }
-            ],
-            "licenses": [
-                {
-                    "license": {
-                        "id": "Apache-2.0",
-                        "url": "https://www.apache.org/licenses/LICENSE-2.0.txt"
-                    }
-                }
-            ]
-        },
-        {
-            "type": "library",
-            "bom-ref": "pkg:maven/io.reqover/reqover-agent@0.2.0?project_path=%3Areqover-agent",
-            "group": "io.reqover",
-            "name": "reqover-agent",
-            "version": "0.2.0",
-            "purl": "pkg:maven/io.reqover/reqover-agent@0.2.0?project_path=%3Areqover-agent",
-            "modified": false,
-            "properties": [
-                {
-                    "name": "cdx:maven:package:test",
-                    "value": "false"
-                }
-            ],
-            "licenses": [
-                {
-                    "license": {
-                        "id": "Apache-2.0",
-                        "url": "https://www.apache.org/licenses/LICENSE-2.0.txt"
-                    }
-                }
-            ]
-        },
-        {
-            "type": "library",
-            "bom-ref": "pkg:maven/io.reqover/reqover-cli@0.2.0?project_path=%3Areqover-cli",
-            "group": "io.reqover",
-            "name": "reqover-cli",
-            "version": "0.2.0",
-            "purl": "pkg:maven/io.reqover/reqover-cli@0.2.0?project_path=%3Areqover-cli",
-            "modified": false,
-            "properties": [
-                {
-                    "name": "cdx:maven:package:test",
-                    "value": "false"
-                }
-            ],
-            "licenses": [
-                {
-                    "license": {
-                        "id": "Apache-2.0",
-                        "url": "https://www.apache.org/licenses/LICENSE-2.0.txt"
-                    }
-                }
-            ]
-        },
-        {
-            "type": "library",
-            "bom-ref": "pkg:maven/io.reqover/reqover-core@0.2.0?project_path=%3Areqover-core",
-            "group": "io.reqover",
-            "name": "reqover-core",
-            "version": "0.2.0",
-            "purl": "pkg:maven/io.reqover/reqover-core@0.2.0?project_path=%3Areqover-core",
-            "modified": false,
-            "properties": [
-                {
-                    "name": "cdx:maven:package:test",
-                    "value": "false"
-                }
-            ],
-            "licenses": [
-                {
-                    "license": {
-                        "id": "Apache-2.0",
-                        "url": "https://www.apache.org/licenses/LICENSE-2.0.txt"
-                    }
-                }
-            ]
-        },
-        {
-            "type": "library",
-            "bom-ref": "pkg:maven/io.reqover/reqover-instrumentation@0.2.0?project_path=%3Areqover-instrumentation",
-            "group": "io.reqover",
-            "name": "reqover-instrumentation",
-            "version": "0.2.0",
-            "purl": "pkg:maven/io.reqover/reqover-instrumentation@0.2.0?project_path=%3Areqover-instrumentation",
-            "modified": false,
-            "properties": [
-                {
-                    "name": "cdx:maven:package:test",
-                    "value": "false"
-                }
-            ],
-            "licenses": [
-                {
-                    "license": {
-                        "id": "Apache-2.0",
-                        "url": "https://www.apache.org/licenses/LICENSE-2.0.txt"
-                    }
-                }
-            ]
-        },
-        {
-            "type": "library",
-            "bom-ref": "pkg:maven/io.reqover/reqover-report@0.2.0?project_path=%3Areqover-report",
-            "group": "io.reqover",
-            "name": "reqover-report",
-            "version": "0.2.0",
-            "purl": "pkg:maven/io.reqover/reqover-report@0.2.0?project_path=%3Areqover-report",
-            "modified": false,
-            "properties": [
-                {
-                    "name": "cdx:maven:package:test",
-                    "value": "false"
-                }
-            ],
-            "licenses": [
-                {
-                    "license": {
-                        "id": "Apache-2.0",
-                        "url": "https://www.apache.org/licenses/LICENSE-2.0.txt"
-                    }
-                }
-            ]
-        },
-        {
-            "type": "library",
-            "bom-ref": "pkg:maven/io.reqover/reqover-spring-boot-starter@0.2.0?project_path=%3Areqover-spring-boot-starter",
-            "group": "io.reqover",
-            "name": "reqover-spring-boot-starter",
-            "version": "0.2.0",
-            "purl": "pkg:maven/io.reqover/reqover-spring-boot-starter@0.2.0?project_path=%3Areqover-spring-boot-starter",
-            "modified": false,
-            "properties": [
-                {
-                    "name": "cdx:maven:package:test",
-                    "value": "false"
-                }
-            ],
-            "licenses": [
-                {
-                    "license": {
-                        "id": "Apache-2.0",
-                        "url": "https://www.apache.org/licenses/LICENSE-2.0.txt"
-                    }
-                }
-            ]
-        },
-        {
-            "type": "library",
-            "bom-ref": "pkg:maven/io.reqover/reqover-spring-mvc@0.2.0?project_path=%3Areqover-spring-mvc",
-            "group": "io.reqover",
-            "name": "reqover-spring-mvc",
-            "version": "0.2.0",
-            "purl": "pkg:maven/io.reqover/reqover-spring-mvc@0.2.0?project_path=%3Areqover-spring-mvc",
-            "modified": false,
-            "properties": [
-                {
-                    "name": "cdx:maven:package:test",
-                    "value": "false"
-                }
-            ],
-            "licenses": [
-                {
-                    "license": {
-                        "id": "Apache-2.0",
-                        "url": "https://www.apache.org/licenses/LICENSE-2.0.txt"
-                    }
-                }
-            ]
-        },
-        {
-            "type": "library",
-            "bom-ref": "pkg:maven/io.reqover/reqover-spring-webflux@0.2.0?project_path=%3Areqover-spring-webflux",
-            "group": "io.reqover",
-            "name": "reqover-spring-webflux",
-            "version": "0.2.0",
-            "purl": "pkg:maven/io.reqover/reqover-spring-webflux@0.2.0?project_path=%3Areqover-spring-webflux",
-            "modified": false,
-            "properties": [
-                {
-                    "name": "cdx:maven:package:test",
-                    "value": "false"
-                }
-            ],
-            "licenses": [
-                {
-                    "license": {
-                        "id": "Apache-2.0",
-                        "url": "https://www.apache.org/licenses/LICENSE-2.0.txt"
-                    }
-                }
-            ]
-        },
-        {
-            "type": "library",
-            "bom-ref": "pkg:maven/io.reqover/webflux-sample@0.2.0?project_path=%3Aexamples%3Awebflux-sample",
-            "group": "io.reqover",
-            "name": "webflux-sample",
-            "version": "0.2.0",
-            "purl": "pkg:maven/io.reqover/webflux-sample@0.2.0?project_path=%3Aexamples%3Awebflux-sample",
-            "modified": false,
-            "properties": [
-                {
-                    "name": "cdx:maven:package:test",
-                    "value": "false"
-                }
-            ],
-            "licenses": [
-                {
-                    "license": {
-                        "id": "Apache-2.0",
-                        "url": "https://www.apache.org/licenses/LICENSE-2.0.txt"
-                    }
                 }
             ]
         },
@@ -6917,6 +6917,154 @@
             ]
         },
         {
+            "ref": "pkg:maven/io.github.reqover-labs/examples@0.2.0?project_path=%3Aexamples",
+            "dependsOn": [
+                
+            ]
+        },
+        {
+            "ref": "pkg:maven/io.github.reqover-labs/mvc-sample@0.2.0?project_path=%3Aexamples%3Amvc-sample",
+            "dependsOn": [
+                "pkg:maven/com.fasterxml.jackson/jackson-bom@2.21.7?type=pom",
+                "pkg:maven/io.github.reqover-labs/reqover-spring-boot-starter@0.2.0?project_path=%3Areqover-spring-boot-starter",
+                "pkg:maven/org.apache.logging.log4j/log4j-bom@2.25.5?type=pom",
+                "pkg:maven/org.junit.platform/junit-platform-launcher@1.12.2?type=jar",
+                "pkg:maven/org.springframework.boot/spring-boot-dependencies@3.5.16?type=pom",
+                "pkg:maven/org.springframework.boot/spring-boot-starter-test@3.5.16?type=jar",
+                "pkg:maven/org.springframework.boot/spring-boot-starter-web@3.5.16?type=jar"
+            ]
+        },
+        {
+            "ref": "pkg:maven/io.github.reqover-labs/reqover-agent@0.2.0?project_path=%3Areqover-agent",
+            "dependsOn": [
+                "pkg:maven/com.fasterxml.jackson.core/jackson-databind@2.21.7?type=jar",
+                "pkg:maven/io.github.reqover-labs/reqover-core@0.2.0?project_path=%3Areqover-core",
+                "pkg:maven/io.github.reqover-labs/reqover-instrumentation@0.2.0?project_path=%3Areqover-instrumentation",
+                "pkg:maven/org.junit.jupiter/junit-jupiter@5.12.2?type=jar",
+                "pkg:maven/org.junit.platform/junit-platform-launcher@1.12.2?type=jar",
+                "pkg:maven/org.junit/junit-bom@5.12.2?type=pom"
+            ]
+        },
+        {
+            "ref": "pkg:maven/io.github.reqover-labs/reqover-cli@0.2.0?project_path=%3Areqover-cli",
+            "dependsOn": [
+                "pkg:maven/io.github.reqover-labs/reqover-report@0.2.0?project_path=%3Areqover-report",
+                "pkg:maven/org.junit.jupiter/junit-jupiter@5.12.2?type=jar",
+                "pkg:maven/org.junit.platform/junit-platform-launcher@1.12.2?type=jar",
+                "pkg:maven/org.junit/junit-bom@5.12.2?type=pom"
+            ]
+        },
+        {
+            "ref": "pkg:maven/io.github.reqover-labs/reqover-core@0.2.0?project_path=%3Areqover-core",
+            "dependsOn": [
+                "pkg:maven/org.junit.jupiter/junit-jupiter@5.12.2?type=jar",
+                "pkg:maven/org.junit.platform/junit-platform-launcher@1.12.2?type=jar",
+                "pkg:maven/org.junit/junit-bom@5.12.2?type=pom"
+            ]
+        },
+        {
+            "ref": "pkg:maven/io.github.reqover-labs/reqover-instrumentation@0.2.0?project_path=%3Areqover-instrumentation",
+            "dependsOn": [
+                "pkg:maven/io.github.reqover-labs/reqover-core@0.2.0?project_path=%3Areqover-core",
+                "pkg:maven/org.junit.jupiter/junit-jupiter@5.12.2?type=jar",
+                "pkg:maven/org.junit.platform/junit-platform-launcher@1.12.2?type=jar",
+                "pkg:maven/org.junit/junit-bom@5.12.2?type=pom",
+                "pkg:maven/org.ow2.asm/asm@9.10.1?type=jar"
+            ]
+        },
+        {
+            "ref": "pkg:maven/io.github.reqover-labs/reqover-report@0.2.0?project_path=%3Areqover-report",
+            "dependsOn": [
+                "pkg:maven/io.github.reqover-labs/reqover-core@0.2.0?project_path=%3Areqover-core",
+                "pkg:maven/org.junit.jupiter/junit-jupiter@5.12.2?type=jar",
+                "pkg:maven/org.junit.platform/junit-platform-launcher@1.12.2?type=jar",
+                "pkg:maven/org.junit/junit-bom@5.12.2?type=pom"
+            ]
+        },
+        {
+            "ref": "pkg:maven/io.github.reqover-labs/reqover-spring-boot-starter@0.2.0?project_path=%3Areqover-spring-boot-starter",
+            "dependsOn": [
+                "pkg:maven/com.fasterxml.jackson/jackson-bom@2.21.7?type=pom",
+                "pkg:maven/io.github.reqover-labs/reqover-core@0.2.0?project_path=%3Areqover-core",
+                "pkg:maven/io.github.reqover-labs/reqover-report@0.2.0?project_path=%3Areqover-report",
+                "pkg:maven/io.github.reqover-labs/reqover-spring-mvc@0.2.0?project_path=%3Areqover-spring-mvc",
+                "pkg:maven/io.github.reqover-labs/reqover-spring-webflux@0.2.0?project_path=%3Areqover-spring-webflux",
+                "pkg:maven/jakarta.servlet/jakarta.servlet-api@6.0.0?type=jar",
+                "pkg:maven/org.apache.logging.log4j/log4j-bom@2.25.5?type=pom",
+                "pkg:maven/org.junit.platform/junit-platform-launcher@1.12.2?type=jar",
+                "pkg:maven/org.junit/junit-bom@5.12.2?type=pom",
+                "pkg:maven/org.springframework.boot/spring-boot-autoconfigure@3.5.16?type=jar",
+                "pkg:maven/org.springframework.boot/spring-boot-dependencies@3.5.16?type=pom",
+                "pkg:maven/org.springframework.boot/spring-boot-starter-test@3.5.16?type=jar",
+                "pkg:maven/org.springframework.boot/spring-boot-starter-web@3.5.16?type=jar",
+                "pkg:maven/org.springframework/spring-webflux@6.2.19?type=jar",
+                "pkg:maven/org.springframework/spring-webmvc@6.2.19?type=jar"
+            ]
+        },
+        {
+            "ref": "pkg:maven/io.github.reqover-labs/reqover-spring-mvc@0.2.0?project_path=%3Areqover-spring-mvc",
+            "dependsOn": [
+                "pkg:maven/io.github.reqover-labs/reqover-core@0.2.0?project_path=%3Areqover-core",
+                "pkg:maven/jakarta.servlet/jakarta.servlet-api@6.0.0?type=jar",
+                "pkg:maven/org.assertj/assertj-core@3.27.7?type=jar",
+                "pkg:maven/org.junit.jupiter/junit-jupiter@5.12.2?type=jar",
+                "pkg:maven/org.junit.platform/junit-platform-launcher@1.12.2?type=jar",
+                "pkg:maven/org.junit/junit-bom@5.12.2?type=pom",
+                "pkg:maven/org.springframework.boot/spring-boot-autoconfigure@3.5.16?type=jar",
+                "pkg:maven/org.springframework.boot/spring-boot-dependencies@3.5.16?type=pom",
+                "pkg:maven/org.springframework.boot/spring-boot-test@3.5.16?type=jar",
+                "pkg:maven/org.springframework/spring-test@6.2.19?type=jar",
+                "pkg:maven/org.springframework/spring-webmvc@6.2.19?type=jar"
+            ]
+        },
+        {
+            "ref": "pkg:maven/io.github.reqover-labs/reqover-spring-webflux@0.2.0?project_path=%3Areqover-spring-webflux",
+            "dependsOn": [
+                "pkg:maven/io.github.reqover-labs/reqover-core@0.2.0?project_path=%3Areqover-core",
+                "pkg:maven/io.micrometer/context-propagation@1.1.4?type=jar",
+                "pkg:maven/io.projectreactor/reactor-core@3.7.19?type=jar",
+                "pkg:maven/org.assertj/assertj-core@3.27.7?type=jar",
+                "pkg:maven/org.junit.jupiter/junit-jupiter@5.12.2?type=jar",
+                "pkg:maven/org.junit.platform/junit-platform-launcher@1.12.2?type=jar",
+                "pkg:maven/org.junit/junit-bom@5.12.2?type=pom",
+                "pkg:maven/org.springframework.boot/spring-boot-autoconfigure@3.5.16?type=jar",
+                "pkg:maven/org.springframework.boot/spring-boot-dependencies@3.5.16?type=pom",
+                "pkg:maven/org.springframework.boot/spring-boot-test@3.5.16?type=jar",
+                "pkg:maven/org.springframework/spring-context@6.2.19?type=jar",
+                "pkg:maven/org.springframework/spring-webflux@6.2.19?type=jar"
+            ]
+        },
+        {
+            "ref": "pkg:maven/io.github.reqover-labs/reqover@0.2.0?project_path=%3A",
+            "dependsOn": [
+                "pkg:maven/io.github.reqover-labs/examples@0.2.0?project_path=%3Aexamples",
+                "pkg:maven/io.github.reqover-labs/mvc-sample@0.2.0?project_path=%3Aexamples%3Amvc-sample",
+                "pkg:maven/io.github.reqover-labs/reqover-agent@0.2.0?project_path=%3Areqover-agent",
+                "pkg:maven/io.github.reqover-labs/reqover-cli@0.2.0?project_path=%3Areqover-cli",
+                "pkg:maven/io.github.reqover-labs/reqover-core@0.2.0?project_path=%3Areqover-core",
+                "pkg:maven/io.github.reqover-labs/reqover-instrumentation@0.2.0?project_path=%3Areqover-instrumentation",
+                "pkg:maven/io.github.reqover-labs/reqover-report@0.2.0?project_path=%3Areqover-report",
+                "pkg:maven/io.github.reqover-labs/reqover-spring-boot-starter@0.2.0?project_path=%3Areqover-spring-boot-starter",
+                "pkg:maven/io.github.reqover-labs/reqover-spring-mvc@0.2.0?project_path=%3Areqover-spring-mvc",
+                "pkg:maven/io.github.reqover-labs/reqover-spring-webflux@0.2.0?project_path=%3Areqover-spring-webflux",
+                "pkg:maven/io.github.reqover-labs/webflux-sample@0.2.0?project_path=%3Aexamples%3Awebflux-sample"
+            ]
+        },
+        {
+            "ref": "pkg:maven/io.github.reqover-labs/webflux-sample@0.2.0?project_path=%3Aexamples%3Awebflux-sample",
+            "dependsOn": [
+                "pkg:maven/com.fasterxml.jackson/jackson-bom@2.21.7?type=pom",
+                "pkg:maven/io.github.reqover-labs/reqover-spring-boot-starter@0.2.0?project_path=%3Areqover-spring-boot-starter",
+                "pkg:maven/io.netty/netty-bom@4.1.137.Final?type=pom",
+                "pkg:maven/io.projectreactor/reactor-test@3.7.19?type=jar",
+                "pkg:maven/org.apache.logging.log4j/log4j-bom@2.25.5?type=pom",
+                "pkg:maven/org.junit.platform/junit-platform-launcher@1.12.2?type=jar",
+                "pkg:maven/org.springframework.boot/spring-boot-dependencies@3.5.16?type=pom",
+                "pkg:maven/org.springframework.boot/spring-boot-starter-test@3.5.16?type=jar",
+                "pkg:maven/org.springframework.boot/spring-boot-starter-webflux@3.5.16?type=jar"
+            ]
+        },
+        {
             "ref": "pkg:maven/io.micrometer/context-propagation@1.1.4?type=jar",
             "dependsOn": [
                 
@@ -7121,154 +7269,6 @@
             "ref": "pkg:maven/io.projectreactor/reactor-test@3.7.19?type=jar",
             "dependsOn": [
                 "pkg:maven/io.projectreactor/reactor-core@3.7.19?type=jar"
-            ]
-        },
-        {
-            "ref": "pkg:maven/io.reqover/examples@0.2.0?project_path=%3Aexamples",
-            "dependsOn": [
-                
-            ]
-        },
-        {
-            "ref": "pkg:maven/io.reqover/mvc-sample@0.2.0?project_path=%3Aexamples%3Amvc-sample",
-            "dependsOn": [
-                "pkg:maven/com.fasterxml.jackson/jackson-bom@2.21.7?type=pom",
-                "pkg:maven/io.reqover/reqover-spring-boot-starter@0.2.0?project_path=%3Areqover-spring-boot-starter",
-                "pkg:maven/org.apache.logging.log4j/log4j-bom@2.25.5?type=pom",
-                "pkg:maven/org.junit.platform/junit-platform-launcher@1.12.2?type=jar",
-                "pkg:maven/org.springframework.boot/spring-boot-dependencies@3.5.16?type=pom",
-                "pkg:maven/org.springframework.boot/spring-boot-starter-test@3.5.16?type=jar",
-                "pkg:maven/org.springframework.boot/spring-boot-starter-web@3.5.16?type=jar"
-            ]
-        },
-        {
-            "ref": "pkg:maven/io.reqover/reqover-agent@0.2.0?project_path=%3Areqover-agent",
-            "dependsOn": [
-                "pkg:maven/com.fasterxml.jackson.core/jackson-databind@2.21.7?type=jar",
-                "pkg:maven/io.reqover/reqover-core@0.2.0?project_path=%3Areqover-core",
-                "pkg:maven/io.reqover/reqover-instrumentation@0.2.0?project_path=%3Areqover-instrumentation",
-                "pkg:maven/org.junit.jupiter/junit-jupiter@5.12.2?type=jar",
-                "pkg:maven/org.junit.platform/junit-platform-launcher@1.12.2?type=jar",
-                "pkg:maven/org.junit/junit-bom@5.12.2?type=pom"
-            ]
-        },
-        {
-            "ref": "pkg:maven/io.reqover/reqover-cli@0.2.0?project_path=%3Areqover-cli",
-            "dependsOn": [
-                "pkg:maven/io.reqover/reqover-report@0.2.0?project_path=%3Areqover-report",
-                "pkg:maven/org.junit.jupiter/junit-jupiter@5.12.2?type=jar",
-                "pkg:maven/org.junit.platform/junit-platform-launcher@1.12.2?type=jar",
-                "pkg:maven/org.junit/junit-bom@5.12.2?type=pom"
-            ]
-        },
-        {
-            "ref": "pkg:maven/io.reqover/reqover-core@0.2.0?project_path=%3Areqover-core",
-            "dependsOn": [
-                "pkg:maven/org.junit.jupiter/junit-jupiter@5.12.2?type=jar",
-                "pkg:maven/org.junit.platform/junit-platform-launcher@1.12.2?type=jar",
-                "pkg:maven/org.junit/junit-bom@5.12.2?type=pom"
-            ]
-        },
-        {
-            "ref": "pkg:maven/io.reqover/reqover-instrumentation@0.2.0?project_path=%3Areqover-instrumentation",
-            "dependsOn": [
-                "pkg:maven/io.reqover/reqover-core@0.2.0?project_path=%3Areqover-core",
-                "pkg:maven/org.junit.jupiter/junit-jupiter@5.12.2?type=jar",
-                "pkg:maven/org.junit.platform/junit-platform-launcher@1.12.2?type=jar",
-                "pkg:maven/org.junit/junit-bom@5.12.2?type=pom",
-                "pkg:maven/org.ow2.asm/asm@9.10.1?type=jar"
-            ]
-        },
-        {
-            "ref": "pkg:maven/io.reqover/reqover-report@0.2.0?project_path=%3Areqover-report",
-            "dependsOn": [
-                "pkg:maven/io.reqover/reqover-core@0.2.0?project_path=%3Areqover-core",
-                "pkg:maven/org.junit.jupiter/junit-jupiter@5.12.2?type=jar",
-                "pkg:maven/org.junit.platform/junit-platform-launcher@1.12.2?type=jar",
-                "pkg:maven/org.junit/junit-bom@5.12.2?type=pom"
-            ]
-        },
-        {
-            "ref": "pkg:maven/io.reqover/reqover-spring-boot-starter@0.2.0?project_path=%3Areqover-spring-boot-starter",
-            "dependsOn": [
-                "pkg:maven/com.fasterxml.jackson/jackson-bom@2.21.7?type=pom",
-                "pkg:maven/io.reqover/reqover-core@0.2.0?project_path=%3Areqover-core",
-                "pkg:maven/io.reqover/reqover-report@0.2.0?project_path=%3Areqover-report",
-                "pkg:maven/io.reqover/reqover-spring-mvc@0.2.0?project_path=%3Areqover-spring-mvc",
-                "pkg:maven/io.reqover/reqover-spring-webflux@0.2.0?project_path=%3Areqover-spring-webflux",
-                "pkg:maven/jakarta.servlet/jakarta.servlet-api@6.0.0?type=jar",
-                "pkg:maven/org.apache.logging.log4j/log4j-bom@2.25.5?type=pom",
-                "pkg:maven/org.junit.platform/junit-platform-launcher@1.12.2?type=jar",
-                "pkg:maven/org.junit/junit-bom@5.12.2?type=pom",
-                "pkg:maven/org.springframework.boot/spring-boot-autoconfigure@3.5.16?type=jar",
-                "pkg:maven/org.springframework.boot/spring-boot-dependencies@3.5.16?type=pom",
-                "pkg:maven/org.springframework.boot/spring-boot-starter-test@3.5.16?type=jar",
-                "pkg:maven/org.springframework.boot/spring-boot-starter-web@3.5.16?type=jar",
-                "pkg:maven/org.springframework/spring-webflux@6.2.19?type=jar",
-                "pkg:maven/org.springframework/spring-webmvc@6.2.19?type=jar"
-            ]
-        },
-        {
-            "ref": "pkg:maven/io.reqover/reqover-spring-mvc@0.2.0?project_path=%3Areqover-spring-mvc",
-            "dependsOn": [
-                "pkg:maven/io.reqover/reqover-core@0.2.0?project_path=%3Areqover-core",
-                "pkg:maven/jakarta.servlet/jakarta.servlet-api@6.0.0?type=jar",
-                "pkg:maven/org.assertj/assertj-core@3.27.7?type=jar",
-                "pkg:maven/org.junit.jupiter/junit-jupiter@5.12.2?type=jar",
-                "pkg:maven/org.junit.platform/junit-platform-launcher@1.12.2?type=jar",
-                "pkg:maven/org.junit/junit-bom@5.12.2?type=pom",
-                "pkg:maven/org.springframework.boot/spring-boot-autoconfigure@3.5.16?type=jar",
-                "pkg:maven/org.springframework.boot/spring-boot-dependencies@3.5.16?type=pom",
-                "pkg:maven/org.springframework.boot/spring-boot-test@3.5.16?type=jar",
-                "pkg:maven/org.springframework/spring-test@6.2.19?type=jar",
-                "pkg:maven/org.springframework/spring-webmvc@6.2.19?type=jar"
-            ]
-        },
-        {
-            "ref": "pkg:maven/io.reqover/reqover-spring-webflux@0.2.0?project_path=%3Areqover-spring-webflux",
-            "dependsOn": [
-                "pkg:maven/io.micrometer/context-propagation@1.1.4?type=jar",
-                "pkg:maven/io.projectreactor/reactor-core@3.7.19?type=jar",
-                "pkg:maven/io.reqover/reqover-core@0.2.0?project_path=%3Areqover-core",
-                "pkg:maven/org.assertj/assertj-core@3.27.7?type=jar",
-                "pkg:maven/org.junit.jupiter/junit-jupiter@5.12.2?type=jar",
-                "pkg:maven/org.junit.platform/junit-platform-launcher@1.12.2?type=jar",
-                "pkg:maven/org.junit/junit-bom@5.12.2?type=pom",
-                "pkg:maven/org.springframework.boot/spring-boot-autoconfigure@3.5.16?type=jar",
-                "pkg:maven/org.springframework.boot/spring-boot-dependencies@3.5.16?type=pom",
-                "pkg:maven/org.springframework.boot/spring-boot-test@3.5.16?type=jar",
-                "pkg:maven/org.springframework/spring-context@6.2.19?type=jar",
-                "pkg:maven/org.springframework/spring-webflux@6.2.19?type=jar"
-            ]
-        },
-        {
-            "ref": "pkg:maven/io.reqover/reqover@0.2.0?project_path=%3A",
-            "dependsOn": [
-                "pkg:maven/io.reqover/examples@0.2.0?project_path=%3Aexamples",
-                "pkg:maven/io.reqover/mvc-sample@0.2.0?project_path=%3Aexamples%3Amvc-sample",
-                "pkg:maven/io.reqover/reqover-agent@0.2.0?project_path=%3Areqover-agent",
-                "pkg:maven/io.reqover/reqover-cli@0.2.0?project_path=%3Areqover-cli",
-                "pkg:maven/io.reqover/reqover-core@0.2.0?project_path=%3Areqover-core",
-                "pkg:maven/io.reqover/reqover-instrumentation@0.2.0?project_path=%3Areqover-instrumentation",
-                "pkg:maven/io.reqover/reqover-report@0.2.0?project_path=%3Areqover-report",
-                "pkg:maven/io.reqover/reqover-spring-boot-starter@0.2.0?project_path=%3Areqover-spring-boot-starter",
-                "pkg:maven/io.reqover/reqover-spring-mvc@0.2.0?project_path=%3Areqover-spring-mvc",
-                "pkg:maven/io.reqover/reqover-spring-webflux@0.2.0?project_path=%3Areqover-spring-webflux",
-                "pkg:maven/io.reqover/webflux-sample@0.2.0?project_path=%3Aexamples%3Awebflux-sample"
-            ]
-        },
-        {
-            "ref": "pkg:maven/io.reqover/webflux-sample@0.2.0?project_path=%3Aexamples%3Awebflux-sample",
-            "dependsOn": [
-                "pkg:maven/com.fasterxml.jackson/jackson-bom@2.21.7?type=pom",
-                "pkg:maven/io.netty/netty-bom@4.1.137.Final?type=pom",
-                "pkg:maven/io.projectreactor/reactor-test@3.7.19?type=jar",
-                "pkg:maven/io.reqover/reqover-spring-boot-starter@0.2.0?project_path=%3Areqover-spring-boot-starter",
-                "pkg:maven/org.apache.logging.log4j/log4j-bom@2.25.5?type=pom",
-                "pkg:maven/org.junit.platform/junit-platform-launcher@1.12.2?type=jar",
-                "pkg:maven/org.springframework.boot/spring-boot-dependencies@3.5.16?type=pom",
-                "pkg:maven/org.springframework.boot/spring-boot-starter-test@3.5.16?type=jar",
-                "pkg:maven/org.springframework.boot/spring-boot-starter-webflux@3.5.16?type=jar"
             ]
         },
         {

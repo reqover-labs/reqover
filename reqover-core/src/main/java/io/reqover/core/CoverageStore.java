@@ -27,6 +27,20 @@ public interface CoverageStore {
      */
     List<CoverageBucketSnapshot> snapshots();
 
-    /** Discards every retained snapshot. */
+    /**
+     * Per-unit totals over everything flushed since the last {@link #clear()},
+     * including units whose snapshots have since been evicted.
+     *
+     * <p>The report prefers these to {@link #snapshots()} for which endpoints
+     * exist, how often they ran and what they executed, so a long recording
+     * does not forget an endpoint that was only called early. The default
+     * returns an empty list, which tells the report to fall back to the
+     * snapshots alone.
+     */
+    default List<UnitAggregate> aggregates() {
+        return List.of();
+    }
+
+    /** Discards every retained snapshot and aggregate. */
     void clear();
 }

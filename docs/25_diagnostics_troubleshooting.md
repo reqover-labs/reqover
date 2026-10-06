@@ -3,9 +3,11 @@
 ## Bounded Exports
 
 Default JSON includes only the newest 100 unit details. `omittedRequestDetails`
-reports exclusions; aggregate endpoint unions and reverse lookup remain intact.
+reports exclusions; recording-wide endpoint aggregates and reverse lookup remain intact.
 Offline timing statistics describe the exported detail window, not all traffic.
 Choose an explicit local export limit only for trusted, appropriately scoped data.
+Evicted observations can remain in endpoint counts/code unions, but not in
+retained timing/status statistics. Do not fabricate timing from aggregate counts.
 
 ## GitHub Action Prerequisites
 

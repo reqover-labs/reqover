@@ -4,6 +4,7 @@ import io.reqover.core.CoverageBucketSnapshot;
 import io.reqover.core.ProbeMetadata;
 import io.reqover.core.ProbeRegistry;
 import io.reqover.core.UnitInfo;
+import io.reqover.core.UnitAggregate;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 
@@ -106,6 +107,30 @@ class RequestDiagnosticsTest {
     static CoverageBucketSnapshot snapshot(String id, long millis, int status, int classId) {
         return new CoverageBucketSnapshot(UnitInfo.httpRequest(id, "GET", "/orders/{id}"),
                 START, START.plusMillis(millis), status, Map.of(classId, Set.of(0)), Set.of("worker-1"));
+    }
+
+    @Test
+    void keepsRecordingAggregatesSeparateFromRetainedRequestDiagnostics() {
+        ProbeRegistry.register(new ProbeMetadata(1, 0, "sample.RetainedService", "run", "()V", null));
+        ProbeRegistry.register(new ProbeMetadata(2, 0, "sample.EvictedService", "run", "()V", null));
+        CoverageBucketSnapshot retained = snapshot("retained", 5, 200, 1);
+        CoverageReport report = new CoverageReportGenerator().generate(List.of(retained), List.of(
+                new UnitAggregate(retained.unitInfo().name(), retained.unitInfo().unitType(), 10,
+                        Map.of(1, Set.of(0)), Set.of("worker-1")),
+                new UnitAggregate("GET /evicted", retained.unitInfo().unitType(), 3,
+                        Map.of(2, Set.of(0)), Set.of("old-worker"))));
+
+        assertEquals(13, report.completedRequestCount());
+        assertEquals(2, report.endpoints().size());
+        EndpointCoverage evicted = report.endpoints().stream()
+                .filter(endpoint -> endpoint.endpoint().equals("GET /evicted")).findFirst().orElseThrow();
+        assertEquals(3, evicted.requestCount());
+        assertTrue(evicted.requestIds().isEmpty());
+        assertEquals(2, report.reverseIndex().size());
+        assertEquals(1, report.requests().size());
+        assertEquals("sample.RetainedService", report.requests().get(0).classes().get(0).className());
+        assertEquals(1, RequestSummary.from(report.requests()).requestCount());
+        assertEquals(report, CoverageReportJson.read(CoverageReportJson.write(report)));
     }
 
     @Test

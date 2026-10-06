@@ -661,7 +661,7 @@ def load_sbom_components(path: Path) -> list[dict]:
         group = str(component.get("group") or "").strip()
         name = str(component.get("name") or "").strip()
         version = str(component.get("version") or "").strip()
-        if not name or group == "io.reqover":
+        if not name or group in ("io.reqover", "io.github.reqover-labs"):
             continue
         unique[(group, name, version)] = component
     return [unique[key] for key in sorted(unique, key=lambda value: tuple(part.lower() for part in value))]

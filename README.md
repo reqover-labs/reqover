@@ -95,7 +95,8 @@ from the file the application exports on shutdown, or with `reqover render`.
 
 These are what the adapter observed: no method timings, call order, client-side
 latency or whole-service TPS. Timing statistics cover the retained requests,
-while the default store's endpoint counts and executed code cover the whole recording.
+while the default store's admitted endpoint aggregates preserve recording-wide
+counts/code within the [aggregate limits](reqover-core/README.md).
 
 ## Three things the report shows
 
@@ -354,8 +355,8 @@ Written plainly. Using a tool with the wrong expectations wastes everyone's time
 
 - **It does not know which lines ran.** Method granularity only. If you need line and branch precision, use JaCoCo.
 - **Compiler-generated methods and runtime proxies** (Spring CGLIB, Hibernate, Byte Buddy, Mockito) are excluded. Trivial getters, setters, builders and record accessors are skipped by default; `accessors=record` keeps them for impact recordings. `references=record` additionally observes included interface calls/static-field reads, not the referenced implementation's execution. Requests served by the unmapped catch-all resource handler are excluded.
-- **Records live in memory only.** The default cap is 10,000 per-request records (`reqover.mvc.max-snapshots` / `reqover.webflux.max-snapshots`); beyond that the oldest are dropped. Which endpoints ran, how often and what they executed is kept separately per endpoint, so an endpoint called only early in a long recording stays in the report. Restarting the application clears everything. `CoverageStore` is the extension point for storing them elsewhere, but Reqover ships no persistent implementation — export the report to a file instead.
-- **Exported details have their own bound.** JSON defaults to the newest 100 unit details and reports `omittedRequestDetails`; endpoint aggregates remain complete. Live HTML timing summaries use retained HTTP snapshots, while HTML rendered from exported JSON can use only that file's details. For a complete retained timing baseline, export the live dashboard's summary.
+- **Records live in memory only.** The default snapshot cap is 10,000 (`reqover.mvc.max-snapshots` / `reqover.webflux.max-snapshots`). Separate aggregates preserve counts/code for admitted names across detail eviction, with a 2,000-distinct-name admission limit and 64 thread names per aggregate. A new name beyond that limit can disappear when its snapshots are evicted; raising the snapshot cap does not raise aggregate limits. Restart clears everything. `CoverageStore` supports custom retention, but no persistent implementation ships; export a file instead.
+- **Exported details have their own bound.** JSON defaults to the newest 100 unit details and reports `omittedRequestDetails`; it does not truncate the report's available endpoint aggregates. Live HTML timing summaries use retained HTTP snapshots, while HTML rendered from exported JSON can use only that file's details. For a complete retained timing baseline, export the live dashboard's summary.
 - **Impact analysis is bounded by what was recorded.** It matches changed files against code the report observed running. A file it cannot match is reported as unmatched, which means "not seen", not "not affected".
 - **MVC async sections are not linked automatically.** Work handed to a separate thread is not recorded; attribution resumes when request handling returns.
 - **The WebFlux adapter turns on one JVM-wide setting.** (Reactor's automatic context propagation — needed to carry request information across threads.) If you don't want that, disable the adapter entirely with `reqover.webflux.enabled=false` before the application starts.

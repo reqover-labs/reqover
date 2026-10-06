@@ -12,10 +12,17 @@ The starter includes it; custom adapters and stores use these APIs directly.
   work without finishing or flushing the original unit.
 - `CoverageStore` exposes `flush`, `snapshots`, optional `aggregates` and `clear`.
 
-The default `InMemoryCoverageStore` retains at most 10,000 snapshots, with
-`oldest-first` or `reject-when-full` retention. Independently, every flush updates
-unit counts and code unions. Aggregates survive detail eviction, not restart or
-`clear()`. The detail cap is not a total heap cap: distinct units/probes add state.
+The default `InMemoryCoverageStore` has a 10,000-snapshot retention bound, with
+`oldest-first` or `reject-when-full` retention. Separate aggregates preserve counts
+and code unions for admitted unit names across detail eviction, until restart or
+`clear()`.
+
+Aggregate admission has a separate 2,000-distinct-unit-name limit (best-effort
+under concurrent new names) and keeps up to 64 thread names per aggregate.
+Existing aggregates keep accumulating after that limit; new names without an
+aggregate use only retained snapshots and disappear from the report when those
+snapshots are evicted. Increasing `maxSnapshots` does not raise these limits.
+The detail cap is not a total heap cap: probe sets can still grow.
 
 Custom stores must be thread-safe and avoid blocking completion threads.
 Without `aggregates()`, reporting falls back to retained snapshots; use the

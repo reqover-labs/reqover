@@ -444,7 +444,7 @@ The most common failure is **"the report is empty"**, and the cause is usually `
 
 ### Adjusting retention
 
-Records live in memory only, with a default cap of 10,000 per-request snapshots. Beyond that the store either drops the oldest snapshot (`oldest-first`, the default) or keeps the existing window and ignores new flushes (`reject-when-full`). Either way every flush is also folded into a per-endpoint total, so the report's endpoints, request counts and executed methods cover the whole recording; only request ids are limited to the window. Both the bound and the policy are properties — no bean needed:
+Records live in memory only, with a default cap of 10,000 per-request snapshots. Beyond that the store either drops the oldest snapshot (`oldest-first`, the default) or keeps the existing window and rejects new details (`reject-when-full`). Both update recording-wide counts/code for admitted aggregate names. New-name admission has a separate 2,000-name limit, best-effort under concurrency; each aggregate keeps up to 64 thread names. Names not admitted depend on retained snapshots and can disappear after eviction. The properties below control only the snapshot window, not those aggregate limits:
 
 ```properties
 reqover.mvc.max-snapshots=50000

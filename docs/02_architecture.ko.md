@@ -58,8 +58,8 @@ impact 분석(`ImpactAnalyzer`)과 대시보드의 요청 진단·테스트 초�
 라이브러리가 끌려 들어오지 않습니다.
 
 `reqover-spring-boot-starter`는 `reqover-core`, `reqover-report`, 양쪽 adapter를
-한 의존성으로 가져오며, Spring Boot auto-configuration을 직접 등록하는 유일한
-모듈입니다. 다음을 제공합니다.
+한 의존성으로 가져옵니다. MVC와 WebFlux 모듈도 각각 자동 설정을 등록하고,
+starter는 리포트 서비스·엔드포인트·종료 내보내기 설정을 더합니다. 다음을 제공합니다.
 
 - `ReqoverReportService`: 활성 adapter가 context에 넣어 둔 `CoverageStore`에서
   요청 시점마다 report를 만듭니다.
@@ -226,9 +226,12 @@ sampling 규칙으로 버리든 구현의 자유입니다. 구현체는 동시 �
 사용합니다.
 
 `oldest-first`가 기본이며 `reject-when-full`은 기존 상세 구간을 유지합니다.
-두 정책 모두 flush된 작업을 endpoint 호출 수·코드 합집합에 누적합니다. 집계는
-상세 삭제 후에도 남지만 `clear()`나 JVM 재시작으로 사라집니다. 집계 크기는 서로
-다른 작업 이름·probe 수에 따라 커지므로 snapshot 상한이 전체 메모리 상한은 아닙니다.
+두 정책 모두 집계 대상으로 받아들인 이름의 호출 수·코드 합집합을 누적합니다.
+새 집계 이름은 2,000개 제한이 있고 동시 추가에서는 엄격한 원자적 상한은 아닙니다.
+집계별 스레드 이름은 최대 64개입니다. 상한 밖의 새 이름은 보관 snapshot으로만
+표시하고 상세가 삭제되면 사라질 수 있습니다. 기존 집계는 `clear()`나 JVM 재시작까지
+유지합니다. snapshot 설정을 늘려도 집계 제한은 바뀌지 않으며, probe 집합이 커질 수
+있어 snapshot 상한이 전체 메모리 상한은 아닙니다.
 자체 저장소가 `aggregates()`를 제공하지 않으면 endpoint 집계도 보관 snapshot 기준입니다.
 
 ## Report 생애주기

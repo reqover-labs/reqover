@@ -85,6 +85,8 @@ and include `omittedRequestDetails` when older details were left out. Endpoint
 unions, the reverse index and completed request count still preserve the full
 recording aggregates supplied by the store, including evicted observations.
 Timing/status statistics cover only retained details, not those aggregates.
+The [default store's aggregate limits](../reqover-core/README.md) still apply;
+names not admitted depend on retained snapshots, not unlimited lifetime data.
 Statistics rendered from exported JSON cover only its exported detail
 window. A trusted local caller can select a different cap with
 `CoverageReportJson.write(report, requestDetailsLimit)`, including zero to omit

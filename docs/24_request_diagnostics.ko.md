@@ -71,7 +71,9 @@ WebFlux는 `-App webflux`로 실행하고 `/auto/reactive/diagnostics/delay/1200
 HTML은 가장 최근 HTTP 요청 100개까지 상세를 표시합니다. JSON도 기본적으로 최근 작업
 100개의 상세만 원래 순서대로 저장하고, 빠진 상세 수를 `omittedRequestDetails`로 알립니다.
 API별 합집합, 역조회와 완료 요청 수는 저장소의 전체 기록 집계를 유지하며 삭제된 상세도
-집계에 포함할 수 있습니다. 시간·상태 통계는 남아 있는 상세만 계산합니다. 내보낸 JSON으로
+집계에 포함할 수 있습니다. [기본 저장소의 집계 제한](../reqover-core/README.ko.md)은
+여전히 적용되며, 집계하지 못한 이름은 보관 snapshot에 의존합니다. 시간·상태 통계는
+남아 있는 상세만 계산합니다. 내보낸 JSON으로
 계산하는 시간·상태 통계는 그 파일의 상세 범위만 나타냅니다. 신뢰할 수 있는 로컬 호출자는
 `CoverageReportJson.write(report, requestDetailsLimit)`로 상한을 정할 수 있고, 0이면 상세를
 생략합니다. include 패키지와 저장 상한도 시험 범위에 맞게 조정합니다.

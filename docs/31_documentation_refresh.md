@@ -40,8 +40,21 @@ default values to source/Action metadata, and smoke-test the documented CLI
 commands using the checksum-verified 0.4.2 release. Preserve source/configuration,
 SBOM and security policy; no application behavior changes require new runtime tests.
 
-Outcome: 56 Markdown files checked, 474 relative links/anchors valid, no
+Outcome: 56 Markdown files checked, 482 relative links/anchors valid, no
 historical link regressions, all nine CLI smoke cases passed against the
 checksum-verified 0.4.2 release. All six 0.4.2 library POMs returned HTTP 200
 from Maven Central after propagation. Application sources, workflows, build
 metadata and the SBOM match the synchronized main; the PR contains documentation only.
+
+## Review Follow-Up
+
+October 7, 2026: corrected the aggregate-scope guarantee across the bilingual
+root, core/report/starter, architecture, integration and diagnostic guides.
+The default store has a separate 2,000-name admission limit (best-effort with
+concurrent new names) and 64 thread names per aggregate. Names outside admission
+can disappear after their retained details are evicted; increasing snapshot
+retention does not raise those limits. JSON detail truncation is separate.
+
+MVC and WebFlux register their own Boot auto-configuration. The starter adds
+report-service, report-endpoint and shutdown-export configuration; it is not the
+only module that registers auto-configuration. Runtime behavior is unchanged.

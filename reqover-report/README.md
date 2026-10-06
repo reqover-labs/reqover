@@ -7,7 +7,7 @@ The starter already includes it. It depends on core, not Spring or a JSON librar
 
 | Feature | Data and boundary |
 | --- | --- |
-| Endpoint/code and reverse index | Recording-wide aggregates from the default store |
+| Endpoint/code and reverse index | Recording-wide data for admitted aggregates; snapshot fallback for other names |
 | Request diagnostics | Retained HTTP timestamps, final status, threads and method sets |
 | Relationship maps | Animated associations, not measured call order or method spans |
 | Reviewed test drafts | JSON or disabled GET/HEAD JUnit files, no original-input replay |
@@ -18,6 +18,11 @@ The starter already includes it. It depends on core, not Spring or a JSON librar
 code names. `CoverageReportJson` uses schema 1; its optional `requests` details
 default to the newest 100 units with `omittedRequestDetails`. Endpoint aggregates
 and reverse index are not truncated. Older files without details remain readable.
+
+The default store's [aggregate limits](../reqover-core/README.md) still apply:
+2,000 distinct names for new aggregate admission and 64 thread names per
+aggregate. Names outside admission can disappear after detail eviction; the
+JSON detail limit does not turn this into unlimited whole-recording coverage.
 
 Live HTML statistics cover retained HTTP snapshots. Rendering exported JSON can
 only use details in that file. Export a live dashboard summary for a complete

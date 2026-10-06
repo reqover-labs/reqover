@@ -26,7 +26,8 @@ File export runs on normal context close, not `SIGKILL`. Contexts exporting to
 the same path in one JVM accumulate; the first export replaces prior-run files.
 
 The default store bounds request details but preserves recording-wide endpoint
-aggregates. JSON exports cap recent details separately. Custom `CoverageStore`
+aggregates within the [store's aggregate limits](../reqover-core/README.md).
+JSON exports cap recent details separately. Custom `CoverageStore`
 beans replace retention; full aggregates require implementing `aggregates()`.
 
 [Properties and integration](../docs/17_integration_guide.md) |

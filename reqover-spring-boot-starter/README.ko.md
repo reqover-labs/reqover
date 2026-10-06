@@ -24,7 +24,8 @@ reqover.report.export.html-path=build/reqover-report.html
 내보내며 `SIGKILL`에서는 저장하지 못합니다. 같은 JVM에서 같은 경로로 내보내면
 여러 context의 기록을 누적하고, 첫 내보내기는 이전 실행의 파일을 교체합니다.
 
-기본 저장소는 요청 상세를 제한하면서 전체 endpoint 집계를 유지합니다. JSON 상세
+기본 저장소는 요청 상세를 제한하면서 [집계 제한](../reqover-core/README.ko.md) 안에서
+전체 endpoint 집계를 유지합니다. JSON 상세
 상한은 별도입니다. 자체 `CoverageStore` 빈으로 보관 정책을 바꿀 수 있고, 전체
 집계를 유지하려면 `aggregates()`도 구현해야 합니다.
 

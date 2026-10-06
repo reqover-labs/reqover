@@ -58,8 +58,9 @@ that generating or reading a report never drags a JSON library onto an
 application's classpath.
 
 `reqover-spring-boot-starter` is a single dependency that brings `reqover-core`,
-`reqover-report`, and both adapters, and it is the only module that registers
-Spring Boot auto-configuration of its own. It contributes:
+`reqover-report`, and both adapters. MVC and WebFlux each register their own
+Spring Boot auto-configuration. The starter adds report-service, report-endpoint
+and shutdown-export configuration. It contributes:
 
 - `ReqoverReportService`, which builds a report on demand from whichever
   `CoverageStore` the active adapter placed in the context.
@@ -238,11 +239,13 @@ contributes its own `CoverageStore` gets that one used everywhere instead — by
 the interceptor, the filter, and the report service alike.
 
 `oldest-first` is the default; `reject-when-full` keeps the existing detail
-window instead. Both still fold every flush into per-unit counts and code unions.
-Those aggregates survive snapshot eviction but not `clear()` or JVM restart.
-Their size depends on distinct unit names/probes, so the snapshot cap is not a
-total heap limit. A custom store returning no aggregates falls back to its
-retained snapshots for endpoint counts/code.
+window instead. Both update counts/code for admitted aggregate names. New-name
+admission has a separate 2,000-name limit, best-effort under concurrency, and each
+aggregate keeps at most 64 thread names. Names not admitted rely on retained
+snapshots and can disappear after eviction. Admitted aggregates survive eviction,
+not `clear()` or restart. The snapshot setting does not raise aggregate limits
+or cap total heap usage; probe sets can grow. A custom store returning no
+aggregates falls back to retained snapshots for endpoint counts/code.
 
 ## Report lifecycle
 

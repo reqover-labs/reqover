@@ -101,12 +101,13 @@ class ReqoverClassInstrumenterTest {
         Object target = instrumented.getDeclaredConstructor().newInstance();
         ReferenceTarget.Lookup stub = key -> key;
 
-        instrumented.getMethod("areaName", ReferenceTarget.Area.class).invoke(target, ReferenceTarget.Area.PARKING);
+        instrumented.getMethod("areaOrdinal", ReferenceTarget.Area.class).invoke(target, ReferenceTarget.Area.PARKING);
         instrumented.getMethod("methodReference", ReferenceTarget.Lookup.class).invoke(target, stub);
 
-        // A switch on an enum from another file reads javac's $SwitchMap$ (its
-        // holder class is package-private to this loader, so it is not run here);
-        // one on an enum in the same file calls ordinal() directly.
+        // A switch reads javac's $SwitchMap$ for an enum in another file (and, on
+        // JDK 17, for one in the same file too); JDK 21 calls ordinal() directly
+        // for a same-file enum. The holder class is package-private to this
+        // loader, so switches are checked for their probe, not run.
         reference(result, ReferenceStatus.class.getName(), "<switch>");
         ProbeMetadata ordinal = reference(result, ReferenceTarget.Area.class.getName(), "ordinal");
         assertTrue(ReqoverProbe.globalSnapshot().hasHit(ordinal.classId(), ordinal.probeId()));

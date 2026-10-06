@@ -40,6 +40,10 @@ public class ReferenceTarget {
         }
     }
 
+    public int areaOrdinal(Area area) {
+        return area.ordinal();
+    }
+
     public String areaName(Area area) {
         switch (area) {
             case PARKING:

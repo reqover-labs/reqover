@@ -49,6 +49,14 @@ All notable changes to Reqover are documented in this file.
   coordinate changes; a `mavenLocal()` build of 0.2.0 still resolves under
   the old group. Java packages stay `io.reqover.*`.
 
+- **`references=record` agent option.** A repository interface or an enum
+  constant has no method body that runs, so a change to one mapped to no
+  endpoint. The agent can now record each call to an included interface and
+  each read of an included class's static field at the call site, attributed
+  to the referenced class. On a production service, with `accessors=record`,
+  it cut unmatched changed files from 21 to 18; the rest were Swagger-only
+  interfaces, startup code and one enum read only through reflection.
+
 - **`accessors=record` agent option.** Skipping trivial accessors hides a class
   made only of them, such as a request DTO record, from impact analysis.
   Recording for CI can keep them; the default is unchanged.

@@ -67,6 +67,103 @@ class ReqoverClassInstrumenterTest {
     }
 
     @Test
+    void recordsInterfaceCallsAndEnumConstantsAgainstTheReferencedClass() throws Exception {
+        String lookup = ReferenceTarget.Lookup.class.getName();
+        String area = ReferenceTarget.Area.class.getName();
+        InstrumentationResult result = new ReqoverClassInstrumenter(true, name -> name.startsWith("io.reqover.instrumentation."))
+                .instrument(classBytes(ReferenceTarget.class));
+        ProbeRegistry.registerAll(result.metadata());
+
+        Class<?> instrumented = new SingleClassLoader(ReferenceTarget.class.getName(), result.bytecode())
+                .loadClass(ReferenceTarget.class.getName());
+        Object target = instrumented.getDeclaredConstructor().newInstance();
+        ReferenceTarget.Lookup stub = key -> key;
+        instrumented.getMethod("area", ReferenceTarget.Lookup.class).invoke(target, stub);
+
+        ProbeMetadata find = reference(result, lookup, "find");
+        ProbeMetadata parking = reference(result, area, "PARKING");
+        assertEquals(StableClassId.of(lookup), find.classId());
+        assertTrue(find.probeId() >= ReferenceProbes.FIRST_PROBE_ID);
+        assertTrue(ReqoverProbe.globalSnapshot().hasHit(find.classId(), find.probeId()));
+        assertTrue(ReqoverProbe.globalSnapshot().hasHit(parking.classId(), parking.probeId()));
+        assertTrue(result.metadata().stream().noneMatch(m -> m.methodName().contains("$SwitchMap")),
+                "compiler-made switch maps are not references");
+        assertTrue(ProbeRegistry.find(find.classId(), find.probeId()).isPresent(),
+                "registered when assigned, before any class using it is defined");
+    }
+
+    @Test
+    void recordsTheEnumASwitchReadsAndMethodReferences() throws Exception {
+        InstrumentationResult result = new ReqoverClassInstrumenter(true, name -> name.startsWith("io.reqover.instrumentation."))
+                .instrument(classBytes(ReferenceTarget.class));
+        Class<?> instrumented = new SingleClassLoader(ReferenceTarget.class.getName(), result.bytecode())
+                .loadClass(ReferenceTarget.class.getName());
+        Object target = instrumented.getDeclaredConstructor().newInstance();
+        ReferenceTarget.Lookup stub = key -> key;
+
+        instrumented.getMethod("areaOrdinal", ReferenceTarget.Area.class).invoke(target, ReferenceTarget.Area.PARKING);
+        instrumented.getMethod("methodReference", ReferenceTarget.Lookup.class).invoke(target, stub);
+
+        // A switch reads javac's $SwitchMap$ for an enum in another file (and, on
+        // JDK 17, for one in the same file too); JDK 21 calls ordinal() directly
+        // for a same-file enum. The holder class is package-private to this
+        // loader, so switches are checked for their probe, not run.
+        reference(result, ReferenceStatus.class.getName(), "<switch>");
+        ProbeMetadata ordinal = reference(result, ReferenceTarget.Area.class.getName(), "ordinal");
+        assertTrue(ReqoverProbe.globalSnapshot().hasHit(ordinal.classId(), ordinal.probeId()));
+        ProbeMetadata find = reference(result, ReferenceTarget.Lookup.class.getName(), "find");
+        assertTrue(ReqoverProbe.globalSnapshot().hasHit(find.classId(), find.probeId()));
+    }
+
+    @Test
+    void recordsReferencesInInterfaceDefaultMethods() throws Exception {
+        InstrumentationResult result = new ReqoverClassInstrumenter(true, name -> name.startsWith("io.reqover.instrumentation."))
+                .instrument(classBytes(ReferenceTarget.Lookup.class));
+
+        assertTrue(result.instrumented());
+        reference(result, ReferenceTarget.Area.class.getName(), "WELFARE_CENTER");
+    }
+
+    @Test
+    void namesTheEnumBehindASwitchMap() {
+        assertEquals("kr/ac/knu/groove/domain/pub/entity/PubArea",
+                ReferenceProbes.switchedEnum("$SwitchMap$kr$ac$knu$groove$domain$pub$entity$PubArea"));
+        assertEquals("io/reqover/instrumentation/ReferenceTarget$Area",
+                ReferenceProbes.switchedEnum("$SwitchMap$io$reqover$instrumentation$ReferenceTarget$Area"));
+        assertEquals(null, ReferenceProbes.switchedEnum("ordinaryField"));
+    }
+
+    @Test
+    void recordsReferencesInsideLambdas() throws Exception {
+        InstrumentationResult result = new ReqoverClassInstrumenter(true, name -> name.startsWith("io.reqover.instrumentation."))
+                .instrument(classBytes(ReferenceTarget.class));
+        ProbeRegistry.registerAll(result.metadata());
+
+        Class<?> instrumented = new SingleClassLoader(ReferenceTarget.class.getName(), result.bytecode())
+                .loadClass(ReferenceTarget.class.getName());
+        Object target = instrumented.getDeclaredConstructor().newInstance();
+        ReferenceTarget.Lookup stub = key -> key;
+        instrumented.getMethod("inLambda", ReferenceTarget.Lookup.class).invoke(target, stub);
+
+        ProbeMetadata find = reference(result, ReferenceTarget.Lookup.class.getName(), "find");
+        assertTrue(ReqoverProbe.globalSnapshot().hasHit(find.classId(), find.probeId()));
+    }
+
+    @Test
+    void recordsNoReferencesUnlessAskedTo() throws Exception {
+        InstrumentationResult result = new ReqoverClassInstrumenter().instrument(classBytes(ReferenceTarget.class));
+
+        assertTrue(result.metadata().stream().allMatch(m -> m.className().equals(ReferenceTarget.class.getName())));
+    }
+
+    private static ProbeMetadata reference(InstrumentationResult result, String className, String member) {
+        return result.metadata().stream()
+                .filter(m -> m.className().equals(className) && m.methodName().equals(member))
+                .findFirst()
+                .orElseThrow(() -> new AssertionError("no reference probe for " + className + "#" + member));
+    }
+
+    @Test
     void instrumentsAccessorsWhenAskedTo() throws Exception {
         InstrumentationResult result = new ReqoverClassInstrumenter(false).instrument(classBytes(RecordTarget.class));
 

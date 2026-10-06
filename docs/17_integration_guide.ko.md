@@ -387,6 +387,16 @@ include=com.example,accessors=record
 
 테스트 167개짜리 Spring Boot 서비스의 최근 커밋 12개에서, 영향 분석이 연결하지 못한 소스 파일이 33개에서 21개로 줄었고 역인덱스는 세 배가 됐습니다. 사람이 읽는 리포트에는 기본값(`accessors=skip`)을 쓰세요.
 
+### `references`: 인터페이스와 enum 상수를 엔드포인트와 연결하기
+
+Spring Data repository 같은 애플리케이션 인터페이스에는 실행되는 메서드 몸체가 없고, enum 상수를 읽어도 enum 파일 안의 코드는 실행되지 않습니다. 그래서 `OrderRepository.java`나 `OrderStatus.java`를 바꿔도 어느 엔드포인트와도 연결되지 않습니다. `references=record`는 포함된 인터페이스를 호출하는 곳과 포함된 클래스의 static 필드를 읽는 곳에 probe를 넣고, 참조된 클래스 쪽으로 기록합니다.
+
+```text
+include=com.example,accessors=record,references=record
+```
+
+두 옵션을 함께 쓰면 위 서비스에서 연결하지 못한 파일이 21개에서 18개로 줄었고, 남은 것은 Swagger 전용 `*Docs` 인터페이스, 기동 시에만 도는 초기화 코드, 리플렉션으로만 읽히는 enum 하나(JPA 컬럼 타입)였습니다. 리플렉션으로만 쓰이는 타입과 컴파일 시점 상수(`javac`가 인라인하는 `static final` 기본형·`String`)는 여전히 연결되지 않습니다. 널리 쓰이는 enum이 모든 엔드포인트 아래에 나타나게 되므로 기본값은 꺼져 있습니다.
+
 ---
 
 ## 5. 잘 됐는지 확인하기
@@ -414,7 +424,7 @@ WebFlux라면 하나 더 — 한 API의 기록 안에 **서로 다른 스레드 
 | `[reqover] no include configured` | `include=`를 안 줬음 | `include=내.패키지` 추가. 이 상태에서는 의도적으로 아무것도 계측하지 않습니다 |
 | `[reqover] no valid include configured` | `include`를 줬지만 값이 비어 있음 | `include=` 뒤에 값이 있는지, 쉼표/세미콜론을 헷갈리지 않았는지 확인 |
 | `[reqover] ignoring malformed agent option` | `key=value` 형태가 아님 | `include=com.example` 처럼 `=`를 넣었는지 확인 |
-| `[reqover] ignoring unknown agent option` | `include`/`exclude`/`accessors` 외의 키를 씀 | 오타 확인 (`includes`, `packages` 등은 인식하지 않습니다) |
+| `[reqover] ignoring unknown agent option` | `include`/`exclude`/`accessors`/`references` 외의 키를 씀 | 오타 확인 (`includes`, `packages` 등은 인식하지 않습니다) |
 | 엔드포인트는 나오는데 클래스 목록이 비어 있음 | `include`가 내 클래스와 안 맞음 | 클래스가 아니라 **패키지 접두사**를 주는지, 기본 제외(`org.springframework.` 등)에 걸리지 않는지 확인 |
 | `/reqover/report`가 404 | **엔드포인트는 기본이 꺼짐** | `reqover.report.endpoint.enabled=true`를 넣거나 직접 컨트롤러를 만드세요. 아무 설정도 안 한 상태에서는 이게 정상 동작입니다 |
 | 엔드포인트를 켰는데도 404 | 어댑터가 안 켜져서 `CoverageStore`도 리포트 서비스도 없음 | 웹 애플리케이션이 맞는지, `reqover.mvc.enabled=false` / `reqover.webflux.enabled=false`로 꺼두지 않았는지 확인 |

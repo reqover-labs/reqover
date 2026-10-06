@@ -10,7 +10,7 @@ inputs:
   version:
     description: Reqover release to download the CLI from, without the leading v.
     required: false
-    default: "0.2.0"
+    default: "0.3.0"
   base-ref:
     description: Git ref the diff is taken against. Defaults to the pull request base.
     required: false

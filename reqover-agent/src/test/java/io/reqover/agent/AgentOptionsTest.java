@@ -101,4 +101,11 @@ class AgentOptionsTest {
         assertFalse(AgentOptions.parse("include=com.example,accessors=skip").recordAccessors());
         assertFalse(AgentOptions.parse("include=com.example,accessors=sometimes").recordAccessors());
     }
+
+    @Test
+    void recordsReferencesOnlyWhenAsked() {
+        assertFalse(AgentOptions.parse("include=com.example").recordReferences());
+        assertTrue(AgentOptions.parse("include=com.example,references=record").recordReferences());
+        assertFalse(AgentOptions.parse("include=com.example,references=maybe").recordReferences());
+    }
 }

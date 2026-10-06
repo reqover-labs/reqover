@@ -1,15 +1,12 @@
 package io.reqover.spring.boot;
 
-import io.reqover.core.CoverageBucketSnapshot;
 import org.springframework.beans.factory.DisposableBean;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.function.Function;
@@ -30,14 +27,14 @@ import java.util.function.Function;
  * so a report from a previous run never leaks in. What was exported is kept
  * until the JVM exits: one context in production exports once at shutdown, and
  * a test JVM ends with the run, so the cost is one copy of each context's
- * already-bounded snapshot window.
+ * already-bounded snapshot window plus its per-endpoint aggregates.
  *
  * <p>Export failures are reported on {@code System.err} and swallowed. A
  * measurement tool must not be the reason a shutdown fails.
  */
 public class ReqoverReportExporter implements DisposableBean {
     /** Guarded by itself: two contexts closing at once must not interleave a read-merge-write. */
-    private static final Map<Path, List<CoverageBucketSnapshot>> EXPORTED_IN_THIS_JVM = new HashMap<>();
+    private static final Map<Path, Recording> EXPORTED_IN_THIS_JVM = new HashMap<>();
 
     private final ReqoverReportService reportService;
     private final ReqoverReportProperties.Export export;
@@ -49,15 +46,15 @@ public class ReqoverReportExporter implements DisposableBean {
 
     @Override
     public void destroy() {
-        List<CoverageBucketSnapshot> own = reportService.snapshots();
+        Recording own = reportService.recording();
         write(export.getJsonPath(), own, reportService::json, "JSON");
         write(export.getHtmlPath(), own, reportService::html, "HTML");
     }
 
     private void write(
             String target,
-            List<CoverageBucketSnapshot> own,
-            Function<List<CoverageBucketSnapshot>, String> render,
+            Recording own,
+            Function<Recording, String> render,
             String kind
     ) {
         if (target == null || target.isBlank()) {
@@ -73,19 +70,18 @@ public class ReqoverReportExporter implements DisposableBean {
     private static void writeMerged(
             Path path,
             Path key,
-            List<CoverageBucketSnapshot> own,
-            Function<List<CoverageBucketSnapshot>, String> render,
+            Recording own,
+            Function<Recording, String> render,
             String kind
     ) {
         try {
-            List<CoverageBucketSnapshot> merged = new ArrayList<>(EXPORTED_IN_THIS_JVM.getOrDefault(key, List.of()));
-            merged.addAll(own);
+            Recording merged = EXPORTED_IN_THIS_JVM.getOrDefault(key, Recording.EMPTY).plus(own);
             Path parent = key.getParent();
             if (parent != null) {
                 Files.createDirectories(parent);
             }
             Files.writeString(path, render.apply(merged), StandardCharsets.UTF_8);
-            EXPORTED_IN_THIS_JVM.put(key, List.copyOf(merged));
+            EXPORTED_IN_THIS_JVM.put(key, merged);
             System.out.println("[reqover] wrote the " + kind + " report to " + key);
         } catch (IOException | RuntimeException e) {
             System.err.println("[reqover] could not write the " + kind + " report to " + path + ": " + e);

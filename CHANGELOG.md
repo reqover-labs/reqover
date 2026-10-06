@@ -6,6 +6,15 @@ All notable changes to Reqover are documented in this file.
 
 ### Fixed
 
+- **A long recording no longer forgets endpoints.** The report used to be built
+  from the 10,000-snapshot window alone, so at 60 RPS an endpoint called only
+  in the first three minutes vanished and request counts covered just the
+  window. Stores now also keep a per-endpoint aggregate (count, executed
+  probes, threads) that eviction does not touch, and the report builds
+  endpoints, counts and the reverse index from it. `CoverageStore.aggregates()`
+  is a default method, so a custom store keeps compiling and falls back to the
+  old behaviour. (#27)
+
 - **Hibernate 6 and Mockito proxies are excluded too.** Hibernate 6 names its
   proxy `Order$HibernateProxy` with no suffix, which the earlier marker missed,
   and a Mockito mock (`$MockitoMock$`) was recorded as application code.
@@ -33,6 +42,20 @@ All notable changes to Reqover are documented in this file.
   document with no `schemaVersion` still reads as version 1.
 
 ### Changed
+
+- **Maven coordinates move to `io.github.reqover-labs`.** Maven Central
+  verifies a namespace by domain or by GitHub organisation, and `reqover.io`
+  is not ours. Nothing was published under `io.reqover`, so no published
+  coordinate changes; a `mavenLocal()` build of 0.2.0 still resolves under
+  the old group. Java packages stay `io.reqover.*`.
+
+- **`references=record` agent option.** A repository interface or an enum
+  constant has no method body that runs, so a change to one mapped to no
+  endpoint. The agent can now record each call to an included interface and
+  each read of an included class's static field at the call site, attributed
+  to the referenced class. On a production service, with `accessors=record`,
+  it cut unmatched changed files from 21 to 18; the rest were Swagger-only
+  interfaces, startup code and one enum read only through reflection.
 
 - **`accessors=record` agent option.** Skipping trivial accessors hides a class
   made only of them, such as a request DTO record, from impact analysis.

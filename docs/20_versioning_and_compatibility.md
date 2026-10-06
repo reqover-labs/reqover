@@ -12,19 +12,24 @@ out to be broken.
 
 ## Coordinates
 
-All modules publish under the group `io.reqover` and share one version.
+All modules publish under the group `io.github.reqover-labs` and share one version.
 
 | Coordinate | Use it when |
 | --- | --- |
-| `io.reqover:reqover-spring-boot-starter` | You have a Spring Boot application. Start here; it pulls in what it needs. |
-| `io.reqover:reqover-core` | You are implementing a `CoverageStore` or opening a `UnitScope` yourself. |
-| `io.reqover:reqover-report` | You are reading, rendering, diffing, or analysing a report programmatically. |
-| `io.reqover:reqover-spring-mvc` / `-spring-webflux` | You are wiring an adapter by hand instead of using the starter. |
-| `io.reqover:reqover-instrumentation` | You are building on the ASM transformer directly. |
-| `io.reqover:reqover-agent` | The `-javaagent` JAR. Usually downloaded, not depended on. |
-| `io.reqover:reqover-cli` | Running `render`, `diff`, or `impact` from a build rather than the release JAR. |
+| `io.github.reqover-labs:reqover-spring-boot-starter` | You have a Spring Boot application. Start here; it pulls in what it needs. |
+| `io.github.reqover-labs:reqover-core` | You are implementing a `CoverageStore` or opening a `UnitScope` yourself. |
+| `io.github.reqover-labs:reqover-report` | You are reading, rendering, diffing, or analysing a report programmatically. |
+| `io.github.reqover-labs:reqover-spring-mvc` / `-spring-webflux` | You are wiring an adapter by hand instead of using the starter. |
+| `io.github.reqover-labs:reqover-instrumentation` | You are building on the ASM transformer directly. |
+| `io.github.reqover-labs:reqover-agent` | The `-javaagent` JAR. Usually downloaded, not depended on. |
+| `io.github.reqover-labs:reqover-cli` | Running `render`, `diff`, or `impact` from a build rather than the release JAR. |
 
-Every module ships at the same version. Mixing versions across `io.reqover`
+The group is the GitHub organisation's Maven Central namespace,
+which Central verifies through the organisation itself. Releases up to 0.2.0
+used `io.reqover` and were never published to Central, so no published
+coordinate changed. Java package names are still `io.reqover.*`.
+
+Every module ships at the same version. Mixing versions across `io.github.reqover-labs`
 modules is not supported and is not tested.
 
 ## What a version number promises
@@ -153,13 +158,34 @@ the acceptance criteria for
 - [x] The public API list above matches what the code actually exposes
 - [x] The report JSON carries `schemaVersion`, and the reader refuses a
       document from a newer schema instead of misparsing it
-- [ ] Signed publication pipeline dry-run against a staging bundle
-      (`REQOVER_SIGNING_KEY=... ./gradlew centralBundle`) — the pipeline exists
-      and stages unsigned bundles, but has never run with a key
-- [ ] `PUBLISH_TO_MAVEN_CENTRAL` enabled with the `io.reqover` namespace
+- [x] Signed publication pipeline dry-run against a staging bundle
+      (`REQOVER_SIGNING_KEY=... ./gradlew centralBundle`) — run on 2026-10-06
+      with a throwaway key: all 24 jars and POMs of the six modules carry a
+      `.asc` that verifies, and the bundle holds sources, Javadoc and checksums
+- [ ] `PUBLISH_TO_MAVEN_CENTRAL` enabled with the `io.github.reqover-labs` namespace
       verified on the Central Portal
 - [ ] A consumer smoke test: a project outside this repository resolving the
       starter from Central and recording one request
 
 The last one is not paperwork. A starter nobody has resolved from outside this
 build is how a permanent mistake gets made.
+
+### Maintainer steps for the first release
+
+These need a maintainer's own accounts and keys, so they are not automated:
+
+1. Sign in to the [Central Portal](https://central.sonatype.com) with GitHub,
+   add the namespace `io.github.reqover-labs`, and verify it by creating the
+   public repository it names under the `reqover-labs` organisation (delete it
+   afterwards).
+2. Generate a Portal user token (username and password pair).
+3. Create a signing key (`gpg --quick-gen-key "Reqover <...>" rsa4096 sign 2y`)
+   and publish its public half to `keys.openpgp.org` and `keyserver.ubuntu.com`.
+4. Add repository secrets `MAVEN_CENTRAL_USERNAME`, `MAVEN_CENTRAL_PASSWORD`,
+   `MAVEN_CENTRAL_SIGNING_KEY` (the armored private key) and
+   `MAVEN_CENTRAL_SIGNING_PASSWORD`, then the variable
+   `PUBLISH_TO_MAVEN_CENTRAL=true`.
+5. Tag the release. The release workflow uploads a `USER_MANAGED` deployment;
+   check it validates in the Portal, then press Publish. It is usually
+   resolvable from Central within 30 minutes; search indexes take longer.
+6. Run the consumer smoke test above, then tick the last box.

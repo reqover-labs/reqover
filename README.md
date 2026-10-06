@@ -71,21 +71,18 @@ Reqover records, from the moment a request arrives until the response leaves, **
 
 ## Performance Validation Preview (Oct-Nov 2026)
 
-The current development branch also includes a [request diagnostics preview](docs/24_request_diagnostics.md):
-per-request recorded processing intervals and HTTP status, a retained-request
-overview, and individual request details. Its offline dashboard also visualizes
-request-to-method associations and shared-code retest candidates, with animation,
-node inspection, and reduced-motion support. It is not included in release `0.2.0`.
-
-Selected observations can also become [reviewed test drafts](docs/27_test_case_drafts.md):
-enter a concrete path and independent expectation, then download JSON or a disabled
-JUnit test. Original inputs are not captured; this is not automatic traffic replay.
-
-[Recording comparison](docs/28_recording_comparison.md) imports a previous report
-and shows observed endpoint timing/status deltas over all retained samples, with
-missing-data and unmatched-condition warnings. It is not a load-test verdict.
-
-![Unreleased diagnostic dashboard with synthetic MVC requests](docs/assets/reqover-request-diagnostics.png)
+The [performance validation plan](docs/23_performance_validation_plan.ko.md)
+(Korean) connects problem requests, execution evidence and reviewed test cases.
+The unreleased implementation is split for review: [request diagnostics #34](https://github.com/reqover-labs/reqover/pull/34),
+[offline dashboard and CI #35](https://github.com/reqover-labs/reqover/pull/35),
+[test drafts #36](https://github.com/reqover-labs/reqover/pull/36) and
+[recording comparison #37](https://github.com/reqover-labs/reqover/pull/37).
+The last two are draft proposals. These do not claim measured call order,
+faithful replay, whole-service TPS or a load-test verdict, and are not in `0.2.0`.
+See [review corrections](docs/30_review_corrections.md) for boundaries and checks.
+Current OSV scans still flag a separate Spring MVC advisory; see the
+[security status](docs/29_osv_dependency_remediation.md). Feature test success
+does not mean the security gate has passed.
 
 ## Three things the report shows
 
@@ -269,12 +266,6 @@ exit code 0 when nothing is affected, 1 when something is, 2 on bad input.
 
 Full walkthrough, including a complete workflow file: [Impact analysis in CI](docs/18_ci_impact_analysis.md).
 
-The **unreleased Action preview** adds automatic HTML/impact artifacts, a
-source-built `cli-jar` option, structured counts, and fork-safe marked comments.
-[Dashboard and CI setup](docs/26_dashboard_and_ci.md) explains prerequisites and
-the preview workflow. These inputs are not available at the `v0.2.0` Action tag;
-the Action analyses an already recorded report, not an uninstrumented application.
-
 ## How it works
 
 In one sentence: **when the application starts, Reqover inserts code that reports "execution passed here", then groups those reports per request.**
@@ -416,21 +407,15 @@ Issues, pull requests, and commit messages are written in English so contributor
 
 ## Documentation
 
-- [OSV dependency scan remediation](docs/29_osv_dependency_remediation.md)
-
-- [Compare retained recordings](docs/28_recording_comparison.md)
-
-- [Reviewed test case drafts](docs/27_test_case_drafts.md)
-
-- [Diagnostic dashboard and CI artifacts](docs/26_dashboard_and_ci.md)
+- [Performance validation plan](docs/23_performance_validation_plan.ko.md) (Korean)
+- [Preview review corrections](docs/30_review_corrections.md)
+- [OSV dependency remediation](docs/29_osv_dependency_remediation.md)
 
 - [System architecture](docs/02_architecture.md) · [한국어판](docs/02_architecture.ko.md)
 - [Spring integration guide](docs/17_integration_guide.md) · [한국어판](docs/17_integration_guide.ko.md)
 - [Impact analysis in CI](docs/18_ci_impact_analysis.md) · [한국어판](docs/18_ci_impact_analysis.ko.md)
 - [Prior art — and when to use a different tool](docs/19_prior_art.md) · [한국어판](docs/19_prior_art.ko.md)
 - [Versioning, compatibility, and rollback](docs/20_versioning_and_compatibility.md) · [한국어판](docs/20_versioning_and_compatibility.ko.md)
-- [Request diagnostics preview](docs/24_request_diagnostics.md) · [한국어판](docs/24_request_diagnostics.ko.md)
-- [Performance validation plan (Oct-Nov 2026)](docs/23_performance_validation_plan.ko.md) (Korean)
 - [Project plan](docs/00_project_plan.md) (Korean) · [Requirements](docs/01_requirements.md) (Korean)
 - [MVP status](docs/08_phase0_mvp_status.md) · [Agent E2E Demo](docs/09_agent_e2e_demo.md) · [Demo script](docs/10_demo_script.md)
 - [Performance measurement](docs/11_performance_measurement.md) · [Measured agent overhead](docs/15_performance_results.md) · [한국어판](docs/15_performance_results.ko.md)

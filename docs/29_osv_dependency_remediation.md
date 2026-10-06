@@ -1,7 +1,30 @@
 # OSV Dependency Remediation
 
-Date: October 4, 2026. Applies to the development branch/PR #25, not existing
-release binaries. Security checks remain enabled and fail on known findings.
+Original check: October 4, 2026; updated October 6. The Jackson/Tomcat patch is
+already on main through [PR #26](https://github.com/reqover-labs/reqover/pull/26).
+PR #25 now adds documentation only, not another dependency upgrade. Existing
+release binaries are unchanged. Security checks remain blocking.
+
+## Current Blocking Finding
+
+The [October 6 stack-tip scan](https://github.com/reqover-labs/reqover/actions/runs/37428486980/job/112154025632)
+and a fresh local OSV query of all 104 external Maven coordinates report one
+remaining finding: `org.springframework:spring-webmvc:6.2.19`,
+[GHSA-pc63-qcmh-9cmg](https://github.com/advisories/GHSA-pc63-qcmh-9cmg),
+CVE-2026-47884. Its OSV record was updated October 5. This is separate from the
+Jackson/Tomcat findings below; the old zero-finding result is historical.
+
+The [official Spring notice](https://spring.io/security/cve-2026-47884/)
+describes an XsltView configuration involving implicit view names and a catch-all
+mapping. It lists 6.2.20 as enterprise-support-only and 7.0.9 as the OSS fix.
+Do not assume every MVC endpoint is exploitable, but absence of that sample
+configuration does not patch the dependency or warrant hiding the scanner result.
+
+A follow-up compatibility/security decision is required: obtain a legitimately
+supported patched 6.2 release, or validate migration of the Spring/Boot stack to
+the supported OSS line. Overriding only MVC to 7.x inside a Boot 3.5 application
+is not a safe patch. This review does not silently perform that major migration,
+add ignored advisories, relabel SBOM packages, or weaken `fail-on-vuln`.
 
 ## Cause and Patch
 
@@ -36,13 +59,13 @@ checked directly.
 
 - Before: OSV query of all 104 external Maven coordinates reported three affected
   components and ten advisories.
-- After: the complete regenerated inventory resolves Jackson 2.21.7 and Tomcat
+- October 4 after patch: the complete regenerated inventory resolves Jackson 2.21.7 and Tomcat
   10.1.60 and the same full OSV query reports zero affected components.
 - `sbom/reqover.cdx.json` is regenerated from Gradle, including actual versions,
   hashes and dependency relationships. It is not manually relabelled.
 - Existing `fail-on-vuln: true` remains; no ignored advisories, severity exclusions,
   removed components or `continue-on-error` are added to the security gate.
-- A fresh isolated `clean build` passes 157 Java tests without failures/errors/skips;
+- The October 4 isolated `clean build` passed 157 Java tests without failures/errors/skips;
   all 20 Node tests, including generated Java compilation, pass with the patch.
   GitHub's actual security job is checked separately before calling the PR green.
 

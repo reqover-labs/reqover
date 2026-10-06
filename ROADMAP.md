@@ -1,7 +1,7 @@
 # Roadmap
 
 What we intend to do next, in the order we intend to do it, and why. There are
-no dates — this is a side project maintained by two people, and a date we
+no release promises — this is a side project maintained by two people, and a date we
 cannot keep is worse than no date.
 
 Everything here is open to argument. If something below matters to you, or the
@@ -11,20 +11,15 @@ the fastest way to change what we work on.
 
 ## Now
 
-**Performance validation preview (Oct-Nov 2026): make problem requests actionable.**
-The [request diagnostics preview](docs/24_request_diagnostics.md) surfaces retained
-request timing and status next to the request's method set. The
-offline dashboard adds animated observed relationships, shared-code retest
-candidates, and a review queue. The updated CI Action saves its results as
-explicit artifacts; see [dashboard and CI setup](docs/26_dashboard_and_ci.md). The
-[performance validation plan](docs/23_performance_validation_plan.ko.md) (Korean) targets
-October 7 for the first demonstration and November 4–5 for the presentation.
-Reviewed JSON/JUnit [test drafts](docs/27_test_case_drafts.md) are now in the preview.
-[Retained recording comparison](docs/28_recording_comparison.md) adds descriptive
-before/after timing and HTTP-status evidence, not a controlled load-run verdict.
-Faithful replay, selective input capture and a k6 runner remain planned stages,
-not released capabilities. Validate the single-request discovery/retest workflow
-before expanding to an APM-sized service.
+**Performance validation preview (Oct-Nov 2026).** The
+[plan](docs/23_performance_validation_plan.ko.md) (Korean) targets October 7
+feedback and a November 4-5 presentation, not a promised release date. Review is
+split into [request diagnostics #34](https://github.com/reqover-labs/reqover/pull/34),
+[dashboard/CI #35](https://github.com/reqover-labs/reqover/pull/35),
+[test drafts #36](https://github.com/reqover-labs/reqover/pull/36) and
+[recording comparison #37](https://github.com/reqover-labs/reqover/pull/37).
+The last two remain draft for feedback. Faithful replay, selective input capture,
+method spans and k6 execution are follow-up work, not current capabilities.
 
 **Make Reqover installable.**
 [#4](https://github.com/reqover-labs/reqover/issues/4) · Maven Central
@@ -104,10 +99,9 @@ Saying no is part of a roadmap. See
   packages you name and samples nothing. That is affordable in development, QA,
   and staging, and it is the wrong shape for permanent production use — an APM
   is the right tool there.
-- **A hosted backend or shared dashboard service.** No hosted or multi-user service
-  is planned. A local standalone diagnostic dashboard is supported. Replay and
-  load-test views are evaluated locally first; a hosted service would require a
-  separate storage, access and operating-cost decision.
+- **A hosted backend or shared dashboard service.** A local standalone HTML
+  dashboard is in scope; hosted or multi-user services are not. Storage, access
+  control and operating costs would require a separate project decision.
 - **Claiming a change is safe.** Impact analysis reports observed execution,
   which is a lower bound. A file it cannot match means "not seen", never "not
   affected", and no amount of product polish will change that.

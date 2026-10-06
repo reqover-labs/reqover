@@ -45,18 +45,7 @@ public final class CoverageReportGenerator {
                 Instant.now(clock),
                 snapshots.size(),
                 endpointCoverages,
-                reverseIndex(endpointCoverages),
-                snapshots.stream().map(snapshot -> new RequestObservation(
-                        snapshot.unitInfo().unitId(), snapshot.unitInfo().unitType(), snapshot.unitInfo().name(),
-                        snapshot.startedAt(), snapshot.endedAt(), snapshot.statusCode(),
-                        snapshot.threadNames().stream().sorted().toList(),
-                        snapshot.hitsByClass().entrySet().stream()
-                                .map(entry -> classCoverage(entry.getKey(), entry.getValue()))
-                                .sorted(Comparator.comparing(ClassCoverage::className).thenComparingInt(ClassCoverage::classId))
-                                .toList()))
-                        .sorted(Comparator.comparing(RequestObservation::startedAt)
-                                .thenComparing(RequestObservation::requestId))
-                        .toList()
+                reverseIndex(endpointCoverages)
         );
     }
 
@@ -128,28 +117,27 @@ public final class CoverageReportGenerator {
             );
         }
 
-    }
+        private ClassCoverage classCoverage(int classId, Set<Integer> probes) {
+            List<MethodCoverage> methods = new ArrayList<>();
+            String className = "class-" + classId;
 
-    private static ClassCoverage classCoverage(int classId, Set<Integer> probes) {
-        List<MethodCoverage> methods = new ArrayList<>();
-        String className = "class-" + classId;
-
-        for (int probeId : probes) {
-            ProbeMetadata metadata = ProbeRegistry.find(classId, probeId).orElse(null);
-            if (metadata != null) {
-                className = metadata.className();
-                methods.add(new MethodCoverage(
-                        probeId,
-                        metadata.methodName(),
-                        metadata.descriptor(),
-                        metadata.lineNumber()
-                ));
-            } else {
-                methods.add(new MethodCoverage(probeId, "probe-" + probeId, "", null));
+            for (int probeId : probes) {
+                ProbeMetadata metadata = ProbeRegistry.find(classId, probeId).orElse(null);
+                if (metadata != null) {
+                    className = metadata.className();
+                    methods.add(new MethodCoverage(
+                            probeId,
+                            metadata.methodName(),
+                            metadata.descriptor(),
+                            metadata.lineNumber()
+                    ));
+                } else {
+                    methods.add(new MethodCoverage(probeId, "probe-" + probeId, "", null));
+                }
             }
-        }
 
-        methods.sort(Comparator.comparing(MethodCoverage::methodName).thenComparingInt(MethodCoverage::probeId));
-        return new ClassCoverage(classId, className, Set.copyOf(probes), List.copyOf(methods));
+            methods.sort(Comparator.comparing(MethodCoverage::methodName).thenComparingInt(MethodCoverage::probeId));
+            return new ClassCoverage(classId, className, Set.copyOf(probes), List.copyOf(methods));
+        }
     }
 }

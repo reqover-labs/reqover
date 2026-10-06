@@ -71,21 +71,17 @@ Reqover는 요청이 들어오는 순간부터 응답이 나갈 때까지 **그 
 
 ## 성능 검증 미리보기 (2026년 10~11월)
 
-현재 개발 브랜치에는 [요청 진단 미리보기](docs/24_request_diagnostics.ko.md)도 있습니다.
-요청별 관측 처리 시간과 HTTP 상태, 전체 관측 요약과 개별 요청 상세를 보여줍니다.
-대시보드에서는 요청과 실행 메서드의 관계, 공통 코드를 수정했을 때 재테스트할 API를
-애니메이션과 노드 상세로 확인합니다. 실제 호출 순서를 추정한 화면은 아닙니다.
-이 기능은 배포된 `0.2.0`에는 포함되지 않은 개발 기능입니다.
-
-선택한 요청에서 [검토 가능한 테스트 초안](docs/27_test_case_drafts.ko.md)도 만듭니다.
-실제 시험 경로와 기대 결과를 직접 확인한 뒤 JSON 또는 비활성화된 JUnit 파일로
-내보냅니다. 원본 입력값은 수집하지 않으므로 자동 재현을 보장하는 기능은 아닙니다.
-
-[이전 기록과 비교](docs/28_recording_comparison.ko.md)에서는 보관된 HTTP 요청 전체의
-API별 시간·상태 변화를 확인합니다. 미측정과 조건 차이를 표시하며 부하 시험의 합격
-판정을 대신하지는 않습니다.
-
-![MVC 합성 요청으로 만든 개발 버전 진단 대시보드](docs/assets/reqover-request-diagnostics.png)
+[개선 계획](docs/23_performance_validation_plan.ko.md)은 문제 요청을 찾고 실행 근거를
+확인한 뒤 검토 가능한 테스트로 옮기는 흐름을 목표로 합니다. 미배포 구현은
+[요청 진단 #34](https://github.com/reqover-labs/reqover/pull/34),
+[대시보드·CI #35](https://github.com/reqover-labs/reqover/pull/35),
+[테스트 초안 #36](https://github.com/reqover-labs/reqover/pull/36),
+[기록 비교 #37](https://github.com/reqover-labs/reqover/pull/37)로 나누어 검토합니다.
+마지막 두 PR은 Draft이며, 배포된 `0.2.0`에는 포함되지 않습니다.
+실제 호출 순서, 원본 재현, 전체 서비스 TPS나 부하 시험 판정을 보장하지 않습니다.
+[리뷰 보완 기록](docs/30_review_corrections.md)에 범위와 검증을 정리했습니다.
+현재 보안 검사에는 별도 Spring MVC 경고가 남아 있습니다.
+[보안 상태](docs/29_osv_dependency_remediation.ko.md)에서 확인하며 기능 검사 통과와 구분합니다.
 
 ## 리포트가 보여주는 세 가지
 
@@ -271,12 +267,6 @@ git diff --name-only origin/main... \
 
 전체 워크플로 파일을 포함한 자세한 설명: [CI에서 영향도 분석하기](docs/18_ci_impact_analysis.ko.md).
 
-**개발 버전 Action**은 HTML과 영향 분석 파일 자동 저장, 직접 빌드한 `cli-jar` 사용,
-관련 API 수 출력과 fork PR 댓글 처리를 지원합니다.
-[대시보드와 CI 연결](docs/26_dashboard_and_ci.ko.md)에 설정 예제를 적었습니다.
-배포된 `v0.2.0` Action에는 이 추가 입력이 없습니다. 먼저 agent를 붙여 요청을 기록해야
-하며, Action이 앱 설치나 테스트 실행까지 대신하는 것은 아닙니다.
-
 ## 어떻게 동작하나
 
 한 문장으로: **애플리케이션이 시작될 때 코드에 "여기 지나갔다"고 알리는 코드를 자동으로 끼워 넣고, 그 기록을 요청별로 모읍니다.**
@@ -420,21 +410,15 @@ fork 후 브랜치를 만들고, `./gradlew clean test` 통과를 확인한 뒤 
 
 ## 문서 목록
 
-- [OSV 보안 검사 실패 보완](docs/29_osv_dependency_remediation.ko.md)
-
-- [이전 기록과 현재 기록 비교하기](docs/28_recording_comparison.ko.md)
-
-- [관측 요청에서 테스트 초안 만들기](docs/27_test_case_drafts.ko.md)
-
-- [대시보드와 CI 연결](docs/26_dashboard_and_ci.ko.md)
+- [성능 검증 개선 계획](docs/23_performance_validation_plan.ko.md)
+- [미리보기 리뷰 보완 기록](docs/30_review_corrections.md)
+- [OSV 보안 검사 보완](docs/29_osv_dependency_remediation.ko.md)
 
 - [시스템 아키텍처](docs/02_architecture.ko.md)
 - [Spring 애플리케이션 연동 가이드](docs/17_integration_guide.ko.md)
 - [CI에서 영향도 분석하기](docs/18_ci_impact_analysis.ko.md)
 - [선행 도구와 Reqover의 자리 — 다른 도구를 써야 할 때](docs/19_prior_art.ko.md)
 - [버전, 호환성, 롤백](docs/20_versioning_and_compatibility.ko.md)
-- [요청 진단 리포트](docs/24_request_diagnostics.ko.md)
-- [성능 검증 개선 계획 (2026년 10~11월)](docs/23_performance_validation_plan.ko.md)
 - [프로젝트 기획](docs/00_project_plan.md) · [요구사항](docs/01_requirements.md)
 - [MVP 진행 상태](docs/08_phase0_mvp_status.md) · [Agent E2E Demo](docs/09_agent_e2e_demo.md) · [데모 스크립트](docs/10_demo_script.md)
 - [성능 측정 방법](docs/11_performance_measurement.md) · [측정된 agent 오버헤드](docs/15_performance_results.ko.md)

@@ -117,10 +117,6 @@ pipeline.
 
 ## Step 3 — put it on the pull request
 
-The example below documents the released `v0.2.0` Action. For the unreleased
-source-built CLI, automatic HTML artifacts, additional outputs, and fork-safe
-comments, use [the dashboard/CI preview guide](26_dashboard_and_ci.md).
-
 The repository ships a composite action:
 
 ```yaml

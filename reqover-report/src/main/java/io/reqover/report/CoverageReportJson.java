@@ -3,13 +3,10 @@ package io.reqover.report;
 import java.time.Instant;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 /**
  * Reads and writes {@link CoverageReport} as JSON.
@@ -19,35 +16,18 @@ import java.util.stream.IntStream;
  * document — so the CLI can render, diff, and analyse it without the
  * {@code ProbeRegistry} that produced it.
  *
- * <p>Output is pretty-printed and deterministic for a given report. Separate
- * recordings retain their own timestamps and statuses, so their bytes can differ
- * even when the endpoint coverage is identical. Coverage diff compares the code
- * relationships rather than these diagnostic observations.
+ * <p>Output is pretty-printed with sorted collections so that two runs over the
+ * same traffic produce byte-identical files apart from {@code generatedAt}.
+ * That is deliberate: baseline reports are meant to be committed and diffed.
  */
 public final class CoverageReportJson {
     /** Version of the document shape, raised when a field changes meaning. */
     public static final int SCHEMA_VERSION = 1;
-    public static final int DEFAULT_REQUEST_DETAILS_LIMIT = 100;
 
     private CoverageReportJson() {
     }
 
     public static String write(CoverageReport report) {
-        return write(report, DEFAULT_REQUEST_DETAILS_LIMIT);
-    }
-
-    /** Explicit larger exports are for trusted local recordings, not the default HTTP response. */
-    public static String write(CoverageReport report, int requestDetailsLimit) {
-        if (requestDetailsLimit < 0) {
-            throw new IllegalArgumentException("requestDetailsLimit must not be negative");
-        }
-        Comparator<RequestObservation> newest = Comparator.comparing(RequestObservation::startedAt).reversed()
-                .thenComparing(RequestObservation::requestId);
-        Set<Integer> selected = IntStream.range(0, report.requests().size()).boxed()
-                .sorted((a, b) -> newest.compare(report.requests().get(a), report.requests().get(b)))
-                .limit(requestDetailsLimit).collect(Collectors.toSet());
-        List<RequestObservation> details = IntStream.range(0, report.requests().size())
-                .filter(selected::contains).mapToObj(report.requests()::get).toList();
         StringBuilder out = new StringBuilder(4096);
         out.append("{\n");
         out.append("  \"schemaVersion\": ").append(SCHEMA_VERSION).append(",\n");
@@ -62,10 +42,6 @@ public final class CoverageReportJson {
 
         out.append("  \"reverseIndex\": [");
         writeJoined(out, report.reverseIndex(), 2, (item, indent) -> writeReverseEntry(out, item, indent));
-        out.append("],\n");
-        out.append("  \"omittedRequestDetails\": ").append(report.requests().size() - details.size()).append(",\n");
-        out.append("  \"requests\": [");
-        writeJoined(out, details, 2, (item, indent) -> writeRequest(out, item, indent));
         out.append("]\n");
 
         out.append("}\n");
@@ -99,22 +75,11 @@ public final class CoverageReportJson {
             ));
         }
 
-        List<RequestObservation> requests = new ArrayList<>();
-        for (Object item : Json.optionalArray(root, "requests")) {
-            Map<String, Object> request = Json.object(item, "requests[]");
-            requests.add(new RequestObservation(
-                    Json.string(request, "requestId"), Json.string(request, "unitType"),
-                    Json.string(request, "endpoint"), readInstant(request, "startedAt"),
-                    request.get("endedAt") == null ? null : readInstant(request, "endedAt"),
-                    Json.integer(request, "statusCode"), Json.strings(request, "threadNames"), readClasses(request)));
-        }
-
         return new CoverageReport(
                 generatedAt,
                 Json.integer(root, "completedRequestCount"),
                 List.copyOf(endpoints),
-                List.copyOf(reverseIndex),
-                List.copyOf(requests)
+                List.copyOf(reverseIndex)
         );
     }
 
@@ -145,16 +110,6 @@ public final class CoverageReportJson {
     }
 
     private static EndpointCoverage readEndpoint(Map<String, Object> node) {
-        return new EndpointCoverage(
-                Json.string(node, "endpoint"),
-                Json.integer(node, "requestCount"),
-                Json.strings(node, "requestIds"),
-                Json.strings(node, "threadNames"),
-                readClasses(node)
-        );
-    }
-
-    private static List<ClassCoverage> readClasses(Map<String, Object> node) {
         List<ClassCoverage> classes = new ArrayList<>();
         for (Object classNode : Json.optionalArray(node, "classes")) {
             Map<String, Object> entry = Json.object(classNode, "classes[]");
@@ -183,40 +138,13 @@ public final class CoverageReportJson {
             ));
         }
 
-        return List.copyOf(classes);
-    }
-
-    private static Instant readInstant(Map<String, Object> node, String field) {
-        try {
-            return Instant.parse(Json.string(node, field));
-        } catch (DateTimeParseException error) {
-            throw new IllegalArgumentException("field '" + field + "' must be an ISO-8601 instant", error);
-        }
-    }
-
-    private static void writeRequest(StringBuilder out, RequestObservation request, String indent) {
-        String inner = indent + "  ";
-        out.append(indent).append("{\n");
-        out.append(inner).append("\"requestId\": ");
-        Json.writeString(out, request.requestId());
-        out.append(",\n").append(inner).append("\"unitType\": ");
-        Json.writeString(out, request.unitType());
-        out.append(",\n").append(inner).append("\"endpoint\": ");
-        Json.writeString(out, request.endpoint());
-        out.append(",\n").append(inner).append("\"startedAt\": ");
-        Json.writeString(out, request.startedAt().toString());
-        out.append(",\n").append(inner).append("\"endedAt\": ");
-        if (request.endedAt() == null) {
-            out.append("null");
-        } else {
-            Json.writeString(out, request.endedAt().toString());
-        }
-        out.append(",\n").append(inner).append("\"statusCode\": ").append(request.statusCode());
-        out.append(",\n").append(inner).append("\"threadNames\": ");
-        writeStringArray(out, request.threadNames());
-        out.append(",\n").append(inner).append("\"classes\": [");
-        writeJoined(out, request.classes(), inner.length(), (item, childIndent) -> writeClass(out, item, childIndent));
-        out.append("]\n").append(indent).append("}");
+        return new EndpointCoverage(
+                Json.string(node, "endpoint"),
+                Json.integer(node, "requestCount"),
+                Json.strings(node, "requestIds"),
+                Json.strings(node, "threadNames"),
+                List.copyOf(classes)
+        );
     }
 
     private static void writeEndpoint(StringBuilder out, EndpointCoverage endpoint, String indent) {

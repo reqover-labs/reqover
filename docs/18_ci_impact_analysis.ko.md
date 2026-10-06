@@ -93,10 +93,6 @@ Changed paths with no observed coverage (1):
 
 ## 3단계 — Pull Request에 붙이기
 
-아래는 배포된 `v0.2.0` Action 예제입니다. 직접 빌드한 CLI, HTML 자동 저장,
-추가 출력과 fork PR 댓글 처리 등 개발 기능은
-[대시보드와 CI 연결](26_dashboard_and_ci.ko.md)을 참고하세요.
-
 저장소에 composite action이 들어 있습니다.
 
 ```yaml

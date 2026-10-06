@@ -4,54 +4,6 @@ All notable changes to Reqover are documented in this file.
 
 ## Unreleased
 
-- PR review corrections: JSON request details default to the latest 100 while
-  preserving full endpoint unions; explicit library limits support trusted local
-  exports. Action artifact upload is now opt-in to avoid matrix/repeated-call
-  collisions. Python/container prerequisites and early shallow-history failure
-  are explicit. Comparison deltas suppress floating-point noise; unfinished
-  records, URI path validation and exported icon notices are corrected.
-
-- Patch known dependency vulnerabilities by aligning Jackson to 2.21.7 and
-  embedded Tomcat core/EL/WebSocket to 10.1.60 in the MVC sample and starter
-  tests. Regenerate the complete SBOM. Keep the OSV blocking policy unchanged.
-
-- The offline dashboard compares retained recordings via local JSON import and
-  aggregate-summary export. Current summaries include all retained HTTP units,
-  not just the graph window. Timing/status deltas retain unknown states and
-  surface sample/condition limitations without an automatic performance verdict.
-  Imported timing preserves submillisecond precision and rejects malformed data.
-
-### Request diagnostics preview
-
-- Report JSON preserves optional individual request observations with resolved
-  code, timestamps, unit type and HTTP status. Older schema-1 reports and the
-  four-argument `CoverageReport` constructor remain supported.
-- The standalone HTML report adds retained HTTP timing/status summaries,
-  cumulative endpoint intervals, searchable request details, and failure/slow
-  filters. Durations are recorded adapter wall-clock intervals, not network
-  latency or method spans; unknown statuses and invalid intervals are explicit.
-- MVC and WebFlux samples add bounded, read-only delay and deliberate 503
-  endpoints for the October mentoring demonstration.
-- Input capture, faithful replay and k6 integration are follow-up work in the
-  mentoring improvement plan; they are not implemented by this preview.
-- The offline report gains sidebar navigation, animated request/method and
-  code/API relationship maps, a review queue, node inspection, pause/zoom controls,
-  reduced-motion support, and an HTML download. These are observed associations,
-  not invented call edges or measured method timelines.
-- The composite Action supports source-built CLI JARs, a default report path,
-  three explicit diagnostic artifacts, structured candidate/unmatched counts,
-  fork-safe marked PR comments, and a gate applied after publishing results.
-  The repository CI exercises the source-built Action and real CLI test harness.
-- Selected HTTP observations now create in-memory reviewed test drafts. Export
-  JSON or disabled GET/HEAD JUnit tests after explicit path/status/input review;
-  observed failures never become expected statuses automatically. Generated Java
-  escapes metadata, requires an explicit local/QA origin, and is compiler-tested.
-
-The `CoverageReport` record now has a fifth component, `requests`. Its previous
-constructor remains available, but Java record patterns and reflective code
-depending on four components must be updated. This public model change belongs
-in a minor development release, not a `0.2.x` patch.
-
 ### Fixed
 
 - **Hibernate 6 and Mockito proxies are excluded too.** Hibernate 6 names its

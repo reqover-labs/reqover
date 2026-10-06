@@ -21,14 +21,9 @@ is published as the CycloneDX SBOM at `sbom/reqover.cdx.json`.
 | CycloneDX Gradle Plugin | 3.3.0 | Apache-2.0 | https://github.com/CycloneDX/cyclonedx-gradle-plugin | Build-time SBOM generation |
 | Shadow Gradle Plugin | 9.6.1 | Apache-2.0 | https://github.com/GradleUp/shadow | Build-time ASM relocation and agent packaging |
 | Gradle | 9.5.1 | Apache-2.0 | https://github.com/gradle/gradle | Build system |
-| Lucide / Feather icons | 500620a2e8123f8d1db191538886dc0c223f69a9 | ISC / MIT | https://github.com/lucide-icons/lucide | Vendored dashboard controls; no network requests or runtime dependency |
 
 The full ASM BSD-3-Clause notice is retained at
 `third-party-licenses/ASM-BSD-3-Clause.txt` and embedded in the agent JAR as
 `META-INF/LICENSE-ASM`.
 
 JaCoCo is not linked into the implementation. If a future phase modifies or forks JaCoCo internals, EPL-2.0 obligations must be reviewed separately.
-
-Lucide and inherited Feather icon notices are retained in
-`reqover-report/src/main/resources/io/reqover/report/dashboard/icons/LICENSE`,
-packaged with the report/CLI resources, and embedded in standalone HTML exports.

@@ -47,12 +47,57 @@ in a minor development release, not a `0.2.x` patch.
 
 ### Fixed
 
+- **Hibernate 6 and Mockito proxies are excluded too.** Hibernate 6 names its
+  proxy `Order$HibernateProxy` with no suffix, which the earlier marker missed,
+  and a Mockito mock (`$MockitoMock$`) was recorded as application code.
+- **Builder and fluent setters count as trivial accessors.** On a real
+  Lombok-heavy service builder methods were a fifth of the reverse index.
+
+- **A test run's report covers every application context, not just the last
+  one closed.** Spring's test context cache keeps one context per distinct
+  configuration and closes them all at JVM exit, and each overwrote the
+  others' export. On a real 167-test Spring Boot suite with five contexts, the
+  exported report listed 20 of the 50 endpoints the tests called. Exports to
+  one path in the same JVM now accumulate; the first export of a run still
+  replaces the file. Request ids are unique across the JVM so the merged
+  report does not reuse `req-1`.
+
+- **Known Jackson and Tomcat advisories are patched.** Jackson moves to 2.21.7
+  and embedded Tomcat core/EL/WebSocket to 10.1.60 in the MVC sample and the
+  starter's test runtime, clearing the OSV dependency scan. Published starter
+  consumers get no new Tomcat constraint. The SBOM is regenerated and the
+  blocking scan policy is unchanged.
+
 - **A report from a newer schema is refused instead of misparsed.** The writer
   has always stamped `schemaVersion`, but the reader ignored it, so a future
   document fed to an older build would parse into a silently wrong result. A
   document with no `schemaVersion` still reads as version 1.
 
 ### Changed
+
+- **`accessors=record` agent option.** Skipping trivial accessors hides a class
+  made only of them, such as a request DTO record, from impact analysis.
+  Recording for CI can keep them; the default is unchanged.
+
+- **Reports no longer list each Spring bean twice.** Runtime proxy classes
+  (`$$SpringCGLIB$$`, `$HibernateProxy$`, `$ByteBuddy$`) sit in the
+  application's package, so an `include` matched them and every proxied service
+  appeared next to its own `$$SpringCGLIB$$0` twin. They are now always
+  excluded; the real method behind the proxy is still recorded.
+- **Trivial accessors are not instrumented.** A method whose whole body reads
+  or writes one of its own instance fields — a Lombok `@Getter`/`@Setter` or a
+  record accessor — runs whenever Jackson serializes the object, so a shared
+  response envelope topped the reverse lookup as "used by every API". The
+  match is on the bytecode shape, not the name: a getter that computes
+  anything is still recorded, and so is a request handler — a method with a
+  Spring web annotation, or any method of a `@Controller`/`@RestController`.
+  A DTO with only field accessors no longer appears in the reverse lookup.
+- **Requests that match no controller are not recorded.** Spring Boot maps a
+  static resource handler to `/**`, so every unmapped URL piled up under one
+  `GET /**` endpoint. The MVC interceptor and the WebFlux filter now skip
+  requests served by `ResourceHttpRequestHandler` / `ResourceWebHandler` under
+  that catch-all pattern. A resource handler you map yourself, such as
+  `/downloads/**`, is still recorded.
 
 - **Agent overhead is measured over alternating rounds** rather than one
   baseline-then-agent run. The retired 2026-08-10 capture reported the agent as

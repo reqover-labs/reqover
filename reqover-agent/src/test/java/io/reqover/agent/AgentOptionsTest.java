@@ -55,6 +55,22 @@ class AgentOptionsTest {
     }
 
     @Test
+    void runtimeGeneratedProxiesAreNeverInstrumented() {
+        AgentOptions options = AgentOptions.parse("include=com.example.");
+
+        assertTrue(options.shouldInstrument("com.example.OrderService"));
+        assertTrue(options.shouldInstrument("com.example.OrderService$Inner"));
+        assertFalse(options.shouldInstrument("com.example.OrderService$$SpringCGLIB$$0"));
+        assertFalse(options.shouldInstrument("com.example.OrderService$$EnhancerBySpringCGLIB$$a1b2c3"));
+        assertFalse(options.shouldInstrument("com.example.OrderService$$FastClassBySpringCGLIB$$a1b2c3"));
+        assertFalse(options.shouldInstrument("com.example.Order$HibernateProxy$Zx8Kq1"));
+        assertFalse(options.shouldInstrument("com.example.Order$HibernateProxy"));
+        assertTrue(options.shouldInstrument("com.example.Order$HibernateProxyFactory"));
+        assertFalse(options.shouldInstrument("com.example.PaymentClient$MockitoMock$W0aexnVR"));
+        assertFalse(options.shouldInstrument("com.example.OrderService$ByteBuddy$Mock"));
+    }
+
+    @Test
     void userExcludeOverridesShorterInclude() {
         AgentOptions options = AgentOptions.parse("include=com.example,exclude=com.example.internal.");
 
@@ -76,5 +92,13 @@ class AgentOptionsTest {
         assertFalse(AgentOptions.parse("   ").shouldInstrument("com.example.OrderService"));
         assertFalse(AgentOptions.parse("verbose,exclude=com.example.generated")
                 .shouldInstrument("com.example.OrderService"));
+    }
+
+    @Test
+    void skipsAccessorsUnlessAskedToRecordThem() {
+        assertFalse(AgentOptions.parse("include=com.example").recordAccessors());
+        assertTrue(AgentOptions.parse("include=com.example,accessors=record").recordAccessors());
+        assertFalse(AgentOptions.parse("include=com.example,accessors=skip").recordAccessors());
+        assertFalse(AgentOptions.parse("include=com.example,accessors=sometimes").recordAccessors());
     }
 }

@@ -1,11 +1,13 @@
 package io.reqover.spring.boot;
 
+import io.reqover.core.CoverageBucketSnapshot;
 import io.reqover.core.CoverageStore;
 import io.reqover.report.CoverageReport;
 import io.reqover.report.CoverageReportGenerator;
 import io.reqover.report.CoverageReportJson;
 import io.reqover.report.HtmlCoverageReportRenderer;
 
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -24,14 +26,30 @@ public class ReqoverReportService {
     }
 
     public CoverageReport report() {
-        return generator.generate(coverageStore.snapshots());
+        return report(snapshots());
     }
 
     public String json() {
-        return CoverageReportJson.write(report());
+        return json(snapshots());
     }
 
     public String html() {
-        return htmlRenderer.render(report());
+        return html(snapshots());
+    }
+
+    List<CoverageBucketSnapshot> snapshots() {
+        return coverageStore.snapshots();
+    }
+
+    CoverageReport report(List<CoverageBucketSnapshot> snapshots) {
+        return generator.generate(snapshots);
+    }
+
+    String json(List<CoverageBucketSnapshot> snapshots) {
+        return CoverageReportJson.write(report(snapshots));
+    }
+
+    String html(List<CoverageBucketSnapshot> snapshots) {
+        return htmlRenderer.render(report(snapshots));
     }
 }

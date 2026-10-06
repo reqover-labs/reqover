@@ -99,6 +99,15 @@ class AgentSpringE2ETest {
                     "validate",
                     "(J)J"
             ), report);
+            assertTrue(hasMethod(
+                    endpoint,
+                    "io.reqover.example.webflux.auto.AutoReactiveOrderService",
+                    "toResponse",
+                    "(J)Lio/reqover/example/webflux/auto/AutoReactiveOrderResponse;"
+            ), report);
+            // Jackson reads the response record through its component
+            // accessors; those are skipped as trivial accessors.
+            assertFalse(hasClass(endpoint, "io.reqover.example.webflux.auto.AutoReactiveOrderResponse"), report);
             assertTrue(hasClass(endpoint, "io.reqover.example.webflux.auto.AutoReactiveOrderController"), report);
             assertFalse(hasClass(endpoint, "ReactiveOrderService"), report);
             assertTrue(hasClass(manualEndpoint, "ReactiveOrderService"), report);

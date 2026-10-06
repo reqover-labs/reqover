@@ -10,17 +10,30 @@ import org.objectweb.asm.Opcodes;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 public final class ReqoverClassInstrumenter {
     private static final String PROBE_OWNER = "io/reqover/core/ReqoverProbe";
     private static final String PROBE_METHOD = "hit";
     private static final String PROBE_DESCRIPTOR = "(II)V";
 
+    private final boolean skipTrivialAccessors;
+
+    public ReqoverClassInstrumenter() {
+        this(true);
+    }
+
+    /** {@code skipTrivialAccessors=false} instruments getters, setters and builder methods too. */
+    public ReqoverClassInstrumenter(boolean skipTrivialAccessors) {
+        this.skipTrivialAccessors = skipTrivialAccessors;
+    }
+
     public InstrumentationResult instrument(byte[] originalBytecode) {
         ClassReader reader = new ClassReader(originalBytecode);
         ClassWriter writer = new ClassWriter(reader, ClassWriter.COMPUTE_MAXS);
         List<ProbeMetadata> metadata = new ArrayList<>();
-        reader.accept(new ReqoverClassVisitor(writer, metadata), 0);
+        Set<String> trivialAccessors = skipTrivialAccessors ? TrivialAccessorScanner.scan(reader) : Set.of();
+        reader.accept(new ReqoverClassVisitor(writer, metadata, trivialAccessors), 0);
 
         if (metadata.isEmpty()) {
             return new InstrumentationResult(originalBytecode, List.of(), false);
@@ -30,14 +43,20 @@ public final class ReqoverClassInstrumenter {
 
     private static final class ReqoverClassVisitor extends ClassVisitor {
         private final List<ProbeMetadata> metadata;
+        private final Set<String> trivialAccessors;
         private String className;
         private int classId;
         private boolean instrumentableClass;
         private int nextProbeId;
 
-        private ReqoverClassVisitor(ClassVisitor delegate, List<ProbeMetadata> metadata) {
+        private ReqoverClassVisitor(
+                ClassVisitor delegate,
+                List<ProbeMetadata> metadata,
+                Set<String> trivialAccessors
+        ) {
             super(Opcodes.ASM9, delegate);
             this.metadata = metadata;
+            this.trivialAccessors = trivialAccessors;
         }
 
         @Override
@@ -64,7 +83,9 @@ public final class ReqoverClassInstrumenter {
                 String[] exceptions
         ) {
             MethodVisitor methodVisitor = super.visitMethod(access, name, descriptor, signature, exceptions);
-            if (!instrumentableClass || !instrumentableMethod(access, name)) {
+            if (!instrumentableClass
+                    || !instrumentableMethod(access, name)
+                    || trivialAccessors.contains(TrivialAccessorScanner.key(name, descriptor))) {
                 return methodVisitor;
             }
 

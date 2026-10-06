@@ -11,7 +11,7 @@ public class AutoReactiveOrderService {
                 .publishOn(Schedulers.boundedElastic())
                 .map(this::validate)
                 .publishOn(Schedulers.parallel())
-                .map(value -> new AutoReactiveOrderResponse(value, "AUTO_REACTIVE_FOUND"));
+                .map(this::toResponse);
     }
 
     private long validate(long id) {
@@ -19,6 +19,10 @@ public class AutoReactiveOrderService {
             throw new IllegalArgumentException("id must be positive");
         }
         return id;
+    }
+
+    private AutoReactiveOrderResponse toResponse(long id) {
+        return new AutoReactiveOrderResponse(id, "AUTO_REACTIVE_FOUND");
     }
 }
 

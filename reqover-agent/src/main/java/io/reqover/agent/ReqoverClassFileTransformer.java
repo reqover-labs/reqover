@@ -9,10 +9,11 @@ import java.security.ProtectionDomain;
 
 public final class ReqoverClassFileTransformer implements ClassFileTransformer {
     private final AgentOptions options;
-    private final ReqoverClassInstrumenter instrumenter = new ReqoverClassInstrumenter();
+    private final ReqoverClassInstrumenter instrumenter;
 
     public ReqoverClassFileTransformer(AgentOptions options) {
         this.options = options;
+        this.instrumenter = new ReqoverClassInstrumenter(!options.recordAccessors());
     }
 
     @Override

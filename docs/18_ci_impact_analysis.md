@@ -47,6 +47,24 @@ java -javaagent:reqover-agent-0.2.0.jar=include=com.example \
   --reqover.report.export.json-path=build/reqover-report.json
 ```
 
+If your integration tests boot the application themselves (`@SpringBootTest`),
+attach the agent to the test JVM instead. Gradle:
+
+```groovy
+tasks.named('test') {
+    jvmArgs "-javaagent:${reqoverAgentJar}=include=com.example,accessors=record"
+    systemProperty 'reqover.report.export.json-path',
+            layout.buildDirectory.file('reqover-report.json').get().asFile.path
+}
+```
+
+Spring's test context cache keeps one application context per distinct test
+configuration and closes them all when the test JVM exits. Each one exports,
+and the file ends up holding the requests of every context in that run.
+`accessors=record` keeps getters and builders, so a change to a request DTO
+still maps to the endpoints that read it (see
+[the agent options](17_integration_guide.md#accessors-keep-getters-and-builders-for-impact-analysis)).
+
 Two things to know:
 
 - The export runs on **normal context shutdown**. A process killed with

@@ -375,6 +375,18 @@ include=org.springframework.samples
 
 `include`는 좁게 쓰는 편이 좋습니다. 넓게 잡으면 리포트가 읽기 힘들어지고 시작 시간도 늘어납니다.
 
+### `accessors`: 영향 분석용으로 getter와 builder도 기록하기
+
+agent는 기본적으로 단순 accessor를 계측하지 않습니다. 몸체 전체가 필드 하나를 옮기기만 하는 getter, setter, record accessor, builder 메서드가 여기에 해당합니다. 응답 envelope가 모든 API가 실행하는 로직처럼 보이지 않게 하려는 것입니다. 대신 이런 메서드로만 이뤄진 클래스(대표적으로 요청 DTO record)는 리포트에 나타나지 않아서, 그 클래스를 바꿨을 때 영향 분석이 어느 엔드포인트와도 연결하지 못합니다.
+
+[CI 영향 분석](18_ci_impact_analysis.ko.md)에 쓸 기록이라면 남겨 두세요.
+
+```text
+include=com.example,accessors=record
+```
+
+테스트 167개짜리 Spring Boot 서비스의 최근 커밋 12개에서, 영향 분석이 연결하지 못한 소스 파일이 33개에서 21개로 줄었고 역인덱스는 세 배가 됐습니다. 사람이 읽는 리포트에는 기본값(`accessors=skip`)을 쓰세요.
+
 ---
 
 ## 5. 잘 됐는지 확인하기
@@ -402,7 +414,7 @@ WebFlux라면 하나 더 — 한 API의 기록 안에 **서로 다른 스레드 
 | `[reqover] no include configured` | `include=`를 안 줬음 | `include=내.패키지` 추가. 이 상태에서는 의도적으로 아무것도 계측하지 않습니다 |
 | `[reqover] no valid include configured` | `include`를 줬지만 값이 비어 있음 | `include=` 뒤에 값이 있는지, 쉼표/세미콜론을 헷갈리지 않았는지 확인 |
 | `[reqover] ignoring malformed agent option` | `key=value` 형태가 아님 | `include=com.example` 처럼 `=`를 넣었는지 확인 |
-| `[reqover] ignoring unknown agent option` | `include`/`exclude` 외의 키를 씀 | 오타 확인 (`includes`, `packages` 등은 인식하지 않습니다) |
+| `[reqover] ignoring unknown agent option` | `include`/`exclude`/`accessors` 외의 키를 씀 | 오타 확인 (`includes`, `packages` 등은 인식하지 않습니다) |
 | 엔드포인트는 나오는데 클래스 목록이 비어 있음 | `include`가 내 클래스와 안 맞음 | 클래스가 아니라 **패키지 접두사**를 주는지, 기본 제외(`org.springframework.` 등)에 걸리지 않는지 확인 |
 | `/reqover/report`가 404 | **엔드포인트는 기본이 꺼짐** | `reqover.report.endpoint.enabled=true`를 넣거나 직접 컨트롤러를 만드세요. 아무 설정도 안 한 상태에서는 이게 정상 동작입니다 |
 | 엔드포인트를 켰는데도 404 | 어댑터가 안 켜져서 `CoverageStore`도 리포트 서비스도 없음 | 웹 애플리케이션이 맞는지, `reqover.mvc.enabled=false` / `reqover.webflux.enabled=false`로 꺼두지 않았는지 확인 |
@@ -523,7 +535,8 @@ class NightlySettlementJob {
 - **메서드 단위입니다.** 몇 번째 줄까지 실행했는지는 알 수 없습니다. 줄·분기 정밀도가 필요하면 JaCoCo를 함께 쓰세요.
 - **기록은 메모리에만 있습니다.** 애플리케이션을 재시작하면 사라지고, 인스턴스가 여러 대면 각자 자기 기록만 갖습니다. 다른 곳에 저장하는 확장점이 `CoverageStore`이지만 Reqover가 제공하는 영속 구현은 없습니다 — 대신 리포트를 파일로 내보내세요.
 - **MVC의 비동기 처리 구간은 자동으로 이어지지 않습니다.** 별도 스레드로 넘어간 부분은 기록되지 않고, 요청 처리가 다시 돌아오는 시점부터 이어집니다. `UnitScope` 안에서도 다른 스레드가 `join` 스코프를 열지 않으면 마찬가지입니다.
-- **컴파일러가 자동 생성한 메서드는 기록하지 않습니다.**
+- **컴파일러가 자동 생성한 메서드는 기록하지 않습니다.** 런타임 프록시 클래스(`$$SpringCGLIB$$`, `$HibernateProxy$`, `$ByteBuddy$`)도 기록하지 않고 프록시 뒤의 실제 메서드가 대신 기록됩니다. 몸체 전체가 자기 필드 하나를 읽거나 쓰기만 하는 단순 accessor(Lombok `@Getter`/`@Setter`, record accessor)도 기록하지 않습니다. 무언가를 계산하는 getter와 요청 핸들러(Spring web 애너테이션이 붙은 메서드, `@Controller`/`@RestController`의 메서드)는 그대로 기록됩니다.
+- **`/**`에 매핑된 기본 정적 리소스 핸들러가 처리한 요청은 기록하지 않습니다.** Spring Boot는 이 핸들러를 `/**`에 매핑하므로, 그대로 두면 어떤 컨트롤러에도 맞지 않는 URL이 `GET /**` 엔드포인트로 쌓입니다. 직접 다른 패턴에 매핑한 리소스 핸들러는 그대로 기록됩니다.
 - **종료 시 내보내기는 정상 종료에서만 동작합니다.** `SIGKILL`은 아무것도 쓰지 않고, 쓰기 실패는 예외로 올리지 않고 로그만 남깁니다.
 - **리포트 엔드포인트의 인증은 애플리케이션 책임입니다.** Reqover가 제공하는 인증은 없습니다.
 - **리포트는 실제로 관측된 것만 보여줍니다.** 리포트에 없다는 것이 그 관계가 없다는 증거는 아닙니다 — 그 API를 아직 호출하지 않은 것일 수도 있습니다. 같은 이유로 역방향 조회는 "여기부터 보라"는 힌트이고, 완전한 변경 영향 분석이 아닙니다.

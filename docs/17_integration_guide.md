@@ -375,6 +375,18 @@ include=org.springframework.samples
 
 Keep `include` narrow. A broad include makes the report hard to read and increases startup time.
 
+### `accessors`: keep getters and builders for impact analysis
+
+By default the agent skips trivial accessors: a getter, setter, record accessor or builder method whose whole body moves one field. That keeps a response envelope from looking like logic every API runs. The cost is that a class made only of such methods, typically a request DTO record, never appears in the report, so impact analysis cannot tie a change to it to the endpoints that use it.
+
+For a recording that feeds [impact analysis in CI](18_ci_impact_analysis.md), keep them:
+
+```text
+include=com.example,accessors=record
+```
+
+On a 167-test Spring Boot service this cut the changed source files that impact analysis could not match from 33 to 21 across its last 12 commits, and tripled the reverse index. Use `accessors=skip` (the default) for a report people read.
+
 ---
 
 ## 5. Check that it worked
@@ -402,7 +414,7 @@ The most common failure is **"the report is empty"**, and the cause is usually `
 | `[reqover] no include configured` | You didn't pass `include=` | Add `include=your.package`. In this state nothing is instrumented, by design |
 | `[reqover] no valid include configured` | You passed `include` but the value was empty | Check there is a value after `include=`, and that you didn't mix up the comma and semicolon |
 | `[reqover] ignoring malformed agent option` | Not in `key=value` form | Make sure you included the `=`, as in `include=com.example` |
-| `[reqover] ignoring unknown agent option` | A key other than `include`/`exclude` | Check for typos — `includes` and `packages` are not recognized |
+| `[reqover] ignoring unknown agent option` | A key other than `include`/`exclude`/`accessors` | Check for typos — `includes` and `packages` are not recognized |
 | Endpoints appear but the class list is empty | `include` doesn't match your classes | Confirm you passed a **package prefix** rather than a class, and that it isn't caught by a default exclude such as `org.springframework.` |
 | `/reqover/report` returns 404 | **The endpoint is disabled by default** | Set `reqover.report.endpoint.enabled=true`, or write your own controller. This is the expected out-of-the-box behaviour |
 | Endpoint enabled but still 404 | No adapter is active, so there is no `CoverageStore` and no report service | Confirm the application is a web application and that you didn't set `reqover.mvc.enabled=false` / `reqover.webflux.enabled=false` |
@@ -523,7 +535,8 @@ Closing the scope finishes the bucket and flushes it exactly once, so leaving th
 - **Method granularity.** You cannot see which lines ran. If you need line and branch precision, use JaCoCo alongside it.
 - **Records live in memory only.** They are lost on restart, and with multiple instances each holds only its own records. `CoverageStore` is the extension point for storing them elsewhere, but Reqover ships no persistent implementation — export the report to a file instead.
 - **MVC async sections are not linked automatically.** Work handed to a separate thread is not recorded; attribution resumes when request handling returns. The same applies inside a `UnitScope` unless the other thread opens a `join` scope.
-- **Compiler-generated methods are not recorded.**
+- **Compiler-generated methods are not recorded.** Neither are runtime proxy classes (`$$SpringCGLIB$$`, `$HibernateProxy$`, `$ByteBuddy$`) — the real method behind the proxy is recorded instead — nor trivial accessors whose whole body reads or writes one of the object's own fields (Lombok `@Getter`/`@Setter`, record accessors). A getter that computes anything is still recorded, and so is any request handler (a method with a Spring web annotation, or a method of a `@Controller`/`@RestController`).
+- **Requests served by the catch-all static resource handler are not recorded.** Spring Boot maps it to `/**`, so a URL that matches no controller would otherwise appear as a `GET /**` endpoint. A resource handler mapped to its own pattern is still recorded.
 - **The shutdown export only runs on a normal context close.** `SIGKILL` writes nothing, and a failed write is logged and swallowed rather than raised.
 - **Report endpoint authentication is your responsibility.** Reqover ships none.
 - **The report only shows what was actually observed.** Absence from the report is not evidence that a relationship doesn't exist — you may simply not have called that API yet. For the same reason, the reverse lookup is a "start looking here" hint, not a complete change-impact analysis.

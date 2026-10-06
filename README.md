@@ -317,7 +317,7 @@ Written plainly. Using a tool with the wrong expectations wastes everyone's time
 ### What doesn't / Things to know
 
 - **It does not know which lines ran.** Method granularity only. If you need line and branch precision, use JaCoCo.
-- **Compiler-generated methods** are not recorded.
+- **Compiler-generated methods** are not recorded, and neither are **runtime proxies** (Spring CGLIB, Hibernate, Byte Buddy) or **trivial accessors** — a getter or setter that only reads or writes one field, including record accessors. Requests that match no controller and fall through to the static resource handler are not recorded either.
 - **Records live in memory only.** The default cap is 10,000 entries (`reqover.mvc.max-snapshots` / `reqover.webflux.max-snapshots`); beyond that the oldest are dropped, and restarting the application clears everything. `CoverageStore` is the extension point for storing them elsewhere, but Reqover ships no persistent implementation — export the report to a file instead.
 - **Impact analysis is bounded by what was recorded.** It matches changed files against code the report observed running. A file it cannot match is reported as unmatched, which means "not seen", not "not affected".
 - **MVC async sections are not linked automatically.** Work handed to a separate thread is not recorded; attribution resumes when request handling returns.

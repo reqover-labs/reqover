@@ -69,7 +69,7 @@ Reqover records, from the moment a request arrives until the response leaves, **
 - **Reading unfamiliar code** — you joined an undocumented service and want to see how deep one API actually reaches
 - **Debugging WebFlux** — request handling is scattered across threads and the flow is hard to follow
 
-## Three things the report shows
+## Performance Validation Preview (Oct-Nov 2026)
 
 The current development branch also includes a [request diagnostics preview](docs/24_request_diagnostics.md):
 per-request recorded processing intervals and HTTP status, a retained-request
@@ -86,6 +86,8 @@ and shows observed endpoint timing/status deltas over all retained samples, with
 missing-data and unmatched-condition warnings. It is not a load-test verdict.
 
 ![Unreleased diagnostic dashboard with synthetic MVC requests](docs/assets/reqover-request-diagnostics.png)
+
+## Three things the report shows
 
 ### 1. Execution paths split per API
 
@@ -428,7 +430,7 @@ Issues, pull requests, and commit messages are written in English so contributor
 - [Prior art — and when to use a different tool](docs/19_prior_art.md) · [한국어판](docs/19_prior_art.ko.md)
 - [Versioning, compatibility, and rollback](docs/20_versioning_and_compatibility.md) · [한국어판](docs/20_versioning_and_compatibility.ko.md)
 - [Request diagnostics preview](docs/24_request_diagnostics.md) · [한국어판](docs/24_request_diagnostics.ko.md)
-- [Mentoring improvement plan toward October 7 and November 4–5](docs/23_performance_validation_plan.ko.md) (Korean)
+- [Performance validation plan (Oct-Nov 2026)](docs/23_performance_validation_plan.ko.md) (Korean)
 - [Project plan](docs/00_project_plan.md) (Korean) · [Requirements](docs/01_requirements.md) (Korean)
 - [MVP status](docs/08_phase0_mvp_status.md) · [Agent E2E Demo](docs/09_agent_e2e_demo.md) · [Demo script](docs/10_demo_script.md)
 - [Performance measurement](docs/11_performance_measurement.md) · [Measured agent overhead](docs/15_performance_results.md) · [한국어판](docs/15_performance_results.ko.md)

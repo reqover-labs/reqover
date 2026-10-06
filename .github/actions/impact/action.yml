@@ -1,5 +1,5 @@
 name: Reqover impact analysis
-description: Analyse observed retest candidates, render an offline report, and attach CI artifacts.
+description: Analyse retest candidates and render an offline report. Requires Java 17+, Bash, Git, curl and Python 3.
 
 inputs:
   report:
@@ -27,9 +27,9 @@ inputs:
     required: false
     default: "true"
   upload-artifact:
-    description: Upload only the generated HTML, impact Markdown, and impact JSON.
+    description: Opt in to upload the three result files; use distinct artifact-name values for matrix jobs or repeated calls.
     required: false
-    default: "true"
+    default: "false"
   artifact-name:
     description: Artifact name. Use a unique value for each matrix job or Action invocation.
     required: false

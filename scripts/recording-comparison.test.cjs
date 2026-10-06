@@ -102,3 +102,28 @@ test('honors bounds on input records and stable alphabetical endpoint identity',
   assert.equal(value.endpoints.length, 2);
   assert.deepEqual(value.endpoints.map(row => row.endpoint), ['GET /a', '__proto__']);
 });
+
+test('ignores arithmetic noise when comparing equivalent recordings', () => {
+  const before = summary([observation()]);
+  const after = structuredClone(before);
+  after.endpoints[0].averageMillis += 2.27e-13;
+  const row = compare.between(before, after).rows[0];
+  assert.equal(row.averageDeltaMillis, 0);
+  after.endpoints[0].averageMillis += 0.000001;
+  after.endpoints[0].cumulativeMillis = after.endpoints[0].averageMillis;
+  after.endpoints[0].maximumMillis = after.endpoints[0].averageMillis;
+  assert(compare.between(before, after).rows[0].averageDeltaMillis > 0);
+});
+
+test('treats missing endedAt as unfinished instead of throwing', () => {
+  const request = observation(); delete request.endedAt;
+  const row = summary([request]).endpoints[0];
+  assert.equal(row.timedRequestCount, 0);
+  assert.equal(row.knownStatusCount, 0);
+  assert.equal(row.averageMillis, null);
+});
+
+test('does not compare a truncated detail export as a complete recording', () => {
+  const truncated = report([observation()]); truncated.omittedRequestDetails = 50;
+  assert.throws(() => compare.fromReport(truncated), /summary|truncated/i);
+});

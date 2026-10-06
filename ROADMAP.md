@@ -11,13 +11,13 @@ the fastest way to change what we work on.
 
 ## Now
 
-**October mentoring track: make problem requests actionable.**
+**Performance validation preview (Oct-Nov 2026): make problem requests actionable.**
 The [request diagnostics preview](docs/24_request_diagnostics.md) surfaces retained
 request timing and status next to the request's method set. The
 offline dashboard adds animated observed relationships, shared-code retest
 candidates, and a review queue. The updated CI Action saves its results as
 explicit artifacts; see [dashboard and CI setup](docs/26_dashboard_and_ci.md). The
-[dated mentoring plan](docs/23_performance_validation_plan.ko.md) (Korean) targets
+[performance validation plan](docs/23_performance_validation_plan.ko.md) (Korean) targets
 October 7 for the first demonstration and November 4–5 for the presentation.
 Reviewed JSON/JUnit [test drafts](docs/27_test_case_drafts.md) are now in the preview.
 [Retained recording comparison](docs/28_recording_comparison.md) adds descriptive
@@ -104,10 +104,10 @@ Saying no is part of a roadmap. See
   packages you name and samples nothing. That is affordable in development, QA,
   and staging, and it is the wrong shape for permanent production use — an APM
   is the right tool there.
-- **A hosted backend.** The current diagnostic dashboard is still a local,
-  standalone file. Replay and load-test screens will first be validated locally;
-  running a shared hosted service requires a separate storage, access and
-  operating-cost decision.
+- **A hosted backend or shared dashboard service.** No hosted or multi-user service
+  is planned. A local standalone diagnostic dashboard is supported. Replay and
+  load-test views are evaluated locally first; a hosted service would require a
+  separate storage, access and operating-cost decision.
 - **Claiming a change is safe.** Impact analysis reports observed execution,
   which is a lower bound. A file it cannot match means "not seen", never "not
   affected", and no amount of product polish will change that.

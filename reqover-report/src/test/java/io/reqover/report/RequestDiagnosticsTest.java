@@ -98,12 +98,29 @@ class RequestDiagnosticsTest {
         assertTrue(html.contains("Most recent 100 of 150 retained HTTP observations"));
         assertTrue(html.contains("request-149"));
         assertFalse(html.contains("<code class=\"request-id\">request-0</code>"));
-        assertEquals(150, CoverageReportJson.read(CoverageReportJson.write(report)).requests().size());
+        assertEquals(100, CoverageReportJson.read(CoverageReportJson.write(report)).requests().size());
+        assertEquals(150, CoverageReportJson.read(CoverageReportJson.write(report, 150)).requests().size());
         assertEquals(150, RequestSummary.from(report.requests()).requestCount());
     }
 
     static CoverageBucketSnapshot snapshot(String id, long millis, int status, int classId) {
         return new CoverageBucketSnapshot(UnitInfo.httpRequest(id, "GET", "/orders/{id}"),
                 START, START.plusMillis(millis), status, Map.of(classId, Set.of(0)), Set.of("worker-1"));
+    }
+
+    @Test
+    void boundsDefaultJsonDetailsWhilePreservingEndpointUnions() {
+        List<CoverageBucketSnapshot> observations = IntStream.range(0, 150).mapToObj(i ->
+                new CoverageBucketSnapshot(UnitInfo.httpRequest("r" + i, "GET", "/bounded"),
+                        START.plusSeconds(i), START.plusSeconds(i).plusMillis(1), 200,
+                        Map.<Integer, Set<Integer>>of(), Set.of())).toList();
+        CoverageReport report = new CoverageReportGenerator().generate(observations);
+        Map<String, Object> root = Json.object(Json.parse(CoverageReportJson.write(report)), "report");
+        List<Object> details = Json.optionalArray(root, "requests");
+        assertEquals(100, details.size());
+        assertEquals("r50", Json.string(Json.object(details.get(0), "request"), "requestId"));
+        assertEquals(150, Json.integer(root, "completedRequestCount"));
+        assertEquals(150, report.endpoints().get(0).requestCount());
+        assertEquals(50, Json.integer(root, "omittedRequestDetails"));
     }
 }

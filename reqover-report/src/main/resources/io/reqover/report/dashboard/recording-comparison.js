@@ -28,6 +28,12 @@
     if (!report || !count(report.completedRequestCount) || typeof report.generatedAt !== 'string'
       || !Array.isArray(report.endpoints) || !Array.isArray(report.reverseIndex)) { throw new Error('Not a Reqover coverage report.'); }
     if (report.schemaVersion !== undefined && report.schemaVersion !== 1) { throw new Error('Unsupported report schema; use schema 1.'); }
+    if (report.omittedRequestDetails !== undefined && !count(report.omittedRequestDetails)) {
+      throw new Error('Invalid omitted request detail count.');
+    }
+    if (report.omittedRequestDetails > 0) {
+      throw new Error('Request details were truncated. Import the live report aggregate summary instead.');
+    }
     instant(report.generatedAt);
     if (report.requests !== undefined && report.requests !== null && !Array.isArray(report.requests)) { throw new Error('Invalid request observations.'); }
     var requests = report.requests || [];
@@ -38,7 +44,7 @@
       if (request.unitType !== 'http-request') { return; }
       if (typeof request.endpoint !== 'string' || !Number.isInteger(request.statusCode)) { throw new Error('Invalid HTTP observation.'); }
       var start = instant(request.startedAt);
-      var end = request.endedAt === null ? null : instant(request.endedAt);
+      var end = request.endedAt == null ? null : instant(request.endedAt);
       var group = grouped.get(request.endpoint);
       if (!group) {
         group = { endpoint: request.endpoint, requestCount: 0, knownStatusCount: 0,
@@ -105,7 +111,12 @@
   function failures(row) {
     return row && row.knownStatusCount ? (row.clientErrorCount + row.serverErrorCount) * 100 / row.knownStatusCount : null;
   }
-  function delta(before, after) { return before !== null && after !== null ? after - before : null; }
+  function delta(before, after) {
+    if (before === null || after === null) { return null; }
+    var difference = after - before;
+    var epsilon = Math.max(1e-9, Number.EPSILON * Math.max(Math.abs(before), Math.abs(after)) * 8);
+    return Math.abs(difference) <= epsilon ? 0 : difference;
+  }
   function between(before, after) {
     before = read(before); after = read(after);
     var b = new Map(before.endpoints.map(function (row) { return [row.endpoint, row]; }));

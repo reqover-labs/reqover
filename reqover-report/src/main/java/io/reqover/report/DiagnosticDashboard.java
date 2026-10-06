@@ -101,8 +101,8 @@ final class DiagnosticDashboard {
                 + "<template id=\"reqover-draft-icon\">" + icon("flask-conical") + "</template>"
                 + TestCaseDraftHtmlRenderer.script()
                 + RecordingComparisonHtmlRenderer.script(report)
-                + "<script>" + SCRIPT + "</script>\n"
-                + "<!-- Lucide / Feather icon licenses:\n" + asset("icons/LICENSE").replace("--", "- -") + "\n-->";
+                + "<!-- Lucide / Feather icon licenses:\n" + asset("icons/LICENSE").replace("--", "- -") + "\n-->"
+                + "<script>" + SCRIPT + "</script>\n";
     }
 
     private static void nav(StringBuilder out, String id, String icon, String label) {

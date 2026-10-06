@@ -69,7 +69,7 @@ Reqover는 요청이 들어오는 순간부터 응답이 나갈 때까지 **그 
 - **레거시 코드 읽기** — 문서 없는 서비스에 들어와서, API 하나가 어디까지 파고드는지 눈으로 확인할 때
 - **WebFlux 디버깅** — 요청 처리가 여러 스레드로 흩어져서 흐름을 따라가기 어려울 때
 
-## 리포트가 보여주는 세 가지
+## 성능 검증 미리보기 (2026년 10~11월)
 
 현재 개발 브랜치에는 [요청 진단 미리보기](docs/24_request_diagnostics.ko.md)도 있습니다.
 요청별 관측 처리 시간과 HTTP 상태, 전체 관측 요약과 개별 요청 상세를 보여줍니다.
@@ -86,6 +86,8 @@ API별 시간·상태 변화를 확인합니다. 미측정과 조건 차이를 �
 판정을 대신하지는 않습니다.
 
 ![MVC 합성 요청으로 만든 개발 버전 진단 대시보드](docs/assets/reqover-request-diagnostics.png)
+
+## 리포트가 보여주는 세 가지
 
 ### 1. API별로 나눠 본 실행 경로
 
@@ -432,7 +434,7 @@ fork 후 브랜치를 만들고, `./gradlew clean test` 통과를 확인한 뒤 
 - [선행 도구와 Reqover의 자리 — 다른 도구를 써야 할 때](docs/19_prior_art.ko.md)
 - [버전, 호환성, 롤백](docs/20_versioning_and_compatibility.ko.md)
 - [요청 진단 리포트](docs/24_request_diagnostics.ko.md)
-- [10월 7일 멘토링과 11월 4~5일 발표까지의 개선 계획](docs/23_performance_validation_plan.ko.md)
+- [성능 검증 개선 계획 (2026년 10~11월)](docs/23_performance_validation_plan.ko.md)
 - [프로젝트 기획](docs/00_project_plan.md) · [요구사항](docs/01_requirements.md)
 - [MVP 진행 상태](docs/08_phase0_mvp_status.md) · [Agent E2E Demo](docs/09_agent_e2e_demo.md) · [데모 스크립트](docs/10_demo_script.md)
 - [성능 측정 방법](docs/11_performance_measurement.md) · [측정된 agent 오버헤드](docs/15_performance_results.ko.md)

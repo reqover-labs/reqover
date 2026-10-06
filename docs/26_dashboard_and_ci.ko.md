@@ -48,6 +48,8 @@ Maven Central에는 아직 배포되지 않았으므로 소스 빌드 또는 배
 
 Ubuntu runner, Java 17 이상, Python 3, Bash를 준비합니다. 아래 예제는 기존 PR
 워크플로에서 **리포트를 기록하고 Java를 설정한 뒤** 붙이는 부분입니다.
+`container: eclipse-temurin` 같은 컨테이너에는 Python이 없을 수 있으므로 먼저
+Python 3을 설치합니다. 이 조건과 얕은 checkout을 네트워크 작업 전에 확인합니다.
 
 ```yaml
 # 개발 미리보기. 장기 사용 시 검토한 commit SHA로 고정합니다.
@@ -68,6 +70,8 @@ Ubuntu runner, Java 17 이상, Python 3, Bash를 준비합니다. 아래 예제�
     report: build/reqover-report.json
     cli-jar: .reqover-tool/reqover-cli/build/libs/reqover-cli-0.2.0.jar
     comment: "false"
+    upload-artifact: "true"
+    artifact-name: reqover-${{ github.job }}-${{ strategy.job-index || 'single' }}
 ```
 
 `.reqover-tool`은 도구를 빌드하려고 별도로 받은 폴더입니다. **우리 앱을 처음
@@ -84,14 +88,16 @@ Reqover 저장소 자체에서는 로컬 Action과 로컬 CLI를 바로 쓰며,
 ## 어떤 결과가 남나
 
 GitHub Actions 실행의 Summary에 관련 API와 관측되지 않은 변경 파일을 보여줍니다.
-Artifacts에는 `report.html`, `impact.md`, `impact.json` 세 파일만 7일간 저장합니다.
+업로드는 기본적으로 끄고 명시적으로 켭니다. 켰을 때 Artifacts에는
+`report.html`, `impact.md`, `impact.json` 세 파일만 7일간 저장합니다.
 워크스페이스 전체를 묶거나 원본 JSON을 그대로 올리지 않습니다.
 다운로드한 `report.html`은 서버 없이 열 수 있습니다.
 
 기본 리포트 경로는 `build/reqover-report.json`입니다. `cli-jar`로 개발 CLI를 지정하고,
 PR이 아닌 push·수동 실행에서는 `base-ref`를 직접 지정합니다. 매트릭스에서는
 `artifact-name`을 각각 다르게 줍니다. 파일 업로드는 `upload-artifact: "false"`로
-끌 수 있습니다.
+끄는 것이 기본값이며 `upload-artifact: "true"`로 켭니다. 같은 job에서 여러 번
+호출한다면 각 호출의 `artifact-name`도 다르게 지정합니다.
 
 매트릭스 작업이라면 PR 댓글은 한 작업에서만 작성해 같은 댓글의 동시 수정을 피합니다.
 

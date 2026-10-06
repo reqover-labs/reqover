@@ -122,6 +122,20 @@ class ImpactActionTest(unittest.TestCase):
         self.assertLess(action.index("name: Upload diagnostic artifacts"), action.index("name: Apply the optional impact gate"))
         self.assertIn("continue-on-error: true", action, "a read-only token must not discard successful analysis")
 
+    def test_artifact_upload_is_opt_in_to_avoid_same_run_name_collisions(self):
+        action = (ROOT / ".github/actions/impact/action.yml").read_text(encoding="utf-8")
+        section = action.split("  upload-artifact:\n", 1)[1].split("  artifact-name:\n", 1)[0]
+        self.assertIn('default: "false"', section)
+
+    def test_shallow_checkout_fails_before_fetching_base_history(self):
+        self.git("remote", "add", "origin", (self.repo / "unreachable-origin.git").as_posix())
+        (self.repo / ".git/shallow").write_text(self.git("rev-parse", "HEAD").stdout.strip() + "\n", encoding="utf-8")
+        result = self.run_analysis(BASE_REF="", PR_BASE="main")
+        self.assertNotEqual(0, result.returncode)
+        self.assertIn("fetch-depth: 0", result.stderr)
+        self.assertNotIn("does not appear to be a git repository", result.stderr)
+        self.assertFalse(self.output.exists())
+
 
 if __name__ == "__main__":
     if not CLI.is_file():

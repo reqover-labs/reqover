@@ -65,10 +65,13 @@ Reactive delay completes after subscription, not when its Mono factory returns.
 The store's existing bound/eviction policy still controls which requests are
 available. These are retained-observation statistics, not all traffic or TPS.
 The overview totals stay fixed while a text or status/slow filter narrows the
-list. HTML expands at most the most recent 100 HTTP observations; the JSON has
-all retained units. A detail search is therefore limited to those displayed
-observations. Resolving per-request methods also enlarges JSON exports; capture
-small, explicit package scopes and choose an appropriate store bound.
+list. HTML expands at most the most recent 100 HTTP observations. JSON now exports
+at most the latest 100 detailed observations by default, while endpoint unions and
+the reverse index remain complete. `omittedRequestDetails` reports excluded detail
+records. Offline diagnostics describe the exported detail window; use the live
+HTML's summary export for complete retained timing comparisons. Trusted library
+callers can explicitly use `CoverageReportJson.write(report, limit)` for a larger
+local export or zero details. Keep package/store scopes bounded.
 
 ## Data compatibility and limitations
 

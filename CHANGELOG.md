@@ -4,6 +4,13 @@ All notable changes to Reqover are documented in this file.
 
 ## Unreleased
 
+- PR review corrections: JSON request details default to the latest 100 while
+  preserving full endpoint unions; explicit library limits support trusted local
+  exports. Action artifact upload is now opt-in to avoid matrix/repeated-call
+  collisions. Python/container prerequisites and early shallow-history failure
+  are explicit. Comparison deltas suppress floating-point noise; unfinished
+  records, URI path validation and exported icon notices are corrected.
+
 - Patch known dependency vulnerabilities by aligning Jackson to 2.21.7 and
   embedded Tomcat core/EL/WebSocket to 10.1.60 in the MVC sample and starter
   tests. Regenerate the complete SBOM. Keep the OSV blocking policy unchanged.

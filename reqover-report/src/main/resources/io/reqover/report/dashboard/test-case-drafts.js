@@ -42,7 +42,7 @@
     if (!path.startsWith('/') || path.startsWith('//')) { return false; }
     var decoded;
     try { decoded = decodeURIComponent(path); } catch (_) { return false; }
-    return !decoded.startsWith('//') && !/[\s\\?#{}*<>"\[\]^`\u0000-\u001f\u007f]/.test(decoded)
+    return !decoded.startsWith('//') && !/[\s\\?#{}*<>"\[\]^`|\u0000-\u001f\u007f]/.test(decoded)
       && !decoded.split('/').some(function (segment) { return segment === '.' || segment === '..'; });
   }
 

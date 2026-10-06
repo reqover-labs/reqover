@@ -83,7 +83,7 @@ final class RequestDiagnosticsHtmlRenderer {
                 + "It excludes unobserved traffic and is not client response time, CPU time, or TPS. "
                 + "Unfinished or negative intervals are not timed. Overview totals stay fixed while filtering.</p></details>");
         html.append(DiagnosticDashboard.workspace());
-        html.append("<h3 class=\"endpoint-priority\">Endpoint priority <span class=\"graph-legend\">Retained cumulative time</span></h3>");
+        html.append("<h3 class=\"endpoint-priority\">Observed impact <span class=\"graph-legend\">Average recorded interval &times; timed call count</span></h3>");
 
         Map<String, List<RequestObservation>> byEndpoint = new TreeMap<>();
         for (RequestObservation request : requests) {

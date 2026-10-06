@@ -47,6 +47,10 @@ Prerequisites: Ubuntu runner, Java 17+ (21 for the example), Python 3, Bash,
 and `actions/checkout` with `fetch-depth: 0`. The example belongs after recording
 and Java setup in your existing `pull_request` workflow:
 
+Container jobs such as `container: eclipse-temurin` do not necessarily include
+Python. Install Python 3 in the container before the Action. The script checks
+that prerequisite and shallow history before downloading the CLI or fetching a base.
+
 ```yaml
 # Unreleased preview. For a long-lived workflow, pin a reviewed commit SHA.
 - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
@@ -66,6 +70,8 @@ and Java setup in your existing `pull_request` workflow:
     report: build/reqover-report.json
     cli-jar: .reqover-tool/reqover-cli/build/libs/reqover-cli-0.2.0.jar
     comment: "false"
+    upload-artifact: "true"
+    artifact-name: reqover-${{ github.job }}-${{ strategy.job-index || 'single' }}
 ```
 
 The first checkout of **your application repository** still needs
@@ -81,7 +87,7 @@ are visible warnings and do not erase successful analysis. Do not use
 
 ## Outputs and defaults
 
-The job summary contains the impact Markdown. A seven-day artifact contains only
+The job summary contains the impact Markdown. Upload is opt-in. When enabled, a seven-day artifact contains only
 `report.html`, `impact.md`, and `impact.json`; it does not glob your workspace or
 copy the original report JSON. Download and open `report.html` locally.
 
@@ -92,7 +98,7 @@ copy the original report JSON. Download and open `report.html` locally.
 | `version` | `0.2.0` | Release CLI fallback, not the preview |
 | `base-ref` | PR base | Explicit Git ref required on push/manual runs |
 | `comment` | `true` | Update only the marked Reqover bot comment |
-| `upload-artifact` | `true` | Save the three named output files |
+| `upload-artifact` | `false` | Opt in to save the three named output files |
 | `artifact-name` | `reqover-report` | Use distinct names in a matrix |
 | `fail-on-impact` | `false` | Optional gate, applied after publishing evidence |
 
@@ -103,6 +109,8 @@ temporary output directory. The original `markdown` and `has-impact` remain.
 
 For matrix jobs, publish the PR comment from one job only to avoid competing
 updates to the same comment.
+Set distinct artifact names for repeated invocations in one job as well; fixed
+names are never uploaded unless the caller explicitly opts in.
 
 `fail-on-impact` fails when **observed APIs executed changed code**, not when a
 test fails. Leave it off for ordinary review. Zero candidates and unmatched files

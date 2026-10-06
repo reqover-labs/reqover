@@ -1,6 +1,15 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+if [ "$(git rev-parse --is-shallow-repository)" = "true" ]; then
+    echo "::error::Reqover needs full checkout history. Set actions/checkout fetch-depth: 0 before this Action." >&2
+    exit 1
+fi
+if ! command -v "${REQOVER_PYTHON:-python3}" > /dev/null 2>&1; then
+    echo "::error::Python 3 is required; install python3 in the job/container before using this Action." >&2
+    exit 1
+fi
+
 if [ ! -s "${REPORT}" ]; then
     echo "::error::Record a Reqover JSON report before this Action; no readable data at ${REPORT}" >&2
     exit 1

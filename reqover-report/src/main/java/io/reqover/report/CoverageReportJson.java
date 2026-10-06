@@ -3,10 +3,13 @@ package io.reqover.report;
 import java.time.Instant;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 /**
  * Reads and writes {@link CoverageReport} as JSON.
@@ -24,11 +27,27 @@ import java.util.Set;
 public final class CoverageReportJson {
     /** Version of the document shape, raised when a field changes meaning. */
     public static final int SCHEMA_VERSION = 1;
+    public static final int DEFAULT_REQUEST_DETAILS_LIMIT = 100;
 
     private CoverageReportJson() {
     }
 
     public static String write(CoverageReport report) {
+        return write(report, DEFAULT_REQUEST_DETAILS_LIMIT);
+    }
+
+    /** Explicit larger exports are for trusted local recordings, not the default HTTP response. */
+    public static String write(CoverageReport report, int requestDetailsLimit) {
+        if (requestDetailsLimit < 0) {
+            throw new IllegalArgumentException("requestDetailsLimit must not be negative");
+        }
+        Comparator<RequestObservation> newest = Comparator.comparing(RequestObservation::startedAt).reversed()
+                .thenComparing(RequestObservation::requestId);
+        Set<Integer> selected = IntStream.range(0, report.requests().size()).boxed()
+                .sorted((a, b) -> newest.compare(report.requests().get(a), report.requests().get(b)))
+                .limit(requestDetailsLimit).collect(Collectors.toSet());
+        List<RequestObservation> details = IntStream.range(0, report.requests().size())
+                .filter(selected::contains).mapToObj(report.requests()::get).toList();
         StringBuilder out = new StringBuilder(4096);
         out.append("{\n");
         out.append("  \"schemaVersion\": ").append(SCHEMA_VERSION).append(",\n");
@@ -44,8 +63,9 @@ public final class CoverageReportJson {
         out.append("  \"reverseIndex\": [");
         writeJoined(out, report.reverseIndex(), 2, (item, indent) -> writeReverseEntry(out, item, indent));
         out.append("],\n");
+        out.append("  \"omittedRequestDetails\": ").append(report.requests().size() - details.size()).append(",\n");
         out.append("  \"requests\": [");
-        writeJoined(out, report.requests(), 2, (item, indent) -> writeRequest(out, item, indent));
+        writeJoined(out, details, 2, (item, indent) -> writeRequest(out, item, indent));
         out.append("]\n");
 
         out.append("}\n");

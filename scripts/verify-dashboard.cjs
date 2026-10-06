@@ -187,6 +187,9 @@ const { chromium } = require('playwright');
     const download = await downloadPromise;
     assert.equal(download.suggestedFilename(), 'reqover-report.html');
     await download.saveAs(path.join(out, 'downloaded-report.html'));
+    const downloaded = fs.readFileSync(path.join(out, 'downloaded-report.html'), 'utf8');
+    const iconLicense = fs.readFileSync(path.resolve(__dirname, '../reqover-report/src/main/resources/io/reqover/report/dashboard/icons/LICENSE'), 'utf8').replace(/--/g, '- -');
+    assert(downloaded.includes(iconLicense), 'Downloaded HTML must include the full Lucide/Feather notices');
 
     await page.locator('.dashboard-link[href="#request-overview"]').click();
     await page.locator('#request-overview').waitFor({ state: 'visible' });

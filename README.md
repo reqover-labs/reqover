@@ -77,6 +77,11 @@ request details. These are adapter observations, not method spans, CPU usage,
 network response times or whole-service TPS. JSON details default to the newest
 100 units; endpoint unions and reverse lookup still cover all retained units.
 
+The [offline dashboard and CI guide](docs/26_dashboard_and_ci.md) adds animated
+request/code associations, a retest map and downloadable evidence. Animation is
+illustrative, not measured call order. The updated Action requires full Git
+history and Python 3; artifact upload is opt-in with distinct names per job.
+
 ## Three things the report shows
 
 ### 1. Execution paths split per API

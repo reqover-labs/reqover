@@ -15,7 +15,7 @@ final class RequestDiagnosticsHtmlRenderer {
             .report-nav a { color: var(--ink-2); text-decoration: none; font-size: 13px; }
             .report-nav a:hover { color: var(--verb-get); text-decoration: underline; }
             .diagnostics-title { margin: 0 0 20px; font-size: 20px; letter-spacing: 0; }
-            .metrics { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 20px; padding-bottom: 22px; border-bottom: 1px solid var(--rule); }
+            .metrics { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 20px; padding-bottom: 22px; border-bottom: 1px solid var(--rule); }
             .metric-label { color: var(--ink-2); font-size: 12px; display: block; }
             .metric-value { font-size: 25px; font-weight: 650; font-variant-numeric: tabular-nums; display: block; margin: 6px 0; overflow-wrap: anywhere; }
             .metric-detail { color: var(--ink-3); font-size: 11px; }
@@ -61,16 +61,11 @@ final class RequestDiagnosticsHtmlRenderer {
     static String render(CoverageReport report) {
         List<RequestObservation> requests = report.requests().stream().filter(RequestObservation::isHttp).toList();
         StringBuilder html = new StringBuilder();
-        html.append("<nav class=\"report-nav\" aria-label=\"Report sections\"><a href=\"#request-overview\">Overview</a>");
-        if (!requests.isEmpty()) {
-            html.append("<a href=\"#request-list\">Requests</a>");
-        }
-        html.append("<a href=\"#endpoint-code\">API to code</a>"
-                + "<a href=\"#code-endpoint\">Code to API</a></nav>");
         html.append("<section class=\"section\" id=\"request-overview\"><h2 class=\"diagnostics-title\">Request diagnostics</h2>");
         if (requests.isEmpty()) {
             html.append("<p class=\"section-note\">No per-request diagnostics. Older reports contain endpoint unions only; "
-                    + "a new recording supplies individual timing and status.</p></section>");
+                    + "a new recording supplies individual timing and status.</p>")
+                    .append(DiagnosticDashboard.workspace()).append("</section>");
             return html.toString();
         }
 
@@ -82,9 +77,13 @@ final class RequestDiagnosticsHtmlRenderer {
         metric(html, "Average", time(summary.averageMillis()), summary.timedRequestCount() + " timed samples", false);
         metric(html, "p95", time(summary.p95Millis()), "Nearest-rank over timed samples", false);
         metric(html, "Maximum", time(summary.maximumMillis()), summary.unknownStatusCount() + " unknown statuses", false);
-        html.append("</div><p class=\"section-note\">Observed processing time is the server adapter's recorded wall-clock interval. "
+        metric(html, "Shared methods", Long.toString(report.reverseIndex().stream().filter(code -> code.endpoints().size() > 1).count()),
+                "Observed in 2+ endpoints", false);
+        html.append("</div><details class=\"measurement-note\"><summary>Measurement scope</summary><p>Observed processing time is the server adapter's recorded wall-clock interval. "
                 + "It excludes unobserved traffic and is not client response time, CPU time, or TPS. "
-                + "Unfinished or negative intervals are not timed. Overview totals stay fixed while filtering.</p>");
+                + "Unfinished or negative intervals are not timed. Overview totals stay fixed while filtering.</p></details>");
+        html.append(DiagnosticDashboard.workspace());
+        html.append("<h3 class=\"endpoint-priority\">Observed impact <span class=\"graph-legend\">Average recorded interval &times; timed call count</span></h3>");
 
         Map<String, List<RequestObservation>> byEndpoint = new TreeMap<>();
         for (RequestObservation request : requests) {

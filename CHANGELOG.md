@@ -34,6 +34,11 @@ All notable changes to Reqover are documented in this file.
 
 ### Changed
 
+- **Impact Action artifact upload is opt-in.** `upload-artifact` defaults to
+  `false` to avoid fixed-name collisions in matrix or repeated invocations.
+  Explicit uploads must use distinct names. The Action requires Python 3 and
+  fails early on shallow history, before any base fetch or CLI download.
+
 - **`accessors=record` agent option.** Skipping trivial accessors hides a class
   made only of them, such as a request DTO record, from impact analysis.
   Recording for CI can keep them; the default is unchanged.
@@ -65,6 +70,11 @@ All notable changes to Reqover are documented in this file.
   it does not cover. See [docs/15_performance_results.md](docs/15_performance_results.md).
 
 ### Added
+
+- **Offline diagnostic dashboard and CI artifacts.** Animated observed
+  associations and retest candidates preserve the table fallback; downloadable
+  HTML includes icon notices. The Action can render HTML, expose impact outputs
+  and retain evidence before an optional impact gate.
 
 - **Retained request diagnostics.** HTTP status counts, average/p95/maximum
   adapter-observed intervals and per-request method sets are available in the

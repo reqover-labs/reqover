@@ -196,7 +196,7 @@ public final class HtmlCoverageReportRenderer {
                       margin: 0 0 4px;
                       font-size: 12px;
                       font-weight: 650;
-                      letter-spacing: 0.06em;
+                      letter-spacing: 0;
                       text-transform: uppercase;
                       color: var(--ink-3);
                     }
@@ -236,7 +236,7 @@ public final class HtmlCoverageReportRenderer {
                       text-align: left;
                       font-size: 11px;
                       font-weight: 650;
-                      letter-spacing: 0.06em;
+                      letter-spacing: 0;
                       text-transform: uppercase;
                       color: var(--ink-3);
                       border-bottom: 1px solid var(--rule-strong);
@@ -263,7 +263,7 @@ public final class HtmlCoverageReportRenderer {
                       margin-top: 4px;
                       font-size: 11px;
                       font-weight: 650;
-                      letter-spacing: 0.04em;
+                      letter-spacing: 0;
                       text-transform: uppercase;
                       color: var(--ink-2);
                     }
@@ -331,12 +331,15 @@ public final class HtmlCoverageReportRenderer {
                   </style>
                 </head>
                 <body>
+                """);
+        html.append(DiagnosticDashboard.navigation(report.requests().stream().anyMatch(RequestObservation::isHttp)));
+        html.append("""
                 <header class="topbar">
                   <div class="wrap">
-                    <span class="wordmark">Reqover</span>
-                    <span class="doctype">coverage report</span>
+                    <span class="wordmark" id="reqover-view-title">Validation overview</span>
+                    <span class="doctype">Recorded data</span>
                 """);
-        html.insert(html.indexOf("</style>"), RequestDiagnosticsHtmlRenderer.STYLES);
+        html.insert(html.indexOf("</style>"), RequestDiagnosticsHtmlRenderer.STYLES + DiagnosticDashboard.styles());
         html.append("    <span class=\"stamp\">")
                 .append(escape(report.generatedAt().toString()))
                 .append("</span>\n");
@@ -362,7 +365,6 @@ public final class HtmlCoverageReportRenderer {
                   <input type="search" id="reqover-filter" autocomplete="off" spellcheck="false"
                          placeholder="Filter by endpoint, class, or method">
                   <span class="filter-count" id="reqover-filter-count"></span>
-                  <span class="filter-hint">Press <kbd>/</kbd> to focus, <kbd>Esc</kbd> to clear.</span>
                 </div>
                 """);
 
@@ -414,10 +416,12 @@ public final class HtmlCoverageReportRenderer {
                 + "No code matches this filter.</p>\n");
         html.append("</section>\n");
 
+        html.append(DiagnosticDashboard.artifacts(report));
         html.append("<footer>Reqover records method-entry hits per observed request. "
                 + "It reports what ran, not line or branch coverage.</footer>\n");
         html.append("</main>\n");
         html.append(FILTER_SCRIPT);
+        html.append(DiagnosticDashboard.script(report));
         html.append("</body></html>\n");
         return html.toString();
     }

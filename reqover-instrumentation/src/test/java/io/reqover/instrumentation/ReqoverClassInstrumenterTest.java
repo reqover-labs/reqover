@@ -67,6 +67,60 @@ class ReqoverClassInstrumenterTest {
     }
 
     @Test
+    void recordsInterfaceCallsAndEnumConstantsAgainstTheReferencedClass() throws Exception {
+        String lookup = ReferenceTarget.Lookup.class.getName();
+        String area = ReferenceTarget.Area.class.getName();
+        InstrumentationResult result = new ReqoverClassInstrumenter(true, name -> name.startsWith("io.reqover.instrumentation."))
+                .instrument(classBytes(ReferenceTarget.class));
+        ProbeRegistry.registerAll(result.metadata());
+
+        Class<?> instrumented = new SingleClassLoader(ReferenceTarget.class.getName(), result.bytecode())
+                .loadClass(ReferenceTarget.class.getName());
+        Object target = instrumented.getDeclaredConstructor().newInstance();
+        ReferenceTarget.Lookup stub = key -> key;
+        instrumented.getMethod("area", ReferenceTarget.Lookup.class).invoke(target, stub);
+
+        ProbeMetadata find = reference(result, lookup, "find");
+        ProbeMetadata parking = reference(result, area, "PARKING");
+        assertEquals(StableClassId.of(lookup), find.classId());
+        assertTrue(find.probeId() >= ReferenceProbes.FIRST_PROBE_ID);
+        assertTrue(ReqoverProbe.globalSnapshot().hasHit(find.classId(), find.probeId()));
+        assertTrue(ReqoverProbe.globalSnapshot().hasHit(parking.classId(), parking.probeId()));
+        assertTrue(result.metadata().stream().noneMatch(m -> m.methodName().contains("$SwitchMap")),
+                "compiler-made switch maps are not references");
+    }
+
+    @Test
+    void recordsReferencesInsideLambdas() throws Exception {
+        InstrumentationResult result = new ReqoverClassInstrumenter(true, name -> name.startsWith("io.reqover.instrumentation."))
+                .instrument(classBytes(ReferenceTarget.class));
+        ProbeRegistry.registerAll(result.metadata());
+
+        Class<?> instrumented = new SingleClassLoader(ReferenceTarget.class.getName(), result.bytecode())
+                .loadClass(ReferenceTarget.class.getName());
+        Object target = instrumented.getDeclaredConstructor().newInstance();
+        ReferenceTarget.Lookup stub = key -> key;
+        instrumented.getMethod("inLambda", ReferenceTarget.Lookup.class).invoke(target, stub);
+
+        ProbeMetadata find = reference(result, ReferenceTarget.Lookup.class.getName(), "find");
+        assertTrue(ReqoverProbe.globalSnapshot().hasHit(find.classId(), find.probeId()));
+    }
+
+    @Test
+    void recordsNoReferencesUnlessAskedTo() throws Exception {
+        InstrumentationResult result = new ReqoverClassInstrumenter().instrument(classBytes(ReferenceTarget.class));
+
+        assertTrue(result.metadata().stream().allMatch(m -> m.className().equals(ReferenceTarget.class.getName())));
+    }
+
+    private static ProbeMetadata reference(InstrumentationResult result, String className, String member) {
+        return result.metadata().stream()
+                .filter(m -> m.className().equals(className) && m.methodName().equals(member))
+                .findFirst()
+                .orElseThrow(() -> new AssertionError("no reference probe for " + className + "#" + member));
+    }
+
+    @Test
     void instrumentsAccessorsWhenAskedTo() throws Exception {
         InstrumentationResult result = new ReqoverClassInstrumenter(false).instrument(classBytes(RecordTarget.class));
 

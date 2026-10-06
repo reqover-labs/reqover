@@ -387,6 +387,16 @@ include=com.example,accessors=record
 
 On a 167-test Spring Boot service this cut the changed source files that impact analysis could not match from 33 to 21 across its last 12 commits, and tripled the reverse index. Use `accessors=skip` (the default) for a report people read.
 
+### `references`: tie interfaces and enum constants to endpoints
+
+A Spring Data repository or another application interface has no method body that runs, and reading an enum constant runs nothing in the enum's file. Without help, a change to `OrderRepository.java` or `OrderStatus.java` maps to no endpoint. `references=record` adds a probe at each call to an included interface and each read of an included class's static field, and attributes it to the referenced class:
+
+```text
+include=com.example,accessors=record,references=record
+```
+
+With both options the service above went from 21 to 18 unmatched files, and what remained was Swagger-only `*Docs` interfaces, startup initializers, and one enum read only through reflection (a JPA column type). A type that is only ever touched by reflection, and a compile-time constant (`static final` primitive or `String`, which `javac` inlines), still map to nothing. Off by default, because a widely used enum then appears under every endpoint.
+
 ---
 
 ## 5. Check that it worked
@@ -414,7 +424,7 @@ The most common failure is **"the report is empty"**, and the cause is usually `
 | `[reqover] no include configured` | You didn't pass `include=` | Add `include=your.package`. In this state nothing is instrumented, by design |
 | `[reqover] no valid include configured` | You passed `include` but the value was empty | Check there is a value after `include=`, and that you didn't mix up the comma and semicolon |
 | `[reqover] ignoring malformed agent option` | Not in `key=value` form | Make sure you included the `=`, as in `include=com.example` |
-| `[reqover] ignoring unknown agent option` | A key other than `include`/`exclude`/`accessors` | Check for typos — `includes` and `packages` are not recognized |
+| `[reqover] ignoring unknown agent option` | A key other than `include`/`exclude`/`accessors`/`references` | Check for typos — `includes` and `packages` are not recognized |
 | Endpoints appear but the class list is empty | `include` doesn't match your classes | Confirm you passed a **package prefix** rather than a class, and that it isn't caught by a default exclude such as `org.springframework.` |
 | `/reqover/report` returns 404 | **The endpoint is disabled by default** | Set `reqover.report.endpoint.enabled=true`, or write your own controller. This is the expected out-of-the-box behaviour |
 | Endpoint enabled but still 404 | No adapter is active, so there is no `CoverageStore` and no report service | Confirm the application is a web application and that you didn't set `reqover.mvc.enabled=false` / `reqover.webflux.enabled=false` |

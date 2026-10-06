@@ -11,6 +11,7 @@ import org.objectweb.asm.Opcodes;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import java.util.function.Predicate;
 
 public final class ReqoverClassInstrumenter {
     private static final String PROBE_OWNER = "io/reqover/core/ReqoverProbe";
@@ -18,6 +19,7 @@ public final class ReqoverClassInstrumenter {
     private static final String PROBE_DESCRIPTOR = "(II)V";
 
     private final boolean skipTrivialAccessors;
+    private final ReferenceProbes references;
 
     public ReqoverClassInstrumenter() {
         this(true);
@@ -25,7 +27,17 @@ public final class ReqoverClassInstrumenter {
 
     /** {@code skipTrivialAccessors=false} instruments getters, setters and builder methods too. */
     public ReqoverClassInstrumenter(boolean skipTrivialAccessors) {
+        this(skipTrivialAccessors, null);
+    }
+
+    /**
+     * @param referenceTargets when not null, calls to interface methods and reads
+     *                         of static fields of classes it accepts (dotted names)
+     *                         are recorded against those classes; see {@link ReferenceProbes}
+     */
+    public ReqoverClassInstrumenter(boolean skipTrivialAccessors, Predicate<String> referenceTargets) {
         this.skipTrivialAccessors = skipTrivialAccessors;
+        this.references = referenceTargets == null ? null : new ReferenceProbes(referenceTargets);
     }
 
     public InstrumentationResult instrument(byte[] originalBytecode) {
@@ -33,9 +45,10 @@ public final class ReqoverClassInstrumenter {
         ClassWriter writer = new ClassWriter(reader, ClassWriter.COMPUTE_MAXS);
         List<ProbeMetadata> metadata = new ArrayList<>();
         Set<String> trivialAccessors = skipTrivialAccessors ? TrivialAccessorScanner.scan(reader) : Set.of();
-        reader.accept(new ReqoverClassVisitor(writer, metadata, trivialAccessors), 0);
+        ReqoverClassVisitor visitor = new ReqoverClassVisitor(writer, metadata, trivialAccessors, references);
+        reader.accept(visitor, 0);
 
-        if (metadata.isEmpty()) {
+        if (metadata.isEmpty() && !visitor.referencesRecorded) {
             return new InstrumentationResult(originalBytecode, List.of(), false);
         }
         return new InstrumentationResult(writer.toByteArray(), metadata, true);
@@ -44,6 +57,8 @@ public final class ReqoverClassInstrumenter {
     private static final class ReqoverClassVisitor extends ClassVisitor {
         private final List<ProbeMetadata> metadata;
         private final Set<String> trivialAccessors;
+        private final ReferenceProbes references;
+        private boolean referencesRecorded;
         private String className;
         private int classId;
         private boolean instrumentableClass;
@@ -52,11 +67,13 @@ public final class ReqoverClassInstrumenter {
         private ReqoverClassVisitor(
                 ClassVisitor delegate,
                 List<ProbeMetadata> metadata,
-                Set<String> trivialAccessors
+                Set<String> trivialAccessors,
+                ReferenceProbes references
         ) {
             super(Opcodes.ASM9, delegate);
             this.metadata = metadata;
             this.trivialAccessors = trivialAccessors;
+            this.references = references;
         }
 
         @Override
@@ -83,6 +100,12 @@ public final class ReqoverClassInstrumenter {
                 String[] exceptions
         ) {
             MethodVisitor methodVisitor = super.visitMethod(access, name, descriptor, signature, exceptions);
+            if (references != null && instrumentableClass && !"<clinit>".equals(name)
+                    && (access & (Opcodes.ACC_ABSTRACT | Opcodes.ACC_NATIVE)) == 0) {
+                // Lambdas and constructors too: a repository call inside a stream
+                // or an enum default in a field initializer is still a use.
+                methodVisitor = new ReferenceMethodVisitor(methodVisitor);
+            }
             if (!instrumentableClass
                     || !instrumentableMethod(access, name)
                     || trivialAccessors.contains(TrivialAccessorScanner.key(name, descriptor))) {
@@ -91,6 +114,38 @@ public final class ReqoverClassInstrumenter {
 
             int probeId = nextProbeId++;
             return new ProbeMethodVisitor(methodVisitor, metadata, classId, probeId, className, name, descriptor);
+        }
+
+        private final class ReferenceMethodVisitor extends MethodVisitor {
+            private ReferenceMethodVisitor(MethodVisitor delegate) {
+                super(Opcodes.ASM9, delegate);
+            }
+
+            @Override
+            public void visitMethodInsn(int opcode, String owner, String name, String descriptor, boolean isInterface) {
+                if (opcode == Opcodes.INVOKEINTERFACE && references.isTarget(owner)) {
+                    probe(owner, name, descriptor);
+                }
+                super.visitMethodInsn(opcode, owner, name, descriptor, isInterface);
+            }
+
+            @Override
+            public void visitFieldInsn(int opcode, String owner, String name, String descriptor) {
+                // '$' skips compiler-made fields such as an enum switch's $SwitchMap$.
+                if (opcode == Opcodes.GETSTATIC && name.indexOf('$') < 0
+                        && !owner.equals(className.replace('.', '/')) && references.isTarget(owner)) {
+                    probe(owner, name, descriptor);
+                }
+                super.visitFieldInsn(opcode, owner, name, descriptor);
+            }
+
+            private void probe(String owner, String name, String descriptor) {
+                int probeId = references.probeId(owner, name, descriptor, metadata);
+                referencesRecorded = true;
+                super.visitLdcInsn(StableClassId.of(owner.replace('/', '.')));
+                super.visitLdcInsn(probeId);
+                super.visitMethodInsn(Opcodes.INVOKESTATIC, PROBE_OWNER, PROBE_METHOD, PROBE_DESCRIPTOR, false);
+            }
         }
 
         private static boolean instrumentableMethod(int access, String name) {

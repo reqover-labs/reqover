@@ -417,6 +417,7 @@ public final class HtmlCoverageReportRenderer {
         html.append("</section>\n");
 
         html.append(DiagnosticDashboard.artifacts(report));
+        html.append(TestCaseDraftHtmlRenderer.render(report.requests().stream().anyMatch(RequestObservation::isHttp)));
         html.append("<footer>Reqover records method-entry hits per observed request. "
                 + "It reports what ran, not line or branch coverage.</footer>\n");
         html.append("</main>\n");

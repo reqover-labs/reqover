@@ -71,6 +71,11 @@ All notable changes to Reqover are documented in this file.
 
 ### Added
 
+- **Reviewed test drafts.** Selected observations can produce JSON drafts and
+  disabled JUnit 5 tests for manually reviewed GET/HEAD requests. No original
+  inputs or faithful replay are assumed. Raw and encoded pipe characters are
+  rejected before URI generation, with actual Java compilation coverage.
+
 - **Offline diagnostic dashboard and CI artifacts.** Animated observed
   associations and retest candidates preserve the table fallback; downloadable
   HTML includes icon notices. The Action can render HTML, expose impact outputs

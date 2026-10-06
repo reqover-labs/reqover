@@ -27,6 +27,13 @@ script takes its initial HTML snapshot.
 
 ## Verification
 
+Test drafts accept concrete GET/HEAD paths only after manual review. Raw or
+encoded pipes are invalid URI paths and are rejected before JUnit generation.
+Observed failures are not automatically copied into expected assertions.
+Generated tests are disabled by default and require an explicitly selected
+local/QA target. `scripts/test-case-drafts.test.cjs` compiles generated Java,
+including hostile metadata, and checks path validation.
+
 `scripts/test-impact-action.py` covers metadata, outputs, gates, malformed input
 and shallow clones with unreachable origins. `scripts/verify-dashboard.cjs`
 covers animation pixels, selection, filters, license-preserving download,

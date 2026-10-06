@@ -76,6 +76,10 @@
   }
   function inspectRequest(r) {
     heading('RECORDED REQUEST', r.endpoint);
+    var draft = el('button', 'case-command draft-action'); draft.type = 'button';
+    draft.append(document.getElementById('reqover-draft-icon').content.cloneNode(true), el('span', '', 'Create test draft'));
+    draft.addEventListener('click', function () { createDraft(r); });
+    inspector.append(draft);
     fields([['Request', r.requestId], ['Status', status(r)], ['Interval', time(r.duration)],
       ['Methods', String(codeOf(r).length)], ['Threads', r.threadNames.join(', ') || 'Not recorded'],
       ['Started', r.startedAt], ['Inputs', 'Not collected'], ['Exceptions', 'Not collected']]);
@@ -239,7 +243,7 @@
     document.getElementById('reqover-queue-count').textContent = issues.length + ' flagged in latest ' + requests.length + ' · ' + sharedMatches.length + ' shared methods';
   }
   function showView(id) {
-    var allowed = ['request-overview', 'request-list', 'endpoint-code', 'code-endpoint', 'ci-report'];
+    var allowed = ['request-overview', 'request-list', 'endpoint-code', 'code-endpoint', 'ci-report', 'test-case-drafts'];
     if (!allowed.includes(id) || !document.getElementById(id)) { id = 'request-overview'; }
     document.querySelectorAll('main > section.section').forEach(function (section) { section.hidden = section.id !== id; });
     document.querySelectorAll('.dashboard-link').forEach(function (a) {
@@ -247,9 +251,9 @@
     });
     document.getElementById('reqover-view-title').textContent = {
       'request-overview': 'Validation overview', 'request-list': 'Observed requests',
-      'endpoint-code': 'API to code', 'code-endpoint': 'Retest candidates', 'ci-report': 'CI artifacts'
+      'endpoint-code': 'API to code', 'code-endpoint': 'Retest candidates', 'ci-report': 'CI artifacts', 'test-case-drafts': 'Test drafts'
     }[id];
-    document.getElementById('reqover-filter-box').hidden = id === 'ci-report';
+    document.getElementById('reqover-filter-box').hidden = id === 'ci-report' || id === 'test-case-drafts';
     if (id === 'request-overview') { requestAnimationFrame(fit); }
   }
   function setAnimation(playing) {
@@ -261,6 +265,19 @@
     animation.disabled = motion.matches;
     animation.replaceChildren(document.getElementById(playing ? 'reqover-pause-icon' : 'reqover-play-icon').content.cloneNode(true));
   }
+
+  function createDraft(request) {
+    window.ReqoverCaseEditor.create(request);
+    window.location.hash = 'test-case-drafts';
+    showView('test-case-drafts');
+  }
+
+  details.forEach(function (detail, index) {
+    var action = el('button', 'case-command'); action.type = 'button';
+    action.append(document.getElementById('reqover-draft-icon').content.cloneNode(true), el('span', '', 'Create test draft'));
+    action.addEventListener('click', function () { createDraft(requests[index]); });
+    detail.querySelector('.request-code').append(action);
+  });
 
   document.querySelectorAll('[data-map-mode]').forEach(function (button) {
     button.addEventListener('click', function () { choose(button.dataset.mapMode, button.dataset.mapMode === 'request' ? selectedRequest : selectedCode); });

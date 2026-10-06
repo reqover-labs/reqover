@@ -23,6 +23,48 @@ const { chromium } = require('playwright');
     assert(requestCount >= 5, 'Record success, 400, 503, delay, and shared code for this check');
     await page.screenshot({ path: path.join(out, 'reqover-request-diagnostics.png') });
 
+    await page.getByRole('button', { name: 'Create test draft', exact: true }).filter({ visible: true }).first().click();
+    await page.locator('#test-case-drafts').waitFor({ state: 'visible' });
+    assert.equal(await page.locator('#reqover-case-expected-status').inputValue(), '', 'Observed failure must not become the expectation');
+    assert.equal(await page.locator('#reqover-case-path').inputValue(), '');
+    assert.equal(await page.locator('#reqover-case-max-ms').inputValue(), '');
+    assert(await page.locator('#reqover-case-junit').isDisabled());
+    await page.locator('#reqover-case-path').fill('/orders/{id}');
+    await page.locator('#reqover-case-expected-status').fill('200');
+    await page.locator('#reqover-case-reviewed').check();
+    assert(await page.locator('#reqover-case-junit').isDisabled(), 'Unresolved route cannot generate an executable draft');
+    await page.locator('#reqover-case-path').fill('/auto/diagnostics/failure');
+    assert(!await page.locator('#reqover-case-reviewed').isChecked(), 'Editing resets prior review');
+    await page.locator('#reqover-case-max-ms').fill('1500');
+    await page.locator('#reqover-case-reviewed').check();
+    assert(!await page.locator('#reqover-case-junit').isDisabled());
+    let exportPromise = page.waitForEvent('download');
+    await page.locator('#reqover-case-junit').click();
+    let exported = await exportPromise;
+    assert.equal(exported.suggestedFilename(), 'ReqoverCase1Test.java');
+    await exported.saveAs(path.join(out, 'ReqoverCase1Test.java'));
+    const java = fs.readFileSync(path.join(out, 'ReqoverCase1Test.java'), 'utf8');
+    assert(java.includes('@Disabled(') && java.includes('assertEquals(200, response.statusCode())'));
+    assert(!java.includes('assertEquals(503'));
+    exportPromise = page.waitForEvent('download');
+    await page.locator('#reqover-case-json').click();
+    exported = await exportPromise;
+    await exported.saveAs(path.join(out, 'case.json'));
+    const draft = JSON.parse(fs.readFileSync(path.join(out, 'case.json'), 'utf8'));
+    assert.equal(draft.source.observedStatus, 503);
+    assert.equal(draft.expected.statusCode, 200);
+    assert.equal(draft.replayable, false);
+    assert.equal(draft.kind, 'reqover-http-test-draft');
+    await page.locator('.case-code summary').click();
+    await page.screenshot({ path: path.join(out, 'reqover-test-case-draft.png') });
+    await page.setViewportSize({ width: 390, height: 900 });
+    const caseWidth = await page.evaluate(() => ({ scroll: document.documentElement.scrollWidth, client: document.documentElement.clientWidth }));
+    assert(caseWidth.scroll <= caseWidth.client, 'Draft editor must not overflow mobile');
+    await page.screenshot({ path: path.join(out, 'reqover-test-case-mobile.png') });
+    await page.setViewportSize({ width: 1440, height: 1000 });
+    await page.locator('.dashboard-link[href="#request-overview"]').click();
+    await page.locator('#request-overview').waitFor({ state: 'visible' });
+
     await page.getByRole('button', { name: 'Retest map', exact: true }).click();
     const methodOption = await page.locator('#reqover-map-selection option').evaluateAll(options =>
       options.find(o => o.textContent.includes('SharedValidator#validate'))?.value);
@@ -67,6 +109,14 @@ const { chromium } = require('playwright');
     await page.locator('details.request-detail:visible summary').first().click();
     assert.equal(await page.locator('details.request-detail[open]:visible').count(), 1);
     await page.screenshot({ path: path.join(out, 'reqover-request-detail.png') });
+    await page.locator('details.request-detail[open]:visible').getByRole('button', { name: 'Create test draft', exact: true }).click();
+    await page.locator('#test-case-drafts').waitFor({ state: 'visible' });
+    assert.equal(await page.locator('#reqover-case-list button').count(), 2);
+    assert.equal(await page.locator('#reqover-case-expected-status').inputValue(), '', 'A new draft must not inherit expectations');
+    await page.locator('#reqover-case-list button').first().click();
+    assert.equal(await page.locator('#reqover-case-expected-status').inputValue(), '200');
+    await page.locator('.dashboard-link[href="#request-list"]').click();
+    await page.locator('#request-list').waitFor({ state: 'visible' });
     await page.locator('#reqover-request-mode').selectOption('slow');
     assert(await page.locator('details.request-detail:visible').count() >= 1);
     await page.locator('#reqover-slow-ms').fill('100000');
@@ -114,6 +164,7 @@ const { chromium } = require('playwright');
     await page.goto(pathToFileURL(path.resolve(legacy)).href);
     assert(await page.getByText('No per-request diagnostics.', { exact: false }).isVisible());
     assert.equal(await page.locator('.dashboard-link[href="#request-list"]').count(), 0);
+    assert.equal(await page.locator('.dashboard-link[href="#test-case-drafts"]').count(), 0);
     assert(await page.locator('[data-map-mode="request"]').isDisabled());
     assert.equal(await page.locator('[data-map-mode="retest"]').getAttribute('aria-pressed'), 'true');
     assert.equal(external.length, 0, 'Standalone reports must not request external assets');
@@ -124,10 +175,11 @@ const { chromium } = require('playwright');
     assert(await fallback.locator('#endpoint-code').isVisible());
     assert(await fallback.locator('#request-list').isVisible());
     assert(await fallback.locator('#reqover-workspace').isHidden());
+    assert(await fallback.locator('.dashboard-link[href="#test-case-drafts"]').isHidden());
     console.log(JSON.stringify({ requestCount, failureStatuses: statuses, graphSelection: true,
       animationPixels: true, zoom: true, filters: true, download: true,
       viewports: [1920, 1280, 760, 390], reducedMotion: true, legacy: true,
-      noScriptFallback: true, externalRequests: external.length, pageErrors: errors }));
+      noScriptFallback: true, reviewedTestDrafts: true, externalRequests: external.length, pageErrors: errors }));
   } finally {
     await browser.close();
   }

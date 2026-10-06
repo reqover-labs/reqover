@@ -83,6 +83,10 @@ request/code associations, a retest map and downloadable evidence. Animation is
 illustrative, not measured call order. The updated Action requires full Git
 history and Python 3; artifact upload is opt-in with distinct names per job.
 
+[Reviewed test drafts](docs/27_test_case_drafts.md) turn a selected observation
+into a JSON draft or a disabled JUnit test. Expected results and safe concrete
+GET/HEAD paths require manual review; no original inputs or replay are implied.
+
 ## Three things the report shows
 
 ### 1. Execution paths split per API

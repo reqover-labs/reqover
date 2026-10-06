@@ -17,6 +17,11 @@ All notable changes to Reqover are documented in this file.
   associations and retest candidates preserve the table fallback; downloadable
   HTML includes icon notices. The Action can render HTML, expose impact outputs
   and retain evidence before an optional impact gate.
+- **Reviewed test drafts.** Selected observations can produce JSON drafts and
+  disabled JUnit 5 tests for manually reviewed GET/HEAD requests. No original
+  inputs or faithful replay are assumed. Raw and encoded pipe characters and
+  C0/C1 controls are rejected before URI generation, with actual Java
+  compilation coverage.
 
 ### Changed
 

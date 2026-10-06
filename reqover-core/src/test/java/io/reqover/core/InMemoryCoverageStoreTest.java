@@ -82,4 +82,15 @@ class InMemoryCoverageStoreTest extends CoverageStoreContract {
         assertEquals(1, store.snapshots().size());
         assertEquals(2, store.aggregates().get(0).count());
     }
+
+    @Test
+    void boundsAggregatesByDistinctUnitNames() {
+        InMemoryCoverageStore store = new InMemoryCoverageStore(1);
+        for (int i = 0; i < InMemoryCoverageStore.MAX_AGGREGATES + 50; i++) {
+            store.flush(new CoverageBucket(UnitInfo.httpRequest("req-" + i, "GET", "/orders/" + i)));
+        }
+
+        assertEquals(InMemoryCoverageStore.MAX_AGGREGATES, store.aggregates().size());
+        assertEquals(1, store.snapshots().size());
+    }
 }

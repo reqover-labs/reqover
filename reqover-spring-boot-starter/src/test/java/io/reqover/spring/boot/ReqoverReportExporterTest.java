@@ -1,6 +1,8 @@
 package io.reqover.spring.boot;
 
 import io.reqover.core.CoverageBucket;
+import io.reqover.core.CoverageBucketSnapshot;
+import io.reqover.core.CoverageStore;
 import io.reqover.core.InMemoryCoverageStore;
 import io.reqover.core.ProbeMetadata;
 import io.reqover.core.ProbeRegistry;
@@ -180,5 +182,47 @@ class ReqoverReportExporterTest {
 
     private static String withoutTimestamp(String json) {
         return json.replaceAll("\"generatedAt\": \"[^\"]+\"", "\"generatedAt\": \"<stamp>\"");
+    }
+
+    @Test
+    void countsEveryRequestWhenAStoreWithoutAggregatesIsMerged() throws Exception {
+        Path json = workspace.resolve("report.json");
+        properties.getExport().setJsonPath(json.toString());
+        InMemoryCoverageStore windowed = new InMemoryCoverageStore(1);
+        for (int i = 0; i < 5; i++) {
+            CoverageBucket bucket = new CoverageBucket(UnitInfo.httpRequest("w-" + i, "GET", "/orders/{id}"));
+            bucket.finish(200);
+            windowed.flush(bucket);
+        }
+        CoverageStore windowOnly = new CoverageStore() {
+            private final InMemoryCoverageStore delegate = new InMemoryCoverageStore();
+
+            @Override
+            public void flush(CoverageBucket bucket) {
+                delegate.flush(bucket);
+            }
+
+            @Override
+            public List<CoverageBucketSnapshot> snapshots() {
+                return delegate.snapshots();
+            }
+
+            @Override
+            public void clear() {
+                delegate.clear();
+            }
+        };
+        for (int i = 0; i < 2; i++) {
+            CoverageBucket bucket = new CoverageBucket(UnitInfo.httpRequest("c-" + i, "GET", "/orders/{id}"));
+            bucket.finish(200);
+            windowOnly.flush(bucket);
+        }
+
+        new ReqoverReportExporter(new ReqoverReportService(windowed), properties.getExport()).destroy();
+        new ReqoverReportExporter(new ReqoverReportService(windowOnly), properties.getExport()).destroy();
+
+        CoverageReport report = CoverageReportJson.read(Files.readString(json, StandardCharsets.UTF_8));
+        assertEquals(7, report.completedRequestCount());
+        assertEquals(7, report.endpoints().get(0).requestCount());
     }
 }

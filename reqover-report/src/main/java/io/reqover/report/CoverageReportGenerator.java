@@ -34,8 +34,11 @@ public final class CoverageReportGenerator {
      * Builds the report from a snapshot window plus the store's per-unit
      * aggregates. Which endpoints exist, how often they ran and what they
      * executed come from the aggregates, so an endpoint whose requests were all
-     * evicted still appears. Request ids exist only for retained snapshots.
-     * With no aggregates this is {@link #generate(List)}.
+     * evicted still appears. Request ids exist only for retained snapshots, so
+     * an endpoint's {@code requestIds} can be fewer than its {@code requestCount}.
+     * An aggregate must cover every snapshot of its unit name; a name with no
+     * aggregate is counted from its snapshots. With no aggregates this is
+     * {@link #generate(List)}.
      */
     public CoverageReport generate(List<CoverageBucketSnapshot> snapshots, List<UnitAggregate> aggregates) {
         Map<String, EndpointAccumulator> endpoints = new HashMap<>();
@@ -48,13 +51,19 @@ public final class CoverageReportGenerator {
             endpoint.accept(snapshot);
         }
         long aggregated = 0;
+        Set<String> totalled = new HashSet<>();
         for (UnitAggregate aggregate : aggregates) {
             endpoints.computeIfAbsent(aggregate.unitName(), EndpointAccumulator::new).accept(aggregate);
             aggregated += aggregate.count();
+            totalled.add(aggregate.unitName());
         }
-        int completed = aggregates.isEmpty()
-                ? snapshots.size()
-                : (int) Math.min(Integer.MAX_VALUE, Math.max(aggregated, snapshots.size()));
+        // A name the store did not total is counted from its snapshots alone.
+        for (CoverageBucketSnapshot snapshot : snapshots) {
+            if (!totalled.contains(snapshot.unitInfo().name())) {
+                aggregated++;
+            }
+        }
+        int completed = (int) Math.min(Integer.MAX_VALUE, aggregated);
 
         List<EndpointCoverage> endpointCoverages = endpoints.values().stream()
                 .map(EndpointAccumulator::toCoverage)

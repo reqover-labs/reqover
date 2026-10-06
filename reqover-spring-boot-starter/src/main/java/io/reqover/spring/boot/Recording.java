@@ -11,13 +11,41 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-/** What a store holds at one moment: its snapshot window and its per-unit aggregates. */
+/**
+ * What a store holds at one moment: its snapshot window and its per-unit aggregates.
+ *
+ * <p>A unit name the store did not total (a custom store with no aggregates,
+ * or a name past the in-memory bound) is totalled here from the snapshots, so
+ * that merging two recordings adds every request exactly once.
+ */
 record Recording(List<CoverageBucketSnapshot> snapshots, List<UnitAggregate> aggregates) {
     static final Recording EMPTY = new Recording(List.of(), List.of());
 
     Recording {
         snapshots = List.copyOf(snapshots);
-        aggregates = List.copyOf(aggregates);
+        aggregates = withUntotalledSnapshots(snapshots, aggregates);
+    }
+
+    private static List<UnitAggregate> withUntotalledSnapshots(
+            List<CoverageBucketSnapshot> snapshots,
+            List<UnitAggregate> aggregates
+    ) {
+        Map<String, UnitAggregate> byName = new LinkedHashMap<>();
+        for (UnitAggregate aggregate : aggregates) {
+            byName.put(aggregate.unitName(), aggregate);
+        }
+        Map<String, UnitAggregate> derived = new LinkedHashMap<>();
+        for (CoverageBucketSnapshot snapshot : snapshots) {
+            String name = snapshot.unitInfo().name();
+            if (byName.containsKey(name)) {
+                continue;
+            }
+            UnitAggregate single = new UnitAggregate(name, snapshot.unitInfo().unitType(), 1,
+                    snapshot.hitsByClass(), snapshot.threadNames());
+            derived.merge(name, single, Recording::sum);
+        }
+        byName.putAll(derived);
+        return List.copyOf(byName.values());
     }
 
     /** Both recordings together, with aggregates of the same unit name summed. */

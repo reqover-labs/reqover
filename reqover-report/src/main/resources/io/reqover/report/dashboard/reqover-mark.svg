@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="48" height="48" role="img" aria-label="Reqover">
+  <g fill="none" stroke-linecap="round" stroke-linejoin="round">
+    <!-- methods that were not reached by this request -->
+    <path d="M24 13 H40" stroke="#5B7CFA" stroke-width="4"/>
+    <path d="M24 35 H40" stroke="#5B7CFA" stroke-width="4"/>
+    <!-- the request, and the method it actually executed -->
+    <path d="M6 24 H38" stroke="#F59E0B" stroke-width="4.5"/>
+    <path d="M33 19 L38 24 L33 29" stroke="#F59E0B" stroke-width="4.5"/>
+  </g>
+</svg>

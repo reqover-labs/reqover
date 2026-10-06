@@ -13,6 +13,22 @@ All notable changes to Reqover are documented in this file.
   unions and the reverse index are never truncated. `CoverageReport` gains
   `requests` and `omittedRequestDetails`; its four-argument constructor
   remains, but Java record patterns must adapt.
+- **Offline diagnostic dashboard and CI artifacts.** Animated observed
+  associations and retest candidates preserve the table fallback; downloadable
+  HTML includes icon notices. The Action can render HTML, expose impact outputs
+  and retain evidence before an optional impact gate.
+
+### Changed
+
+- **Impact Action artifact upload is opt-in.** `upload-artifact` defaults to
+  `false` to avoid fixed-name collisions in matrix or repeated invocations.
+  Explicit uploads must use distinct names. The Action requires Python 3 and
+  fails early on shallow history, before any base fetch or CLI download.
+- **The impact comment is marked and updated in place.** The `markdown` output
+  now starts with an HTML comment marker (`<!-- reqover-impact -->`, or
+  `<!-- reqover-impact:NAME -->` with the new `analysis-name` input), and the
+  Action edits its own earlier comment instead of adding one per run. Give
+  each analysis in one pull request its own `analysis-name`.
 
 ## 0.3.0 — 2026-10-06
 

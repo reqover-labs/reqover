@@ -71,6 +71,11 @@ All notable changes to Reqover are documented in this file.
 
 ### Added
 
+- **Retained recording comparison.** Import/export aggregate HTTP summaries
+  without executing requests. Explicit comparability confirmation is required.
+  Arithmetic-only drift is suppressed with an epsilon; missing `endedAt` marks
+  unfinished observations. Truncated detail exports are rejected as baselines.
+
 - **Reviewed test drafts.** Selected observations can produce JSON drafts and
   disabled JUnit 5 tests for manually reviewed GET/HEAD requests. No original
   inputs or faithful replay are assumed. Raw and encoded pipe characters are

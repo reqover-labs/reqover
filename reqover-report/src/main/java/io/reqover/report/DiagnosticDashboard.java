@@ -15,7 +15,7 @@ final class DiagnosticDashboard {
     }
 
     static String styles() {
-        return STYLES + TestCaseDraftHtmlRenderer.styles();
+        return STYLES + TestCaseDraftHtmlRenderer.styles() + RecordingComparisonHtmlRenderer.styles();
     }
 
     static String navigation(boolean hasRequests) {
@@ -30,6 +30,7 @@ final class DiagnosticDashboard {
         }
         nav(out, "endpoint-code", "network", "API to code");
         nav(out, "code-endpoint", "git-pull-request", "Retest candidates");
+        nav(out, "recording-comparison", "git-compare-arrows", "Compare recordings");
         nav(out, "ci-report", "download", "CI artifacts");
         out.append("<div class=\"sidebar-meta\"><span class=\"record-dot\"></span>Recorded snapshot<small>Local / QA / staging</small></div></nav>");
         return out.toString();
@@ -93,21 +94,25 @@ final class DiagnosticDashboard {
         CoverageReport graph = new CoverageReport(report.generatedAt(), report.completedRequestCount(),
                 report.endpoints(), report.reverseIndex(), recent);
         // JSON is inside a raw-text script element; HTML escaping would corrupt it.
-        String json = CoverageReportJson.write(graph).replace("&", "\\u0026")
-                .replace("<", "\\u003c").replace(">", "\\u003e")
-                .replace("\u2028", "\\u2028").replace("\u2029", "\\u2029");
+        String json = scriptJson(CoverageReportJson.write(graph));
         return "<script type=\"application/json\" id=\"reqover-map-data\">" + json + "</script>\n"
                 + "<template id=\"reqover-play-icon\">" + icon("play") + "</template>"
                 + "<template id=\"reqover-pause-icon\">" + icon("pause") + "</template>"
                 + "<template id=\"reqover-draft-icon\">" + icon("flask-conical") + "</template>"
                 + TestCaseDraftHtmlRenderer.script()
-                + "<!-- Lucide / Feather icon licenses:\n" + asset("icons/LICENSE").replace("--", "- -") + "\n-->\n"
+                + RecordingComparisonHtmlRenderer.script(report)
+                + "<!-- Lucide / Feather icon licenses:\n" + asset("icons/LICENSE").replace("--", "- -") + "\n-->"
                 + "<script>" + SCRIPT + "</script>\n";
     }
 
     private static void nav(StringBuilder out, String id, String icon, String label) {
         out.append("<a class=\"dashboard-link\" href=\"#").append(id).append("\">")
                 .append(icon(icon)).append("<span>").append(label).append("</span></a>");
+    }
+
+    static String scriptJson(String json) {
+        return json.replace("&", "\\u0026").replace("<", "\\u003c").replace(">", "\\u003e")
+                .replace("\u2028", "\\u2028").replace("\u2029", "\\u2029");
     }
 
     private static String control(String id, String name, String label) {

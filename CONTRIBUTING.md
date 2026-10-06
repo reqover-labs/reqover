@@ -87,6 +87,13 @@ translations are welcome.
 - Add tests for coverage attribution, instrumentation, and report changes.
 - Do not commit generated build outputs.
 - Do not commit `.env`, API keys, tokens, local credentials, or private certificates.
+- New first-party source files (Java, Kotlin build scripts, JavaScript, CSS,
+  Python, shell, PowerShell) start with the project license header:
+  `Copyright 2026 Reqover contributors. All Rights Reserved.`, the Apache-2.0
+  notice, and `SPDX-License-Identifier: Apache-2.0`. Copy it from any existing
+  file of the same type; scripts keep their shebang on the first line. Do not
+  add or change headers in third-party files (the Gradle wrapper, the vendored
+  icons and their `LICENSE`, `third-party-licenses/`).
 
 ## Pull Requests
 
@@ -103,6 +110,7 @@ didn't match is the worst outcome for everyone.
 - `./gradlew build` passes.
 - New behavior is documented.
 - License or dependency changes are reflected in `THIRD_PARTY_NOTICES.md`.
+- New source files carry the Apache-2.0 license header.
 - No secrets are included.
 
 For a documentation-only change, say so and skip the build boxes rather than

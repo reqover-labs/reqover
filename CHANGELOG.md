@@ -4,6 +4,26 @@ All notable changes to Reqover are documented in this file.
 
 ## Unreleased
 
+### Changed
+
+- **License readiness.** Every first-party source file (Java, Gradle Kotlin
+  scripts, dashboard JavaScript/CSS, Python, shell, PowerShell, Node scripts)
+  now starts with a `Copyright 2026 Reqover contributors` Apache-2.0 header
+  and `SPDX-License-Identifier: Apache-2.0`; third-party files are untouched.
+  The published library, sources and Javadoc JARs now include
+  `META-INF/LICENSE` and `META-INF/NOTICE`. `NOTICE` names the redistributed
+  ASM and Lucide/Feather components, `THIRD_PARTY_NOTICES.md` matches the
+  resolved Netty, CycloneDX plugin and Gradle versions and lists
+  development-only tooling, and `sbom/README.md` explains how dual licenses
+  are recorded.
+
+### Removed
+
+- The result-report DOCX draft and video deck PPTX under
+  `docs/competition/submission/`. The report is generated from the organiser's
+  template, which this repository does not redistribute; both are now
+  ignored there and kept in the private submission archive.
+
 ## 0.4.0 — 2026-10-06
 
 Request diagnostics and an offline dashboard: find slow and failing requests

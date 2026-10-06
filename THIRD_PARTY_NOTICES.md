@@ -13,15 +13,31 @@ is published as the CycloneDX SBOM at `sbom/reqover.cdx.json`.
 | Micrometer Context Propagation | 1.1.4 | Apache-2.0 | https://github.com/micrometer-metrics/context-propagation | Reactor Context to ThreadLocal propagation |
 | Jakarta Servlet API | 6.0.0 | EPL-2.0 OR GPL-2.0-with-classpath-exception | https://github.com/jakartaee/servlet | Compile-only servlet API for the MVC adapter |
 | Jackson | 2.21.7 | Apache-2.0 | https://github.com/FasterXML/jackson | Sample JSON serialization and E2E report parsing; annotations follow the BOM's 2.21 version |
-| Netty | 4.1.136.Final | Apache-2.0 | https://github.com/netty/netty | WebFlux sample network runtime |
+| Netty | 4.1.137.Final | Apache-2.0 | https://github.com/netty/netty | WebFlux sample network runtime |
 | Apache Tomcat | 10.1.60 | Apache-2.0 | https://github.com/apache/tomcat | MVC sample embedded server and starter test runtime |
 | Logback | 1.5.34 | EPL-2.0 OR LGPL-2.1-only | https://github.com/qos-ch/logback | Sample application logging |
 | ASM | 9.10.1 | BSD-3-Clause | https://gitlab.ow2.org/asm/asm | Method-entry bytecode instrumentation; redistributed in the agent JAR |
 | JUnit 5 | 5.12.2 | EPL-2.0 | https://github.com/junit-team/junit5 | Unit and integration tests |
-| CycloneDX Gradle Plugin | 3.3.0 | Apache-2.0 | https://github.com/CycloneDX/cyclonedx-gradle-plugin | Build-time SBOM generation |
+| CycloneDX Gradle Plugin | 3.4.1 | Apache-2.0 | https://github.com/CycloneDX/cyclonedx-gradle-plugin | Build-time SBOM generation |
 | Shadow Gradle Plugin | 9.6.1 | Apache-2.0 | https://github.com/GradleUp/shadow | Build-time ASM relocation and agent packaging |
-| Gradle | 9.5.1 | Apache-2.0 | https://github.com/gradle/gradle | Build system |
+| Gradle | 9.8.0 | Apache-2.0 | https://github.com/gradle/gradle | Build system |
 | Lucide / Feather icons | 500620a2e8123f8d1db191538886dc0c223f69a9 | ISC / MIT | https://github.com/lucide-icons/lucide | Vendored dashboard controls; no network requests or runtime dependency |
+
+### Development-only tooling (not redistributed)
+
+These tools are used only by helper scripts and CI. None of them is linked into
+or shipped with the Reqover libraries, the agent JAR, or the CLI JAR.
+
+| Component | Version | License | Used by |
+| --- | --- | --- | --- |
+| python-docx | 1.2.0 | MIT | `scripts/build-result-report-docx.py` (pinned in `scripts/requirements-report.txt`) |
+| Pillow | 12.2.0 | MIT-CMU (HPND) | `scripts/build-result-report-docx.py` (pinned in `scripts/requirements-report.txt`) |
+| lxml | 6.0.2 | BSD-3-Clause | `scripts/build-result-report-docx.py` (pinned in `scripts/requirements-report.txt`) |
+| Playwright (Node.js) | not pinned; installed by the developer | Apache-2.0 | `scripts/verify-dashboard.cjs` |
+| GitHub Actions: `actions/checkout`, `actions/setup-java`, `actions/upload-artifact`, `gradle/actions` | SHA-pinned in workflows | MIT | `.github/workflows`, `.github/actions/impact` |
+| `google/osv-scanner-action` | SHA-pinned in workflows | Apache-2.0 | `.github/workflows/build.yml`, `.github/workflows/release.yml` |
+
+The Node.js test scripts (`scripts/*.test.cjs`) use only Node.js built-in modules.
 
 The full ASM BSD-3-Clause notice is retained at
 `third-party-licenses/ASM-BSD-3-Clause.txt` and embedded in the agent JAR as

@@ -39,3 +39,6 @@ tmp/
 
 # 대회 공식 양식은 주최측 저작물이라 저장소에 두지 않는다.
 docs/competition/templates/*.docx
+# 양식에서 생성한 결과보고서·발표 자료도 같은 이유로 커밋하지 않는다.
+docs/competition/submission/*.docx
+docs/competition/submission/*.pptx

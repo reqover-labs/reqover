@@ -4,6 +4,18 @@ All notable changes to Reqover are documented in this file.
 
 ## Unreleased
 
+## 0.4.2 — 2026-10-07
+
+Dashboard keyboard fix found during the functional-test dry run.
+
+### Fixed
+
+- **Dashboard: typing `/` inside a text field no longer jumps to the search box.**
+  The `/` search shortcut fired for every text input, so a path such as
+  `/auto/diagnostics/delay/120` typed into a test draft's *Reviewed path*
+  lost its slashes. The shortcut now applies only when no input, textarea,
+  select or editable element has focus.
+
 ## 0.4.1 — 2026-10-07
 
 License readiness and one WebFlux fix.

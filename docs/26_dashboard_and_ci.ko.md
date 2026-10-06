@@ -2,7 +2,7 @@
 
 # 대시보드와 CI 연결
 
-**0.4.0부터** 제공하는 기능입니다. `v0.4.1` Action은 배포된 `reqover-cli-0.4.1.jar`를
+**0.4.0부터** 제공하는 기능입니다. `v0.4.2` Action은 배포된 `reqover-cli-0.4.2.jar`를
 내려받고, 이 CLI의 `render`가 새 대시보드를 만듭니다. 소스를 직접 빌드할 필요는 없습니다.
 요청 진단에는 0.4.0부터 추가된 선택적인 `requests` 상세가 필요합니다. 예전 JSON도
 열리지만 상세가 없으면 미측정으로 표시하며, 0 ms·성공으로 채우지 않습니다.
@@ -44,8 +44,8 @@ Action은 이미 있는 JSON을 읽는 도구입니다. 프로젝트에 agent/st
 서버를 띄우고 테스트를 대신 돌려주지는 않습니다. 그 부분은
 [Spring 연동 가이드](17_integration_guide.ko.md)와
 [CI 기록 방법](18_ci_impact_analysis.ko.md)을 먼저 적용합니다.
-starter는 Maven Central의 `io.github.reqover-labs:reqover-spring-boot-starter:0.4.1`을,
-agent JAR는 [v0.4.1 GitHub Release](https://github.com/reqover-labs/reqover/releases/tag/v0.4.1)를 사용합니다.
+starter는 Maven Central의 `io.github.reqover-labs:reqover-spring-boot-starter:0.4.2`을,
+agent JAR는 [v0.4.2 GitHub Release](https://github.com/reqover-labs/reqover/releases/tag/v0.4.2)를 사용합니다.
 
 Ubuntu runner, Java 17 이상, Python 3, Bash를 준비합니다. 아래 예제는 기존 PR
 워크플로에서 **리포트를 기록하고 Java를 설정한 뒤** 붙이는 부분입니다.
@@ -55,7 +55,7 @@ Python 3을 설치합니다. 이 조건과 얕은 checkout을 네트워크 작�
 ```yaml
 - name: Retest candidates and dashboard
   id: reqover
-  uses: reqover-labs/reqover/.github/actions/impact@v0.4.1
+  uses: reqover-labs/reqover/.github/actions/impact@v0.4.2
   with:
     report: build/reqover-report.json
     comment: "false"
@@ -65,7 +65,7 @@ Python 3을 설치합니다. 이 조건과 얕은 checkout을 네트워크 작�
 ```
 
 **우리 앱을 checkout하는 단계**에는 `fetch-depth: 0`을 넣어야 변경 기준과 공통 조상을
-찾습니다. Action은 `version` 입력(기본 `0.4.1`)에 맞는 CLI를 릴리스에서 내려받습니다.
+찾습니다. Action은 `version` 입력(기본 `0.4.2`)에 맞는 CLI를 릴리스에서 내려받습니다.
 아직 배포되지 않은 빌드를 시험할 때만 CLI를 직접 빌드해 `cli-jar`로 경로를 지정하며,
 이때 `version`은 무시됩니다. Reqover 저장소 자체 CI가 이 방식으로 로컬 Action과
 로컬 CLI를 사용합니다([실제 CI 설정](../.github/workflows/build.yml)).
@@ -84,7 +84,7 @@ GitHub Actions 실행의 Summary에 관련 API와 관측되지 않은 변경 파
 워크스페이스 전체를 묶거나 원본 JSON을 그대로 올리지 않습니다.
 다운로드한 `report.html`은 서버 없이 열 수 있습니다.
 
-기본 리포트 경로는 `build/reqover-report.json`이고, CLI 기본 버전(`version`)은 `0.4.1`입니다.
+기본 리포트 경로는 `build/reqover-report.json`이고, CLI 기본 버전(`version`)은 `0.4.2`입니다.
 미배포 빌드를 쓸 때만 `cli-jar`로 CLI를 지정합니다. PR이 아닌 push·수동 실행에서는
 `base-ref`를 직접 지정합니다. 매트릭스에서는 `artifact-name`을 각각 다르게 줍니다. 파일 업로드는 `upload-artifact: "false"`로
 끄는 것이 기본값이며 `upload-artifact: "true"`로 켭니다. 같은 job에서 여러 번

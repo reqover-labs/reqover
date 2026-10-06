@@ -1,6 +1,7 @@
 package io.reqover.instrumentation;
 
 import io.reqover.core.ProbeMetadata;
+import io.reqover.core.ProbeRegistry;
 
 import java.util.List;
 import java.util.Map;
@@ -36,8 +37,41 @@ final class ReferenceProbes {
     }
 
     /**
-     * The probe id for one member, assigning it on first use and adding its
-     * metadata to {@code newMetadata} so the caller's class registers it.
+     * The enum a {@code $SwitchMap$...} field was generated for, or {@code null}.
+     * javac names the field after the enum with every {@code .} and {@code $}
+     * turned into {@code $}; package segments are told apart from nested class
+     * names by their lower-case first letter.
+     */
+    static String switchedEnum(String switchMapField) {
+        String prefix = "$SwitchMap$";
+        if (!switchMapField.startsWith(prefix)) {
+            return null;
+        }
+        String[] parts = switchMapField.substring(prefix.length()).split("\\$");
+        StringBuilder internalName = new StringBuilder();
+        boolean inClassName = false;
+        for (String part : parts) {
+            if (part.isEmpty()) {
+                return null;
+            }
+            if (internalName.length() > 0) {
+                internalName.append(inClassName ? '$' : '/');
+            }
+            if (Character.isUpperCase(part.charAt(0))) {
+                inClassName = true;
+            }
+            internalName.append(part);
+        }
+        return inClassName ? internalName.toString() : null;
+    }
+
+    /**
+     * The probe id for one member, assigning it on first use.
+     *
+     * <p>A new probe is registered here, before its id is handed to any
+     * caller: another class can reuse the id and run before the class that
+     * assigned it is defined. Its metadata is also added to {@code newMetadata}
+     * for callers that inspect what an instrumentation produced.
      */
     int probeId(String owner, String name, String descriptor, List<ProbeMetadata> newMetadata) {
         String key = owner + '#' + name + descriptor;
@@ -53,7 +87,9 @@ final class ReferenceProbes {
             int probeId = nextProbeIds.computeIfAbsent(owner, ignored -> new AtomicInteger(FIRST_PROBE_ID))
                     .getAndIncrement();
             String className = owner.replace('/', '.');
-            newMetadata.add(new ProbeMetadata(StableClassId.of(className), probeId, className, name, descriptor, null));
+            ProbeMetadata metadata = new ProbeMetadata(StableClassId.of(className), probeId, className, name, descriptor, null);
+            ProbeRegistry.tryRegister(metadata);
+            newMetadata.add(metadata);
             probeIds.put(key, probeId);
             return probeId;
         }

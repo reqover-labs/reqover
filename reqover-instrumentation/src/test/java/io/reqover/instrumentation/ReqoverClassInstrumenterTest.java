@@ -88,6 +88,48 @@ class ReqoverClassInstrumenterTest {
         assertTrue(ReqoverProbe.globalSnapshot().hasHit(parking.classId(), parking.probeId()));
         assertTrue(result.metadata().stream().noneMatch(m -> m.methodName().contains("$SwitchMap")),
                 "compiler-made switch maps are not references");
+        assertTrue(ProbeRegistry.find(find.classId(), find.probeId()).isPresent(),
+                "registered when assigned, before any class using it is defined");
+    }
+
+    @Test
+    void recordsTheEnumASwitchReadsAndMethodReferences() throws Exception {
+        InstrumentationResult result = new ReqoverClassInstrumenter(true, name -> name.startsWith("io.reqover.instrumentation."))
+                .instrument(classBytes(ReferenceTarget.class));
+        Class<?> instrumented = new SingleClassLoader(ReferenceTarget.class.getName(), result.bytecode())
+                .loadClass(ReferenceTarget.class.getName());
+        Object target = instrumented.getDeclaredConstructor().newInstance();
+        ReferenceTarget.Lookup stub = key -> key;
+
+        instrumented.getMethod("areaName", ReferenceTarget.Area.class).invoke(target, ReferenceTarget.Area.PARKING);
+        instrumented.getMethod("methodReference", ReferenceTarget.Lookup.class).invoke(target, stub);
+
+        // A switch on an enum from another file reads javac's $SwitchMap$ (its
+        // holder class is package-private to this loader, so it is not run here);
+        // one on an enum in the same file calls ordinal() directly.
+        reference(result, ReferenceStatus.class.getName(), "<switch>");
+        ProbeMetadata ordinal = reference(result, ReferenceTarget.Area.class.getName(), "ordinal");
+        assertTrue(ReqoverProbe.globalSnapshot().hasHit(ordinal.classId(), ordinal.probeId()));
+        ProbeMetadata find = reference(result, ReferenceTarget.Lookup.class.getName(), "find");
+        assertTrue(ReqoverProbe.globalSnapshot().hasHit(find.classId(), find.probeId()));
+    }
+
+    @Test
+    void recordsReferencesInInterfaceDefaultMethods() throws Exception {
+        InstrumentationResult result = new ReqoverClassInstrumenter(true, name -> name.startsWith("io.reqover.instrumentation."))
+                .instrument(classBytes(ReferenceTarget.Lookup.class));
+
+        assertTrue(result.instrumented());
+        reference(result, ReferenceTarget.Area.class.getName(), "WELFARE_CENTER");
+    }
+
+    @Test
+    void namesTheEnumBehindASwitchMap() {
+        assertEquals("kr/ac/knu/groove/domain/pub/entity/PubArea",
+                ReferenceProbes.switchedEnum("$SwitchMap$kr$ac$knu$groove$domain$pub$entity$PubArea"));
+        assertEquals("io/reqover/instrumentation/ReferenceTarget$Area",
+                ReferenceProbes.switchedEnum("$SwitchMap$io$reqover$instrumentation$ReferenceTarget$Area"));
+        assertEquals(null, ReferenceProbes.switchedEnum("ordinaryField"));
     }
 
     @Test

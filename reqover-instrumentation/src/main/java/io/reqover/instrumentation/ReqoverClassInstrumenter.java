@@ -4,6 +4,7 @@ import io.reqover.core.ProbeMetadata;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.ClassWriter;
+import org.objectweb.asm.Handle;
 import org.objectweb.asm.Label;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
@@ -62,6 +63,7 @@ public final class ReqoverClassInstrumenter {
         private String className;
         private int classId;
         private boolean instrumentableClass;
+        private boolean annotationType;
         private int nextProbeId;
 
         private ReqoverClassVisitor(
@@ -88,6 +90,7 @@ public final class ReqoverClassInstrumenter {
             this.className = name.replace('/', '.');
             this.classId = StableClassId.of(className);
             this.instrumentableClass = (access & (Opcodes.ACC_INTERFACE | Opcodes.ACC_ANNOTATION)) == 0;
+            this.annotationType = (access & Opcodes.ACC_ANNOTATION) != 0;
             super.visit(version, access, name, signature, superName, interfaces);
         }
 
@@ -100,10 +103,11 @@ public final class ReqoverClassInstrumenter {
                 String[] exceptions
         ) {
             MethodVisitor methodVisitor = super.visitMethod(access, name, descriptor, signature, exceptions);
-            if (references != null && instrumentableClass && !"<clinit>".equals(name)
+            if (references != null && !annotationType && !"<clinit>".equals(name)
                     && (access & (Opcodes.ACC_ABSTRACT | Opcodes.ACC_NATIVE)) == 0) {
-                // Lambdas and constructors too: a repository call inside a stream
-                // or an enum default in a field initializer is still a use.
+                // Lambdas, constructors and interface default methods too: a
+                // repository call inside a stream or an enum default in a field
+                // initializer is still a use.
                 methodVisitor = new ReferenceMethodVisitor(methodVisitor);
             }
             if (!instrumentableClass
@@ -125,18 +129,50 @@ public final class ReqoverClassInstrumenter {
             public void visitMethodInsn(int opcode, String owner, String name, String descriptor, boolean isInterface) {
                 if (opcode == Opcodes.INVOKEINTERFACE && references.isTarget(owner)) {
                     probe(owner, name, descriptor);
+                } else if (opcode == Opcodes.INVOKEVIRTUAL && isEnumIdentity(name, descriptor)
+                        && references.isTarget(owner)) {
+                    // ordinal() and name() are final in java.lang.Enum, so nothing in
+                    // the enum's own file runs; javac switches on ordinal() directly
+                    // when the enum is declared in the same file.
+                    probe(owner, name, descriptor);
                 }
                 super.visitMethodInsn(opcode, owner, name, descriptor, isInterface);
             }
 
             @Override
             public void visitFieldInsn(int opcode, String owner, String name, String descriptor) {
-                // '$' skips compiler-made fields such as an enum switch's $SwitchMap$.
-                if (opcode == Opcodes.GETSTATIC && name.indexOf('$') < 0
-                        && !owner.equals(className.replace('.', '/')) && references.isTarget(owner)) {
-                    probe(owner, name, descriptor);
+                if (opcode == Opcodes.GETSTATIC) {
+                    String switchedEnum = ReferenceProbes.switchedEnum(name);
+                    if (switchedEnum != null) {
+                        // A switch on an enum reads javac's $SwitchMap$, not the enum.
+                        if (references.isTarget(switchedEnum)) {
+                            probe(switchedEnum, "<switch>", "");
+                        }
+                    } else if (name.indexOf('$') < 0
+                            && !owner.equals(className.replace('.', '/')) && references.isTarget(owner)) {
+                        probe(owner, name, descriptor);
+                    }
                 }
                 super.visitFieldInsn(opcode, owner, name, descriptor);
+            }
+
+            @Override
+            public void visitInvokeDynamicInsn(String name, String descriptor, Handle bootstrap, Object... arguments) {
+                // A method reference such as repository::findById has no
+                // INVOKEINTERFACE at the call site; record it where it is made.
+                for (Object argument : arguments) {
+                    if (argument instanceof Handle handle
+                            && handle.getTag() == Opcodes.H_INVOKEINTERFACE
+                            && references.isTarget(handle.getOwner())) {
+                        probe(handle.getOwner(), handle.getName(), handle.getDesc());
+                    }
+                }
+                super.visitInvokeDynamicInsn(name, descriptor, bootstrap, arguments);
+            }
+
+            private static boolean isEnumIdentity(String name, String descriptor) {
+                return ("ordinal".equals(name) && "()I".equals(descriptor))
+                        || ("name".equals(name) && "()Ljava/lang/String;".equals(descriptor));
             }
 
             private void probe(String owner, String name, String descriptor) {

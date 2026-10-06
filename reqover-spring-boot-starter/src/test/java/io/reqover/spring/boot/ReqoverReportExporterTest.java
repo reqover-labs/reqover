@@ -132,6 +132,24 @@ class ReqoverReportExporterTest {
     }
 
     @Test
+    void sumsOneEndpointRecordedByTwoContexts() throws Exception {
+        Path json = workspace.resolve("report.json");
+        properties.getExport().setJsonPath(json.toString());
+        InMemoryCoverageStore otherStore = new InMemoryCoverageStore();
+        CoverageBucket again = new CoverageBucket(UnitInfo.httpRequest("req-2", "GET", "/orders/{id}"));
+        again.finish(200);
+        otherStore.flush(again);
+
+        exporter().destroy();
+        new ReqoverReportExporter(new ReqoverReportService(otherStore), properties.getExport()).destroy();
+
+        CoverageReport report = CoverageReportJson.read(Files.readString(json, StandardCharsets.UTF_8));
+        assertEquals(1, report.endpoints().size());
+        assertEquals(2, report.endpoints().get(0).requestCount());
+        assertEquals(2, report.completedRequestCount());
+    }
+
+    @Test
     void replacesAReportLeftByAnEarlierRun() throws Exception {
         Path json = workspace.resolve("report.json");
         Files.writeString(json, "stale");

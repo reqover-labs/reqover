@@ -3,6 +3,7 @@ package io.reqover.report;
 import io.reqover.core.CoverageBucketSnapshot;
 import io.reqover.core.ProbeMetadata;
 import io.reqover.core.ProbeRegistry;
+import io.reqover.core.UnitAggregate;
 
 import java.time.Clock;
 import java.time.Instant;
@@ -26,6 +27,17 @@ public final class CoverageReportGenerator {
     }
 
     public CoverageReport generate(List<CoverageBucketSnapshot> snapshots) {
+        return generate(snapshots, List.of());
+    }
+
+    /**
+     * Builds the report from a snapshot window plus the store's per-unit
+     * aggregates. Which endpoints exist, how often they ran and what they
+     * executed come from the aggregates, so an endpoint whose requests were all
+     * evicted still appears. Request ids exist only for retained snapshots.
+     * With no aggregates this is {@link #generate(List)}.
+     */
+    public CoverageReport generate(List<CoverageBucketSnapshot> snapshots, List<UnitAggregate> aggregates) {
         Map<String, EndpointAccumulator> endpoints = new HashMap<>();
 
         for (CoverageBucketSnapshot snapshot : snapshots) {
@@ -35,6 +47,14 @@ public final class CoverageReportGenerator {
             );
             endpoint.accept(snapshot);
         }
+        long aggregated = 0;
+        for (UnitAggregate aggregate : aggregates) {
+            endpoints.computeIfAbsent(aggregate.unitName(), EndpointAccumulator::new).accept(aggregate);
+            aggregated += aggregate.count();
+        }
+        int completed = aggregates.isEmpty()
+                ? snapshots.size()
+                : (int) Math.min(Integer.MAX_VALUE, Math.max(aggregated, snapshots.size()));
 
         List<EndpointCoverage> endpointCoverages = endpoints.values().stream()
                 .map(EndpointAccumulator::toCoverage)
@@ -43,7 +63,7 @@ public final class CoverageReportGenerator {
 
         return new CoverageReport(
                 Instant.now(clock),
-                snapshots.size(),
+                completed,
                 endpointCoverages,
                 reverseIndex(endpointCoverages)
         );
@@ -85,6 +105,7 @@ public final class CoverageReportGenerator {
     private static final class EndpointAccumulator {
         private final String endpoint;
         private int requestCount;
+        private long aggregateCount;
         private final Set<String> requestIds = new HashSet<>();
         private final Set<String> threadNames = new HashSet<>();
         private final Map<Integer, Set<Integer>> hitsByClass = new HashMap<>();
@@ -102,6 +123,14 @@ public final class CoverageReportGenerator {
             );
         }
 
+        private void accept(UnitAggregate aggregate) {
+            aggregateCount += aggregate.count();
+            threadNames.addAll(aggregate.threadNames());
+            aggregate.hitsByClass().forEach((classId, probes) ->
+                    hitsByClass.computeIfAbsent(classId, ignored -> new HashSet<>()).addAll(probes)
+            );
+        }
+
         private EndpointCoverage toCoverage() {
             List<ClassCoverage> classes = hitsByClass.entrySet().stream()
                     .map(entry -> classCoverage(entry.getKey(), entry.getValue()))
@@ -110,7 +139,7 @@ public final class CoverageReportGenerator {
 
             return new EndpointCoverage(
                     endpoint,
-                    requestCount,
+                    (int) Math.min(Integer.MAX_VALUE, Math.max(requestCount, aggregateCount)),
                     requestIds.stream().sorted().toList(),
                     threadNames.stream().sorted().toList(),
                     classes

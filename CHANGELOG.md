@@ -6,6 +6,15 @@ All notable changes to Reqover are documented in this file.
 
 ### Fixed
 
+- **A long recording no longer forgets endpoints.** The report used to be built
+  from the 10,000-snapshot window alone, so at 60 RPS an endpoint called only
+  in the first three minutes vanished and request counts covered just the
+  window. Stores now also keep a per-endpoint aggregate (count, executed
+  probes, threads) that eviction does not touch, and the report builds
+  endpoints, counts and the reverse index from it. `CoverageStore.aggregates()`
+  is a default method, so a custom store keeps compiling and falls back to the
+  old behaviour. (#27)
+
 - **Hibernate 6 and Mockito proxies are excluded too.** Hibernate 6 names its
   proxy `Order$HibernateProxy` with no suffix, which the earlier marker missed,
   and a Mockito mock (`$MockitoMock$`) was recorded as application code.

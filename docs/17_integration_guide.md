@@ -424,7 +424,7 @@ The most common failure is **"the report is empty"**, and the cause is usually `
 | `InMemoryCoverageStore` injection fails after upgrading from `0.1.1` | The adapters now contribute a `CoverageStore` bean | Change the injection point to `CoverageStore`. See [Replacing the store](#replacing-the-store) |
 | `CoverageStore` injection fails | The adapter dependency is missing, or the web type doesn't match | Use the starter, or confirm `reqover-spring-mvc` in an MVC app and `reqover-spring-webflux` in a WebFlux app |
 | Dependency not found (`Could not find io.reqover:...`) | Step 1 wasn't done, or `mavenLocal()` is missing | Re-run `publishToMavenLocal`, and check `mavenLocal()` comes before `mavenCentral()` |
-| Old records disappear after a while | The retention cap (10,000 by default) was reached | This is expected. See [Adjusting retention](#adjusting-retention) |
+| Old request ids disappear after a while | The retention cap (10,000 by default) was reached | This is expected: endpoints, counts and executed methods are kept per endpoint; only per-request detail is dropped. See [Adjusting retention](#adjusting-retention) |
 
 ---
 
@@ -432,7 +432,7 @@ The most common failure is **"the report is empty"**, and the cause is usually `
 
 ### Adjusting retention
 
-Records live in memory only, with a default cap of 10,000 entries. Beyond that the store either drops the oldest snapshot (`oldest-first`, the default) or keeps the existing window and ignores new flushes (`reject-when-full`). Both the bound and the policy are properties — no bean needed:
+Records live in memory only, with a default cap of 10,000 per-request snapshots. Beyond that the store either drops the oldest snapshot (`oldest-first`, the default) or keeps the existing window and ignores new flushes (`reject-when-full`). Either way every flush is also folded into a per-endpoint total, so the report's endpoints, request counts and executed methods cover the whole recording; only request ids are limited to the window. Both the bound and the policy are properties — no bean needed:
 
 ```properties
 reqover.mvc.max-snapshots=50000

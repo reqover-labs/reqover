@@ -2,8 +2,6 @@
 
 작성일: 2026년 10월 3일
 
-- 첫 피드백 검토 일정: 10월 7일
-- 발표 일정: 11월 4~5일 2차 평가 발표
 - 구현 기준: 공개 main `935d3db`, 배포 버전 `0.2.0`; 10월 6일 리뷰 반영
 - 이번 문서: 성능 검증 계획과 범위. 구현은 #34~#37에서 별도 검토
 
@@ -45,7 +43,7 @@ OpenTelemetry Java agent 역시 선택한 메서드와 DB 호출 계측을 지�
 상용 APM 가격이 높다는 일반화나 보안 취약점을 탐지한다는 주장은 사용하지 않습니다.
 성능·오류 검증이 보안 진단을 대신하지는 않습니다.
 
-## 4 구현 PR과 10월 7일의 범위
+## 4 구현 PR과 첫 피드백 검토의 범위
 
 #25는 기획·보안·리뷰 문서만 포함합니다. 아래 기능은 #34~#37에 분리되어 있으며,
 병합된 main의 기능이나 배포 버전으로 소개하지 않습니다.
@@ -68,16 +66,16 @@ nearest-rank 값이며 샘플 수를 함께 표시합니다.
 성공으로 계산하지 않습니다. 테스트가 예상한 4xx였는지는 앞으로의 assertion에서
 판단해야 합니다. 보관된 요청 통계는 실제 전체 트래픽의 TPS가 아닙니다.
 
-### 다음 미팅까지 가져갈 산출물
+### 첫 피드백 검토까지의 산출물
 
 | 마감 | 결과물 | 완료 조건 |
 | --- | --- | --- |
 | 10월 4일 목표 | 요청 진단 데이터와 JSON 왕복 | 개별 시간·상태가 보존되고 예전 파일도 렌더됨 |
 | 10월 5일 목표 | 실제 요청 진단 화면 | 정상·실패·지연 요청을 찾아 개별 코드 확인 |
 | 10월 6일 목표 | 다섯 화면 설계와 회귀 확인 | 화면 간 이동·빈 상태·미구현 기능 구분, 데모 재현 |
-| 10월 7일 미팅 | 3분 데모와 결정할 질문 | 느린 GET·실패 GET 관측, 원인 후보와 다음 개선 제시 |
+| 피드백 검토 | 3분 데모와 결정할 질문 | 느린 GET·실패 GET 관측, 원인 후보와 다음 개선 제시 |
 
-이 일정은 작업 목표이며 이번 PR 검증 기록에서 완료 여부를 갱신합니다. 미팅에서는
+이 일정은 작업 목표이며 이번 PR 검증 기록에서 완료 여부를 갱신합니다. 검토에서는
 실제 진단·Test drafts 화면을 먼저 보여주고 Load Test는 설계로 표시합니다.
 Test drafts는 입력을 직접 보완하는 초안이며 원본 요청의 재현이나 자동 실행이 아닙니다.
 현재 기능과 사용 흐름은 [테스트 초안 PR #36](https://github.com/reqover-labs/reqover/pull/36)에 정리했습니다.
@@ -158,7 +156,7 @@ Collector는 처음부터 별도 cloud 서버로 만들 필요가 없습니다. 
 
 | 기간 | 목표 | 결과와 판단 기준 |
 | --- | --- | --- |
-| 10월 3~7일 | 실제 요청 진단과 화면 기획 | 첫 미팅에서 데이터로 정상·실패·지연을 구분 |
+| 10월 3~7일 | 실제 요청 진단과 화면 기획 | 첫 검토에서 데이터로 정상·실패·지연을 구분 |
 | 10월 8~14일 | 요청 측정 경계 보강, 실패 정보, 선택한 메서드 시간 spike | monotonic 경과시간, 예외와 4xx/5xx 구분, MVC sync 범위 명시 |
 | 10월 15~21일 | 허용 입력 기반 재현 요청 초안 | 샘플 GET에서 재현, 민감값 미저장, 미지정 값은 사용자 보완 |
 | 10월 22~28일 | k6 연동과 단일 API 부하 run | VU·duration, RPS·p95·오류, 중지·예산 제한, 요청과 run 연결 |
@@ -220,7 +218,7 @@ main에 병합된 #24의 proxy/accessor/미매핑 URL 처리, #26의 의존성 �
 이후 monotonic timing와 실패 종료 정보, 선택 메서드 시간과 OTel spike, 허용 입력과
 익명화, k6 실행·중지·결과 import, 외부 적용·overhead 검증을 별도 PR로 검토합니다.
 
-## 11 다음 미팅에서 결정할 질문
+## 11 다음 피드백 검토에서 결정할 질문
 
 1. 가장 도움이 되는 사용 순간은 배포 전 성능 확인인가요, 오류 재현인가요?
 2. 단일 GET의 발견→재현→재검증이 첫 MVP로 충분한가요?
@@ -234,4 +232,4 @@ main에 병합된 #24의 proxy/accessor/미매핑 URL 처리, #26의 의존성 �
 - [Postman performance testing](https://learning.postman.com/docs/tests-and-scripts/performance-testing/performance-test-configuration/): 기존 제품과 겹치는 기능 확인.
 - [k6 metrics](https://grafana.com/docs/k6/latest/using-k6/metrics/reference/)와 [thresholds](https://grafana.com/docs/k6/latest/using-k6/thresholds/): 부하 결과와 통과 기준의 재사용.
 - [OpenTelemetry method instrumentation](https://opentelemetry.io/docs/zero-code/java/agent/annotations/)와 [supported libraries](https://opentelemetry.io/docs/zero-code/java/agent/supported-libraries/): method·DB 계측 재사용 후보.
-- 사용자 제공 멘토링 정리와 일정. 원 대화의 개인 정보는 공개 문서에 옮기지 않습니다.
+- 외부 피드백 검토 내용. 개인 정보는 공개 문서에 옮기지 않습니다.

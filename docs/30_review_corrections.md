@@ -57,9 +57,9 @@ The agent suite passed on rerun, followed by a successful full build. No
 production code or unrelated cleanup logic was changed to hide that failure.
 
 Initial GitHub Java 17/21 and export/impact jobs passed on all four split PRs.
-The #35-#37 scans then failed on Spring MVC 6.2.19 and GHSA-pc63-qcmh-9cmg,
-independently reproduced by a full local query. A subsequent main update added
-the maintainers' expiring exception policy. It was preserved during the final
+The #35-#37 scans then failed on Spring MVC 6.2.19 and GHSA-pc63-qcmh-9cmg
+because those branches predated main's `osv-scanner.toml` (#32), which excepts
+that advisory until December 31, 2026; it was not a new risk in these PRs. It was preserved during the final
 synchronization; passing that policy does not mean the dependency is patched.
 See the [security record](29_osv_dependency_remediation.md).
 

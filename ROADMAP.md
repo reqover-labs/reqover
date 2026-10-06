@@ -12,8 +12,8 @@ the fastest way to change what we work on.
 ## Now
 
 **Performance validation preview (Oct-Nov 2026).** The
-[plan](docs/23_performance_validation_plan.ko.md) (Korean) targets October 7
-feedback and a November 4-5 presentation, not a promised release date. Review is
+[plan](docs/23_performance_validation_plan.ko.md) (Korean) sets the scope for
+this preview; it is not a promised release date. Review is
 split into [request diagnostics #34](https://github.com/reqover-labs/reqover/pull/34),
 [dashboard/CI #35](https://github.com/reqover-labs/reqover/pull/35),
 [test drafts #36](https://github.com/reqover-labs/reqover/pull/36) and

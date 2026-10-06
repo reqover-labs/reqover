@@ -21,14 +21,14 @@ mapping. It lists 6.2.20 as enterprise-support-only and 7.0.9 as the OSS fix.
 Do not assume every MVC endpoint is exploitable, but absence of that sample
 configuration does not patch the dependency or warrant hiding the scanner result.
 
-A follow-up compatibility/security decision is required: obtain a legitimately
-supported patched 6.2 release, or validate migration of the Spring/Boot stack to
-the supported OSS line. Overriding only MVC to 7.x inside a Boot 3.5 application
-is not a safe patch. This review does not silently perform that major migration,
-relabel SBOM packages, or weaken `fail-on-vuln`.
+The maintainers decided this in #32: the advisory is excepted in
+`osv-scanner.toml` until December 31, 2026, under the policy in
+[SECURITY.md](../SECURITY.md#dependency-advisories), and must be revisited before
+that date (a supported patched 6.2 release, or a validated move of the samples to
+the Spring Boot 4 line). Overriding only MVC to 7.x inside a Boot 3.5 application
+is not a safe patch, and `fail-on-vuln` stays on.
 
-Main `935d3db` now includes the maintainers' existing `osv-scanner.toml` exception
-for this advisory until December 31, 2026. Its rationale is limited to samples
+The exception applies Its rationale is limited to samples
 and test runtimes that do not configure XsltView; published adapters use Spring
 as `compileOnly`, leaving the application owner's version choice intact. The
 latest synchronization preserves that upstream policy without broadening it.

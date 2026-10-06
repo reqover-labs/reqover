@@ -112,10 +112,13 @@ public final class HtmlCoverageReportRenderer {
                 if (event.key === 'Escape') { input.value = ''; apply(); }
               });
               document.addEventListener('keydown', function (event) {
-                if (event.key === '/' && document.activeElement !== input) {
-                  event.preventDefault();
-                  input.focus();
-                }
+                if (event.key !== '/' || document.activeElement === input) { return; }
+                var active = document.activeElement;
+                var editing = active && (active.tagName === 'INPUT' || active.tagName === 'TEXTAREA'
+                  || active.tagName === 'SELECT' || active.isContentEditable);
+                if (editing) { return; }
+                event.preventDefault();
+                input.focus();
               });
 
               box.hidden = false;

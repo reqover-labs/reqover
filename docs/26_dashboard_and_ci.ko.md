@@ -2,10 +2,10 @@
 
 # 대시보드와 CI 연결
 
-이번 기능은 **개발 브랜치의 미리보기**입니다. 배포된 `v0.3.0`에는 없습니다.
-새 Action과 현재 소스로 빌드한 CLI를 함께 사용해야 새 대시보드가 나옵니다.
-`version: 0.3.0`만 지정하면 예전 배포 CLI를 내려받습니다. 새 화면이나 요청 수집
-기능까지 자동으로 설치되는 것은 아닙니다.
+**0.4.0부터** 제공하는 기능입니다. `v0.4.0` Action은 배포된 `reqover-cli-0.4.0.jar`를
+내려받고, 이 CLI의 `render`가 새 대시보드를 만듭니다. 소스를 직접 빌드할 필요는 없습니다.
+다만 요청별 상세는 0.4.0 agent/starter로 기록한 JSON에만 있습니다. 예전 JSON도 열리지만
+요청 진단 데이터는 비어 있습니다.
 
 ## 무엇부터 보나
 
@@ -44,7 +44,8 @@ Action은 이미 있는 JSON을 읽는 도구입니다. 프로젝트에 agent/st
 서버를 띄우고 테스트를 대신 돌려주지는 않습니다. 그 부분은
 [Spring 연동 가이드](17_integration_guide.ko.md)와
 [CI 기록 방법](18_ci_impact_analysis.ko.md)을 먼저 적용합니다.
-Maven Central에는 아직 배포되지 않았으므로 소스 빌드 또는 배포 JAR가 필요합니다.
+starter는 Maven Central의 `io.github.reqover-labs:reqover-spring-boot-starter:0.4.0`을,
+agent JAR는 [v0.4.0 GitHub Release](https://github.com/reqover-labs/reqover/releases/tag/v0.4.0)를 사용합니다.
 
 Ubuntu runner, Java 17 이상, Python 3, Bash를 준비합니다. 아래 예제는 기존 PR
 워크플로에서 **리포트를 기록하고 Java를 설정한 뒤** 붙이는 부분입니다.
@@ -52,32 +53,22 @@ Ubuntu runner, Java 17 이상, Python 3, Bash를 준비합니다. 아래 예제�
 Python 3을 설치합니다. 이 조건과 얕은 checkout을 네트워크 작업 전에 확인합니다.
 
 ```yaml
-# 개발 미리보기. 장기 사용 시 검토한 commit SHA로 고정합니다.
-- uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
-  with:
-    repository: reqover-labs/reqover
-    ref: main  # replace with the commit SHA you reviewed
-    path: .reqover-tool
-    persist-credentials: false
-
-- name: Build the preview CLI
-  run: ./.reqover-tool/gradlew -p .reqover-tool :reqover-cli:shadowJar
-
 - name: Retest candidates and dashboard
   id: reqover
-  uses: ./.reqover-tool/.github/actions/impact
+  uses: reqover-labs/reqover/.github/actions/impact@v0.4.0
   with:
     report: build/reqover-report.json
-    cli-jar: .reqover-tool/reqover-cli/build/libs/reqover-cli-0.3.0.jar
     comment: "false"
     upload-artifact: "true"
     artifact-name: reqover-${{ github.job }}-${{ strategy.job-index || 'single' }}
+    analysis-name: ${{ github.job }}
 ```
 
-`.reqover-tool`은 도구를 빌드하려고 별도로 받은 폴더입니다. **우리 앱을 처음
-checkout하는 단계**에는 `fetch-depth: 0`을 넣어야 변경 기준과 공통 조상을 찾습니다.
-Reqover 저장소 자체에서는 로컬 Action과 로컬 CLI를 바로 쓰며,
-[실제 CI 설정](../.github/workflows/build.yml)에 같은 흐름을 넣었습니다.
+**우리 앱을 checkout하는 단계**에는 `fetch-depth: 0`을 넣어야 변경 기준과 공통 조상을
+찾습니다. Action은 `version` 입력(기본 `0.4.0`)에 맞는 CLI를 릴리스에서 내려받습니다.
+아직 배포되지 않은 빌드를 시험할 때만 CLI를 직접 빌드해 `cli-jar`로 경로를 지정하며,
+이때 `version`은 무시됩니다. Reqover 저장소 자체 CI가 이 방식으로 로컬 Action과
+로컬 CLI를 사용합니다([실제 CI 설정](../.github/workflows/build.yml)).
 
 처음에는 `contents: read`, `comment: "false"`로 시작하면 됩니다. 같은 저장소 PR에
 댓글도 남기려면 `pull-requests: write`를 주고 댓글을 켭니다. fork PR에는 댓글을
@@ -93,9 +84,9 @@ GitHub Actions 실행의 Summary에 관련 API와 관측되지 않은 변경 파
 워크스페이스 전체를 묶거나 원본 JSON을 그대로 올리지 않습니다.
 다운로드한 `report.html`은 서버 없이 열 수 있습니다.
 
-기본 리포트 경로는 `build/reqover-report.json`입니다. `cli-jar`로 개발 CLI를 지정하고,
-PR이 아닌 push·수동 실행에서는 `base-ref`를 직접 지정합니다. 매트릭스에서는
-`artifact-name`을 각각 다르게 줍니다. 파일 업로드는 `upload-artifact: "false"`로
+기본 리포트 경로는 `build/reqover-report.json`이고, CLI 기본 버전(`version`)은 `0.4.0`입니다.
+미배포 빌드를 쓸 때만 `cli-jar`로 CLI를 지정합니다. PR이 아닌 push·수동 실행에서는
+`base-ref`를 직접 지정합니다. 매트릭스에서는 `artifact-name`을 각각 다르게 줍니다. 파일 업로드는 `upload-artifact: "false"`로
 끄는 것이 기본값이며 `upload-artifact: "true"`로 켭니다. 같은 job에서 여러 번
 호출한다면 각 호출의 `artifact-name`도 다르게 지정합니다.
 
@@ -121,8 +112,9 @@ PR이 아닌 push·수동 실행에서는 `base-ref`를 직접 지정합니다. 
 코드 이름·요청 ID·스레드 이름이 있으므로 공개해도 되는 QA 데이터만 사용합니다.
 임의의 리포트 필드에 비밀값을 넣으면 Action이 자동으로 지워주지는 않습니다.
 
-테스트 초안 생성, 완전한 재현, 자동 실행, 입력값 수집, 실제 호출 순서·메서드 시간, DB 구간, TPS와 k6는
-아직 후속 단계입니다. 이번 목표는 **문제 요청을 찾고 관련 코드·재테스트 범위를
+완전한 재현, 자동 실행, 입력값 수집, 실제 호출 순서·메서드 시간, DB 구간, TPS와 k6는
+아직 후속 단계입니다. 검토한 테스트 초안은 대시보드에서 직접 만들며
+([안내](27_test_case_drafts.ko.md)), Action이 생성하거나 실행하지 않습니다. 이번 목표는 **문제 요청을 찾고 관련 코드·재테스트 범위를
 확인한 뒤 CI에서도 같은 근거를 남기는 흐름**입니다.
 
 재현 명령과 검증 범위는 [영문 안내](26_dashboard_and_ci.md)에 있습니다.

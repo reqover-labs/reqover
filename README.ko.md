@@ -39,7 +39,7 @@
 </p>
 
 > [!IMPORTANT]
-> Reqover `0.3.0`은 **초기 개발 단계**입니다. 라이브러리는 Maven Central에 `io.github.reqover-labs`로 올라가 있고, agent와 CLI jar는 [GitHub Releases](https://github.com/reqover-labs/reqover/releases)에서 받습니다. 개발·QA·스테이징 환경에서 써보는 것을 전제로 만들었고, 운영 환경에 상시로 켜두는 용도는 아닙니다.
+> Reqover `0.4.0`은 **초기 개발 단계**입니다. 라이브러리는 Maven Central에 `io.github.reqover-labs`로 올라가 있고, agent와 CLI jar는 [GitHub Releases](https://github.com/reqover-labs/reqover/releases)에서 받습니다. 개발·QA·스테이징 환경에서 써보는 것을 전제로 만들었고, 운영 환경에 상시로 켜두는 용도는 아닙니다.
 
 
 ## 무슨 문제를 푸나
@@ -69,29 +69,27 @@ Reqover는 요청이 들어오는 순간부터 응답이 나갈 때까지 **그 
 - **레거시 코드 읽기** — 문서 없는 서비스에 들어와서, API 하나가 어디까지 파고드는지 눈으로 확인할 때
 - **WebFlux 디버깅** — 요청 처리가 여러 스레드로 흩어져서 흐름을 따라가기 어려울 때
 
-## 미리보기
+## 배포 전에 느린 요청과 실패한 요청 찾기
 
-미배포 [요청 진단 기능](docs/24_request_diagnostics.ko.md)은 보관된 HTTP 상태,
-관측 처리 구간과 개별 요청 상세를 보여줍니다. 메서드 span, CPU 사용량, 네트워크
-응답시간이나 전체 서비스 TPS를 측정하는 기능은 아닙니다. JSON 상세는 기본적으로 최근
-작업 100개로 제한하며, API별 합집합과 역조회는 저장소의 전체 기록 집계를 유지합니다.
-시간·상태 통계는 남아 있는 상세 기록의 범위입니다.
+0.4.0부터 리포트는 서버 없이 열리는 대시보드입니다. 리포트 엔드포인트, 종료 시 내보낸
+파일, `reqover render` 중 어느 쪽으로든 열 수 있습니다.
 
-[오프라인 대시보드·CI 안내](docs/26_dashboard_and_ci.ko.md)에서 움직이는 요청·코드
-관계도, 재테스트 맵과 근거 파일을 확인할 수 있습니다. 애니메이션은 관측 관계를 설명하며
-실제 호출 순서를 재생하지 않습니다. 새 Action은 전체 Git 이력과 Python 3이 필요하고,
-artifact 업로드는 명시적으로 켠 경우에만 수행하며 작업마다 다른 이름을 지정합니다.
+![검증 개요: 요청 통계와 요청 하나가 실행한 코드](docs/assets/reqover-request-diagnostics.png)
 
-[테스트 초안](docs/27_test_case_drafts.ko.md)은 선택한 관측 기록을 JSON 또는 비활성화된
-JUnit 파일로 옮깁니다. 기대 결과와 안전한 GET/HEAD 경로를 직접 검토해야 하며,
-원래 입력값을 복원하거나 요청을 자동 재실행하는 기능은 아닙니다.
+- **요청 진단** — 보관된 요청마다 HTTP 상태와 어댑터가 기록한 처리 구간을 남기고 평균·p95·최대를
+  보여줍니다. 실패나 기준보다 느린 요청만 걸러서, 펼치면 그 요청이 실행한 메서드가 나옵니다.
+  [자세히](docs/24_request_diagnostics.ko.md)
+- **기록 비교** — 이전 기록의 요약을 불러와 어느 엔드포인트가 느려졌거나 실패하기 시작했는지
+  봅니다. 차이만 보여주고 판정은 사람에게 맡깁니다. [자세히](docs/28_recording_comparison.ko.md)
+- **테스트 초안** — 관측된 요청을 검토한 JSON 초안이나 JUnit 테스트로 만듭니다. 생성된 테스트는
+  로컬·QA 주소를 직접 지정하기 전까지 꺼져 있습니다. [자세히](docs/27_test_case_drafts.ko.md)
+- **CI에서** — Action이 대시보드를 artifact로 올리고, 분석마다 표시된 댓글 하나를 갱신합니다.
+  [자세히](docs/26_dashboard_and_ci.ko.md)
 
-[기록 비교](docs/28_recording_comparison.ko.md)는 보관된 요약을 비교하며, 두 실행 조건이
-비교 가능한지 직접 확인해야 합니다. 부동소수점 오차는 차이에서 제외하고 미완료 기록은
-미측정으로 둡니다. 상세가 생략된 JSON을 완전한 시간 기준선으로 사용하지 않습니다.
+![기록 비교: 같은 트래픽을 두 번 기록했고 두 번째에 한 엔드포인트가 느려짐](docs/assets/reqover-recording-comparison.png)
 
-[개선 계획](docs/23_performance_validation_plan.ko.md)과
-[리뷰 보완 기록](docs/30_review_corrections.md)에 범위와 한계를 정리했습니다.
+어댑터가 관측한 값입니다. 메서드별 시간, 호출 순서, 클라이언트 지연, 서비스 전체 TPS는 아닙니다.
+시간 통계는 보관된 요청 기준이고, 엔드포인트 호출 수와 실행 코드는 기록 전체 기준입니다.
 
 ## 리포트가 보여주는 세 가지
 
@@ -201,13 +199,13 @@ GET /auto/orders/{id}          3 classes · 3 methods · 1 thread
 의존성 하나면 어댑터와 리포트, Spring 연결이 함께 들어옵니다.
 
 ```kotlin
-implementation("io.github.reqover-labs:reqover-spring-boot-starter:0.3.0")
+implementation("io.github.reqover-labs:reqover-spring-boot-starter:0.4.0")
 ```
 
 그다음 agent를 붙이고 기록할 패키지를 지정합니다.
 
 ```bash
-java -javaagent:reqover-agent-0.3.0.jar=include=com.example.orders -jar your-app.jar
+java -javaagent:reqover-agent-0.4.0.jar=include=com.example.orders -jar your-app.jar
 ```
 
 전체 속성 목록은 [Spring 애플리케이션 연동 가이드](docs/17_integration_guide.ko.md)를
@@ -256,7 +254,7 @@ git diff --name-only origin/main... \
 | `POST /payments`   | `SharedValidator#validate(String)` |
 ```
 
-여기서 `reqover`는 릴리스에 들어 있는 `java -jar reqover-cli-0.3.0.jar`입니다. CLI에는
+여기서 `reqover`는 릴리스에 들어 있는 `java -jar reqover-cli-0.4.0.jar`입니다. CLI에는
 `render`(리포트 JSON을 단독 실행 페이지로)와 `diff`(두 기록 사이에 무엇이 달라졌는지)도
 있습니다. `--fail-on-impact`를 주면 이 분석이 게이트가 됩니다. 영향받는 것이 없으면 종료
 코드 0, 있으면 1, 입력이 잘못됐으면 2입니다.
@@ -264,7 +262,7 @@ git diff --name-only origin/main... \
 ### 3. Pull Request에 코멘트로 남기기
 
 ```yaml
-- uses: reqover-labs/reqover/.github/actions/impact@v0.3.0
+- uses: reqover-labs/reqover/.github/actions/impact@v0.4.0
   with:
     report: build/reqover-report.json
 ```
@@ -337,7 +335,7 @@ flowchart LR
 
 | 항목                 | 현재                            |
 | ------------------ | ----------------------------- |
-| 버전                 | `0.3.0`                       |
+| 버전                 | `0.4.0`                       |
 | 빌드에 필요한 JDK        | 17 또는 21                      |
 | 컴파일 결과물 대상         | Java 17                       |
 | CI                 | Ubuntu + Temurin 17 / 21      |
@@ -421,7 +419,7 @@ fork 후 브랜치를 만들고, `./gradlew clean test` 통과를 확인한 뒤 
 ## 문서 목록
 
 - [성능 검증 개선 계획](docs/23_performance_validation_plan.ko.md)
-- [미리보기 리뷰 보완 기록](docs/30_review_corrections.md)
+- [0.4.0 진단 기능 리뷰 기록](docs/30_review_corrections.md)
 - [OSV 보안 검사 보완](docs/29_osv_dependency_remediation.ko.md)
 
 - [시스템 아키텍처](docs/02_architecture.ko.md)

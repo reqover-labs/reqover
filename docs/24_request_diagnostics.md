@@ -1,23 +1,41 @@
 # Recorded request diagnostics
 
-The development report now preserves individual observations as well as the
+Since 0.4.0 the report preserves individual observations as well as the
 endpoint union. Its overview shows recorded HTTP request counts, 4xx/5xx status
 counts, average/p95/maximum recorded processing intervals, and an endpoint table
 ranked by cumulative interval. Expand a request to see its timestamps, status,
 thread names and independently resolved method set.
 
-![Request diagnostics from five synthetic requests to the MVC sample](assets/reqover-request-diagnostics.png)
+![Request diagnostics from 900 dummy requests to the MVC sample, with intentional slow and 503 endpoints](assets/reqover-request-diagnostics.png)
 
-![An actual HTTP failure expanded to show its recorded code and timestamps](assets/reqover-request-detail.png)
+![A slow request expanded to show its timestamps and recorded code](assets/reqover-request-detail.png)
 
 Screenshots were captured on October 3, 2026 from the agent-attached MVC sample
 on loopback. Numbers illustrate that recording, not an application benchmark.
 
-## Trying the preview
+## Using it with 0.4.0
 
-Build the current branch and run a sample with the agent; release `0.2.0` does
-not include this unreleased preview. The current demo script uses the built
-version automatically:
+Request diagnostics need no extra switch of their own. Add the starter from Maven Central and
+attach the agent from the [v0.4.0 release](https://github.com/reqover-labs/reqover/releases/tag/v0.4.0):
+
+```kotlin
+implementation("io.github.reqover-labs:reqover-spring-boot-starter:0.4.0")
+```
+
+```bash
+java -javaagent:reqover-agent-0.4.0.jar=include=com.example -jar build/libs/your-app.jar
+```
+
+Turn on a way to read the report, which is off by default: either
+`reqover.report.endpoint.enabled=true` and open `/reqover/report.html` while the
+application runs, or `reqover.report.export.html-path` / `json-path` for a file
+at shutdown. See the [integration guide](17_integration_guide.md#3-decide-how-you-read-the-report)
+for Maven and the full property list.
+
+### Bundled demo
+
+From a checkout of the repository (for example the `v0.4.0` tag), the demo
+script builds the agent and a sample and runs them together:
 
 ```powershell
 .\scripts\run-agent-demo.ps1 -App mvc -Port 8080
@@ -83,11 +101,11 @@ available. Endpoint aggregation, reverse lookup, `impact` and `diff` retain thei
 existing interpretation; timing/status changes are not added to coverage diff.
 
 The Java record itself now has five components. Record-pattern consumers and
-code inspecting component count must adapt. This is intended for a minor
-development release, even though the JSON extension is additive.
+code inspecting component count must adapt. This is why it shipped in the 0.4.0
+minor release, even though the JSON extension is additive.
 
-Request methods are an unordered set. This preview does not collect invocation
+Request methods are an unordered set. Reqover does not collect invocation
 order/count, timed method spans, DB intervals, test cases or load-test runs.
 Non-HTTP units remain in the JSON but are excluded from HTTP diagnostics.
 
-Replay and load-test integration are not part of this diagnostic preview.
+Replay and load-test integration are not part of request diagnostics.

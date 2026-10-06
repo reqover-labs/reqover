@@ -38,11 +38,12 @@ reqover.report.export.json-path=build/reqover-report.json
 reqover.report.export.html-path=build/reqover-report.html
 ```
 
-Run the application with the agent attached, drive your integration tests
-through it, and let it shut down normally.
+Run the application with the agent attached (`reqover-agent-0.4.0.jar` from the
+[v0.4.0 release](https://github.com/reqover-labs/reqover/releases/tag/v0.4.0)),
+drive your integration tests through it, and let it shut down normally.
 
 ```bash
-java -javaagent:reqover-agent-0.3.0.jar=include=com.example \
+java -javaagent:reqover-agent-0.4.0.jar=include=com.example \
   -jar build/libs/your-app.jar \
   --reqover.report.export.json-path=build/reqover-report.json
 ```
@@ -89,7 +90,7 @@ so nothing needs the recording JVM to read it back.
 
 ```bash
 git diff --name-only origin/main...HEAD \
-  | java -jar reqover-cli-0.3.0.jar impact \
+  | java -jar reqover-cli-0.4.0.jar impact \
       --report build/reqover-report.json \
       --changed-files -
 ```
@@ -118,11 +119,10 @@ pipeline.
 
 ## Step 3 — put it on the pull request
 
-The example below documents the released `v0.2.0` Action. For the unreleased
-source-built CLI, automatic HTML artifacts, additional outputs, and fork-safe
-comments, use [the dashboard/CI preview guide](26_dashboard_and_ci.md).
-
-The repository ships a composite action:
+The repository ships a composite action. The minimal example below posts the
+impact analysis; for the HTML dashboard artifact, per-analysis comment markers,
+the additional outputs and fork PR handling, see
+[Diagnostic dashboard and CI artifacts](26_dashboard_and_ci.md).
 
 ```yaml
 name: reqover
@@ -151,7 +151,7 @@ jobs:
       - name: Record a report
         run: ./scripts/record-reqover-report.sh
 
-      - uses: reqover-labs/reqover/.github/actions/impact@v0.3.0
+      - uses: reqover-labs/reqover/.github/actions/impact@v0.4.0
         with:
           report: build/reqover-report.json
 ```
@@ -162,14 +162,20 @@ The action's inputs:
 
 | Input            | Default   | What it does                                                     |
 | ---------------- | --------- | ---------------------------------------------------------------- |
-| `report`         | *required* | Path to the recorded report JSON                                  |
-| `version`        | `0.3.0`   | Release to download the CLI from                                  |
+| `report`         | `build/reqover-report.json` | Path to the recorded report JSON                |
+| `version`        | `0.4.0`   | Release to download the CLI from                                  |
+| `cli-jar`        | empty     | Use an existing CLI JAR (e.g. an unreleased build) instead        |
 | `base-ref`       | PR base   | Git ref to diff against; required outside a pull request          |
 | `fail-on-impact` | `false`   | Fail the step when any observed endpoint runs changed code        |
 | `comment`        | `true`    | Post the analysis as a pull request comment                       |
+| `upload-artifact` | `false`  | Opt in to upload `report.html`, `impact.md`, `impact.json`        |
+| `artifact-name`  | `reqover-report` | Artifact name; make it unique per matrix job or call       |
+| `analysis-name`  | empty     | Names the comment marker so several analyses keep separate comments |
 
 It writes the analysis to the job summary, exposes it as the `markdown` output,
-and updates its previous comment rather than adding a new one each push.
+and updates its previous comment (identified by a marker that includes
+`analysis-name`) rather than adding a new one each push. The step needs Python 3,
+Bash and full Git history on the runner.
 
 > `fail-on-impact: true` fails the build **when the change is covered**, which is
 > the opposite of what you usually want. It is for the narrow case of a module
@@ -178,7 +184,7 @@ and updates its previous comment rather than adding a new one each push.
 
 ## Command reference
 
-`reqover` below means `java -jar reqover-cli-0.3.0.jar`.
+`reqover` below means `java -jar reqover-cli-0.4.0.jar`.
 
 ### `render`
 
@@ -189,7 +195,8 @@ reqover render --report build/reqover-report.json --out build/reqover-report.htm
 ```
 
 Useful for publishing the report as a CI artifact without keeping the
-application running.
+application running. Since 0.4.0 the page is the
+[diagnostic dashboard](26_dashboard_and_ci.md).
 
 ### `impact`
 
@@ -271,5 +278,6 @@ writes — a truncated download, or an HTML page saved by mistake.
 
 - [Spring integration guide](17_integration_guide.md) — the full property list
 - [System architecture](02_architecture.md) — how attribution is recorded
+- [Diagnostic dashboard and CI artifacts](26_dashboard_and_ci.md) — HTML artifact, comment markers, outputs
 - `scripts/run-impact-demo.sh` — the whole loop against the demo application, in
   one command

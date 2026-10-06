@@ -1,4 +1,4 @@
-# Diagnostic Preview Troubleshooting
+# Diagnostics Troubleshooting
 
 ## Bounded Exports
 

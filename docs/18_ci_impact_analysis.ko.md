@@ -30,10 +30,10 @@ reqover.report.export.json-path=build/reqover-report.json
 reqover.report.export.html-path=build/reqover-report.html
 ```
 
-agent를 붙인 채로 애플리케이션을 실행하고, 통합 테스트를 그 위로 흘려보낸 다음, 정상적으로 종료시킵니다.
+agent(`reqover-agent-0.4.0.jar`, [v0.4.0 릴리스](https://github.com/reqover-labs/reqover/releases/tag/v0.4.0)에서 받음)를 붙인 채로 애플리케이션을 실행하고, 통합 테스트를 그 위로 흘려보낸 다음, 정상적으로 종료시킵니다.
 
 ```bash
-java -javaagent:reqover-agent-0.3.0.jar=include=com.example \
+java -javaagent:reqover-agent-0.4.0.jar=include=com.example \
   -jar build/libs/your-app.jar \
   --reqover.report.export.json-path=build/reqover-report.json
 ```
@@ -67,7 +67,7 @@ curl -sf http://127.0.0.1:8080/reqover/report > build/reqover-report.json
 
 ```bash
 git diff --name-only origin/main...HEAD \
-  | java -jar reqover-cli-0.3.0.jar impact \
+  | java -jar reqover-cli-0.4.0.jar impact \
       --report build/reqover-report.json \
       --changed-files -
 ```
@@ -93,11 +93,9 @@ Changed paths with no observed coverage (1):
 
 ## 3단계 — Pull Request에 붙이기
 
-아래는 배포된 `v0.2.0` Action 예제입니다. 직접 빌드한 CLI, HTML 자동 저장,
-추가 출력과 fork PR 댓글 처리 등 개발 기능은
+저장소에 composite action이 들어 있습니다. 아래는 영향도 분석만 남기는 최소 예제입니다.
+HTML 대시보드 Artifact, 분석별 댓글 구분, 추가 출력과 fork PR 처리는
 [대시보드와 CI 연결](26_dashboard_and_ci.ko.md)을 참고하세요.
-
-저장소에 composite action이 들어 있습니다.
 
 ```yaml
 name: reqover
@@ -126,7 +124,7 @@ jobs:
       - name: Record a report
         run: ./scripts/record-reqover-report.sh
 
-      - uses: reqover-labs/reqover/.github/actions/impact@v0.3.0
+      - uses: reqover-labs/reqover/.github/actions/impact@v0.4.0
         with:
           report: build/reqover-report.json
 ```
@@ -137,19 +135,23 @@ action의 입력값:
 
 | 입력값            | 기본값     | 하는 일                                                          |
 | ---------------- | --------- | ---------------------------------------------------------------- |
-| `report`         | *필수*     | 기록된 리포트 JSON 파일 경로                                        |
-| `version`        | `0.3.0`   | CLI를 받아올 릴리스                                                |
+| `report`         | `build/reqover-report.json` | 기록된 리포트 JSON 파일 경로                     |
+| `version`        | `0.4.0`   | CLI를 받아올 릴리스                                                |
+| `cli-jar`        | 비어 있음  | 릴리스 대신 이미 있는 CLI JAR(예: 미배포 빌드)를 사용                  |
 | `base-ref`       | PR의 base | diff 기준이 되는 Git ref. Pull Request 밖에서는 필수                 |
 | `fail-on-impact` | `false`   | 관측된 엔드포인트가 바뀐 코드를 실행하면 스텝을 실패시킴                 |
 | `comment`        | `true`    | 분석 결과를 Pull Request 코멘트로 남김                              |
+| `upload-artifact` | `false`  | `report.html`, `impact.md`, `impact.json` 업로드를 명시적으로 켬      |
+| `artifact-name`  | `reqover-report` | Artifact 이름. 매트릭스 job·호출마다 다르게 지정             |
+| `analysis-name`  | 비어 있음  | 코멘트 표식 이름. 한 PR의 여러 분석이 각자 코멘트를 유지                |
 
-분석 결과는 job summary에 쓰이고, `markdown` 출력으로도 노출됩니다. 푸시할 때마다 새 코멘트를 다는 대신 이전 코멘트를 갱신합니다.
+분석 결과는 job summary에 쓰이고, `markdown` 출력으로도 노출됩니다. 푸시할 때마다 새 코멘트를 다는 대신 이전 코멘트(`analysis-name`이 들어간 표식으로 구분)를 갱신합니다. runner에는 Python 3, Bash와 전체 Git 히스토리가 필요합니다.
 
 > `fail-on-impact: true`는 **변경이 커버되었을 때** 빌드를 실패시킵니다. 보통 원하는 것과 반대입니다. API 표면에서 도달할 수 없어야 하는 모듈을 지키는, 좁은 용도로 만든 옵션입니다. 평범한 리뷰라면 켜지 말고 코멘트를 읽으세요.
 
 ## 명령 레퍼런스
 
-아래에서 `reqover`는 `java -jar reqover-cli-0.3.0.jar`를 뜻합니다.
+아래에서 `reqover`는 `java -jar reqover-cli-0.4.0.jar`를 뜻합니다.
 
 ### `render`
 
@@ -159,7 +161,7 @@ action의 입력값:
 reqover render --report build/reqover-report.json --out build/reqover-report.html
 ```
 
-애플리케이션을 계속 띄워둘 필요 없이 리포트를 CI 아티팩트로 남기고 싶을 때 씁니다.
+애플리케이션을 계속 띄워둘 필요 없이 리포트를 CI 아티팩트로 남기고 싶을 때 씁니다. 0.4.0부터 이 페이지는 [진단 대시보드](26_dashboard_and_ci.ko.md)입니다.
 
 ### `impact`
 
@@ -218,4 +220,5 @@ CI에서는 이 구분이 중요합니다. `2`는 파이프라인 설정이 잘�
 
 - [Spring 애플리케이션 연동 가이드](17_integration_guide.ko.md) — 전체 속성 목록
 - [시스템 아키텍처](02_architecture.ko.md) — 실행 귀속이 어떻게 기록되는가
+- [대시보드와 CI 연결](26_dashboard_and_ci.ko.md) — HTML Artifact, 코멘트 표식, 출력값
 - `scripts/run-impact-demo.sh` — 데모 애플리케이션에 대고 전체 흐름을 명령 하나로 돌려보기

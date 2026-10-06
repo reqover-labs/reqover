@@ -9,7 +9,7 @@ inputs:
   version:
     description: CLI release to download, without the leading v. Ignored when cli-jar is supplied.
     required: false
-    default: "0.3.0"
+    default: "0.4.0"
   cli-jar:
     description: Optional path to an existing source-built CLI JAR, for unreleased report features.
     required: false

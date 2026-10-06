@@ -39,7 +39,7 @@ recorded per request, answerable in reverse, and checkable in CI.</p>
 </p>
 
 > [!IMPORTANT]
-> Reqover `0.3.0` is an **early development release**. The libraries are on Maven Central as `io.github.reqover-labs`, and the agent and CLI jars are on [GitHub Releases](https://github.com/reqover-labs/reqover/releases). Reqover is designed for development, QA, and staging — not for running permanently in production.
+> Reqover `0.4.0` is an **early development release**. The libraries are on Maven Central as `io.github.reqover-labs`, and the agent and CLI jars are on [GitHub Releases](https://github.com/reqover-labs/reqover/releases). Reqover is designed for development, QA, and staging — not for running permanently in production.
 
 
 ## What problem it solves
@@ -69,32 +69,31 @@ Reqover records, from the moment a request arrives until the response leaves, **
 - **Reading unfamiliar code** — you joined an undocumented service and want to see how deep one API actually reaches
 - **Debugging WebFlux** — request handling is scattered across threads and the flow is hard to follow
 
-## Preview
+## Slow and failing requests, before you deploy
 
-The unreleased [request diagnostics preview](docs/24_request_diagnostics.md)
-adds retained HTTP status counts, recorded processing intervals and individual
-request details. These are adapter observations, not method spans, CPU usage,
-network response times or whole-service TPS. JSON details default to the newest
-100 units; endpoint unions and reverse lookup preserve the store's recording-wide
-aggregates, while timing/status statistics remain limited to retained details.
+Since 0.4.0 the report is an offline dashboard. Open it from the report endpoint,
+from the file the application exports on shutdown, or with `reqover render`.
 
-The [offline dashboard and CI guide](docs/26_dashboard_and_ci.md) adds animated
-request/code associations, a retest map and downloadable evidence. Animation is
-illustrative, not measured call order. The updated Action requires full Git
-history and Python 3; artifact upload is opt-in with distinct names per job.
+![Validation overview: request statistics and the code one request ran](docs/assets/reqover-request-diagnostics.png)
 
-[Reviewed test drafts](docs/27_test_case_drafts.md) turn a selected observation
-into a JSON draft or a disabled JUnit test. Expected results and safe concrete
-GET/HEAD paths require manual review; no original inputs or replay are implied.
+- **Request diagnostics** — HTTP status and the adapter's recorded interval for
+  each retained request, with average, p95 and maximum. Filter to failures or to
+  requests over a threshold, then expand one to see the methods it ran.
+  [Details](docs/24_request_diagnostics.md)
+- **Recording comparison** — import the summary of an earlier recording and see
+  which endpoints got slower or started failing. It shows the deltas and leaves
+  the verdict to you. [Details](docs/28_recording_comparison.md)
+- **Test drafts** — turn an observed request into a reviewed JSON draft or a
+  JUnit test. Generated tests are disabled until you set a local or QA base URL.
+  [Details](docs/27_test_case_drafts.md)
+- **In CI** — the Action uploads the dashboard as an artifact and keeps one
+  marked comment per analysis. [Details](docs/26_dashboard_and_ci.md)
 
-[Recording comparison](docs/28_recording_comparison.md) compares retained
-aggregate summaries with explicit comparability confirmation. Floating-point
-noise is suppressed; unfinished and legacy observations stay unmeasured.
-Truncated detail exports are not accepted as complete timing baselines.
+![Recording comparison: the same traffic recorded twice, one endpoint slower the second time](docs/assets/reqover-recording-comparison.png)
 
-The [performance validation plan](docs/23_performance_validation_plan.ko.md)
-(Korean) and the [review notes](docs/30_review_corrections.md) record the scope
-and its boundaries.
+These are what the adapter observed: no method timings, call order, client-side
+latency or whole-service TPS. Timing statistics cover the retained requests,
+while endpoint counts and executed code cover the whole recording.
 
 ## Three things the report shows
 
@@ -204,13 +203,13 @@ is the same sequence the [CI section](#use-it-in-ci) describes, in one command.
 One dependency brings the adapters, the report, and the Spring wiring:
 
 ```kotlin
-implementation("io.github.reqover-labs:reqover-spring-boot-starter:0.3.0")
+implementation("io.github.reqover-labs:reqover-spring-boot-starter:0.4.0")
 ```
 
 Then attach the agent and name the packages to record:
 
 ```bash
-java -javaagent:reqover-agent-0.3.0.jar=include=com.example.orders -jar your-app.jar
+java -javaagent:reqover-agent-0.4.0.jar=include=com.example.orders -jar your-app.jar
 ```
 
 See the [Spring integration guide](docs/17_integration_guide.md) for the full
@@ -257,7 +256,7 @@ git diff --name-only origin/main... \
 | `POST /payments`   | `SharedValidator#validate(String)` |
 ```
 
-`reqover` here is `java -jar reqover-cli-0.3.0.jar` from the release. The CLI
+`reqover` here is `java -jar reqover-cli-0.4.0.jar` from the release. The CLI
 also has `render` (report JSON to a standalone page) and `diff` (what changed
 between two recordings). `--fail-on-impact` turns the analysis into a gate:
 exit code 0 when nothing is affected, 1 when something is, 2 on bad input.
@@ -265,7 +264,7 @@ exit code 0 when nothing is affected, 1 when something is, 2 on bad input.
 ### 3. Have it comment on the pull request
 
 ```yaml
-- uses: reqover-labs/reqover/.github/actions/impact@v0.3.0
+- uses: reqover-labs/reqover/.github/actions/impact@v0.4.0
   with:
     report: build/reqover-report.json
 ```
@@ -338,7 +337,7 @@ Written plainly. Using a tool with the wrong expectations wastes everyone's time
 
 | Item                      | Current                       |
 | ------------------------- | ----------------------------- |
-| Version                   | `0.3.0`                       |
+| Version                   | `0.4.0`                       |
 | JDK required to build     | 17 or 21                      |
 | Bytecode target           | Java 17                       |
 | CI                        | Ubuntu + Temurin 17 / 21      |
@@ -420,7 +419,7 @@ Issues, pull requests, and commit messages are written in English so contributor
 ## Documentation
 
 - [Performance validation plan](docs/23_performance_validation_plan.ko.md) (Korean)
-- [Preview review corrections](docs/30_review_corrections.md)
+- [Review notes for the 0.4.0 diagnostics](docs/30_review_corrections.md)
 - [OSV dependency remediation](docs/29_osv_dependency_remediation.md)
 
 - [System architecture](docs/02_architecture.md) · [한국어판](docs/02_architecture.ko.md)

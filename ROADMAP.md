@@ -11,14 +11,11 @@ the fastest way to change what we work on.
 
 ## Now
 
-**Performance validation preview (Oct-Nov 2026).** The
-[plan](docs/23_performance_validation_plan.ko.md) (Korean) sets the scope for
-this preview; it is not a promised release date. On main for the next release:
-[request diagnostics #34](https://github.com/reqover-labs/reqover/pull/34),
-[dashboard/CI #35](https://github.com/reqover-labs/reqover/pull/35),
-[test drafts #36](https://github.com/reqover-labs/reqover/pull/36) and
-[recording comparison #37](https://github.com/reqover-labs/reqover/pull/37). Faithful replay, selective input capture,
-method spans and k6 execution are follow-up work, not current capabilities.
+**Lightweight pre-deploy validation.** 0.4.0 shipped request diagnostics, the
+offline dashboard, reviewed test drafts and recording comparison
+([plan](docs/23_performance_validation_plan.ko.md), Korean). Next: selective
+input capture with masking, method-level timing, and a k6 run/import loop.
+Faithful replay and production APM remain non-goals.
 
 Today nobody can depend on Reqover by coordinate. The pipeline is built and
 signs on demand; what remains is a namespace, a key, and a smoke test from

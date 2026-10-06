@@ -75,7 +75,8 @@ The unreleased [request diagnostics preview](docs/24_request_diagnostics.md)
 adds retained HTTP status counts, recorded processing intervals and individual
 request details. These are adapter observations, not method spans, CPU usage,
 network response times or whole-service TPS. JSON details default to the newest
-100 units; endpoint unions and reverse lookup still cover all retained units.
+100 units; endpoint unions and reverse lookup preserve the store's recording-wide
+aggregates, while timing/status statistics remain limited to retained details.
 
 The [offline dashboard and CI guide](docs/26_dashboard_and_ci.md) adds animated
 request/code associations, a retest map and downloadable evidence. Animation is
@@ -190,7 +191,7 @@ is the same sequence the [CI section](#use-it-in-ci) describes, in one command.
 One dependency brings the adapters, the report, and the Spring wiring:
 
 ```kotlin
-implementation("io.reqover:reqover-spring-boot-starter:0.2.0")
+implementation("io.github.reqover-labs:reqover-spring-boot-starter:0.2.0")
 ```
 
 Then attach the agent and name the packages to record:
@@ -309,7 +310,7 @@ Written plainly. Using a tool with the wrong expectations wastes everyone's time
 
 - **It does not know which lines ran.** Method granularity only. If you need line and branch precision, use JaCoCo.
 - **Compiler-generated methods** are not recorded, and neither are **runtime proxies** (Spring CGLIB, Hibernate, Byte Buddy) or **trivial accessors** — a getter or setter that only reads or writes one field, including record accessors. Requests that match no controller and fall through to the static resource handler are not recorded either.
-- **Records live in memory only.** The default cap is 10,000 entries (`reqover.mvc.max-snapshots` / `reqover.webflux.max-snapshots`); beyond that the oldest are dropped, and restarting the application clears everything. `CoverageStore` is the extension point for storing them elsewhere, but Reqover ships no persistent implementation — export the report to a file instead.
+- **Records live in memory only.** The default cap is 10,000 per-request records (`reqover.mvc.max-snapshots` / `reqover.webflux.max-snapshots`); beyond that the oldest are dropped. Which endpoints ran, how often and what they executed is kept separately per endpoint, so an endpoint called only early in a long recording stays in the report. Restarting the application clears everything. `CoverageStore` is the extension point for storing them elsewhere, but Reqover ships no persistent implementation — export the report to a file instead.
 - **Impact analysis is bounded by what was recorded.** It matches changed files against code the report observed running. A file it cannot match is reported as unmatched, which means "not seen", not "not affected".
 - **MVC async sections are not linked automatically.** Work handed to a separate thread is not recorded; attribution resumes when request handling returns.
 - **The WebFlux adapter turns on one JVM-wide setting.** (Reactor's automatic context propagation — needed to carry request information across threads.) If you don't want that, disable the adapter entirely with `reqover.webflux.enabled=false` before the application starts.

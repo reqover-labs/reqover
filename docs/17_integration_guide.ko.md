@@ -44,16 +44,16 @@ cd reqover
 
 Windows는 `.\gradlew.bat clean publishToMavenLocal`입니다.
 
-설치되는 것은 `io.reqover` 그룹의 라이브러리 모듈입니다.
+설치되는 것은 `io.github.reqover-labs` 그룹의 라이브러리 모듈입니다.
 
 | 아티팩트 | 버전 |
 | --- | --- |
-| `io.reqover:reqover-core` | `0.2.0` |
-| `io.reqover:reqover-instrumentation` | `0.2.0` |
-| `io.reqover:reqover-report` | `0.2.0` |
-| `io.reqover:reqover-spring-mvc` | `0.2.0` |
-| `io.reqover:reqover-spring-webflux` | `0.2.0` |
-| `io.reqover:reqover-spring-boot-starter` | `0.2.0` |
+| `io.github.reqover-labs:reqover-core` | `0.2.0` |
+| `io.github.reqover-labs:reqover-instrumentation` | `0.2.0` |
+| `io.github.reqover-labs:reqover-report` | `0.2.0` |
+| `io.github.reqover-labs:reqover-spring-mvc` | `0.2.0` |
+| `io.github.reqover-labs:reqover-spring-webflux` | `0.2.0` |
+| `io.github.reqover-labs:reqover-spring-boot-starter` | `0.2.0` |
 
 **`reqover-agent`와 `reqover-cli`는 여기 없습니다.** 둘 다 의존성이 섞이지 않게 따로 묶은(shaded) 실행 파일이고 컴파일할 때 참조하는 라이브러리가 아니라서 배포 대상이 아닙니다. GitHub Release에서 파일로 받습니다 → [4단계](#4-java-agent-붙여서-실행).
 
@@ -90,7 +90,7 @@ repositories {
 }
 
 dependencies {
-    implementation("io.reqover:reqover-spring-boot-starter:0.2.0")
+    implementation("io.github.reqover-labs:reqover-spring-boot-starter:0.2.0")
 }
 ```
 
@@ -101,7 +101,7 @@ repositories {
 }
 
 dependencies {
-    implementation 'io.reqover:reqover-spring-boot-starter:0.2.0'
+    implementation 'io.github.reqover-labs:reqover-spring-boot-starter:0.2.0'
 }
 ```
 
@@ -124,12 +124,12 @@ dependencies {
 ```kotlin
 dependencies {
     // Spring MVC 프로젝트라면
-    implementation("io.reqover:reqover-spring-mvc:0.2.0")
+    implementation("io.github.reqover-labs:reqover-spring-mvc:0.2.0")
 
     // Spring WebFlux 프로젝트라면 (위 대신)
-    // implementation("io.reqover:reqover-spring-webflux:0.2.0")
+    // implementation("io.github.reqover-labs:reqover-spring-webflux:0.2.0")
 
-    implementation("io.reqover:reqover-report:0.2.0")
+    implementation("io.github.reqover-labs:reqover-report:0.2.0")
 }
 ```
 
@@ -387,6 +387,16 @@ include=com.example,accessors=record
 
 테스트 167개짜리 Spring Boot 서비스의 최근 커밋 12개에서, 영향 분석이 연결하지 못한 소스 파일이 33개에서 21개로 줄었고 역인덱스는 세 배가 됐습니다. 사람이 읽는 리포트에는 기본값(`accessors=skip`)을 쓰세요.
 
+### `references`: 인터페이스와 enum 상수를 엔드포인트와 연결하기
+
+Spring Data repository 같은 애플리케이션 인터페이스에는 실행되는 메서드 몸체가 없고, enum 상수를 읽어도 enum 파일 안의 코드는 실행되지 않습니다. 그래서 `OrderRepository.java`나 `OrderStatus.java`를 바꿔도 어느 엔드포인트와도 연결되지 않습니다. `references=record`는 포함된 인터페이스를 호출하는 곳과 포함된 클래스의 static 필드를 읽는 곳에 probe를 넣고, 참조된 클래스 쪽으로 기록합니다.
+
+```text
+include=com.example,accessors=record,references=record
+```
+
+두 옵션을 함께 쓰면 위 서비스에서 연결하지 못한 파일이 21개에서 18개로 줄었고, 남은 것은 Swagger 전용 `*Docs` 인터페이스, 기동 시에만 도는 초기화 코드, 리플렉션으로만 읽히는 enum 하나(JPA 컬럼 타입)였습니다. 리플렉션으로만 쓰이는 타입과 컴파일 시점 상수(`javac`가 인라인하는 `static final` 기본형·`String`)는 여전히 연결되지 않습니다. 널리 쓰이는 enum이 모든 엔드포인트 아래에 나타나게 되므로 기본값은 꺼져 있습니다.
+
 ---
 
 ## 5. 잘 됐는지 확인하기
@@ -414,7 +424,7 @@ WebFlux라면 하나 더 — 한 API의 기록 안에 **서로 다른 스레드 
 | `[reqover] no include configured` | `include=`를 안 줬음 | `include=내.패키지` 추가. 이 상태에서는 의도적으로 아무것도 계측하지 않습니다 |
 | `[reqover] no valid include configured` | `include`를 줬지만 값이 비어 있음 | `include=` 뒤에 값이 있는지, 쉼표/세미콜론을 헷갈리지 않았는지 확인 |
 | `[reqover] ignoring malformed agent option` | `key=value` 형태가 아님 | `include=com.example` 처럼 `=`를 넣었는지 확인 |
-| `[reqover] ignoring unknown agent option` | `include`/`exclude`/`accessors` 외의 키를 씀 | 오타 확인 (`includes`, `packages` 등은 인식하지 않습니다) |
+| `[reqover] ignoring unknown agent option` | `include`/`exclude`/`accessors`/`references` 외의 키를 씀 | 오타 확인 (`includes`, `packages` 등은 인식하지 않습니다) |
 | 엔드포인트는 나오는데 클래스 목록이 비어 있음 | `include`가 내 클래스와 안 맞음 | 클래스가 아니라 **패키지 접두사**를 주는지, 기본 제외(`org.springframework.` 등)에 걸리지 않는지 확인 |
 | `/reqover/report`가 404 | **엔드포인트는 기본이 꺼짐** | `reqover.report.endpoint.enabled=true`를 넣거나 직접 컨트롤러를 만드세요. 아무 설정도 안 한 상태에서는 이게 정상 동작입니다 |
 | 엔드포인트를 켰는데도 404 | 어댑터가 안 켜져서 `CoverageStore`도 리포트 서비스도 없음 | 웹 애플리케이션이 맞는지, `reqover.mvc.enabled=false` / `reqover.webflux.enabled=false`로 꺼두지 않았는지 확인 |
@@ -423,8 +433,8 @@ WebFlux라면 하나 더 — 한 API의 기록 안에 **서로 다른 스레드 
 | 종료했는데 파일이 없음 | `SIGKILL`로 죽였거나 쓰기가 실패함 | `SIGTERM`으로 멈추고 종료를 기다리세요. stdout의 `[reqover] wrote the`와 stderr의 `[reqover] could not write` 확인 |
 | `0.1.1`에서 올린 뒤 `InMemoryCoverageStore` 주입 실패 | 어댑터가 이제 `CoverageStore` 빈을 만듦 | 주입 지점을 `CoverageStore`로 바꾸세요. [저장소 교체하기](#저장소-교체하기) 참고 |
 | `CoverageStore` 빈 주입 실패 | 어댑터 의존성이 없거나 웹 타입이 안 맞음 | 스타터를 쓰거나, MVC 앱에 `reqover-spring-mvc`, WebFlux 앱에 `reqover-spring-webflux`가 들어갔는지 확인 |
-| 의존성을 못 찾음 (`Could not find io.reqover:...`) | 1단계를 안 했거나 `mavenLocal()`이 없음 | `publishToMavenLocal` 재실행, `mavenLocal()`이 `mavenCentral()`보다 앞인지 확인 |
-| 한참 뒤 오래된 기록이 사라짐 | 보관 개수 상한(기본 10,000)에 도달 | 정상 동작입니다. [보관 개수 조정](#보관-개수-조정) 참고 |
+| 의존성을 못 찾음 (`Could not find io.github.reqover-labs:...`) | 1단계를 안 했거나 `mavenLocal()`이 없음 | `publishToMavenLocal` 재실행, `mavenLocal()`이 `mavenCentral()`보다 앞인지 확인 |
+| 한참 뒤 오래된 요청 id가 사라짐 | 보관 개수 상한(기본 10,000)에 도달 | 정상 동작입니다. 엔드포인트, 호출 횟수, 실행한 메서드는 엔드포인트별로 남고 요청 단위 세부만 지워집니다. [보관 개수 조정](#보관-개수-조정) 참고 |
 
 ---
 
@@ -432,7 +442,7 @@ WebFlux라면 하나 더 — 한 API의 기록 안에 **서로 다른 스레드 
 
 ### 보관 개수 조정
 
-기록은 메모리에만 남고 기본 상한이 10,000건입니다. 상한을 넘으면 가장 오래된 스냅샷을 지우거나(`oldest-first`, 기본), 기존 창을 그대로 두고 새로 들어오는 것을 버립니다(`reject-when-full`). 상한과 정책 모두 속성으로 조정합니다 — 빈을 만들 필요가 없습니다.
+기록은 메모리에만 남고 요청별 스냅샷의 기본 상한이 10,000건입니다. 상한을 넘으면 가장 오래된 스냅샷을 지우거나(`oldest-first`, 기본), 기존 창을 그대로 두고 새로 들어오는 것을 버립니다(`reject-when-full`). 어느 쪽이든 모든 요청은 엔드포인트별 합계에도 더해지므로, 리포트의 엔드포인트·호출 횟수·실행 메서드는 기록 전체를 다룹니다. 창에 묶이는 것은 요청 id뿐입니다. 상한과 정책 모두 속성으로 조정합니다 — 빈을 만들 필요가 없습니다.
 
 ```properties
 reqover.mvc.max-snapshots=50000

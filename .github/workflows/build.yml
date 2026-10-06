@@ -150,6 +150,7 @@ jobs:
     with:
       download-artifact: reqover-sbom
       scan-args: |-
+        --config=osv-scanner.toml
         --sbom=reqover.cdx.json
       upload-sarif: false
       fail-on-vuln: true

@@ -1,6 +1,6 @@
 # 10. Demo Script
 
-> Historical demo script. Use the [current quickstart](../README.md#try-it-in-5-minutes) and [feature guides](README.md) for the 0.4.1 dashboard, defaults and release artifacts.
+> Historical demo script. Use the [current quickstart](../README.md#try-it-in-5-minutes) and [feature guides](README.md) for the released dashboard, defaults and artifacts.
 
 ## Goal
 

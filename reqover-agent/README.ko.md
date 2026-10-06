@@ -6,12 +6,12 @@
 Spring starter 또는 직접 관리한 `UnitScope`와 함께 사용합니다. agent만 붙인다고
 HTTP 요청 귀속이나 리포트 엔드포인트가 생기는 것은 아닙니다.
 
-[v0.4.1 릴리스](https://github.com/reqover-labs/reqover/releases/tag/v0.4.1)에서
-`reqover-agent-0.4.1.jar`와 체크섬 파일을 받습니다. Maven Central 라이브러리가 아닌
+[v0.4.2 릴리스](https://github.com/reqover-labs/reqover/releases/tag/v0.4.2)에서
+`reqover-agent-0.4.2.jar`와 체크섬 파일을 받습니다. Maven Central 라이브러리가 아닌
 의존성을 묶은 실행 JAR이며 JDK 17 이상이 필요합니다.
 
 ```bash
-java -javaagent:reqover-agent-0.4.1.jar=include=com.example -jar app.jar
+java -javaagent:reqover-agent-0.4.2.jar=include=com.example -jar app.jar
 ```
 
 | 옵션 | 기본값 | 의미 |

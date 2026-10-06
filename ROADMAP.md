@@ -37,6 +37,7 @@ from full-recording code relationships.
 - Optional accessor/reference recording, multi-context exports and endpoint aggregates.
 - Offline dashboard, reviewed disabled test drafts, retained-summary comparison and opt-in CI artifacts.
 - WebFlux catch-all pattern handling fixed in 0.4.1.
+- The `/` search shortcut respects editable fields in 0.4.2.
 
 See [CHANGELOG](CHANGELOG.md) for release boundaries; completed work is not a future promise.
 

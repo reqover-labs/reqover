@@ -7,11 +7,11 @@
 Action이 agent를 설치하거나 앱 테스트를 실행하지는 않습니다.
 
 `pull_request` 작업에서 전체 이력 checkout(`fetch-depth: 0`), Java 준비와 리포트
-생성 뒤 `reqover-labs/reqover/.github/actions/impact@v0.4.1`을 사용합니다.
+생성 뒤 `reqover-labs/reqover/.github/actions/impact@v0.4.2`을 사용합니다.
 컨테이너 내부를 포함한 실행 환경에 Java 17+, Bash, Git, curl, Python 3이 필요합니다.
 
 ```yaml
-- uses: reqover-labs/reqover/.github/actions/impact@v0.4.1
+- uses: reqover-labs/reqover/.github/actions/impact@v0.4.2
   with:
     report: build/reqover-report.json
     comment: "false"
@@ -20,7 +20,7 @@ Action이 agent를 설치하거나 앱 테스트를 실행하지는 않습니다
     analysis-name: ${{ github.job }}-${{ strategy.job-index || 'single' }}
 ```
 
-기본값은 CLI `version: 0.4.1`, `comment: true`, `upload-artifact: false`,
+기본값은 CLI `version: 0.4.2`, `comment: true`, `upload-artifact: false`,
 `fail-on-impact: false`입니다. 업로드는 `report.html`, `impact.md`, `impact.json`
 세 파일만 7일간 보관합니다. matrix·반복 실행은 artifact 이름을 구분하고,
 `analysis-name`도 구분하면 분석마다 독립적인 봇 댓글을 갱신합니다.

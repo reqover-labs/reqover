@@ -2,9 +2,9 @@
 
 # Documentation
 
-Current usage is based on **0.4.1**. Libraries are on Maven Central under
+Current usage is based on **0.4.2**. Libraries are on Maven Central under
 `io.github.reqover-labs`; agent and CLI executables are in the
-[GitHub release](https://github.com/reqover-labs/reqover/releases/tag/v0.4.1).
+[GitHub release](https://github.com/reqover-labs/reqover/releases/tag/v0.4.2).
 Java packages remain `io.reqover.*`. The root quickstart pins that release;
 `main` may contain subsequent changes.
 

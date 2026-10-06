@@ -2,7 +2,7 @@
 
 # Spring WebFlux Adapter
 
-Maven Central library: `io.github.reqover-labs:reqover-spring-webflux:0.4.1`.
+Maven Central library: `io.github.reqover-labs:reqover-spring-webflux:0.4.2`.
 Use the [starter](../reqover-spring-boot-starter/README.md) and agent for the usual
 Spring Boot integration. The adapter itself does not serve a report endpoint.
 

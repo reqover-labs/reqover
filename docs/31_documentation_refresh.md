@@ -1,6 +1,6 @@
 # Current Usage Documentation Refresh
 
-Baseline: release **0.4.1**, checked against main `2cbfbfa` on October 6, 2026.
+Baseline: release **0.4.2**, checked against main `0afe11b` on October 6, 2026.
 This is a documentation-only update, not a release or runtime behavior change.
 
 ## Scope
@@ -29,9 +29,19 @@ No global replacement of `0.2.0` or `io.reqover` is appropriate: old release
 history is intentional and Java package names are unchanged. Protected organiser
 templates and private submission files are not restored or published.
 
+The 0.4.2 publication completed during this update. Current install commands and
+artifacts were aligned only after verifying that release. The v0.2.0 video,
+0.4.0 diagnostic introduction and 0.4.1 WebFlux fix remain dated milestones.
+
 ## Validation
 
 Check relative links and heading anchors in the changed current guides, compare
 default values to source/Action metadata, and smoke-test the documented CLI
-commands using the checksum-verified 0.4.1 release. Preserve source/configuration,
+commands using the checksum-verified 0.4.2 release. Preserve source/configuration,
 SBOM and security policy; no application behavior changes require new runtime tests.
+
+Outcome: 56 Markdown files checked, 474 relative links/anchors valid, no
+historical link regressions, all nine CLI smoke cases passed against the
+checksum-verified 0.4.2 release. All six 0.4.2 library POMs returned HTTP 200
+from Maven Central after propagation. Application sources, workflows, build
+metadata and the SBOM match the synchronized main; the PR contains documentation only.

@@ -2,7 +2,7 @@
 
 # Spring MVC 어댑터
 
-Maven Central 라이브러리 `io.github.reqover-labs:reqover-spring-mvc:0.4.1`입니다.
+Maven Central 라이브러리 `io.github.reqover-labs:reqover-spring-mvc:0.4.2`입니다.
 일반 Spring Boot 앱은 이 어댑터를 직접 연결하기보다
 [starter](../reqover-spring-boot-starter/README.ko.md)와 agent를 사용합니다.
 

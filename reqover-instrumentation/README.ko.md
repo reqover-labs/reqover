@@ -2,7 +2,7 @@
 
 # 바이트코드 계측
 
-Maven Central 라이브러리 `io.github.reqover-labs:reqover-instrumentation:0.4.1`입니다.
+Maven Central 라이브러리 `io.github.reqover-labs:reqover-instrumentation:0.4.2`입니다.
 대부분의 앱은 이 모듈을 직접 사용하기보다 [agent](../reqover-agent/README.ko.md)를
 붙입니다. Java 패키지는 `io.reqover.instrumentation` 그대로입니다.
 

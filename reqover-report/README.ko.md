@@ -2,7 +2,7 @@
 
 # 리포트와 진단 대시보드
 
-Maven Central 라이브러리 `io.github.reqover-labs:reqover-report:0.4.1`입니다.
+Maven Central 라이브러리 `io.github.reqover-labs:reqover-report:0.4.2`입니다.
 starter에 이미 포함됩니다. core에 의존하며 Spring이나 JSON 라이브러리를 요구하지 않습니다.
 
 | 기능 | 데이터와 한계 |

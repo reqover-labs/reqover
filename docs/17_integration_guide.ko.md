@@ -270,7 +270,7 @@ public class InternalReqoverReportController {
 스타터를 안 쓴다면 `CoverageStore`를 주입받아서 `reqover-report`의 `CoverageReportGenerator`, `HtmlCoverageReportRenderer`로 리포트를 직접 만들면 됩니다.
 
 > [!IMPORTANT]
-> **`InMemoryCoverageStore`가 아니라 `CoverageStore`를 주입받으세요.** `0.4.1`에서 바뀐 부분입니다 — [저장소 교체하기](#저장소-교체하기) 참고.
+> **`InMemoryCoverageStore`가 아니라 `CoverageStore`를 주입받으세요.** `0.2.0`에서 바뀐 부분입니다 — [저장소 교체하기](#저장소-교체하기) 참고.
 
 동작하는 전체 예시는 [`examples/mvc-sample`](../examples/mvc-sample)과 [`examples/webflux-sample`](../examples/webflux-sample)에 있습니다.
 

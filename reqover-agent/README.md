@@ -6,12 +6,12 @@ The Java agent instruments included application classes at load time. Use it
 with the Spring starter or an explicitly managed `UnitScope`; the agent alone
 does not create HTTP request attribution or a report endpoint.
 
-Download `reqover-agent-0.4.1.jar` and the checksum file from the
-[v0.4.1 release](https://github.com/reqover-labs/reqover/releases/tag/v0.4.1).
+Download `reqover-agent-0.4.2.jar` and the checksum file from the
+[v0.4.2 release](https://github.com/reqover-labs/reqover/releases/tag/v0.4.2).
 It is a shaded executable, not a Maven Central library. JDK 17+ is required.
 
 ```bash
-java -javaagent:reqover-agent-0.4.1.jar=include=com.example -jar app.jar
+java -javaagent:reqover-agent-0.4.2.jar=include=com.example -jar app.jar
 ```
 
 | Option | Default | Meaning |

@@ -25,6 +25,7 @@ GitHub Release에서 받습니다. 이제 예제 밖의 실제 앱에서 설치�
 - 선택적 접근자·참조 기록, 여러 context의 파일 내보내기 누적과 전체 endpoint 집계.
 - 대시보드, 비활성화된 테스트 초안, 보관 요약 비교와 opt-in CI artifact.
 - 0.4.1의 WebFlux catch-all route 패턴 처리 수정.
+- 0.4.2의 텍스트 입력 중 `/` 검색 단축키 포커스 간섭 수정.
 
 ## 다음 후보
 

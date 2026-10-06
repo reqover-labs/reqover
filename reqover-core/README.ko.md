@@ -2,7 +2,7 @@
 
 # 기록의 핵심 모델
 
-Maven Central 라이브러리 `io.github.reqover-labs:reqover-core:0.4.1`입니다.
+Maven Central 라이브러리 `io.github.reqover-labs:reqover-core:0.4.2`입니다.
 starter에 포함되며, 자체 어댑터나 저장소를 만들 때 직접 사용하는 API입니다.
 
 - `CoverageBucket`: 작업의 시각·상태·스레드와 실행 probe 집합.

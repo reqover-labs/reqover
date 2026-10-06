@@ -2,7 +2,7 @@
 
 # Reports and Diagnostic Dashboard
 
-Maven Central library: `io.github.reqover-labs:reqover-report:0.4.1`.
+Maven Central library: `io.github.reqover-labs:reqover-report:0.4.2`.
 The starter already includes it. It depends on core, not Spring or a JSON library.
 
 | Feature | Data and boundary |

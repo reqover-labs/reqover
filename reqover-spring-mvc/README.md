@@ -2,7 +2,7 @@
 
 # Spring MVC Adapter
 
-Maven Central library: `io.github.reqover-labs:reqover-spring-mvc:0.4.1`.
+Maven Central library: `io.github.reqover-labs:reqover-spring-mvc:0.4.2`.
 For normal Spring Boot use, install the [starter](../reqover-spring-boot-starter/README.md)
 and attach the agent rather than wiring this adapter yourself.
 

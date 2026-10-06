@@ -186,7 +186,7 @@ sequenceDiagram
 The normalized endpoint pattern uses Spring's best-matching pattern, falling back
 to the request URI when no pattern is available yet. Servlet async re-dispatch
 reuses the existing bucket, but application execution on the async worker thread
-before re-dispatch is **not** propagated automatically in `0.4.1`.
+before re-dispatch is **not** propagated automatically in `0.4.2`.
 
 ## Spring WebFlux lifecycle
 
@@ -352,6 +352,6 @@ same document to a path of your choosing; treat that file as the report it is.
   recording is reported as unmatched, which is not the same as unaffected.
 - Context on unmanaged threads and MVC async workers is not guaranteed
   automatically; a second thread needs `UnitScope.join`.
-- `0.4.1` prioritizes development, QA, and CI use. Retention is in memory by
+- `0.4.2` prioritizes development, QA, and CI use. Retention is in memory by
   default and a report leaves the JVM only when it is exported or served; it does
   not claim to be a production always-on agent.

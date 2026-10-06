@@ -2,7 +2,7 @@
 
 # Bytecode Instrumentation
 
-Maven Central library: `io.github.reqover-labs:reqover-instrumentation:0.4.1`.
+Maven Central library: `io.github.reqover-labs:reqover-instrumentation:0.4.2`.
 Most applications use the packaged [agent](../reqover-agent/README.md), not this
 module directly. Java packages stay `io.reqover.instrumentation`.
 

@@ -2,7 +2,7 @@
 
 # Core Recording Model
 
-Maven Central library: `io.github.reqover-labs:reqover-core:0.4.1`.
+Maven Central library: `io.github.reqover-labs:reqover-core:0.4.2`.
 The starter includes it; custom adapters and stores use these APIs directly.
 
 - `CoverageBucket` records a unit's timestamps, status, threads and probe set.

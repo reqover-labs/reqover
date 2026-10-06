@@ -7,7 +7,7 @@
 포트를 준비하고 저장소 루트에서 실행합니다.
 
 ```bash
-git checkout v0.4.1
+git checkout v0.4.2
 ./scripts/run-agent-demo.sh mvc 8080
 ./scripts/run-agent-demo.sh webflux 8081
 ```

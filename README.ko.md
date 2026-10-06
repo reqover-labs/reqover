@@ -109,7 +109,7 @@ WebFlux는 요청 하나를 처리하면서 스레드를 여러 번 갈아탑니
 
 `Code to Endpoint Index`는 방향을 뒤집은 표입니다. 메서드마다 **그 메서드를 실행한 API가 나열됩니다.** 코드를 고친 뒤 어디부터 다시 확인할지 정할 때 쓰면 됩니다. 메서드 이름은 JVM 내부 표기 대신 `find(long): OrderResponse`처럼 읽기 쉬운 형태로 보여줍니다.
 
-> 리포트 위쪽에는 필터 입력란이 있습니다. 엔드포인트·클래스·메서드 이름의 일부를 입력하면 두 섹션이 함께 걸러집니다. `/`를 누르면 입력란으로 이동하고, `Esc`를 누르면 지웁니다. 디스크립터는 두 표기 모두 매칭되므로 `(J)`로 찾든 `long`으로 찾든 같은 메서드가 나옵니다. 스크립트가 없어도 표 전체는 그대로 그려집니다 — 필터는 행을 숨길 뿐이라 브라우저 찾기(`Ctrl`/`Cmd`+`F`)도 그대로 동작합니다.
+> 필터로 엔드포인트·클래스·메서드를 검색합니다. 글을 입력 중이 아닐 때 `/`가 검색창으로 이동하고, `Esc`는 리포트 필터를 지웁니다. 0.4.2에서는 초안 경로 등 입력란에 `/`를 써도 포커스를 빼앗지 않습니다. `(J)`와 `long` 같은 두 디스크립터 표기를 모두 찾습니다. 스크립트 없이도 정적인 표와 브라우저 찾기를 사용할 수 있습니다.
 
 ![SharedValidator를 두 개의 API에 연결해 보여주는 역방향 조회](docs/assets/reqover-code-to-endpoint-index.png)
 
@@ -133,7 +133,7 @@ WebFlux는 요청 하나를 처리하면서 스레드를 여러 번 갈아탑니
 ```bash
 git clone https://github.com/reqover-labs/reqover.git
 cd reqover
-git checkout v0.4.1
+git checkout v0.4.2
 
 ./gradlew test
 ./scripts/run-agent-demo.sh mvc 8080
@@ -144,7 +144,7 @@ git checkout v0.4.1
 ```powershell
 git clone https://github.com/reqover-labs/reqover.git
 Set-Location .\reqover
-git checkout v0.4.1
+git checkout v0.4.2
 
 # JAVA_HOME이 JDK 17 또는 21을 가리켜야 합니다
 $env:Path = "$env:JAVA_HOME\bin;$env:Path"
@@ -258,7 +258,7 @@ agent를 붙인 채로 통합 테스트를 돌리고 애플리케이션이 정�
 
 ```bash
 git diff --name-only origin/main... \
-  | java -jar reqover-cli-0.4.1.jar impact --report build/reqover-report.json --changed-files - --format markdown
+  | java -jar reqover-cli-0.4.2.jar impact --report build/reqover-report.json --changed-files - --format markdown
 ```
 
 ```
@@ -362,7 +362,7 @@ flowchart LR
 - **역방향 조회는 "여기부터 보라"는 힌트입니다.** 완전한 변경 영향 분석을 보장하지 않습니다.
 - **데모의 리포트 페이지에는 로그인이 없습니다.** `127.0.0.1`로만 열어두세요.
 
-공개된 [메서드 진입 벤치마크](docs/15_performance_results.ko.md)는 문서에 적힌 환경에서 진입당 약 24 ns를 측정했습니다. 당시의 좁은 범위 측정이며, 0.4.1의 대시보드·내보내기·참조 probe 전체 비용이나 운영 환경 성능을 보장하지 않습니다. 실제 적용 전 원시 샘플과 측정 제외 항목을 함께 확인하세요.
+공개된 [메서드 진입 벤치마크](docs/15_performance_results.ko.md)는 문서에 적힌 환경에서 진입당 약 24 ns를 측정했습니다. 당시의 좁은 범위 측정이며, 0.4.2의 대시보드·내보내기·참조 probe 전체 비용이나 운영 환경 성능을 보장하지 않습니다. 실제 적용 전 원시 샘플과 측정 제외 항목을 함께 확인하세요.
 
 ## 지원 범위
 

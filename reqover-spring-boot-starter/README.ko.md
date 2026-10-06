@@ -6,7 +6,7 @@ Spring Boot 앱에 붙일 때 사용하는 기본 진입점입니다. core·repo
 어댑터를 Maven Central 의존성 하나로 가져옵니다. Java 패키지는 `io.reqover.*` 그대로입니다.
 
 ```kotlin
-implementation("io.github.reqover-labs:reqover-spring-boot-starter:0.4.1")
+implementation("io.github.reqover-labs:reqover-spring-boot-starter:0.4.2")
 ```
 
 앱 메서드를 기록하려면 [agent](../reqover-agent/README.ko.md)도 붙입니다.

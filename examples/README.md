@@ -7,7 +7,7 @@ manual probe examples and agent-recorded `/auto/` handlers. No database is neede
 Run commands from the repository root with JDK 17/21 and free ports:
 
 ```bash
-git checkout v0.4.1
+git checkout v0.4.2
 ./scripts/run-agent-demo.sh mvc 8080
 ./scripts/run-agent-demo.sh webflux 8081
 ```

@@ -113,7 +113,7 @@ WebFlux switches threads several times while handling a single request. That nor
 
 `Code to Endpoint Index` is the same data flipped around: for each method, **the APIs that executed it are listed.** Use it to decide where to look first after changing code. Method names are shown in a readable form like `find(long): OrderResponse` rather than JVM descriptors.
 
-> The report has a filter box at the top: type part of an endpoint, class, or method and both sections narrow to what matches. Press `/` to focus it, `Esc` to clear. Descriptors match either spelling, so `(J)` and `long` find the same method. The page is still fully rendered without scripting — the filter only hides rows, so your browser's find (`Ctrl`/`Cmd`+`F`) keeps working.
+> Use the filter for endpoint, class or method text. `/` focuses search when you are not editing a text field, and `Esc` clears the report filter. In 0.4.2, entering `/` in a draft path or another input no longer steals focus. Descriptors match either spelling, so `(J)` and `long` find the same method. Without scripting, the static tables remain readable and browser find still works.
 
 ![Reverse index mapping SharedValidator to two APIs](docs/assets/reqover-code-to-endpoint-index.png)
 
@@ -137,7 +137,7 @@ Before wiring Reqover into your own project, we recommend running the demo appli
 ```bash
 git clone https://github.com/reqover-labs/reqover.git
 cd reqover
-git checkout v0.4.1
+git checkout v0.4.2
 
 ./gradlew test
 ./scripts/run-agent-demo.sh mvc 8080
@@ -148,7 +148,7 @@ git checkout v0.4.1
 ```powershell
 git clone https://github.com/reqover-labs/reqover.git
 Set-Location .\reqover
-git checkout v0.4.1
+git checkout v0.4.2
 
 # JAVA_HOME must point at JDK 17 or 21
 $env:Path = "$env:JAVA_HOME\bin;$env:Path"
@@ -260,7 +260,7 @@ nothing.) Commit that file as a baseline, or keep it as a CI artifact.
 
 ```bash
 git diff --name-only origin/main... \
-  | java -jar reqover-cli-0.4.1.jar impact --report build/reqover-report.json --changed-files - --format markdown
+  | java -jar reqover-cli-0.4.2.jar impact --report build/reqover-report.json --changed-files - --format markdown
 ```
 
 ```
@@ -364,7 +364,7 @@ Written plainly. Using a tool with the wrong expectations wastes everyone's time
 - **The reverse lookup is a "start looking here" hint.** It is not a complete change-impact analysis.
 - **The demo report page has no authentication.** Keep it on `127.0.0.1`.
 
-The published [method-entry benchmark](docs/15_performance_results.md) · [한국어판](docs/15_performance_results.ko.md) measured about 24 ns per entry under its stated setup. This is a dated, narrow measurement, not a full 0.4.1 dashboard/export/reference-probe or production-overhead guarantee. Check its raw samples and excluded costs before applying it to your application.
+The published [method-entry benchmark](docs/15_performance_results.md) · [한국어판](docs/15_performance_results.ko.md) measured about 24 ns per entry under its stated setup. This is a dated, narrow measurement, not a full 0.4.2 dashboard/export/reference-probe or production-overhead guarantee. Check its raw samples and excluded costs before applying it to your application.
 
 ## Support matrix
 

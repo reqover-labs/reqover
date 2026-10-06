@@ -6,12 +6,12 @@ Analyse changed source paths against an existing coverage report, add a job
 summary/PR comment, and optionally keep HTML/impact artifacts. Recording happens
 before the Action; it does not install instrumentation or run application tests.
 
-Use `reqover-labs/reqover/.github/actions/impact@v0.4.1` in a `pull_request` job
+Use `reqover-labs/reqover/.github/actions/impact@v0.4.2` in a `pull_request` job
 after full-history checkout (`fetch-depth: 0`), Java setup and report generation.
 The runner needs Java 17+, Bash, Git, curl and Python 3, including inside containers.
 
 ```yaml
-- uses: reqover-labs/reqover/.github/actions/impact@v0.4.1
+- uses: reqover-labs/reqover/.github/actions/impact@v0.4.2
   with:
     report: build/reqover-report.json
     comment: "false"
@@ -20,7 +20,7 @@ The runner needs Java 17+, Bash, Git, curl and Python 3, including inside contai
     analysis-name: ${{ github.job }}-${{ strategy.job-index || 'single' }}
 ```
 
-Defaults: CLI `version: 0.4.1`, `comment: true`, `upload-artifact: false`,
+Defaults: CLI `version: 0.4.2`, `comment: true`, `upload-artifact: false`,
 `fail-on-impact: false`. Upload contains only `report.html`, `impact.md` and
 `impact.json`, kept for seven days. Use distinct artifact names for matrix and
 repeated steps; separate `analysis-name` values keep independent bot comments.

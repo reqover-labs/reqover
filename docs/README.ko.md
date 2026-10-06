@@ -2,9 +2,9 @@
 
 # 문서 목차
 
-현재 사용법은 **0.4.1** 기준입니다. 라이브러리는 Maven Central의
+현재 사용법은 **0.4.2** 기준입니다. 라이브러리는 Maven Central의
 `io.github.reqover-labs`, agent·CLI 실행 파일은
-[GitHub 릴리스](https://github.com/reqover-labs/reqover/releases/tag/v0.4.1)에서 받습니다.
+[GitHub 릴리스](https://github.com/reqover-labs/reqover/releases/tag/v0.4.2)에서 받습니다.
 Java 패키지는 `io.reqover.*` 그대로입니다. 루트 빠른 시작은 릴리스 태그를 고정하고,
 `main`에는 이후 변경이 들어갈 수 있습니다.
 

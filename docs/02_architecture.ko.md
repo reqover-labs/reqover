@@ -177,7 +177,7 @@ sequenceDiagram
 normalized endpoint pattern은 Spring의 best-matching pattern을 사용하고, pattern이
 아직 없으면 request URI로 fallback합니다. Servlet async re-dispatch에는 기존
 bucket을 재사용하지만, re-dispatch 전 async worker thread의 application 실행은
-현재 `0.4.1`에서 자동 전파하지 않습니다.
+현재 `0.4.2`에서 자동 전파하지 않습니다.
 
 ## Spring WebFlux lifecycle
 
@@ -335,6 +335,6 @@ starter의 HTTP report endpoint는 기본 비활성이고 자체 인증을 제�
   파일은 unmatched로 보고되며, 이는 영향이 없다는 뜻이 아닙니다.
 - unmanaged thread와 MVC async worker의 context는 자동 보장하지 않습니다. 다른
   thread에는 `UnitScope.join`이 필요합니다.
-- `0.4.1`은 개발·QA·CI 활용을 우선합니다. 보관은 기본적으로 in-memory이고
+- `0.4.2`는 개발·QA·CI 활용을 우선합니다. 보관은 기본적으로 in-memory이고
   report는 export하거나 제공할 때만 JVM 밖으로 나가며, production always-on
   agent를 주장하지 않습니다.

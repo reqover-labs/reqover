@@ -6,7 +6,7 @@ The usual entry point for Spring Boot applications: core, report and MVC/WebFlux
 adapters in one Maven Central dependency. Java packages remain `io.reqover.*`.
 
 ```kotlin
-implementation("io.github.reqover-labs:reqover-spring-boot-starter:0.4.1")
+implementation("io.github.reqover-labs:reqover-spring-boot-starter:0.4.2")
 ```
 
 Attach the [agent](../reqover-agent/README.md) to record application methods.

@@ -2,7 +2,7 @@
 
 # Spring WebFlux 어댑터
 
-Maven Central 라이브러리 `io.github.reqover-labs:reqover-spring-webflux:0.4.1`입니다.
+Maven Central 라이브러리 `io.github.reqover-labs:reqover-spring-webflux:0.4.2`입니다.
 일반 Spring Boot 연동은 [starter](../reqover-spring-boot-starter/README.ko.md)와 agent를
 사용합니다. 어댑터 자체는 리포트 엔드포인트를 열지 않습니다.
 

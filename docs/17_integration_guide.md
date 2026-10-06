@@ -270,7 +270,7 @@ public class InternalReqoverReportController {
 Without the starter, inject `CoverageStore` and build the report yourself with `CoverageReportGenerator` and `HtmlCoverageReportRenderer` from `reqover-report`.
 
 > [!IMPORTANT]
-> **Inject `CoverageStore`, not `InMemoryCoverageStore`.** This changed in `0.4.1` — see [Replacing the store](#replacing-the-store).
+> **Inject `CoverageStore`, not `InMemoryCoverageStore`.** This changed in `0.2.0` — see [Replacing the store](#replacing-the-store).
 
 Complete working examples are in [`examples/mvc-sample`](../examples/mvc-sample) and [`examples/webflux-sample`](../examples/webflux-sample).
 

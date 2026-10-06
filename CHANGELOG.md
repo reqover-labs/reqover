@@ -4,6 +4,11 @@ All notable changes to Reqover are documented in this file.
 
 ## Unreleased
 
+## 0.3.0 — 2026-10-06
+
+First release on Maven Central, as `io.github.reqover-labs`. The changes below
+came from applying Reqover to a production Spring Boot service.
+
 ### Fixed
 
 - **A long recording no longer forgets endpoints.** The report used to be built

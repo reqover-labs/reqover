@@ -7,7 +7,7 @@
 아직 데모를 안 돌려보셨다면 [README의 "5분 만에 직접 보기"](../README.ko.md#5분-만에-직접-보기)를 먼저 해보시는 걸 권합니다. 데모가 되는 걸 본 다음에 붙이는 게 문제를 찾기 훨씬 쉽습니다.
 
 > [!IMPORTANT]
-> Reqover `0.2.0`은 **Maven Central에 아직 없습니다.** 서명된 배포 파이프라인은 만들어져 있지만(`./gradlew centralBundle`과, 저장소가 켜기 전까지는 동작하지 않는 릴리스 잡) 아직 실행한 적이 없어서 지금 Central에서 받을 수 있는 것은 없습니다. 소스를 직접 빌드해 로컬 Maven 저장소에 넣거나, GitHub Release의 jar를 받아 써야 합니다. 개발·QA·스테이징 환경을 전제로 만들었고, 운영 환경에 상시로 켜두는 용도가 아닙니다.
+> 라이브러리는 Maven Central에 `io.github.reqover-labs`로 올라가 있습니다(0.2.0까지는 `io.reqover`로, 소스 빌드나 GitHub Release로만 받을 수 있었습니다). agent와 CLI jar는 GitHub Release에서 받습니다. 개발·QA·스테이징 환경을 전제로 만들었고, 운영 환경에 상시로 켜두는 용도가 아닙니다.
 
 ---
 
@@ -17,7 +17,7 @@
 
 | 단계 | 하는 일 | 왜 필요한가 |
 | --- | --- | --- |
-| 1 | 라이브러리 받기 | Maven Central에 아직 없어서 |
+| 1 | 라이브러리 받기 | Maven Central 또는 소스 빌드 |
 | 2 | 의존성 1개 추가 | 요청과 실행 기록을 연결하는 부분 |
 | 3 | 리포트를 어떻게 볼지 정하기 | 보는 방법 둘 다 기본이 꺼짐이라서 |
 | 4 | Java agent 붙여서 실행 | 실제로 실행을 기록하는 부분 |
@@ -32,12 +32,16 @@
 
 ## 1. 라이브러리 받기
 
-### 방법 A — 소스에서 빌드 (권장)
+### 방법 A — Maven Central (권장)
 
-`v0.2.0` 태그를 받아서 로컬 Maven 저장소에 설치합니다.
+설치할 것이 없습니다. 2단계의 `mavenCentral()`이 starter를 받아옵니다. [2단계](#2-의존성-추가)로 넘어가세요.
+
+### 방법 B — 소스에서 빌드
+
+아직 릴리스되지 않은 변경을 쓰려면 `v0.3.0` 태그를 받아서 로컬 Maven 저장소에 설치합니다.
 
 ```bash
-git clone --branch v0.2.0 --depth 1 https://github.com/reqover-labs/reqover.git
+git clone --branch v0.3.0 --depth 1 https://github.com/reqover-labs/reqover.git
 cd reqover
 ./gradlew clean publishToMavenLocal
 ```
@@ -48,30 +52,30 @@ Windows는 `.\gradlew.bat clean publishToMavenLocal`입니다.
 
 | 아티팩트 | 버전 |
 | --- | --- |
-| `io.github.reqover-labs:reqover-core` | `0.2.0` |
-| `io.github.reqover-labs:reqover-instrumentation` | `0.2.0` |
-| `io.github.reqover-labs:reqover-report` | `0.2.0` |
-| `io.github.reqover-labs:reqover-spring-mvc` | `0.2.0` |
-| `io.github.reqover-labs:reqover-spring-webflux` | `0.2.0` |
-| `io.github.reqover-labs:reqover-spring-boot-starter` | `0.2.0` |
+| `io.github.reqover-labs:reqover-core` | `0.3.0` |
+| `io.github.reqover-labs:reqover-instrumentation` | `0.3.0` |
+| `io.github.reqover-labs:reqover-report` | `0.3.0` |
+| `io.github.reqover-labs:reqover-spring-mvc` | `0.3.0` |
+| `io.github.reqover-labs:reqover-spring-webflux` | `0.3.0` |
+| `io.github.reqover-labs:reqover-spring-boot-starter` | `0.3.0` |
 
 **`reqover-agent`와 `reqover-cli`는 여기 없습니다.** 둘 다 의존성이 섞이지 않게 따로 묶은(shaded) 실행 파일이고 컴파일할 때 참조하는 라이브러리가 아니라서 배포 대상이 아닙니다. GitHub Release에서 파일로 받습니다 → [4단계](#4-java-agent-붙여서-실행).
 
 설치가 됐는지 확인:
 
 ```bash
-ls ~/.m2/repository/io/reqover        # macOS / Linux
+ls ~/.m2/repository/io/github/reqover-labs        # macOS / Linux
 ```
 
 ```powershell
-Get-ChildItem "$env:USERPROFILE\.m2\repository\io\reqover"   # Windows
+Get-ChildItem "$env:USERPROFILE\.m2\repository\io\github\reqover-labs"   # Windows
 ```
 
-### 방법 B — GitHub Release 번들
+### 방법 C — GitHub Release 번들
 
-[v0.2.0 릴리스](https://github.com/reqover-labs/reqover/releases/tag/v0.2.0)에는 `reqover-0.2.0.zip`이 있고, 그 안에 같은 라이브러리 jar가 `lib/`에, 소스가 `sources/`에, 그리고 `reqover-agent-0.2.0.jar`와 `reqover-cli-0.2.0.jar`가 최상위에 들어 있습니다. 소스를 빌드할 수 없는 상황이면 이 방법을 쓰되, `lib/`의 jar를 빌드가 찾을 수 있는 곳(flat-dir 저장소나 사내 Nexus/Artifactory)에 직접 올려야 합니다.
+[v0.3.0 릴리스](https://github.com/reqover-labs/reqover/releases/tag/v0.3.0)에는 `reqover-0.3.0.zip`이 있고, 그 안에 같은 라이브러리 jar가 `lib/`에, 소스가 `sources/`에, 그리고 `reqover-agent-0.3.0.jar`와 `reqover-cli-0.3.0.jar`가 최상위에 들어 있습니다. Maven Central도 소스 빌드도 쓸 수 없는 상황이면 이 방법을 쓰되, `lib/`의 jar를 빌드가 찾을 수 있는 곳(flat-dir 저장소나 사내 Nexus/Artifactory)에 직접 올려야 합니다.
 
-어느 쪽이든 같은 릴리스의 `reqover-0.2.0-SHA256SUMS.txt`로 파일이 온전한지 확인할 수 있습니다.
+어느 쪽이든 같은 릴리스의 `reqover-0.3.0-SHA256SUMS.txt`로 파일이 온전한지 확인할 수 있습니다.
 
 ---
 
@@ -81,37 +85,35 @@ Get-ChildItem "$env:USERPROFILE\.m2\repository\io\reqover"   # Windows
 
 **의존성 1개**입니다. `reqover-spring-boot-starter`가 `reqover-core`, `reqover-report`, 그리고 어댑터 둘 다를 함께 가져오고, 리포트 엔드포인트와 종료 시 내보내기를 위한 Spring Boot 자동 설정을 추가합니다.
 
-`mavenLocal()`을 저장소 목록에 넣어야 하고, 1단계에서 설치한 것을 먼저 찾도록 `mavenCentral()`보다 앞에 둡니다.
+`mavenCentral()`만 있으면 됩니다. 소스에서 빌드했다면(방법 B) 그 빌드를 먼저 찾도록 `mavenLocal()`을 앞에 추가하세요.
 
 ```kotlin
 repositories {
-    mavenLocal()
     mavenCentral()
 }
 
 dependencies {
-    implementation("io.github.reqover-labs:reqover-spring-boot-starter:0.2.0")
+    implementation("io.github.reqover-labs:reqover-spring-boot-starter:0.3.0")
 }
 ```
 
 ```groovy
 repositories {
-    mavenLocal()
     mavenCentral()
 }
 
 dependencies {
-    implementation 'io.github.reqover-labs:reqover-spring-boot-starter:0.2.0'
+    implementation 'io.github.reqover-labs:reqover-spring-boot-starter:0.3.0'
 }
 ```
 
-`mavenLocal`은 Maven에서 기본으로 쓰이므로 저장소 설정을 따로 추가할 필요가 없습니다.
+Maven은 기본으로 Central에서(소스 빌드 후에는 로컬 저장소에서도) 받아오므로 저장소 설정을 따로 추가할 필요가 없습니다.
 
 ```xml
 <dependency>
-  <groupId>io.reqover</groupId>
+  <groupId>io.github.reqover-labs</groupId>
   <artifactId>reqover-spring-boot-starter</artifactId>
-  <version>0.2.0</version>
+  <version>0.3.0</version>
 </dependency>
 ```
 
@@ -124,12 +126,12 @@ dependencies {
 ```kotlin
 dependencies {
     // Spring MVC 프로젝트라면
-    implementation("io.github.reqover-labs:reqover-spring-mvc:0.2.0")
+    implementation("io.github.reqover-labs:reqover-spring-mvc:0.3.0")
 
     // Spring WebFlux 프로젝트라면 (위 대신)
-    // implementation("io.github.reqover-labs:reqover-spring-webflux:0.2.0")
+    // implementation("io.github.reqover-labs:reqover-spring-webflux:0.3.0")
 
-    implementation("io.github.reqover-labs:reqover-report:0.2.0")
+    implementation("io.github.reqover-labs:reqover-report:0.3.0")
 }
 ```
 
@@ -268,7 +270,7 @@ public class InternalReqoverReportController {
 스타터를 안 쓴다면 `CoverageStore`를 주입받아서 `reqover-report`의 `CoverageReportGenerator`, `HtmlCoverageReportRenderer`로 리포트를 직접 만들면 됩니다.
 
 > [!IMPORTANT]
-> **`InMemoryCoverageStore`가 아니라 `CoverageStore`를 주입받으세요.** `0.2.0`에서 바뀐 부분입니다 — [저장소 교체하기](#저장소-교체하기) 참고.
+> **`InMemoryCoverageStore`가 아니라 `CoverageStore`를 주입받으세요.** `0.3.0`에서 바뀐 부분입니다 — [저장소 교체하기](#저장소-교체하기) 참고.
 
 동작하는 전체 예시는 [`examples/mvc-sample`](../examples/mvc-sample)과 [`examples/webflux-sample`](../examples/webflux-sample)에 있습니다.
 
@@ -288,7 +290,7 @@ reqover.report.export.html-path=build/reqover-report.html
 **CI 작업이 통합 테스트 실행 결과를 리포트 파일로 받아 가는 방법이 바로 이것입니다.** agent를 붙여서 애플리케이션을 띄우고, 테스트를 흘려보내고, 정상 종료시키면 파일이 남습니다.
 
 ```bash
-java -javaagent:reqover-agent-0.2.0.jar=include=com.example \
+java -javaagent:reqover-agent-0.3.0.jar=include=com.example \
   -jar build/libs/your-app.jar \
   --reqover.report.export.json-path=build/reqover-report.json
 ```
@@ -309,15 +311,15 @@ java -javaagent:reqover-agent-0.2.0.jar=include=com.example \
 
 ### 4-1. agent JAR 받기
 
-[v0.2.0 릴리스](https://github.com/reqover-labs/reqover/releases/tag/v0.2.0)에서 `reqover-agent-0.2.0.jar`를 받습니다. 같은 릴리스의 `reqover-0.2.0-SHA256SUMS.txt`로 파일이 온전한지 확인할 수 있습니다.
+[v0.3.0 릴리스](https://github.com/reqover-labs/reqover/releases/tag/v0.3.0)에서 `reqover-agent-0.3.0.jar`를 받습니다. 같은 릴리스의 `reqover-0.3.0-SHA256SUMS.txt`로 파일이 온전한지 확인할 수 있습니다.
 
 ```bash
-shasum -a 256 reqover-agent-0.2.0.jar          # macOS
-sha256sum reqover-agent-0.2.0.jar              # Linux
+shasum -a 256 reqover-agent-0.3.0.jar          # macOS
+sha256sum reqover-agent-0.3.0.jar              # Linux
 ```
 
 ```powershell
-Get-FileHash reqover-agent-0.2.0.jar -Algorithm SHA256   # Windows
+Get-FileHash reqover-agent-0.3.0.jar -Algorithm SHA256   # Windows
 ```
 
 ### 4-2. 실행
@@ -326,7 +328,7 @@ Get-FileHash reqover-agent-0.2.0.jar -Algorithm SHA256   # Windows
 
 ```bash
 java \
-  -javaagent:reqover-agent-0.2.0.jar=include=com.example.orders \
+  -javaagent:reqover-agent-0.3.0.jar=include=com.example.orders \
   -jar app.jar
 ```
 
@@ -433,7 +435,7 @@ WebFlux라면 하나 더 — 한 API의 기록 안에 **서로 다른 스레드 
 | 종료했는데 파일이 없음 | `SIGKILL`로 죽였거나 쓰기가 실패함 | `SIGTERM`으로 멈추고 종료를 기다리세요. stdout의 `[reqover] wrote the`와 stderr의 `[reqover] could not write` 확인 |
 | `0.1.1`에서 올린 뒤 `InMemoryCoverageStore` 주입 실패 | 어댑터가 이제 `CoverageStore` 빈을 만듦 | 주입 지점을 `CoverageStore`로 바꾸세요. [저장소 교체하기](#저장소-교체하기) 참고 |
 | `CoverageStore` 빈 주입 실패 | 어댑터 의존성이 없거나 웹 타입이 안 맞음 | 스타터를 쓰거나, MVC 앱에 `reqover-spring-mvc`, WebFlux 앱에 `reqover-spring-webflux`가 들어갔는지 확인 |
-| 의존성을 못 찾음 (`Could not find io.github.reqover-labs:...`) | 1단계를 안 했거나 `mavenLocal()`이 없음 | `publishToMavenLocal` 재실행, `mavenLocal()`이 `mavenCentral()`보다 앞인지 확인 |
+| 의존성을 못 찾음 (`Could not find io.github.reqover-labs:...`) | 좌표 오타, 또는 소스 빌드인데 `mavenLocal()`이 없음 | `io.github.reqover-labs:reqover-spring-boot-starter` 확인. 소스 빌드라면 `publishToMavenLocal` 재실행 후 `mavenLocal()`을 `mavenCentral()` 앞에 |
 | 한참 뒤 오래된 요청 id가 사라짐 | 보관 개수 상한(기본 10,000)에 도달 | 정상 동작입니다. 엔드포인트, 호출 횟수, 실행한 메서드는 엔드포인트별로 남고 요청 단위 세부만 지워집니다. [보관 개수 조정](#보관-개수-조정) 참고 |
 
 ---

@@ -6,11 +6,12 @@
 예전 Reqover JSON을 불러오면 API별 관측 건수, 평균·p95 처리 구간과 HTTP 오류 비율이
 현재 기록에서 얼마나 달라졌는지 보여줍니다. 통제된 부하 테스트나 자동 합격 판정은 아닙니다.
 
-![같은 트래픽의 더미 기록 둘을 비교한 화면. 두 번째 기록에서 한 엔드포인트가 느려짐](assets/reqover-recording-comparison.png)
+![실제 예제 요청 5건의 관측값과 합성 시간 기준선을 비교한 라이트모드 화면](assets/reqover-recording-comparison.png)
 
-이 스크린샷의 baseline은 기능 검사를 위해 기존 관측 시간에 2를 곱한 합성 데이터입니다.
-파일 이름도 `synthetic-baseline.json`으로 표시합니다. 실제 성능 개선이나 벤치마크의
-근거가 아니라 화면 동작을 확인하기 위한 예시입니다.
+2026년 10월 7일 라이트모드로 촬영했습니다. 현재 기록은 v0.4.2 MVC 예제에 실제 요청
+5건을 보낸 관측값입니다. baseline은 기능 검사를 위해 그 관측 시간에 2를 곱한
+합성 데이터이며, 파일 이름도 `synthetic-baseline.json`으로 표시합니다. 두 번째 실제
+실행이나 성능 개선을 증명하는 벤치마크가 아닙니다. [촬영 기록](32_current_screenshot_capture.ko.md)을 참고합니다.
 
 ## 사용하는 흐름
 

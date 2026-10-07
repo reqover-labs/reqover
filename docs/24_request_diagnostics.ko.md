@@ -6,12 +6,13 @@
 화면 위쪽에는 관측 HTTP 요청 수, 4xx·5xx, 평균·p95·최대 처리 시간과 endpoint별
 누적 시간을 표시합니다. 요청을 펼치면 그 요청의 시각·상태·스레드·실행 메서드를 확인합니다.
 
-![MVC 예제에 더미 요청 900건(의도적 지연·503 포함)을 보내 만든 진단 화면](assets/reqover-request-diagnostics.png)
+![MVC 예제에 실제 요청 5건을 보낸 라이트모드 진단 화면. 의도적 지연·503 포함](assets/reqover-request-diagnostics.png)
 
 ![느린 요청의 시각과 실행 코드를 펼친 화면](assets/reqover-request-detail.png)
 
-화면은 2026년 10월 3일 loopback에서 agent를 붙인 MVC 데모로 캡처했습니다.
-이 수치는 합성 데모의 관측 결과입니다.
+화면은 2026년 10월 7일 loopback에서 agent를 붙인 v0.4.2 MVC 예제에 실제 요청
+5건을 보내 라이트모드로 촬영했습니다. 이 수치는 데모 관측값이지 애플리케이션
+벤치마크가 아닙니다. [촬영 기록](32_current_screenshot_capture.ko.md)을 참고합니다.
 
 ## 0.4.x에서 사용하기
 

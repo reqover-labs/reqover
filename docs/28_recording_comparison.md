@@ -8,11 +8,13 @@ endpoint counts, average/p95 adapter intervals, and HTTP error-percentage change
 This is descriptive before/after evidence, **not a controlled load-test result or
 automatic performance pass/fail**.
 
-![Two dummy recordings of the same traffic, the second with a slower endpoint](assets/reqover-recording-comparison.png)
+![Light-mode comparison of five actual sample observations against an explicitly synthetic timing baseline](assets/reqover-recording-comparison.png)
 
-The screenshot baseline doubles the sample recording's timing values to exercise
-the UI. It is explicitly named `synthetic-baseline.json`. These numbers do not
-demonstrate an application improvement or a benchmark.
+Captured in light mode on October 7, 2026. The current side is the actual five-request
+v0.4.2 MVC recording. The baseline doubles that recording's timing values to exercise
+the UI and is explicitly named `synthetic-baseline.json`; it is not a second real
+run. These numbers do not demonstrate an application improvement or a benchmark.
+See [capture provenance](32_current_screenshot_capture.md).
 
 ## Use
 

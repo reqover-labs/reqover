@@ -114,9 +114,9 @@ WebFlux는 요청 하나를 처리하면서 스레드를 여러 번 갈아탑니
 
 ![SharedValidator와 이를 실행한 두 API만 검색한 Reqover 0.4.2 재테스트 후보](docs/assets/reqover-retest-candidates.png)
 
-> 맨 위 관계도·WebFlux 상세·역조회 화면은 실제 0.4.2 예제 요청으로 촬영했습니다.
-> [최신 촬영 기록](docs/32_current_screenshot_capture.ko.md)을 참고합니다. 다른 진단 예시는
-> 각 기능 문서의 출처를 유지하고, [원래 촬영 기록](docs/16_readme_demo_capture.md)은 보존된 옛 표 이미지를 설명합니다.
+> 현재 대시보드 스크린샷은 실제 0.4.2 예제 요청을 라이트모드로 촬영했습니다.
+> 기록 비교의 기준선만 명시적으로 표시한 합성 시간을 사용합니다. [최신 촬영 기록](docs/32_current_screenshot_capture.ko.md)을 참고합니다.
+> 앱의 다크모드 지원은 유지하며, [원래 촬영 기록](docs/16_readme_demo_capture.md)은 보존된 옛 표 이미지를 설명합니다.
 
 ## 5분 만에 직접 보기
 

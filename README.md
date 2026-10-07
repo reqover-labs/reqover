@@ -118,7 +118,7 @@ WebFlux switches threads several times while handling a single request. That nor
 
 ![Reqover 0.4.2 retest candidates filtered to SharedValidator and its two observed APIs](docs/assets/reqover-retest-candidates.png)
 
-> The lead retest map, WebFlux detail and reverse-index screenshots come from actual 0.4.2 sample requests; see [current capture provenance](docs/32_current_screenshot_capture.md). Other diagnostic examples retain the provenance in their feature guides. [Original capture notes](docs/16_readme_demo_capture.md) describe the archived old table screenshots.
+> Current dashboard screenshots use light mode and actual 0.4.2 sample requests. The comparison baseline alone uses explicitly labeled synthetic timings; see [current capture provenance](docs/32_current_screenshot_capture.md). The application still supports dark mode. [Original capture notes](docs/16_readme_demo_capture.md) describe the archived old table screenshots.
 
 ## Try it in 5 minutes
 

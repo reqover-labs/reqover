@@ -4,7 +4,8 @@
 
 2026년 10월 7일 한국 시간 기준으로 **v0.4.2** 예제에 실제 로컬 HTTP 요청을 보내
 촬영했습니다. 소스 commit은 `0afe11bb4e2e37054fce36ae25db89421d1363de`입니다.
-화면을 생성하거나 측정값을 고친 이미지가 아닌 실제 애플리케이션 출력입니다.
+생성한 UI 이미지가 아닌 실제 애플리케이션 화면입니다. 관측 요청 데이터는 그대로
+유지하며, 기록 비교의 기준선은 아래에 설명한 합성 데이터입니다.
 
 ## 환경과 범위
 
@@ -16,12 +17,20 @@
 - 실제 리포트 HTML을 저장한 뒤 데이터를 바꾸지 않고 브라우저에서 촬영.
 - 밝은 모드, 배율 2. 요청 상세 viewport 1280 x 800, 검색한 후보 1280 x 720,
   멈춘 관계도 1280 x 900.
+- 현재 README와 기능 안내의 대시보드 이미지는 모두 라이트모드로 통일.
+  MVC 개요·테스트 초안 1280 x 900, MVC 느린 요청 상세 1280 x 720,
+  기록 비교 1280 x 1000에서 전체 페이지 촬영. 앱의 다크모드 지원과
+  README의 테마별 로고는 변경하지 않음.
 
 | 새 이미지 | 화면과 확인 내용 |
 | --- | --- |
 | `assets/reqover-webflux-request-detail.png` | Requests에서 요청 하나 펼침. 클래스 2개·메서드 4개·스레드 3개 |
 | `assets/reqover-retest-candidates.png` | Retest candidates에서 SharedValidator 검색. 공유 메서드 1행과 API 두 개 |
 | `assets/reqover-retest-map-current.png` | Overview의 Retest map, 애니메이션 일시정지. 공유 메서드와 관측된 두 후보 연결 |
+| `assets/reqover-request-diagnostics.png` | 실제 MVC 요청 5건. 느린 req-4 선택, 애니메이션 일시정지, 의도적 503 한 건 |
+| `assets/reqover-request-detail.png` | Slow 기준 1000 ms. 요청 5건 중 한 건 표시하고 지연 요청 펼침 |
+| `assets/reqover-test-case-draft.png` | req-4에 연결한 초안. 경로·기대 상태 200·제한 500 ms 직접 입력, 비활성 Java 미리보기 펼침 |
+| `assets/reqover-recording-comparison.png` | 실제 5건의 집계와 synthetic-baseline.json 비교. 기준선의 시간만 2배, 조건 확인 체크하지 않음 |
 
 ## 실제 호출한 요청
 
@@ -37,6 +46,13 @@ controller의 `find`와 service의 `find`, `toResponse`, `validate`가 기록되
 AutoReactiveOrderResponse 접근자는 없습니다. 재실행하면 스레드 번호·요청 ID·시각·시간은 달라질 수 있습니다.
 
 ## 해석과 안전
+
+테스트 초안의 `/auto/diagnostics/delay/120`은 실제 호출한 `/1200`과 일부러 다르게
+입력한 시험 조건입니다. 원래 입력 복원이나 재실행 성공을 뜻하지 않으며 생성된
+테스트는 비활성 상태입니다. 기록 비교의 현재 집계는 변경하지 않습니다. 별도 복사본의
+평균·p95·최대·누적 시간에만 2를 곱하고 요청 수·상태·생성 시각은 유지합니다.
+이를 `synthetic-baseline.json`으로 명시해 불러오며, 두 번째 실제 측정이나 개선 결과로
+설명하지 않습니다.
 
 시간은 작은 데모의 관측값이지 벤치마크가 아닙니다. 선은 호출 순서가 아닌 관측
 관계입니다. 후보 이미지는 일부러 검색한 화면이며, 리포트에 메서드가 하나뿐이라는

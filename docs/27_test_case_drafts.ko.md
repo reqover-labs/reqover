@@ -8,6 +8,11 @@
 
 ![느린 요청을 기대 상태 200, 제한 500 ms로 검토한 테스트 초안](assets/reqover-test-case-draft.png)
 
+2026년 10월 7일 v0.4.2 예제를 라이트모드로 촬영했습니다. 출처 요청은
+`/auto/diagnostics/delay/1200`으로 호출했고, 초안의 `/auto/diagnostics/delay/120`,
+기대 상태 200과 제한 500 ms는 직접 정한 테스트 조건입니다. 원래 입력을 복원하거나
+테스트를 실행한 결과가 아닙니다. [촬영 기록](32_current_screenshot_capture.ko.md)을 참고합니다.
+
 ## 사용하는 흐름
 
 1. 요청 그래프에서 요청을 선택하거나 Requests에서 요청을 펼칩니다.

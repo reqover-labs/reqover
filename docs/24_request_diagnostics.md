@@ -8,12 +8,13 @@ counts, average/p95/maximum recorded processing intervals, and an endpoint table
 ranked by cumulative interval. Expand a request to see its timestamps, status,
 thread names and independently resolved method set.
 
-![Request diagnostics from 900 dummy requests to the MVC sample, with intentional slow and 503 endpoints](assets/reqover-request-diagnostics.png)
+![Light-mode diagnostics from five actual MVC sample requests, including intentional delay and 503 examples](assets/reqover-request-diagnostics.png)
 
 ![A slow request expanded to show its timestamps and recorded code](assets/reqover-request-detail.png)
 
-Screenshots were captured on October 3, 2026 from the agent-attached MVC sample
-on loopback. Numbers illustrate that recording, not an application benchmark.
+Screenshots were captured in light mode on October 7, 2026 from five actual
+requests to the agent-attached v0.4.2 MVC sample on loopback. Numbers illustrate
+that recording, not an application benchmark. See [capture provenance](32_current_screenshot_capture.md).
 
 ## Using it with 0.4.x
 

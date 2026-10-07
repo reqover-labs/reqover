@@ -9,6 +9,11 @@ It is not faithful traffic replay, a test runner, or a load generator.
 
 ![A slow recorded request turned into a reviewed draft with an expected 200 and a 500 ms limit](assets/reqover-test-case-draft.png)
 
+Captured in light mode from the v0.4.2 sample on October 7, 2026. The source
+request used `/auto/diagnostics/delay/1200`; the draft's `/auto/diagnostics/delay/120`,
+expected 200 and 500 ms limit are manually entered test choices, not recovered
+inputs or an executed test result. See [capture provenance](32_current_screenshot_capture.md).
+
 ## Workflow
 
 1. Choose a request in the request map, or expand it in Requests.

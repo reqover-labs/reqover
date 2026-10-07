@@ -1,5 +1,7 @@
 # 10. Demo Script
 
+> Historical demo script. Use the [current quickstart](../README.md#try-it-in-5-minutes) and [feature guides](README.md) for the released dashboard, defaults and artifacts.
+
 ## Goal
 
 The demo should prove one idea quickly:

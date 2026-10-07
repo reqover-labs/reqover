@@ -270,7 +270,7 @@ public class InternalReqoverReportController {
 스타터를 안 쓴다면 `CoverageStore`를 주입받아서 `reqover-report`의 `CoverageReportGenerator`, `HtmlCoverageReportRenderer`로 리포트를 직접 만들면 됩니다.
 
 > [!IMPORTANT]
-> **`InMemoryCoverageStore`가 아니라 `CoverageStore`를 주입받으세요.** `0.4.1`에서 바뀐 부분입니다 — [저장소 교체하기](#저장소-교체하기) 참고.
+> **`InMemoryCoverageStore`가 아니라 `CoverageStore`를 주입받으세요.** `0.2.0`에서 바뀐 부분입니다 — [저장소 교체하기](#저장소-교체하기) 참고.
 
 동작하는 전체 예시는 [`examples/mvc-sample`](../examples/mvc-sample)과 [`examples/webflux-sample`](../examples/webflux-sample)에 있습니다.
 
@@ -299,7 +299,7 @@ java -javaagent:reqover-agent-0.4.2.jar=include=com.example \
 
 - **내보내기는 애플리케이션 컨텍스트가 닫힐 때 실행됩니다.** `SIGKILL`로 죽인 프로세스는 아무것도 쓰지 않습니다. CI에서는 `SIGTERM`(그냥 `kill`)으로 멈추고 종료될 때까지 기다리세요.
 - **내보내기 실패는 표준 에러에 남기고 삼킵니다.** 측정 도구가 종료를 실패시키는 원인이 되어서는 안 되기 때문입니다. 뒤집어 말하면 파일이 없는 것이 조용한 실패라는 뜻이므로, 분석하기 전에 파일이 실제로 있는지 확인하세요.
-- **내보낸 문서는 엔드포인트가 내보냈을 것과 바이트 단위로 같습니다.** 둘 다 같은 `ReqoverReportService`를 거칩니다.
+- **같은 모델과 렌더러를 쓰지만 바이트 단위로 같음을 보장하지는 않습니다.** 같은 JVM의 여러 context가 같은 경로에 내보내면 기록을 누적하고, endpoint는 활성 저장소를 읽습니다. 상세 상한도 별도이므로 파일 형식뿐 아니라 기록 범위를 확인합니다.
 
 리포트를 내보내고, diff가 어떤 엔드포인트에 영향을 주는지 묻고, 그 답을 pull request에 댓글로 다는 전체 흐름은 [CI에서 영향 분석하기](18_ci_impact_analysis.ko.md)에 있습니다.
 
@@ -444,7 +444,7 @@ WebFlux라면 하나 더 — 한 API의 기록 안에 **서로 다른 스레드 
 
 ### 보관 개수 조정
 
-기록은 메모리에만 남고 요청별 스냅샷의 기본 상한이 10,000건입니다. 상한을 넘으면 가장 오래된 스냅샷을 지우거나(`oldest-first`, 기본), 기존 창을 그대로 두고 새로 들어오는 것을 버립니다(`reject-when-full`). 어느 쪽이든 모든 요청은 엔드포인트별 합계에도 더해지므로, 리포트의 엔드포인트·호출 횟수·실행 메서드는 기록 전체를 다룹니다. 창에 묶이는 것은 요청 id뿐입니다. 상한과 정책 모두 속성으로 조정합니다 — 빈을 만들 필요가 없습니다.
+기록은 메모리에만 남고 snapshot 기본 상한은 10,000건입니다. 넘으면 오래된 상세를 지우거나(`oldest-first`, 기본), 기존 창을 유지하고 새 상세를 거절합니다(`reject-when-full`). 두 정책 모두 집계 대상으로 받아들인 이름의 호출 수·코드를 누적합니다. 새 집계 이름은 별도로 2,000개 제한이 있고 동시 추가에서는 엄격한 원자적 상한은 아닙니다. 집계별 스레드 이름은 최대 64개입니다. 집계하지 못한 이름은 보관 snapshot에 의존하며 삭제되면 사라질 수 있습니다. 아래 속성은 상세 창만 조정하고 집계 제한은 늘리지 않습니다.
 
 ```properties
 reqover.mvc.max-snapshots=50000
@@ -469,20 +469,21 @@ CoverageStore reqoverCoverageStore() {
 }
 ```
 
-인터페이스는 메서드 세 개입니다.
+필수 메서드 세 개와 기본 구현이 있는 `aggregates()` 확장이 있습니다.
 
 | 메서드 | 지켜야 할 것 |
 | --- | --- |
 | `flush(CoverageBucket)` | 끝난 기록함을 받습니다. `bucket.snapshot()`을 즉시 호출하세요 — 호출이 반환된 뒤에도 남은 스레드에서 기록이 더 들어올 수 있습니다 |
 | `snapshots()` | 보관 중인 스냅샷을 오래된 것부터. 반환값은 복사본이라 다른 스레드가 flush하는 중에도 순회해도 안전합니다 |
-| `clear()` | 보관 중인 스냅샷을 전부 버립니다 |
+| `aggregates()` | 선택적인 전체 작업 수·코드 합집합. 기본 빈 목록이면 보관 snapshot으로 집계 |
+| `clear()` | 보관 snapshot과 집계를 전부 버립니다 |
 
 구현은 동시 호출에 안전해야 하고, `flush`는 작업 단위를 끝낸 스레드(보통 HTTP 워커)에서 호출되므로 오래 블로킹하면 안 됩니다.
 
 내 저장소를 넣으면 **`max-snapshots`는 의미가 없어집니다.** 그 시점부터 보관 정책은 전적으로 내 몫입니다.
 
 > [!IMPORTANT]
-> **`0.1.1`에서 바뀐 점(호환성 깨짐).** 어댑터가 만들던 빈이 `InMemoryCoverageStore`에서 `CoverageStore`로 바뀌었습니다. `InMemoryCoverageStore`는 이제 유일한 선택지가 아니라 그 인터페이스의 한 구현일 뿐입니다. 구체 타입으로 주입받던 애플리케이션은 주입 지점을 `CoverageStore`로 바꿔야 합니다.
+> **`0.2.0`에서 바뀐 점(호환성 깨짐).** 어댑터가 만들던 빈이 `InMemoryCoverageStore`에서 `CoverageStore`로 바뀌었습니다. `InMemoryCoverageStore`는 이제 유일한 선택지가 아니라 그 인터페이스의 한 구현일 뿐입니다. 구체 타입으로 주입받던 애플리케이션은 주입 지점을 `CoverageStore`로 바꿔야 합니다.
 
 인메모리 저장소를 그대로 쓰면서 값만 직접 정하고 싶다면 빈 방식도 여전히 됩니다.
 

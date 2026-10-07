@@ -30,9 +30,9 @@ Reqover는 네 층으로 나뉩니다.
 2. **Attribution**: Spring adapter가 현재 HTTP 요청의 bucket을 context에
    연결하고 probe hit을 그 bucket으로 보냅니다. HTTP 요청이 아닌 작업 단위는
    `UnitScope`가 같은 일을 합니다.
-3. **Reporting**: 완료된 snapshot을 작업 단위 기준으로 합치고 정방향·역방향
-   관계를 standalone HTML로 렌더링하거나, JVM보다 오래 남는 JSON 문서로
-   기록합니다.
+3. **Reporting**: 보관된 snapshot으로 요청 상세와 시간·상태를 계산하고,
+   전체 작업 집계로 endpoint 호출 수와 코드 관계를 유지합니다. 이를 standalone
+   대시보드나 JVM보다 오래 남는 JSON으로 제공합니다.
 4. **Analysis**: CLI가 기록된 report를 별도 JVM에서 읽어 diff, impact 목록,
    exit code로 바꿉니다.
 
@@ -45,21 +45,21 @@ Reqover는 네 층으로 나뉩니다.
 | `reqover-agent` | `premain`, include/exclude 정책, shaded standalone agent JAR |
 | `reqover-spring-mvc` | MVC interceptor와 request lifecycle |
 | `reqover-spring-webflux` | WebFilter, Reactor Context ↔ ThreadLocal bridge |
-| `reqover-report` | endpoint aggregation, reverse index, HTML renderer, JSON read/write, diff, impact 분석 |
+| `reqover-report` | endpoint 집계, 요청 진단, 대시보드, 검토 초안, 시간·상태 비교, JSON, 코드 diff와 impact |
 | `reqover-spring-boot-starter` | core·report·양쪽 adapter를 한 의존성으로 묶고 report service, opt-in HTTP endpoint, 종료 시 export 제공 |
 | `reqover-cli` | shaded 실행 JAR. disk에서 읽은 report에 `render`, `diff`, `impact` 수행 |
 | `examples/*` | manual probe와 agent 자동계측 E2E sample |
 
-`reqover-report`는 `0.4.1`에서 렌더링 범위를 넘어섰습니다. JSON 영속화
-(`CoverageReportJson`), report 비교(`CoverageReportDiff`), impact 분석
-(`ImpactAnalyzer`)까지 이 모듈이 담당합니다. 그러면서도 의존성은 여전히
+`reqover-report`는 JSON 영속화(`CoverageReportJson`), 코드 비교(`CoverageReportDiff`),
+impact 분석(`ImpactAnalyzer`)과 대시보드의 요청 진단·테스트 초안·시간/상태 비교를
+담당합니다. 그러면서도 의존성은 여전히
 `reqover-core` 하나뿐입니다. JSON reader/writer를 직접 구현한 이유가 바로
 이것으로, report를 만들거나 읽는 것만으로 application classpath에 JSON
 라이브러리가 끌려 들어오지 않습니다.
 
 `reqover-spring-boot-starter`는 `reqover-core`, `reqover-report`, 양쪽 adapter를
-한 의존성으로 가져오며, Spring Boot auto-configuration을 직접 등록하는 유일한
-모듈입니다. 다음을 제공합니다.
+한 의존성으로 가져옵니다. MVC와 WebFlux 모듈도 각각 자동 설정을 등록하고,
+starter는 리포트 서비스·엔드포인트·종료 내보내기 설정을 더합니다. 다음을 제공합니다.
 
 - `ReqoverReportService`: 활성 adapter가 context에 넣어 둔 `CoverageStore`에서
   요청 시점마다 report를 만듭니다.
@@ -70,8 +70,9 @@ Reqover는 네 층으로 나뉩니다.
   application 타입에 맞는 쪽만 활성화됩니다.
 - `ReqoverReportExporter`: `DisposableBean`으로, application context가 닫힐 때
   `reqover.report.export.json-path`와 `reqover.report.export.html-path`에
-  report를 씁니다. 둘 다 `ReqoverReportService`를 거치므로 파일 내용은
-  endpoint가 제공했을 문서와 byte 단위로 같습니다. export 실패는 출력만 하고
+  report를 씁니다. 같은 모델과 렌더러를 쓰지만, 같은 JVM의 여러 context가 같은
+  경로에 내보내면 기록을 누적합니다. 실행 중 endpoint는 활성 context의 저장소를
+  보므로 항상 바이트 단위로 같지는 않습니다. export 실패는 출력만 하고
   삼킵니다. 측정 도구가 shutdown 실패의 원인이 되어서는 안 되기 때문입니다.
 
 starter가 등록하는 bean은 모두 `@ConditionalOnMissingBean`이라, application이
@@ -114,7 +115,8 @@ transform 결과는 class ID, probe ID, method 이름, JVM descriptor, 확인 �
 
 ## Hit routing
 
-계측된 application bytecode는 다음 정적 호출만 수행합니다.
+각 메서드 진입 probe는 다음 정적 호출을 수행합니다. 선택적인 참조 probe도
+호출 지점에서 같은 기록 경로를 사용합니다.
 
 ```java
 ReqoverProbe.hit(classId, probeId);
@@ -133,8 +135,8 @@ ReqoverProbe.hit(classId, probeId);
 모든 bucket은 `UnitInfo`에 속합니다. unit ID, unit type, 표시 이름, attribute
 map으로 이루어진 record이며, 원래부터 HTTP에 묶이지 않은 형태였습니다. 정의된
 타입은 `http-request`, `scheduled-job`, `message`, `test`, `global` 다섯
-가지입니다. `0.4.1`이 더한 것은 `UnitScope`로, adapter를 새로 만들지 않고도
-HTTP가 아닌 작업 단위를 쓸 수 있게 합니다.
+가지입니다. `UnitScope`로 adapter를 새로 만들지 않고도 HTTP가 아닌 작업 단위를
+기록할 수 있습니다.
 
 ```java
 try (UnitScope scope = UnitScope.open(store, UnitInfo.scheduledJob(runId, "nightly-settlement"))) {
@@ -175,7 +177,7 @@ sequenceDiagram
 normalized endpoint pattern은 Spring의 best-matching pattern을 사용하고, pattern이
 아직 없으면 request URI로 fallback합니다. Servlet async re-dispatch에는 기존
 bucket을 재사용하지만, re-dispatch 전 async worker thread의 application 실행은
-현재 `0.4.1`에서 자동 전파하지 않습니다.
+현재 `0.4.2`에서 자동 전파하지 않습니다.
 
 ## Spring WebFlux lifecycle
 
@@ -207,7 +209,8 @@ reactive 요청 20개를 병렬 실행해 endpoint별 10개씩 분리되고 clas
 ## Snapshot과 store
 
 `CoverageStore`는 귀속과 보관을 가르는 이음새입니다. adapter와 `UnitScope`는
-`flush(CoverageBucket)`, `snapshots()`, `clear()` 세 메서드만 알기 때문에, 완료된
+`flush(CoverageBucket)`, `snapshots()`, `clear()`와 선택적인 `aggregates()` 확장을
+사용하기 때문에, 완료된
 bucket을 어떻게 처리할지는 교체 지점이 됩니다. heap에 두든, 어딘가에 쓰든,
 sampling 규칙으로 버리든 구현의 자유입니다. 구현체는 동시 사용에 안전해야 하고,
 `flush`는 작업 단위를 끝낸 thread — 보통 HTTP worker — 에서 호출되므로 오래
@@ -221,6 +224,15 @@ sampling 규칙으로 버리든 구현의 자유입니다. 구현체는 동시 �
 `@ConditionalOnMissingBean(CoverageStore.class)`로 선언하므로, application이 자체
 `CoverageStore`를 등록하면 interceptor·filter·report service가 모두 그것을
 사용합니다.
+
+`oldest-first`가 기본이며 `reject-when-full`은 기존 상세 구간을 유지합니다.
+두 정책 모두 집계 대상으로 받아들인 이름의 호출 수·코드 합집합을 누적합니다.
+새 집계 이름은 2,000개 제한이 있고 동시 추가에서는 엄격한 원자적 상한은 아닙니다.
+집계별 스레드 이름은 최대 64개입니다. 상한 밖의 새 이름은 보관 snapshot으로만
+표시하고 상세가 삭제되면 사라질 수 있습니다. 기존 집계는 `clear()`나 JVM 재시작까지
+유지합니다. snapshot 설정을 늘려도 집계 제한은 바뀌지 않으며, probe 집합이 커질 수
+있어 snapshot 상한이 전체 메모리 상한은 아닙니다.
+자체 저장소가 `aggregates()`를 제공하지 않으면 endpoint 집계도 보관 snapshot 기준입니다.
 
 ## Report 생애주기
 
@@ -240,7 +252,7 @@ flowchart LR
   I --> J
 ```
 
-`CoverageReportGenerator`는 store가 보관 중인 snapshot을 읽어
+`CoverageReportGenerator`는 보관 snapshot과 선택적인 전체 작업 집계를 읽어
 `UnitInfo.name()` 기준으로 묶고, 모든 `(classId, probeId)` 쌍을
 `ProbeRegistry`로 해석합니다. 결과인 `CoverageReport`에는 다음이 포함됩니다.
 
@@ -249,12 +261,19 @@ flowchart LR
 - 관측 thread 이름
 - class, method, descriptor, probe ID, 확인 가능한 첫 line
 - 각 method를 실행한 관측 endpoint의 reverse index
+- 요청별 작업 유형, 시작·끝 시각, 최종 상태, 스레드와 독립적인 실행 메서드 집합
 
 여기서 report는 두 갈래로 갑니다. `HtmlCoverageReportRenderer`는 사람이 읽는
-standalone 페이지를 만듭니다. endpoint 카드와 code-to-endpoint 표로 구성되며,
-heatmap, thread transition timeline, execution duration chart는 제공하지
-않습니다. `CoverageReportJson`은 같은 report를 JSON 문서(`schemaVersion` 1)로
-파일에 씁니다.
+standalone 대시보드를 만듭니다. HTTP 시간·상태 요약, 요청 상세, 관측 관계도,
+endpoint 코드와 역조회가 있습니다. 브라우저에서 검토한 JSON/JUnit 초안을 만들고
+보관된 시간·상태 요약을 비교합니다. 실제 호출 순서 재생, 메서드 span이나 요청 실행은
+지원하지 않으며, JavaScript 없이도 기존 표를 읽을 수 있습니다.
+
+`CoverageReportJson`은 schema 1로 기록하고 기본적으로 최근 작업 상세 100개와
+`omittedRequestDetails`를 담습니다. endpoint 집계와 역조회는 자르지 않습니다.
+로컬 호출자는 `write(report, requestDetailsLimit)`로 상한을 정할 수 있습니다.
+JSON을 다시 그린 시간 통계는 파일의 상세 범위만 사용하며, 실행 중 대시보드의 요약
+내보내기는 보관된 전체 HTTP snapshot으로 계산합니다.
 
 **기록된 report는 완전히 해석된 상태입니다.** class 이름, method 이름,
 descriptor, line 번호가 문서 안에 들어 있고 읽을 때 다시 조회하지 않습니다.
@@ -262,9 +281,10 @@ CLI가 다른 JVM, 다른 머신에서 `ProbeRegistry`도 agent도 없이 report
 비교하고 분석할 수 있는 구조적 이유가 이것입니다. 문서가 담은 probe ID는 그것이
 가리키던 이름과 함께 이동합니다.
 
-JSON은 정렬된 컬렉션으로 pretty-print되므로 같은 트래픽을 두 번 기록하면
-`generatedAt`을 빼고 byte 단위로 동일한 파일이 나옵니다. 의도된 설계이며,
-baseline report를 커밋해 두고 git에서 깔끔하게 diff하기 위한 것입니다.
+JSON의 컬렉션 순서는 안정적이지만 기록마다 요청 ID, 시각, 시간, 스레드 이름은
+달라질 수 있습니다. 같은 트래픽이 바이트 단위로 같은 파일을 만든다는 뜻은 아닙니다.
+CLI `diff`는 시간·상태가 아닌 endpoint·코드 관계를 비교합니다. 대시보드의 요약
+비교는 시간·상태 차이를 별도로 보여주며 성능 합격 게이트를 제공하지 않습니다.
 
 기록된 문서를 읽는 소비자는 둘이고, 어느 쪽도 application을 필요로 하지
 않습니다.
@@ -297,8 +317,9 @@ method와 normalized endpoint pattern이 담기는 작은 attribute map)와 시�
 
 이는 정책이 아니라 구조적 성질입니다. `CoverageBucketSnapshot`에 해당 필드가
 없고, adapter는 그 값을 읽는 servlet·reactive API를 호출하지 않습니다. 내보낸
-JSON은 범위가 더 좁아서 작업 단위 이름, 요청 수, request ID, thread 이름, 코드
-식별자만 담고 bucket이 갖고 있던 시각·status·attribute는 담지 않습니다.
+JSON은 작업 이름·호출 수·요청 ID·스레드·코드 외에 선택적인 `requests` 배열로
+보관 요청의 시각과 상태도 담습니다. 임의의 `UnitInfo` attribute map은 내보내지
+않습니다. 요청 상세가 없는 예전 파일은 계속 읽되 시간·상태를 미측정으로 표시합니다.
 
 starter의 HTTP report endpoint는 기본 비활성이고 자체 인증을 제공하지 않습니다.
 활성화하면 `reqover.report.endpoint.path`에 내부 class·method 이름이 공개되므로
@@ -317,6 +338,6 @@ starter의 HTTP report endpoint는 기본 비활성이고 자체 인증을 제�
   파일은 unmatched로 보고되며, 이는 영향이 없다는 뜻이 아닙니다.
 - unmanaged thread와 MVC async worker의 context는 자동 보장하지 않습니다. 다른
   thread에는 `UnitScope.join`이 필요합니다.
-- `0.4.1`은 개발·QA·CI 활용을 우선합니다. 보관은 기본적으로 in-memory이고
+- `0.4.2`는 개발·QA·CI 활용을 우선합니다. 보관은 기본적으로 in-memory이고
   report는 export하거나 제공할 때만 JVM 밖으로 나가며, production always-on
   agent를 주장하지 않습니다.

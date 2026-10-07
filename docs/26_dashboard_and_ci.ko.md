@@ -4,8 +4,8 @@
 
 **0.4.0부터** 제공하는 기능입니다. `v0.4.2` Action은 배포된 `reqover-cli-0.4.2.jar`를
 내려받고, 이 CLI의 `render`가 새 대시보드를 만듭니다. 소스를 직접 빌드할 필요는 없습니다.
-다만 요청별 상세는 0.4.1 agent/starter로 기록한 JSON에만 있습니다. 예전 JSON도 열리지만
-요청 진단 데이터는 비어 있습니다.
+요청 진단에는 0.4.0부터 추가된 선택적인 `requests` 상세가 필요합니다. 예전 JSON도
+열리지만 상세가 없으면 미측정으로 표시하며, 0 ms·성공으로 채우지 않습니다.
 
 ## 무엇부터 보나
 
@@ -61,7 +61,7 @@ Python 3을 설치합니다. 이 조건과 얕은 checkout을 네트워크 작�
     comment: "false"
     upload-artifact: "true"
     artifact-name: reqover-${{ github.job }}-${{ strategy.job-index || 'single' }}
-    analysis-name: ${{ github.job }}
+    analysis-name: ${{ github.job }}-${{ strategy.job-index || 'single' }}
 ```
 
 **우리 앱을 checkout하는 단계**에는 `fetch-depth: 0`을 넣어야 변경 기준과 공통 조상을

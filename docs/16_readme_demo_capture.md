@@ -1,5 +1,7 @@
 # 16. README Demo Capture
 
+> Provenance for the original attribution/reverse-index screenshots. It is not a current-release output contract or provenance for every later dashboard asset. See the [current guides](README.md) for current behavior.
+
 ## Purpose
 
 This document records how the screenshots in the root README were generated

@@ -1,3 +1,5 @@
+**English** | [한국어](24_request_diagnostics.ko.md) | [Documentation](README.md)
+
 # Recorded request diagnostics
 
 Since 0.4.0 the report preserves individual observations as well as the
@@ -83,6 +85,8 @@ and include `omittedRequestDetails` when older details were left out. Endpoint
 unions, the reverse index and completed request count still preserve the full
 recording aggregates supplied by the store, including evicted observations.
 Timing/status statistics cover only retained details, not those aggregates.
+The [default store's aggregate limits](../reqover-core/README.md) still apply;
+names not admitted depend on retained snapshots, not unlimited lifetime data.
 Statistics rendered from exported JSON cover only its exported detail
 window. A trusted local caller can select a different cap with
 `CoverageReportJson.write(report, requestDetailsLimit)`, including zero to omit
@@ -100,12 +104,14 @@ diagnostics**. The previous four-argument `CoverageReport` constructor remains
 available. Endpoint aggregation, reverse lookup, `impact` and `diff` retain their
 existing interpretation; timing/status changes are not added to coverage diff.
 
-The Java record itself now has five components. Record-pattern consumers and
-code inspecting component count must adapt. This is why it shipped in the 0.4.1
-minor release, even though the JSON extension is additive.
+The Java record has five components since 0.4.0. Record-pattern consumers and
+code inspecting component count must adapt; the four-argument constructor remains.
+See the [compatibility policy](20_versioning_and_compatibility.md) for the minor
+release boundary, even though the JSON extension is additive.
 
 Request methods are an unordered set. Reqover does not collect invocation
-order/count, timed method spans, DB intervals, test cases or load-test runs.
+order/count, timed method spans, DB intervals, test executions or load-test runs.
+Reviewed test drafts are a separate [dashboard feature](27_test_case_drafts.md).
 Non-HTTP units remain in the JSON but are excluded from HTTP diagnostics.
 
 Replay and load-test integration are not part of request diagnostics.

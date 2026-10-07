@@ -1,3 +1,5 @@
+[English](24_request_diagnostics.md) | **한국어** | [문서 목차](README.ko.md)
+
 # 요청 진단 리포트 사용 방법
 
 0.4.0부터 리포트는 기존 API별 메서드 합집합과 함께 개별 요청을 보존합니다.
@@ -69,7 +71,9 @@ WebFlux는 `-App webflux`로 실행하고 `/auto/reactive/diagnostics/delay/1200
 HTML은 가장 최근 HTTP 요청 100개까지 상세를 표시합니다. JSON도 기본적으로 최근 작업
 100개의 상세만 원래 순서대로 저장하고, 빠진 상세 수를 `omittedRequestDetails`로 알립니다.
 API별 합집합, 역조회와 완료 요청 수는 저장소의 전체 기록 집계를 유지하며 삭제된 상세도
-집계에 포함할 수 있습니다. 시간·상태 통계는 남아 있는 상세만 계산합니다. 내보낸 JSON으로
+집계에 포함할 수 있습니다. [기본 저장소의 집계 제한](../reqover-core/README.ko.md)은
+여전히 적용되며, 집계하지 못한 이름은 보관 snapshot에 의존합니다. 시간·상태 통계는
+남아 있는 상세만 계산합니다. 내보낸 JSON으로
 계산하는 시간·상태 통계는 그 파일의 상세 범위만 나타냅니다. 신뢰할 수 있는 로컬 호출자는
 `CoverageReportJson.write(report, requestDetailsLimit)`로 상한을 정할 수 있고, 0이면 상세를
 생략합니다. include 패키지와 저장 상한도 시험 범위에 맞게 조정합니다.
@@ -79,10 +83,12 @@ API별 합집합, 역조회와 완료 요청 수는 저장소의 전체 기록 �
 schema 1에 선택적인 `requests` 배열을 추가했습니다. 개별 요청 ID, 작업 유형,
 endpoint, 시작·끝 시각, 상태, 스레드와 메서드를 보존합니다. 옛 JSON은 계속 읽고,
 요청 진단 데이터가 없다는 상태를 표시합니다. 기존 네 인자 `CoverageReport` 생성자도
-유지합니다. `impact`와 `diff`는 이전 코드 관계 분석을 유지하며 시간·상태 비교는 별도 후속 기능입니다.
+유지합니다. `impact`와 CLI `diff`는 코드 관계를 분석합니다. 현재 시간·상태 비교는
+대시보드 [기록 비교](28_recording_comparison.ko.md)에서 별도로 제공합니다.
 
-Java record 구성 요소는 다섯 개로 늘었습니다. 네 요소 record pattern과 구성 요소
-수를 검사하는 소비자는 수정해야 하므로, JSON 추가와 별개로 0.4.1 마이너 릴리스에 포함한 변경입니다.
+Java record 구성 요소는 0.4.0부터 다섯 개입니다. 네 요소 record pattern과 구성 요소
+수를 검사하는 소비자는 수정해야 하며 네 인자 생성자는 유지합니다.
+JSON 추가와 별개인 마이너 버전 경계는 [호환성 정책](20_versioning_and_compatibility.ko.md)을 참고합니다.
 
 입력 파라미터, 헤더, 토큰, 예외 메시지는 수집하지 않습니다. 메서드 목록은 집합이며
 호출 순서·횟수·span 시간이 아닙니다. 비HTTP 작업은 JSON에 보존하지만 HTTP 통계에서 제외합니다.

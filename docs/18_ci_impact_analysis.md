@@ -76,8 +76,9 @@ Two things to know:
   shutdown fails, which also means a missing file is a quiet failure — check that
   the file exists before analysing it.
 
-If you prefer, you can save what the HTTP endpoint serves instead. It is the
-same document, byte for byte:
+If you prefer, save the HTTP endpoint's JSON. The format is the same, but it
+reads its active context's store; a multi-context shutdown export can contain
+additional recordings:
 
 ```bash
 curl -sf http://127.0.0.1:8080/reqover/report > build/reqover-report.json

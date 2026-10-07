@@ -2,10 +2,11 @@
 
 # Diagnostic dashboard and CI artifacts
 
-Available since **0.4.1**. The `v0.4.2` Action downloads the released
+The dashboard shipped in **0.4.0**; this guide uses **0.4.2**. The `v0.4.2` Action downloads the released
 `reqover-cli-0.4.2.jar`, whose `render` produces this dashboard; no source build
-is needed. Request details only appear when the recording itself was made with
-the 0.4.1 agent/starter. Older JSON still renders, without per-request diagnostics.
+is needed. Request diagnostics require a recording with the optional `requests`
+details introduced in 0.4.0. Older JSON still renders; missing details are shown
+as unavailable, not as zero-duration successful requests.
 
 ## What to review first
 
@@ -61,7 +62,7 @@ that prerequisite and shallow history before downloading the CLI or fetching a b
     comment: "false"
     upload-artifact: "true"
     artifact-name: reqover-${{ github.job }}-${{ strategy.job-index || 'single' }}
-    analysis-name: ${{ github.job }}
+    analysis-name: ${{ github.job }}-${{ strategy.job-index || 'single' }}
 ```
 
 The checkout of **your application repository** needs `fetch-depth: 0`. The

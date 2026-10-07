@@ -25,17 +25,17 @@
   <a href="#어떻게-동작하나">동작 원리</a> ·
   <a href="docs/17_integration_guide.ko.md">내 앱에 붙이기</a> ·
   <a href="https://youtu.be/N62BEzVchSM">데모 영상</a> ·
-  <a href="#문서-목록">문서</a> ·
+  <a href="docs/README.ko.md">문서</a> ·
   <a href="README.md">English</a>
 </p>
 
 </div>
 
-![endpoint별로 실행된 코드를 나눠서 보여주는 Reqover 리포트](docs/assets/reqover-mvc-request-attribution.png)
+![요청 진단과 관측 코드 관계를 함께 보여주는 Reqover 대시보드](docs/assets/reqover-request-diagnostics.png)
 
 <p align="center">
   <a href="https://youtu.be/N62BEzVchSM"><b>▶&nbsp; 2분 데모 영상 보기</b></a><br>
-  <sub>요청 분리, 역방향 조회, WebFlux thread hop, 그리고 Pull Request 코멘트까지 실제로 돌아가는 화면으로 봅니다.</sub>
+  <sub>v0.2.0으로 촬영한 기본 귀속·역조회·WebFlux·PR 댓글 영상입니다. 현재 대시보드는 아래 빠른 시작으로 확인하세요.</sub>
 </p>
 
 > [!IMPORTANT]
@@ -50,7 +50,7 @@
 
 여기서 알 수 없는 게 하나 있습니다. **누가** 실행했는지입니다. `GET /orders/{id}`가 실행했을까요, 아니면 관리자용 배치가 실행했을까요? 둘 다일까요? 커버리지 숫자만으로는 알 수 없어서, 보통 코드를 따라 읽으며 직접 추적합니다.
 
-Reqover는 요청이 들어오는 순간부터 응답이 나갈 때까지 **그 요청이 실제로 밟고 지나간 메서드를 요청별로 따로 기록합니다.** 그래서 이런 게 됩니다.
+Reqover는 **어댑터가 관측하는 요청 구간에서 실행된 메서드를 요청별로 따로 기록합니다.** MVC는 handler 매핑 이후부터 관측하므로 전체 네트워크 왕복 시간이 아니며, 메서드 목록도 호출 순서를 재생하는 trace가 아닙니다. 그래서 이런 게 됩니다.
 
 |                                              | 기존 커버리지 도구  | Reqover               |
 | -------------------------------------------- | ----------- | --------------------- |
@@ -81,15 +81,18 @@ Reqover는 요청이 들어오는 순간부터 응답이 나갈 때까지 **그 
   [자세히](docs/24_request_diagnostics.ko.md)
 - **기록 비교** — 이전 기록의 요약을 불러와 어느 엔드포인트가 느려졌거나 실패하기 시작했는지
   봅니다. 차이만 보여주고 판정은 사람에게 맡깁니다. [자세히](docs/28_recording_comparison.ko.md)
-- **테스트 초안** — 관측된 요청을 검토한 JSON 초안이나 JUnit 테스트로 만듭니다. 생성된 테스트는
-  로컬·QA 주소를 직접 지정하기 전까지 꺼져 있습니다. [자세히](docs/27_test_case_drafts.ko.md)
-- **CI에서** — Action이 대시보드를 artifact로 올리고, 분석마다 표시된 댓글 하나를 갱신합니다.
+- **테스트 초안** — 관측 요청을 JSON 초안이나 비활성화된 GET/HEAD JUnit 파일로 만듭니다.
+  직접 검토하고 로컬·QA 주소를 지정한 뒤 `@Disabled`를 제거해야 기존 테스트 도구에서
+  실행할 수 있습니다. [자세히](docs/27_test_case_drafts.ko.md)
+- **CI에서** — Action이 기존 기록을 분석하고 분석별 댓글 하나를 갱신합니다. 대시보드를
+  남기려면 `upload-artifact: "true"`를 지정합니다. 업로드 기본값은 꺼짐입니다.
   [자세히](docs/26_dashboard_and_ci.ko.md)
 
-![기록 비교: 같은 트래픽을 두 번 기록했고 두 번째에 한 엔드포인트가 느려짐](docs/assets/reqover-recording-comparison.png)
+![합성 기준선을 이용한 관측 시간·HTTP 상태 비교 예시](docs/assets/reqover-recording-comparison.png)
 
 어댑터가 관측한 값입니다. 메서드별 시간, 호출 순서, 클라이언트 지연, 서비스 전체 TPS는 아닙니다.
-시간 통계는 보관된 요청 기준이고, 엔드포인트 호출 수와 실행 코드는 기록 전체 기준입니다.
+시간 통계는 보관된 요청 기준입니다. 기본 저장소가 집계 대상으로 받아들인 이름의
+호출 수·코드는 기록 전체를 누적하지만 [별도의 집계 제한](reqover-core/README.ko.md)이 있습니다.
 
 ## 리포트가 보여주는 세 가지
 
@@ -107,7 +110,7 @@ WebFlux는 요청 하나를 처리하면서 스레드를 여러 번 갈아탑니
 
 `Code to Endpoint Index`는 방향을 뒤집은 표입니다. 메서드마다 **그 메서드를 실행한 API가 나열됩니다.** 코드를 고친 뒤 어디부터 다시 확인할지 정할 때 쓰면 됩니다. 메서드 이름은 JVM 내부 표기 대신 `find(long): OrderResponse`처럼 읽기 쉬운 형태로 보여줍니다.
 
-> 리포트 위쪽에는 필터 입력란이 있습니다. 엔드포인트·클래스·메서드 이름의 일부를 입력하면 두 섹션이 함께 걸러집니다. `/`를 누르면 입력란으로 이동하고, `Esc`를 누르면 지웁니다. 디스크립터는 두 표기 모두 매칭되므로 `(J)`로 찾든 `long`으로 찾든 같은 메서드가 나옵니다. 스크립트가 없어도 표 전체는 그대로 그려집니다 — 필터는 행을 숨길 뿐이라 브라우저 찾기(`Ctrl`/`Cmd`+`F`)도 그대로 동작합니다.
+> 필터로 엔드포인트·클래스·메서드를 검색합니다. 글을 입력 중이 아닐 때 `/`가 검색창으로 이동하고, `Esc`는 리포트 필터를 지웁니다. 0.4.2에서는 초안 경로 등 입력란에 `/`를 써도 포커스를 빼앗지 않습니다. `(J)`와 `long` 같은 두 디스크립터 표기를 모두 찾습니다. 스크립트 없이도 정적인 표와 브라우저 찾기를 사용할 수 있습니다.
 
 ![SharedValidator를 두 개의 API에 연결해 보여주는 역방향 조회](docs/assets/reqover-code-to-endpoint-index.png)
 
@@ -131,6 +134,7 @@ WebFlux는 요청 하나를 처리하면서 스레드를 여러 번 갈아탑니
 ```bash
 git clone https://github.com/reqover-labs/reqover.git
 cd reqover
+git checkout v0.4.2
 
 ./gradlew test
 ./scripts/run-agent-demo.sh mvc 8080
@@ -141,6 +145,7 @@ cd reqover
 ```powershell
 git clone https://github.com/reqover-labs/reqover.git
 Set-Location .\reqover
+git checkout v0.4.2
 
 # JAVA_HOME이 JDK 17 또는 21을 가리켜야 합니다
 $env:Path = "$env:JAVA_HOME\bin;$env:Path"
@@ -157,32 +162,46 @@ $env:Path = "$env:JAVA_HOME\bin;$env:Path"
 http://127.0.0.1:8080/reqover/report.html
 ```
 
-리포트에 이런 내용이 보이면 정상 동작한 것입니다.
+**Requests**에서 요청 상세를, **API to code**에서 API별 실행 코드를 확인합니다.
+기본 설정은 단순 접근자를 건너뛰므로 다음과 같이 보입니다.
 
 ```
-GET /auto/orders/{id}          3 classes · 3 methods · 1 thread
+GET /auto/orders/{id}          2 classes · 3 methods · 1 thread
   AutoOrderController          io.reqover.example.mvc.auto
   AutoOrderService             io.reqover.example.mvc.auto
-  AutoOrderResponse            io.reqover.example.mvc.auto
 ```
 
-끝낼 때는 스크립트를 실행한 터미널에서 `Enter`를 누릅니다. 기다리지 않고 리포트만 저장한 뒤 바로 종료하려면 — 스크립트나 CI에서 유용합니다 — 세 번째 인자를 넘기세요.
+끝낼 때는 실행한 터미널에서 `Enter`를 누릅니다. JSON을 출력한 뒤 기다리지 않고
+종료하려면 세 번째 인자를 넘깁니다. 이 옵션은 HTML 파일을 저장하지 않습니다.
+파일을 남기려면 리포트 내보내기 설정이나 대시보드의 HTML 내려받기를 사용합니다.
 
 ```bash
 ./scripts/run-agent-demo.sh mvc 8080 --stop-after-report
 ```
 
+MVC 데모가 켜진 동안 다른 터미널에서 지연·실패 요청도 보낼 수 있습니다.
+읽기 전용 데모이며 지연은 최대 2000 ms까지 허용합니다.
+
+```bash
+curl -s http://127.0.0.1:8080/auto/diagnostics/delay/1200
+curl -s -o /dev/null -w '%{http_code}\n' http://127.0.0.1:8080/auto/diagnostics/failure
+```
+
+대시보드를 새로고침하면 요청이 추가됩니다. 두 번째 요청은 의도적으로 503을 반환합니다.
+PowerShell에서는 `curl.exe`를 사용합니다. [요청 진단 안내](docs/24_request_diagnostics.ko.md).
+
 ### WebFlux 버전도 보고 싶다면
 
 ```bash
-./scripts/run-agent-demo.sh webflux 8080
+./scripts/run-agent-demo.sh webflux 8081
 ```
 
 ```powershell
-.\scripts\run-agent-demo.ps1 -App webflux -Port 8080
+.\scripts\run-agent-demo.ps1 -App webflux -Port 8081
 ```
 
 이번에는 `GET /auto/reactive/orders/{id}`와 함께 **서로 다른 스레드 이름이 2개 이상** 나타나야 합니다. 그게 "스레드가 바뀌어도 추적이 유지됐다"는 증거입니다.
+이 데모의 대시보드 주소는 `http://127.0.0.1:8081/reqover/report.html`입니다.
 
 ### CI 흐름 전체를 한 번에 보고 싶다면
 
@@ -240,7 +259,7 @@ agent를 붙인 채로 통합 테스트를 돌리고 애플리케이션이 정�
 
 ```bash
 git diff --name-only origin/main... \
-  | reqover impact --report build/reqover-report.json --changed-files - --format markdown
+  | java -jar reqover-cli-0.4.2.jar impact --report build/reqover-report.json --changed-files - --format markdown
 ```
 
 ```
@@ -254,7 +273,9 @@ git diff --name-only origin/main... \
 | `POST /payments`   | `SharedValidator#validate(String)` |
 ```
 
-여기서 `reqover`는 릴리스에 들어 있는 `java -jar reqover-cli-0.4.2.jar`입니다. CLI에는
+이 예시는 릴리스에서 받은 CLI JAR이 현재 폴더에 있다고 가정합니다. 다른 위치라면
+전체 경로를 사용하고, 소스 빌드라면 `reqover-cli/build/libs/reqover-cli-0.4.2.jar`를
+사용합니다. CLI에는
 `render`(리포트 JSON을 단독 실행 페이지로)와 `diff`(두 기록 사이에 무엇이 달라졌는지)도
 있습니다. `--fail-on-impact`를 주면 이 분석이 게이트가 됩니다. 영향받는 것이 없으면 종료
 코드 0, 있으면 1, 입력이 잘못됐으면 2입니다.
@@ -265,7 +286,16 @@ git diff --name-only origin/main... \
 - uses: reqover-labs/reqover/.github/actions/impact@v0.4.2
   with:
     report: build/reqover-report.json
+    upload-artifact: "true"
+    artifact-name: reqover-${{ github.job }}-${{ strategy.job-index || 'single' }}
+    analysis-name: ${{ github.job }}-${{ strategy.job-index || 'single' }}
 ```
+
+`pull_request` 작업에서 요청 기록과 Java 준비를 마친 뒤 실행합니다. checkout은
+`fetch-depth: 0`이어야 하고 Java 17+, Bash, Git, curl, Python 3이 필요합니다.
+같은 저장소 PR 댓글에는 `pull-requests: write` 권한이 필요하며, 권한이 없으면
+`comment: "false"`로 끕니다. fork 댓글은 생략합니다. 여러 번 실행하면 artifact와
+분석 이름을 구분합니다. Action은 앱이나 테스트를 대신 실행하지 않습니다.
 
 > [!NOTE]
 > 영향도 분석은 **실행되는 것을 관측한** 코드에 대해서만 말할 수 있습니다. 관측된 실행
@@ -304,6 +334,9 @@ flowchart LR
 ### 되는 것
 
 - Spring MVC / WebFlux 요청별 실행 기록
+- 오프라인 대시보드, 관측 관계 애니메이션, 실패·지연 필터와 개별 요청 상세
+- 보관된 HTTP 시간·상태 요약 비교와, 별도의 CLI 코드 차이 분석
+- 검토 가능한 JSON 초안과 비활성화된 GET/HEAD JUnit 내보내기. 원본 입력 자동 재현은 아님
 - 메서드 시작 지점 자동 기록 (소스 수정 불필요)
 - API → 코드 리포트, 그리고 코드 → API 역방향 조회
 - 리포트를 JSON으로 쓰고 다시 읽기 — JVM이 끝나도 기록이 남습니다
@@ -319,8 +352,9 @@ flowchart LR
 ### 안 되는 것 / 주의할 점
 
 - **몇 번째 줄까지 실행했는지는 모릅니다.** 메서드 단위로만 봅니다. 줄·분기 단위 정밀도가 필요하면 JaCoCo를 쓰세요.
-- **컴파일러가 자동 생성한 메서드**는 기록하지 않습니다. **런타임 프록시**(Spring CGLIB, Hibernate, Byte Buddy)와, 필드 하나를 읽거나 쓰기만 하는 **단순 getter·setter**(record accessor 포함)도 기록하지 않습니다. 어떤 컨트롤러에도 매칭되지 않아 정적 리소스 핸들러로 넘어간 요청도 기록하지 않습니다.
-- **기록은 메모리에만 남습니다.** 요청별 기록의 기본 상한은 10,000건이고(`reqover.mvc.max-snapshots` / `reqover.webflux.max-snapshots`로 조정), 넘으면 오래된 것부터 지웁니다. 어떤 엔드포인트가 몇 번 실행됐고 무엇을 실행했는지는 엔드포인트별로 따로 쌓기 때문에, 긴 기록 초반에만 호출된 엔드포인트도 리포트에 남습니다. 애플리케이션을 재시작하면 사라집니다. 다른 곳에 저장하고 싶다면 `CoverageStore`가 확장 지점이지만, Reqover가 제공하는 영속 구현체는 없습니다 — 대신 리포트를 파일로 내보내세요.
+- **컴파일러 생성 메서드와 런타임 프록시**(Spring CGLIB, Hibernate, Byte Buddy, Mockito)는 제외합니다. 단순 getter·setter·builder·record 접근자는 기본적으로 건너뛰지만, 영향 분석용 기록에는 `accessors=record`로 포함할 수 있습니다. `references=record`는 포함 대상 인터페이스 호출·정적 필드 참조를 관측하며, 참조된 구현 내부가 실행됐다는 뜻은 아닙니다. 미매핑 URL의 catch-all 리소스 요청은 기록하지 않습니다.
+- **기록은 메모리에만 남습니다.** snapshot 기본 상한은 10,000건입니다(`reqover.mvc.max-snapshots` / `reqover.webflux.max-snapshots`). 별도 집계는 받아들인 이름의 호출 수·코드를 유지하며, 서로 다른 이름 2,000개와 집계별 스레드 이름 64개 제한이 있습니다. 상한 밖의 새 이름은 상세까지 삭제되면 사라질 수 있고 snapshot 상한을 늘려도 집계 제한은 그대로입니다. 재시작하면 모두 사라집니다. `CoverageStore`로 보관을 바꿀 수 있지만 기본 영속 구현은 없으므로 파일 내보내기를 사용합니다.
+- **내보낸 상세에는 별도 상한이 있습니다.** JSON은 기본적으로 최근 작업 100개의 상세를 담고 생략 수를 `omittedRequestDetails`로 알립니다. endpoint 집계는 유지합니다. 실행 중 HTML의 시간 통계는 보관된 HTTP snapshot 기준이고, JSON을 다시 그린 HTML은 그 파일에 남은 상세만 계산합니다. 전체 보관 구간의 시간 기준선은 실행 중 대시보드의 요약 내보내기를 사용합니다.
 - **영향도 분석은 기록된 범위 안에서만 동작합니다.** 바뀐 파일을, 리포트가 실행을 관측한 코드와 맞춰볼 뿐입니다. 맞출 수 없는 파일은 매칭 실패로 보고되는데, 이는 "영향 없음"이 아니라 "본 적 없음"이라는 뜻입니다.
 - **MVC의 비동기 처리 구간**은 자동 연결이 끊깁니다. 별도 스레드로 넘어간 부분은 기록되지 않고, 요청 처리가 다시 돌아오는 시점부터 이어집니다.
 - **WebFlux 어댑터는 JVM 전체에 영향을 주는 설정 하나를 켭니다.** (Reactor의 컨텍스트 자동 전달 기능. 스레드를 넘어 요청 정보를 옮기기 위해 필요합니다.) 원하지 않으면 애플리케이션 시작 전에 `reqover.webflux.enabled=false`로 어댑터를 끄세요.
@@ -329,7 +363,7 @@ flowchart LR
 - **역방향 조회는 "여기부터 보라"는 힌트입니다.** 완전한 변경 영향 분석을 보장하지 않습니다.
 - **데모의 리포트 페이지에는 로그인이 없습니다.** `127.0.0.1`로만 열어두세요.
 
-**오버헤드는 계측 메서드 진입 1회당 약 24 ns**이고, 요청당 고정 비용은 여기서 측정될 만큼 크지 않습니다. 계측 메서드 수백 개를 지나가는 요청이면 대략 10 µs입니다. 측정 방법과 원시 샘플, 그리고 이 측정이 다루지 *않는* 것(동시성·GC·시작 시간)은 [측정된 agent 오버헤드](docs/15_performance_results.ko.md)에 있습니다.
+공개된 [메서드 진입 벤치마크](docs/15_performance_results.ko.md)는 문서에 적힌 환경에서 진입당 약 24 ns를 측정했습니다. 당시의 좁은 범위 측정이며, 0.4.2의 대시보드·내보내기·참조 probe 전체 비용이나 운영 환경 성능을 보장하지 않습니다. 실제 적용 전 원시 샘플과 측정 제외 항목을 함께 확인하세요.
 
 ## 지원 범위
 
@@ -352,14 +386,14 @@ flowchart LR
 
 | 폴더                        | 하는 일                                       |
 | ------------------------- | ----------------------------------------- |
-| `reqover-core`            | 요청별 기록함, 기록 저장소 — **여기가 심장부입니다**          |
-| `reqover-instrumentation` | 클래스에 기록 코드를 끼워 넣는 부분 (ASM 사용)             |
-| `reqover-agent`           | 위 기능을 `-javaagent`로 쓸 수 있게 포장             |
-| `reqover-spring-mvc`      | MVC에서 "지금 어느 요청인지" 찾기                     |
-| `reqover-spring-webflux`  | WebFlux에서 같은 일 (스레드 전환 처리 포함)             |
-| `reqover-spring-boot-starter` | 의존성 하나로 전체를 연결. 리포트 엔드포인트와 파일 내보내기 포함 |
-| `reqover-report`          | 리포트 집계, 역방향 조회, 영향도 분석, 기록 비교, JSON/HTML 만들기 |
-| `reqover-cli`             | 기록된 리포트에 대한 `render`, `diff`, `impact` 명령 |
+| [reqover-core](reqover-core/README.ko.md) | 요청 기록함, 제한된 상세와 전체 작업 집계 |
+| [reqover-instrumentation](reqover-instrumentation/README.ko.md) | ASM 진입 probe와 선택적인 참조 관측 |
+| [reqover-agent](reqover-agent/README.ko.md) | `-javaagent` JAR과 기록 옵션 |
+| [reqover-spring-mvc](reqover-spring-mvc/README.ko.md) | MVC 요청 귀속과 수명 관리 |
+| [reqover-spring-webflux](reqover-spring-webflux/README.ko.md) | reactive 스레드 전환의 요청 귀속 |
+| [reqover-spring-boot-starter](reqover-spring-boot-starter/README.ko.md) | 앱 연결, 선택적 리포트와 내보내기 |
+| [reqover-report](reqover-report/README.ko.md) | 대시보드·진단·초안·요약·코드 diff·impact |
+| [reqover-cli](reqover-cli/README.ko.md) | 오프라인 `render`, `diff`, `impact`, `version`, `help` |
 | `examples/mvc-sample`     | MVC 데모 애플리케이션                             |
 | `examples/webflux-sample` | WebFlux 데모 애플리케이션                         |
 | `docs`                    | 설계·측정·결정 기록                               |
@@ -418,20 +452,23 @@ fork 후 브랜치를 만들고, `./gradlew clean test` 통과를 확인한 뒤 
 
 ## 문서 목록
 
-- [성능 검증 개선 계획](docs/23_performance_validation_plan.ko.md)
-- [0.4.0 진단 기능 리뷰 기록](docs/30_review_corrections.md)
-- [OSV 보안 검사 보완](docs/29_osv_dependency_remediation.ko.md)
+- [현재 사용 문서 목차](docs/README.ko.md) · [English](docs/README.md)
+- [요청 진단](docs/24_request_diagnostics.ko.md)
+- [대시보드와 CI 결과물](docs/26_dashboard_and_ci.ko.md)
+- [검토 가능한 테스트 초안](docs/27_test_case_drafts.ko.md)
+- [보관 기록 비교](docs/28_recording_comparison.ko.md)
 
 - [시스템 아키텍처](docs/02_architecture.ko.md)
 - [Spring 애플리케이션 연동 가이드](docs/17_integration_guide.ko.md)
 - [CI에서 영향도 분석하기](docs/18_ci_impact_analysis.ko.md)
 - [선행 도구와 Reqover의 자리 — 다른 도구를 써야 할 때](docs/19_prior_art.ko.md)
 - [버전, 호환성, 롤백](docs/20_versioning_and_compatibility.ko.md)
-- [프로젝트 기획](docs/00_project_plan.md) · [요구사항](docs/01_requirements.md)
-- [MVP 진행 상태](docs/08_phase0_mvp_status.md) · [Agent E2E Demo](docs/09_agent_e2e_demo.md) · [데모 스크립트](docs/10_demo_script.md)
 - [성능 측정 방법](docs/11_performance_measurement.md) · [측정된 agent 오버헤드](docs/15_performance_results.ko.md)
 - [JaCoCo 연동 관련 결정](docs/14_jacoco_interop_decision.md) · [README 스크린샷 촬영 기록](docs/16_readme_demo_capture.md)
 - [대회 준비 문서](docs/competition/README.md)
+
+최초 기획·Phase 0·예전 영상 대본·리뷰 기록은 목차의 과거 자료로 보존합니다.
+현재 설치 방법이나 지원 기능은 위의 사용 가이드를 기준으로 확인하세요.
 
 **프로젝트 문서** — [도움 받기](SUPPORT.md) · [로드맵](ROADMAP.md) · [거버넌스](GOVERNANCE.md) · [기여 가이드](CONTRIBUTING.md) · [행동 강령](CODE_OF_CONDUCT.md) · [보안 정책](SECURITY.md) · [변경 이력](CHANGELOG.md)
 

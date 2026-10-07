@@ -30,9 +30,9 @@ Reqover is split into four layers.
 2. **Attribution** — the Spring adapter binds the current HTTP request's bucket
    to a context and routes probe hits into that bucket; `UnitScope` does the same
    for units of work that are not HTTP requests.
-3. **Reporting** — completed snapshots are aggregated per unit and the forward
-   and reverse relationships are rendered as self-contained HTML, or written as a
-   JSON document that outlives the JVM.
+3. **Reporting** — retained snapshots provide request details and timing/status
+   statistics; recording-wide unit aggregates preserve endpoint counts and code.
+   The report becomes a self-contained dashboard or JSON that outlives the JVM.
 4. **Analysis** — the CLI reads a written report in a separate JVM and turns it
    into a diff, an impact list, or an exit code.
 
@@ -45,21 +45,22 @@ Reqover is split into four layers.
 | `reqover-agent` | `premain`, include/exclude policy, shaded standalone agent JAR |
 | `reqover-spring-mvc` | MVC interceptor and request lifecycle |
 | `reqover-spring-webflux` | `WebFilter`, Reactor Context ↔ ThreadLocal bridge |
-| `reqover-report` | Endpoint aggregation, reverse index, HTML renderer, JSON read/write, diff, impact analysis |
+| `reqover-report` | Endpoint aggregates, request diagnostics, offline dashboard, reviewed drafts, timing/status comparison, JSON, code diff and impact |
 | `reqover-spring-boot-starter` | One dependency for core, report, and both adapters; report service, opt-in HTTP endpoint, shutdown export |
 | `reqover-cli` | Shaded executable JAR: `render`, `diff`, `impact` over a report read from disk |
 | `examples/*` | E2E samples for manual probes and agent auto-instrumentation |
 
-`reqover-report` outgrew its name in `0.4.1`. Besides rendering, it now owns JSON
-persistence (`CoverageReportJson`), report comparison (`CoverageReportDiff`), and
-impact analysis (`ImpactAnalyzer`). It still declares exactly one dependency,
+`reqover-report` owns JSON persistence (`CoverageReportJson`), code comparison
+(`CoverageReportDiff`), impact analysis (`ImpactAnalyzer`) and the offline
+dashboard's diagnostics, drafts and recording-summary views. It still declares exactly one dependency,
 `reqover-core` — the JSON reader and writer are hand-written for that reason, so
 that generating or reading a report never drags a JSON library onto an
 application's classpath.
 
 `reqover-spring-boot-starter` is a single dependency that brings `reqover-core`,
-`reqover-report`, and both adapters, and it is the only module that registers
-Spring Boot auto-configuration of its own. It contributes:
+`reqover-report`, and both adapters. MVC and WebFlux each register their own
+Spring Boot auto-configuration. The starter adds report-service, report-endpoint
+and shutdown-export configuration. It contributes:
 
 - `ReqoverReportService`, which builds a report on demand from whichever
   `CoverageStore` the active adapter placed in the context.
@@ -70,8 +71,9 @@ Spring Boot auto-configuration of its own. It contributes:
   application type activates.
 - `ReqoverReportExporter`, a `DisposableBean` that writes the report to
   `reqover.report.export.json-path` and `reqover.report.export.html-path` when
-  the application context closes. Both go through `ReqoverReportService`, so the
-  exported file is byte-for-byte what the endpoint would have served. Export
+  the application context closes. Both use the same report model and renderers.
+  Exports to a shared path accumulate contexts closing within the same JVM;
+  a live endpoint represents its active context's store. Export
   failures are printed and swallowed: a measurement tool must not be the reason
   a shutdown fails.
 
@@ -111,6 +113,9 @@ The invocation form is:
 - ASM is relocated to `io.reqover.agent.internal.asm` so it cannot collide with
   the application's own ASM on the classpath.
 - Probe precision is currently method-entry. Synthetic methods are excluded.
+- Trivial accessors are skipped unless `accessors=record`. Optional
+  `references=record` adds included interface-call/static-field observations at
+  call sites; these do not prove that a referenced implementation body ran.
 
 Each transform registers the class ID, probe ID, method name, JVM descriptor, and
 the first resolvable line number in `ProbeRegistry`. A transform failure never
@@ -118,7 +123,8 @@ aborts application startup — it only gives up on instrumenting that one class.
 
 ## Hit routing
 
-Instrumented application bytecode performs exactly one static call:
+Each method-entry probe performs one static call. Optional reference probes at
+call sites use the same recording path:
 
 ```java
 ReqoverProbe.hit(classId, probeId);
@@ -137,9 +143,8 @@ The correctness principle is **unattributed is better than misattributed.**
 
 Every bucket belongs to a `UnitInfo`: a unit ID, a unit type, a display name, and
 an attribute map. That record was always generic — the five types it names are
-`http-request`, `scheduled-job`, `message`, `test`, and `global`. What `0.4.1`
-adds is `UnitScope`, which makes the non-HTTP ones usable without writing an
-adapter:
+`http-request`, `scheduled-job`, `message`, `test`, and `global`. `UnitScope`
+makes the non-HTTP ones usable without writing an adapter:
 
 ```java
 try (UnitScope scope = UnitScope.open(store, UnitInfo.scheduledJob(runId, "nightly-settlement"))) {
@@ -182,7 +187,7 @@ sequenceDiagram
 The normalized endpoint pattern uses Spring's best-matching pattern, falling back
 to the request URI when no pattern is available yet. Servlet async re-dispatch
 reuses the existing bucket, but application execution on the async worker thread
-before re-dispatch is **not** propagated automatically in `0.4.1`.
+before re-dispatch is **not** propagated automatically in `0.4.2`.
 
 ## Spring WebFlux lifecycle
 
@@ -218,7 +223,7 @@ class bleeding across endpoints.
 
 `CoverageStore` is the seam between attribution and retention. The adapters and
 `UnitScope` know only this interface — `flush(CoverageBucket)`, `snapshots()`,
-`clear()` — so what happens to a finished bucket is a substitution point: keep it
+`clear()`, plus the optional `aggregates()` reporting extension — so what happens to a finished bucket is a substitution point: keep it
 in heap, write it somewhere, or drop it under a sampling rule. Implementations
 must be safe for concurrent use, and `flush` is called on the thread that
 completed the unit of work — an HTTP worker in the common case — so it must not
@@ -232,6 +237,15 @@ the adapters expose it as `reqover.mvc.max-snapshots` and
 `@ConditionalOnMissingBean(CoverageStore.class)`, so an application that
 contributes its own `CoverageStore` gets that one used everywhere instead — by
 the interceptor, the filter, and the report service alike.
+
+`oldest-first` is the default; `reject-when-full` keeps the existing detail
+window instead. Both update counts/code for admitted aggregate names. New-name
+admission has a separate 2,000-name limit, best-effort under concurrency, and each
+aggregate keeps at most 64 thread names. Names not admitted rely on retained
+snapshots and can disappear after eviction. Admitted aggregates survive eviction,
+not `clear()` or restart. The snapshot setting does not raise aggregate limits
+or cap total heap usage; probe sets can grow. A custom store returning no
+aggregates falls back to retained snapshots for endpoint counts/code.
 
 ## Report lifecycle
 
@@ -251,8 +265,8 @@ flowchart LR
   I --> J
 ```
 
-`CoverageReportGenerator` reads the snapshots the store holds, groups them by
-`UnitInfo.name()`, and resolves every `(classId, probeId)` pair through
+`CoverageReportGenerator` reads retained snapshots and optional unit aggregates,
+groups by `UnitInfo.name()`, and resolves every `(classId, probeId)` pair through
 `ProbeRegistry`. The resulting `CoverageReport` contains:
 
 - the endpoint — or other unit name — and the number of completed requests
@@ -260,12 +274,21 @@ flowchart LR
 - observed thread names
 - class, method, descriptor, probe ID, and first resolvable line
 - a reverse index of the observed endpoints that executed each method
+- independent request observations: unit type, start/end, final status, threads
+  and that request's own resolved method set
 
 From there the report goes two ways. `HtmlCoverageReportRenderer` produces the
-self-contained page a person reads: endpoint cards plus a code-to-endpoint table.
-It provides no heatmaps, thread-transition timelines, or execution-duration
-charts. `CoverageReportJson` writes the same report as a JSON document
-(`schemaVersion` 1) to a file.
+self-contained dashboard: retained HTTP statistics, request details, observed
+association graphs, endpoint code and reverse lookup. Browser-only views create
+reviewed JSON/disabled JUnit drafts and compare retained HTTP summaries. They
+do not execute requests, replay measured call order or collect method spans.
+The original tables remain without JavaScript.
+
+`CoverageReportJson` writes schema 1 with at most 100 recent unit details by
+default and an `omittedRequestDetails` count. Endpoint aggregates and the reverse
+index are not truncated. `write(report, requestDetailsLimit)` provides an explicit
+local limit. Offline statistics can only use the details actually in that file;
+the live dashboard summary exports statistics over all retained HTTP snapshots.
 
 **A written report is fully resolved.** Class names, method names, descriptors,
 and line numbers are inside the document, not looked up when it is read back.
@@ -273,9 +296,11 @@ That is the architectural reason the CLI can render, diff, and analyse a report
 in a different JVM, on a different machine, with no `ProbeRegistry` and no agent:
 the probe IDs it carries already travel with the names they stood for.
 
-The JSON is pretty-printed with sorted collections, so two runs over the same
-traffic produce byte-identical files apart from `generatedAt`. That is
-deliberate — it is what makes a committed baseline report diff cleanly in git.
+The JSON has stable collection ordering. Separate recordings still differ in
+request IDs, timestamps, durations or thread names; identical traffic does not
+produce byte-identical documents. CLI `diff` compares endpoint/code relationships,
+not these diagnostic fields. Dashboard summary comparison handles time/status
+deltas separately and does not produce a performance gate.
 
 Two consumers read the written document, and neither needs the application:
 
@@ -307,9 +332,10 @@ thread names, and code-hit metadata. The following are **not** collected:
 
 This is a structural property, not a policy: `CoverageBucketSnapshot` has no
 field for them, and the adapters never call the servlet or reactive APIs that
-would read them. The exported JSON narrows further still — it carries unit names,
-request counts, request IDs, thread names, and code identity, and not the
-timestamps, status codes, or attributes the bucket held.
+would read them. Exported JSON includes retained request timestamps and status
+codes in the optional `requests` array, plus unit names, counts, IDs, threads and
+code identity. It does not export the arbitrary `UnitInfo` attribute map. Older
+files without request details remain readable with unavailable timing/status data.
 
 The starter's HTTP report endpoint is disabled by default and ships no
 authentication of its own. Enabling it publishes internal class and method names
@@ -329,6 +355,6 @@ same document to a path of your choosing; treat that file as the report it is.
   recording is reported as unmatched, which is not the same as unaffected.
 - Context on unmanaged threads and MVC async workers is not guaranteed
   automatically; a second thread needs `UnitScope.join`.
-- `0.4.1` prioritizes development, QA, and CI use. Retention is in memory by
+- `0.4.2` prioritizes development, QA, and CI use. Retention is in memory by
   default and a report leaves the JVM only when it is exported or served; it does
   not claim to be a production always-on agent.

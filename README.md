@@ -31,7 +31,7 @@ recorded per request, answerable in reverse, and checkable in CI.</p>
 
 </div>
 
-![Reqover dashboard with request diagnostics and observed code relationships](docs/assets/reqover-request-diagnostics.png)
+![Reqover 0.4.2 dashboard connecting shared code to two observed retest candidates](docs/assets/reqover-retest-map-current.png)
 
 <p align="center">
   <a href="https://youtu.be/N62BEzVchSM"><b>▶&nbsp; Watch the 2-minute demo</b></a><br>
@@ -108,7 +108,7 @@ Call `GET /orders/{id}` and `POST /payments` against the same application, and t
 
 WebFlux switches threads several times while handling a single request. That normally loses the answer to "which request caused this code to run" — Reqover keeps recording it under the same request even after the thread changes.
 
-![Reqover WebFlux report preserving request attribution across threads](docs/assets/reqover-webflux-thread-hop.png)
+![Reqover 0.4.2 request detail: one WebFlux request across three threads, without response accessors](docs/assets/reqover-webflux-request-detail.png)
 
 ### 3. Code → API reverse lookup
 
@@ -116,9 +116,9 @@ WebFlux switches threads several times while handling a single request. That nor
 
 > Use the filter for endpoint, class or method text. `/` focuses search when you are not editing a text field, and `Esc` clears the report filter. In 0.4.2, entering `/` in a draft path or another input no longer steals focus. Descriptors match either spelling, so `(J)` and `long` find the same method. Without scripting, the static tables remain readable and browser find still works.
 
-![Reverse index mapping SharedValidator to two APIs](docs/assets/reqover-code-to-endpoint-index.png)
+![Reqover 0.4.2 retest candidates filtered to SharedValidator and its two observed APIs](docs/assets/reqover-retest-candidates.png)
 
-> How and where these screenshots were captured is recorded in [README Demo Capture](docs/16_readme_demo_capture.md).
+> The lead retest map, WebFlux detail and reverse-index screenshots come from actual 0.4.2 sample requests; see [current capture provenance](docs/32_current_screenshot_capture.md). Other diagnostic examples retain the provenance in their feature guides. [Original capture notes](docs/16_readme_demo_capture.md) describe the archived old table screenshots.
 
 ## Try it in 5 minutes
 

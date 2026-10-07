@@ -38,6 +38,7 @@ Endpoint aggregates and the retained/detail-export windows are different scopes.
 
 ## Design and Evidence
 
+- [Current 0.4.2 screenshot capture](32_current_screenshot_capture.md): real sample requests, default recording options and browser checks.
 - [Current architecture](02_architecture.md) and [compatibility policy](20_versioning_and_compatibility.md).
 - [Prior art](19_prior_art.md) and [JaCoCo interoperability decision](14_jacoco_interop_decision.md).
 - [Method-entry measurement](15_performance_results.md): a dated benchmark, not overall current-release overhead.

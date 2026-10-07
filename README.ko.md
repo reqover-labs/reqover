@@ -31,7 +31,7 @@
 
 </div>
 
-![요청 진단과 관측 코드 관계를 함께 보여주는 Reqover 대시보드](docs/assets/reqover-request-diagnostics.png)
+![공유 코드와 관측된 두 재테스트 후보를 연결하는 Reqover 0.4.2 대시보드](docs/assets/reqover-retest-map-current.png)
 
 <p align="center">
   <a href="https://youtu.be/N62BEzVchSM"><b>▶&nbsp; 2분 데모 영상 보기</b></a><br>
@@ -104,7 +104,7 @@ Reqover는 **어댑터가 관측하는 요청 구간에서 실행된 메서드�
 
 WebFlux는 요청 하나를 처리하면서 스레드를 여러 번 갈아탑니다. 보통 이러면 "이 코드가 어느 요청 때문에 돌았는지"를 놓치는데, Reqover는 스레드가 바뀌어도 같은 요청으로 계속 기록합니다.
 
-![스레드가 바뀌어도 요청 추적이 유지되는 WebFlux 리포트](docs/assets/reqover-webflux-thread-hop.png)
+![응답 접근자를 제외하고 세 스레드의 WebFlux 요청 하나를 보여주는 Reqover 0.4.2 상세](docs/assets/reqover-webflux-request-detail.png)
 
 ### 3. 코드 → API 역방향 조회
 
@@ -112,9 +112,11 @@ WebFlux는 요청 하나를 처리하면서 스레드를 여러 번 갈아탑니
 
 > 필터로 엔드포인트·클래스·메서드를 검색합니다. 글을 입력 중이 아닐 때 `/`가 검색창으로 이동하고, `Esc`는 리포트 필터를 지웁니다. 0.4.2에서는 초안 경로 등 입력란에 `/`를 써도 포커스를 빼앗지 않습니다. `(J)`와 `long` 같은 두 디스크립터 표기를 모두 찾습니다. 스크립트 없이도 정적인 표와 브라우저 찾기를 사용할 수 있습니다.
 
-![SharedValidator를 두 개의 API에 연결해 보여주는 역방향 조회](docs/assets/reqover-code-to-endpoint-index.png)
+![SharedValidator와 이를 실행한 두 API만 검색한 Reqover 0.4.2 재테스트 후보](docs/assets/reqover-retest-candidates.png)
 
-> 스크린샷을 어떤 환경에서 어떻게 찍었는지는 [README Demo Capture](docs/16_readme_demo_capture.md)에 적어두었습니다.
+> 맨 위 관계도·WebFlux 상세·역조회 화면은 실제 0.4.2 예제 요청으로 촬영했습니다.
+> [최신 촬영 기록](docs/32_current_screenshot_capture.ko.md)을 참고합니다. 다른 진단 예시는
+> 각 기능 문서의 출처를 유지하고, [원래 촬영 기록](docs/16_readme_demo_capture.md)은 보존된 옛 표 이미지를 설명합니다.
 
 ## 5분 만에 직접 보기
 

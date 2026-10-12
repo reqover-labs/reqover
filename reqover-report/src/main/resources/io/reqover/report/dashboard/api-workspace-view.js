@@ -11,6 +11,7 @@
   requests.forEach(function (r, i) { var value = details[i] && details[i].dataset.requestDuration; r.duration = value ? Number(value) : null; });
   var selected = new Set(), page = 0, size = 20, mode = 'groups', group = '', depth = 1;
   var metric = 'requestCount', direction = 'desc', visible = [];
+  var pages = { groups: 0, table: 0 };
   function node(tag, text, cls) { var e = document.createElement(tag); if (text !== undefined) { e.textContent = text; } if (cls) { e.className = cls; } return e; }
   function byId(id) { return document.getElementById('api-' + id); }
   function time(value) { return value === null ? 'Not timed' : value.toFixed(2) + ' ms'; }
@@ -26,21 +27,26 @@
     minCount: Math.max(0, Number(byId('min-count').value) || 0), minP95: Math.max(0, Number(byId('min-p95').value) || 0),
     group: group, depth: depth, metric: metric, direction: direction }; }
   function renderSelection() {
-    var count = rows.reduce(function (n, r) { return n + (selected.has(r.endpoint) ? r.requestCount : 0); }, 0);
-    var hidden = Array.from(selected).filter(function (e) { return !visible.some(function (r) { return r.endpoint === e; }); }).length;
-    byId('selection-count').textContent = selected.size + ' selected APIs / ' + count.toLocaleString() + ' observations';
-    byId('selection-scope').textContent = percent(count, total) + ' of retained observations' + (hidden ? ' / ' + hidden + ' outside current filters' : '');
+    var state = api.selectionSummary(rows, selected, visible, requests);
+    byId('selection-bar').hidden = mode === 'groups' && selected.size === 0;
+    byId('selection-count').textContent = selected.size + ' selected APIs / ' + state.observationCount.toLocaleString() + ' observations';
+    byId('selection-scope').textContent = percent(state.observationCount, total) + ' of retained observations' + (state.hiddenCount ? ' / ' + state.hiddenCount + ' outside current filters' : '');
+    byId('source-count').textContent = state.availableCount + ' available draft sources / ' + state.missingCount + ' without recent detail';
     byId('export').disabled = selected.size === 0; byId('clear').disabled = selected.size === 0;
-    byId('create').disabled = api.sources(selected, requests).requests.length === 0;
+    byId('create').disabled = state.availableCount === 0;
   }
   function switchMode(next) {
+    if (next === mode) { return; }
+    pages[mode] = page;
     mode = next;
     if (next === 'groups') { group = ''; }
     document.querySelectorAll('[data-api-view]').forEach(function (b) { b.setAttribute('aria-pressed', String(b.dataset.apiView === next)); });
-    page = 0; render();
+    page = pages[next]; render();
   }
   function render() {
     visible = api.filter(rows, options());
+    byId('group-label').textContent = group ? 'Path group: ' + group : 'All path groups';
+    byId('group-clear').hidden = !group;
     var groupRows = api.groups(visible, depth);
     var itemCount = mode === 'groups' ? groupRows.length : visible.length;
     page = Math.min(page, Math.max(0, Math.ceil(itemCount / size) - 1));
@@ -57,7 +63,7 @@
           var cell = node('div'); cell.append(node('span', pair[0]), node('b', pair[1])); metrics.append(cell);
         });
         var track = node('div', undefined, 'api-share-track'), fill = node('span'); fill.style.width = (total ? 100 * g.requestCount / total : 0) + '%'; track.append(fill);
-        b.append(metrics, track); b.addEventListener('click', function () { group = g.name; switchMode('table'); }); byId('groups').append(b);
+        b.append(metrics, track); b.addEventListener('click', function () { group = g.name; pages.table = 0; switchMode('table'); }); byId('groups').append(b);
       });
     }
     var slice = visible.slice(page * size, (page + 1) * size);
@@ -73,7 +79,7 @@
       });
       var first = node('td'); first.append(check); tr.append(first);
       var name = node('td'), open = node('button', r.endpoint, 'api-endpoint'); open.type = 'button'; open.title = 'Show observed code';
-      open.addEventListener('click', function () { var filter = document.getElementById('reqover-filter'); filter.value = r.endpoint; filter.dispatchEvent(new Event('input', { bubbles: true })); window.location.hash = 'endpoint-code'; });
+      open.addEventListener('click', function () { window.ReqoverFilter.selectEndpoint(r.endpoint); window.location.hash = 'endpoint-code'; });
       name.append(open, node('small', r.timedRequestCount + ' timed / ' + (r.requestCount - r.knownStatusCount) + ' unknown statuses' + (r.timedRequestCount < 20 ? ' / small timing sample' : ''))); tr.append(name);
       [r.requestCount.toLocaleString(), percent(r.requestCount, total), time(r.averageMillis), time(r.p95Millis), time(r.maximumMillis)].forEach(function (value) { tr.append(node('td', value)); });
       [r.clientErrorCount, r.serverErrorCount].forEach(function (value) { var cell = node('td', value.toLocaleString(), value ? 'api-error' : ''); cell.append(node('small', percent(value, r.knownStatusCount))); tr.append(cell); });
@@ -87,8 +93,14 @@
     byId('top').disabled = !visible.length;
     renderSelection();
   }
-  ['search', 'status', 'min-count', 'min-p95'].forEach(function (id) { byId(id).addEventListener('input', function () { page = 0; render(); }); });
-  byId('depth').addEventListener('change', function () { depth = Number(byId('depth').value); group = ''; page = 0; render(); });
+  function resetPages() { page = 0; pages = { groups: 0, table: 0 }; }
+  ['search', 'status', 'min-count', 'min-p95'].forEach(function (id) { byId(id).addEventListener('input', function () { resetPages(); render(); }); });
+  byId('depth').addEventListener('change', function () { depth = Number(byId('depth').value); group = ''; resetPages(); render(); });
+  byId('group-clear').addEventListener('click', function () { group = ''; resetPages(); render(); });
+  byId('reset').addEventListener('click', function () {
+    byId('search').value = ''; byId('status').value = 'all'; byId('min-count').value = '0'; byId('min-p95').value = '0';
+    group = ''; resetPages(); render();
+  });
   document.querySelectorAll('[data-api-view]').forEach(function (b) { b.addEventListener('click', function () { switchMode(b.dataset.apiView); }); });
   document.querySelectorAll('[data-api-sort]').forEach(function (th) { th.querySelector('button').addEventListener('click', function () {
     direction = metric === th.dataset.apiSort && direction === 'desc' ? 'asc' : 'desc'; metric = th.dataset.apiSort; page = 0;
@@ -104,8 +116,8 @@
   byId('clear').addEventListener('click', function () { selected.clear(); render(); });
   byId('create').addEventListener('click', function () {
     var sources = api.sources(selected, requests);
-    sources.requests.forEach(function (r) { window.ReqoverCaseEditor.create(r); });
-    byId('export-status').textContent = sources.requests.length + ' drafts created / ' + sources.missing.length + ' selected APIs without recent detail.';
+    var result = window.ReqoverCaseEditor.createMany(sources.requests);
+    byId('export-status').textContent = result.added + ' new drafts / ' + result.reused + ' existing drafts reused / ' + sources.missing.length + ' selected APIs without recent detail.';
     if (sources.requests.length) { window.location.hash = 'test-case-drafts'; }
   });
   byId('export').addEventListener('click', function () {

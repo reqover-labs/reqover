@@ -35,6 +35,7 @@ final class TestCaseDraftHtmlRenderer {
                 <section class="section" id="test-case-drafts" hidden>
                   <div class="case-heading"><h2 class="diagnostics-title">Test drafts</h2>
                     <span id="reqover-case-count" class="graph-legend">0 drafts</span></div>
+                  <p id="reqover-case-message" class="graph-legend" role="status"></p>
                   <p id="reqover-case-empty" class="empty">No test drafts.</p>
                   <div class="case-workspace" id="reqover-case-workspace" hidden>
                     <aside class="case-list" id="reqover-case-list" aria-label="Test drafts"></aside>

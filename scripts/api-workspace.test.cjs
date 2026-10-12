@@ -6,6 +6,11 @@ const row = (endpoint, count, time, errors = 0) => ({ endpoint, requestCount: co
   timedRequestCount: time === null ? 0 : count, averageMillis: time, p95Millis: time, maximumMillis: time,
   cumulativeMillis: time === null ? 0 : count * time, clientErrorCount: 0, serverErrorCount: errors });
 const rows = [row('GET /orders/{id}', 100, 10), row('POST /orders', 1, 1000, 1), row('GET /health', 2, null)];
+test('selection summary exposes missing sources and hidden selections before actions', () => {
+  const selected = new Set(['GET /orders/{id}', 'POST /orders']);
+  const state = api.selectionSummary(rows, selected, [rows[0]], [{ endpoint: 'GET /orders/{id}', requestId: 'r1', startedAt: '2026-10-12T00:00:00Z' }]);
+  assert.deepEqual(state, { selectedCount: 2, observationCount: 101, hiddenCount: 1, availableCount: 1, missingCount: 1 });
+});
 test('path groups combine counts and weighted timing, never average percentiles', () => {
   const groups = api.groups(rows);
   const orders = groups.find(g => g.name === '/orders');

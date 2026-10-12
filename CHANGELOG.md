@@ -6,6 +6,10 @@ All notable changes to Reqover are documented in this file.
 
 ### Added
 
+- API workspace usability: clearable group/filter context, source availability before actions,
+  selection visible across views, remembered pagination, sticky table headings and exact API navigation.
+- Repeated test-draft creation reuses matching source observations and preserves existing edits.
+
 - Offline API workspace with adjustable path-group summaries, retained HTTP statistics,
   sortable/filterable paginated API selection, and representative-request draft creation/export.
 - Explicit missing-source API lists when selected endpoints are outside the recent 100-detail window.

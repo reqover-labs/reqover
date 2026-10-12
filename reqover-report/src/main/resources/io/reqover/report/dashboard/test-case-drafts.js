@@ -136,5 +136,16 @@
     return source.join('\n');
   }
 
-  return { create: create, update: update, problems: problems, junit: junit };
+  function addUnique(existing, requests) {
+    var next = existing.slice(), added = 0, reused = 0, activeIndex = -1;
+    function identity(source) { return JSON.stringify([source.endpoint, source.requestId, source.startedAt]); }
+    var indices = new Map(next.map(function (draft, index) { return [identity(draft.source), index]; }));
+    requests.forEach(function (request) {
+      var key = identity(request);
+      if (indices.has(key)) { activeIndex = indices.get(key); reused++; }
+      else { activeIndex = next.length; next.push(create(request)); indices.set(key, activeIndex); added++; }
+    });
+    return { drafts: next, activeIndex: activeIndex, added: added, reused: reused };
+  }
+  return { create: create, update: update, problems: problems, junit: junit, addUnique: addUnique };
 });

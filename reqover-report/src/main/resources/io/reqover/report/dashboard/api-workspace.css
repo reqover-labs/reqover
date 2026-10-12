@@ -26,11 +26,17 @@
 .api-selection { display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; border-block:1px solid var(--rule); padding:13px 0; margin-bottom:0; }
 .api-selection strong { font-size:12px; }
 .api-selection small { display:block; font-size:11px; color:var(--ink-3); margin-top:4px; }
+.api-context { display:flex; align-items:center; gap:10px; margin:0 0 14px; font-size:12px; flex-wrap:wrap; }
+.api-context strong { overflow-wrap:anywhere; }
+.api-context button { border:1px solid var(--rule-strong); border-radius:5px; padding:6px 9px; background:var(--bg); font-size:11px; }
+#api-reset { margin-left:auto; }
+#api-source-count { color:var(--warning); }
 .api-commands { display:flex; flex-wrap:wrap; gap:7px; }
 .api-commands button,.api-pagination button { display:flex; align-items:center; gap:6px; padding:8px 11px; border:1px solid var(--rule-strong); background:var(--bg); border-radius:5px; font-size:12px; }
 #api-export { background:var(--accent); color:var(--bg); border-color:var(--accent); }
 .api-commands button:disabled,.api-pagination button:disabled { opacity:.45; cursor:default; }
-.api-table-scroll { overflow:auto; max-width:100%; background:var(--bg); }
+.api-table-scroll { overflow:auto; max-width:100%; max-height:640px; background:var(--bg); }
+.api-table thead th { position:sticky; top:0; background:var(--bg); z-index:1; }
 .api-table { width:100%; min-width:950px; border-collapse:collapse; table-layout:auto; margin-top:0; font-variant-numeric:tabular-nums; }
 .api-table th:first-child,.api-table td:first-child { width:36px; text-align:left; }
 .api-table th:nth-child(2),.api-table td:nth-child(2) { width:30%; }
@@ -52,3 +58,4 @@
 .api-info { display:inline-grid; place-items:center; border:1px solid var(--ink-3); border-radius:50%; width:13px; height:13px; font-size:9px; text-transform:none; }
 #api-export-status { font-size:12px; color:var(--ink-2); overflow-wrap:anywhere; }
 @media(max-width:600px) { .api-totals { grid-template-columns:1fr 1fr; } .api-totals strong { font-size:21px; } .api-toolbar label { flex:1 1 130px; } .api-toolbar input[type=number] { width:100%; } .api-commands { width:100%; } }
+@media print { .api-table-scroll { max-height:none; overflow:visible; } .api-table thead th { position:static; } }

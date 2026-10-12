@@ -23,11 +23,12 @@ final class ApiWorkspaceHtmlRenderer {
                     <label>Minimum p95 (ms)<input id="api-min-p95" type="number" min="0" value="0"></label>
                     <label>Group depth<select id="api-depth"><option value="1">1 path segment</option><option value="2">2 path segments</option><option value="3">3 path segments</option></select></label>
                   </div>
-                  <div id="api-groups" class="api-groups"></div>
-                  <div id="api-list" hidden>
-                    <div class="api-selection"><div><strong id="api-selection-count" aria-live="polite"></strong><small id="api-selection-scope"></small></div>
+                  <div class="api-context"><strong id="api-group-label">All path groups</strong><button type="button" id="api-group-clear" hidden>Clear group</button><button type="button" id="api-reset">Reset filters</button></div>
+                    <div class="api-selection" id="api-selection-bar" hidden><div><strong id="api-selection-count" aria-live="polite"></strong><small id="api-selection-scope"></small><small id="api-source-count"></small></div>
                       <div class="api-commands"><button type="button" id="api-top">Select top 20</button><button type="button" id="api-clear">Clear selection</button>
                         <button type="button" id="api-create">Create drafts</button><button type="button" id="api-export">Export draft bundle</button></div></div>
+                  <div id="api-groups" class="api-groups"></div>
+                  <div id="api-list" hidden>
                     <div class="api-table-scroll" tabindex="0" role="region" aria-label="API statistics"><table class="api-table"><thead><tr>
                       <th><input type="checkbox" id="api-select-page" aria-label="Select current page"></th>
                       <th data-api-sort="endpoint" aria-sort="none"><button type="button">API</button></th>

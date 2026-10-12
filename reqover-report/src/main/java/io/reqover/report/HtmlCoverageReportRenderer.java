@@ -60,6 +60,7 @@ public final class HtmlCoverageReportRenderer {
               var threshold = document.getElementById('reqover-slow-ms');
               var requestCount = document.getElementById('reqover-request-count');
               var noRequest = document.getElementById('reqover-no-request');
+              var exactEndpoint = null;
 
               function apply() {
                 var query = input.value.trim().toLowerCase();
@@ -67,7 +68,8 @@ public final class HtmlCoverageReportRenderer {
                 var shownRows = 0;
 
                 for (var i = 0; i < endpoints.length; i++) {
-                  var hit = query === '' || endpoints[i].getAttribute('data-search').indexOf(query) !== -1;
+                  var hit = exactEndpoint !== null ? endpoints[i].getAttribute('data-endpoint') === exactEndpoint
+                    : query === '' || endpoints[i].getAttribute('data-search').indexOf(query) !== -1;
                   endpoints[i].hidden = !hit;
                   if (hit) { shownEndpoints++; }
                 }
@@ -105,11 +107,12 @@ public final class HtmlCoverageReportRenderer {
                     + shownRows + ' of ' + rows.length + ' methods';
               }
 
-              input.addEventListener('input', apply);
+              input.addEventListener('input', function () { exactEndpoint = null; apply(); });
+              window.ReqoverFilter = { selectEndpoint: function (name) { exactEndpoint = name; input.value = name; apply(); } };
               if (mode) { mode.addEventListener('change', apply); }
               if (threshold) { threshold.addEventListener('input', apply); }
               input.addEventListener('keydown', function (event) {
-                if (event.key === 'Escape') { input.value = ''; apply(); }
+                if (event.key === 'Escape') { input.value = ''; exactEndpoint = null; apply(); }
               });
               document.addEventListener('keydown', function (event) {
                 if (event.key !== '/' || document.activeElement === input) { return; }
@@ -117,8 +120,11 @@ public final class HtmlCoverageReportRenderer {
                 var editing = active && (active.tagName === 'INPUT' || active.tagName === 'TEXTAREA'
                   || active.tagName === 'SELECT' || active.isContentEditable);
                 if (editing) { return; }
+                var apiWorkspace = document.getElementById('api-workspace');
+                var target = apiWorkspace && !apiWorkspace.hidden ? document.getElementById('api-search') : input;
+                if (!target || (target === input && box.hidden)) { return; }
                 event.preventDefault();
-                input.focus();
+                target.focus();
               });
 
               box.hidden = false;

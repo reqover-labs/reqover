@@ -12,9 +12,10 @@ CLI commands, the CI Action contract or the existing relationship maps.
 
 ![Unreleased API statistics and top-20 selection from the synthetic fixture](assets/reqover-api-workspace.png)
 
-These screenshots are actual renderer output over a synthetic 120-API/660-observation
+These initial-iteration screenshots are actual renderer output over a synthetic 120-API/660-observation
 fixture, not production evidence or a performance benchmark. Both groups and API
-rows paginate at 20 items to avoid unbounded DOM growth.
+rows paginate at 20 items to avoid unbounded DOM growth. Newly added reset/group-context
+and source-availability controls are not pictured; see the [usability follow-up](35_dashboard_usability_review.md).
 
 **Groups** combines API routes by the first one, two or three path segments.
 Choose deeper grouping for `/api/v1/...`. These are path groups, not discovered
@@ -24,6 +25,8 @@ group summaries; top-level totals remain fixed for the recording.
 **API list** shows retained observations and share, average/p95/maximum adapter
 intervals, timed sample counts, unknown statuses and 4xx/5xx counts/percentages.
 Click a column heading to sort. Missing timing sorts last in either direction.
+Reset filters clears search/status/count/p95 and group restriction without clearing
+selection, sort order or group depth. Clear group removes only the path-group restriction.
 Twenty API rows are rendered per page; checkboxes preserve selection across
 pages, filters and views. Select top 20 adds the first 20 matching APIs in the
 current sort order; it does not discard previous selections. Clear selection
@@ -41,7 +44,9 @@ test assertions. A 4xx may be expected. Unknown statuses are shown explicitly.
 Create drafts opens the existing editor with one latest available detail per
 selected API. Concrete path, expected status, authentication and timing expectations
 are not guessed. Review each draft independently; JUnit remains disabled by default.
-Repeated creation makes additional drafts, just like the existing single-request action.
+Repeated creation reuses drafts with the same endpoint, request ID and start time,
+preserving reviewed edits. Available/missing detail counts are shown before creation;
+the editor reports new versus reused drafts.
 
 Export draft bundle produces `reqover-http-test-draft-bundle`, schema 1:
 `selectedEndpoints`, `drafts`, `missingSourceEndpoints`, `sourceDetailLimit: 100`,

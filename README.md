@@ -73,6 +73,9 @@ Reqover records **the methods observed during each request's adapter scope, kept
 
 > **Unreleased source development:** [API workspace](docs/34_api_workspace.md) adds path-group summaries, sortable/filterable API statistics, persistent-in-page checkbox selection, and representative-request draft bundles. Published 0.4.2 artifacts do not include it yet; existing request and retest maps remain unchanged.
 
+The [usability follow-up](docs/35_dashboard_usability_review.md) adds clearable filters,
+source availability and deduplicated draft creation; fresh browser visual QA is pending.
+
 Since 0.4.0 the report is an offline dashboard. Open it from the report endpoint,
 from the file the application exports on shutdown, or with `reqover render`.
 

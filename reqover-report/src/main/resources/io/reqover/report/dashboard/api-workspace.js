@@ -44,5 +44,13 @@
     return { requests: Array.from(selected).filter(function (e) { return latest.has(e); }).map(function (e) { return latest.get(e); }),
       missing: Array.from(selected).filter(function (e) { return !latest.has(e); }) };
   }
-  return { groupName: groupName, groups: groups, filter: filter, sources: sources };
+  function selectionSummary(rows, selected, visible, requests) {
+    var visibleNames = new Set(visible.map(function (r) { return r.endpoint; }));
+    var source = sources(selected, requests);
+    return { selectedCount: selected.size,
+      observationCount: rows.reduce(function (n, r) { return n + (selected.has(r.endpoint) ? r.requestCount : 0); }, 0),
+      hiddenCount: Array.from(selected).filter(function (name) { return !visibleNames.has(name); }).length,
+      availableCount: source.requests.length, missingCount: source.missing.length };
+  }
+  return { groupName: groupName, groups: groups, filter: filter, sources: sources, selectionSummary: selectionSummary };
 });

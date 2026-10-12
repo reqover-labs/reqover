@@ -97,7 +97,12 @@
     var name = 'ReqoverCase' + (active + 1) + 'Test';
     download(name + '.java', api.junit(drafts[active], name), 'text/plain;charset=utf-8');
   });
-  window.ReqoverCaseEditor = { create: function (request) {
-    drafts.push(api.create(request)); select(drafts.length - 1);
-  } };
+  function createMany(requests) {
+    var result = api.addUnique(drafts, requests);
+    drafts = result.drafts;
+    if (result.activeIndex >= 0) { select(result.activeIndex); }
+    text('reqover-case-message', result.added + ' new drafts / ' + result.reused + ' existing drafts reused. Existing edits preserved.');
+    return { added: result.added, reused: result.reused };
+  }
+  window.ReqoverCaseEditor = { create: function (request) { return createMany([request]); }, createMany: createMany };
 })();

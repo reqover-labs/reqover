@@ -37,6 +37,10 @@ class DiagnosticDashboardTest {
         assertTrue(html.contains("id=\"api-workspace\" hidden"));
         assertTrue(html.contains("id=\"api-select-page\""));
         assertTrue(html.contains("id=\"api-export\""));
+        assertTrue(html.contains("id=\"api-reset\""));
+        assertTrue(html.contains("id=\"api-group-clear\""));
+        assertTrue(html.contains("id=\"api-source-count\""));
+        assertTrue(html.contains("id=\"reqover-case-message\""));
         assertTrue(html.contains("reqover-http-test-draft-bundle"));
         assertTrue(html.contains("Group p95 is not calculated from API percentiles"));
     }

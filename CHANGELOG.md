@@ -4,6 +4,14 @@ All notable changes to Reqover are documented in this file.
 
 ## Unreleased
 
+### Security
+
+- Reviewed two additional Spring 6.2.19 advisories under the existing exception
+  policy, expiring November 12, 2026. Current samples do not use the affected
+  deployment/rendering paths; consumer applications must assess their own use.
+  No patched Spring claim, dependency inventory removal or disabled OSV gate.
+- Added offline checks for exception scope, expiry and fail-closed scan behavior.
+
 ### Added
 
 - Scenario schema-1 save/import/re-review, Postman Collection 2.1 and disabled JMeter JMX export.
@@ -15,7 +23,7 @@ All notable changes to Reqover are documented in this file.
 - Connected scale views: all-retained five-minute UTC time/interval distribution,
   scoped group/API statistics and matching recent request-map navigation.
 - Bounded 256-window summaries with explicit gaps/omissions, interval-scoped draft sources
-  and time scope in draft bundles. No persistent history or replay.
+  and time scope in draft bundles. No automatic live collector history or original-request replay.
 
 - API workspace usability: clearable group/filter context, source availability before actions,
   selection visible across views, remembered pagination, sticky table headings and exact API navigation.

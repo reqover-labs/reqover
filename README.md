@@ -81,6 +81,11 @@ The unreleased [retest workflow](docs/39_retest_workflow.md) adds scenario files
 Postman/JMeter export, explicitly confirmed local CLI checks, result reports and
 separate run/recording histories. It is not faithful replay or a load generator.
 
+[Finalization status](docs/40_finalization.md): automated regression and dependency
+policy checks are separate from the still-pending rendered browser QA. Spring
+advisories have [explicit expiring exceptions](SECURITY.md#dependency-advisories),
+not a patched dependency or a zero-advisory guarantee.
+
 Since 0.4.0 the report is an offline dashboard. Open it from the report endpoint,
 from the file the application exports on shutdown, or with `reqover render`.
 

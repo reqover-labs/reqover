@@ -9,26 +9,41 @@
   var requests = JSON.parse(document.getElementById('reqover-map-data').textContent).requests || [];
   var details = Array.from(document.querySelectorAll('details.request-detail'));
   requests.forEach(function (r, i) { var value = details[i] && details[i].dataset.requestDuration; r.duration = value ? Number(value) : null; });
-  var selected = new Set(), page = 0, size = 20, mode = 'groups', group = '', depth = 1;
+  var selected = new Set(), page = 0, size = 20, mode = api.initialView(rows.length, summary.httpRequestCount), group = '', depth = 1;
+  var scope = null;
+  var distribution = JSON.parse(document.getElementById('reqover-time-data').textContent);
   var metric = 'requestCount', direction = 'desc', visible = [];
-  var pages = { groups: 0, table: 0 };
+  var pages = { distribution: 0, groups: 0, table: 0 };
   function node(tag, text, cls) { var e = document.createElement(tag); if (text !== undefined) { e.textContent = text; } if (cls) { e.className = cls; } return e; }
   function byId(id) { return document.getElementById('api-' + id); }
   function time(value) { return value === null ? 'Not timed' : value.toFixed(2) + ' ms'; }
   function percent(n, total) { return total ? (100 * n / total).toFixed(1) + '%' : 'Not available'; }
   function stat(parent, label, value) { var item = node('div'); item.append(node('span', label), node('strong', value)); parent.append(item); }
   var total = summary.httpRequestCount;
-  stat(byId('totals'), 'Observed APIs', rows.length);
-  stat(byId('totals'), 'Retained observations', total.toLocaleString());
-  stat(byId('totals'), 'HTTP 4xx', rows.reduce(function (n, r) { return n + r.clientErrorCount; }, 0).toLocaleString());
-  stat(byId('totals'), 'HTTP 5xx', rows.reduce(function (n, r) { return n + r.serverErrorCount; }, 0).toLocaleString());
+  function renderTotals() {
+    byId('totals').replaceChildren();
+    stat(byId('totals'), 'Observed APIs', rows.length);
+    stat(byId('totals'), scope ? 'Selected observations' : 'Retained observations', total.toLocaleString());
+    stat(byId('totals'), 'HTTP 4xx', rows.reduce(function (n, r) { return n + r.clientErrorCount; }, 0).toLocaleString());
+    stat(byId('totals'), 'HTTP 5xx', rows.reduce(function (n, r) { return n + r.serverErrorCount; }, 0).toLocaleString());
+  }
+  function scopedRequests() { return requests.filter(function (r) { return api.matchesScope(r, scope); }); }
+  var markTime = window.ReqoverTimeView.init(distribution, function (nextScope, nextRows) {
+    scope = nextScope; rows = nextRows; total = rows.reduce(function (n, r) { return n + r.requestCount; }, 0);
+    selected.clear(); resetFilters(); markTime(scope); renderTotals();
+    if (mode === 'groups') { render(); } else { switchMode('groups'); }
+  });
+  byId('time-clear').addEventListener('click', function () {
+    scope = null; rows = summary.endpoints; total = summary.httpRequestCount;
+    selected.clear(); resetFilters(); markTime(null); renderTotals(); render();
+  });
 
   function options() { return { search: byId('search').value, status: byId('status').value,
     minCount: Math.max(0, Number(byId('min-count').value) || 0), minP95: Math.max(0, Number(byId('min-p95').value) || 0),
     group: group, depth: depth, metric: metric, direction: direction }; }
   function renderSelection() {
-    var state = api.selectionSummary(rows, selected, visible, requests);
-    byId('selection-bar').hidden = mode === 'groups' && selected.size === 0;
+    var state = api.selectionSummary(rows, selected, visible, scopedRequests());
+    byId('selection-bar').hidden = mode !== 'table' && selected.size === 0;
     byId('selection-count').textContent = selected.size + ' selected APIs / ' + state.observationCount.toLocaleString() + ' observations';
     byId('selection-scope').textContent = percent(state.observationCount, total) + ' of retained observations' + (state.hiddenCount ? ' / ' + state.hiddenCount + ' outside current filters' : '');
     byId('source-count').textContent = state.availableCount + ' available draft sources / ' + state.missingCount + ' without recent detail';
@@ -44,6 +59,12 @@
     page = pages[next]; render();
   }
   function render() {
+    byId('distribution').hidden = mode !== 'distribution';
+    byId('toolbar').hidden = mode === 'distribution';
+    document.querySelector('.api-context').hidden = mode === 'distribution';
+    byId('time-clear').hidden = !scope;
+    byId('time-label').textContent = scope ? scope.startedAt + ' to ' + scope.endedAt + ' / ' + (scope.band === null ? 'All intervals' : distribution.windows.find(function (w) { return w.startedAt === scope.startedAt; }).bands[scope.band].label) : 'All recorded time';
+    document.querySelectorAll('[data-api-view]').forEach(function (b) { b.setAttribute('aria-pressed', String(b.dataset.apiView === mode)); });
     visible = api.filter(rows, options());
     byId('group-label').textContent = group ? 'Path group: ' + group : 'All path groups';
     byId('group-clear').hidden = !group;
@@ -51,7 +72,7 @@
     var itemCount = mode === 'groups' ? groupRows.length : visible.length;
     page = Math.min(page, Math.max(0, Math.ceil(itemCount / size) - 1));
     byId('groups').hidden = mode !== 'groups'; byId('list').hidden = mode !== 'table';
-    byId('empty').hidden = visible.length > 0;
+    byId('empty').hidden = mode === 'distribution' || visible.length > 0;
     byId('empty').textContent = rows.length ? 'No APIs match these filters.' : 'No retained HTTP diagnostics in this recording. Record HTTP requests with a current adapter to use this workspace.';
     byId('groups').replaceChildren();
     if (mode === 'groups') {
@@ -81,6 +102,12 @@
       var name = node('td'), open = node('button', r.endpoint, 'api-endpoint'); open.type = 'button'; open.title = 'Show observed code';
       open.addEventListener('click', function () { window.ReqoverFilter.selectEndpoint(r.endpoint); window.location.hash = 'endpoint-code'; });
       name.append(open, node('small', r.timedRequestCount + ' timed / ' + (r.requestCount - r.knownStatusCount) + ' unknown statuses' + (r.timedRequestCount < 20 ? ' / small timing sample' : ''))); tr.append(name);
+      var representative = api.sources(new Set([r.endpoint]), scopedRequests()).requests[0];
+      var requestLink = node('button', 'Request map', 'api-request-link'); requestLink.type = 'button'; requestLink.disabled = !representative;
+      requestLink.title = representative ? 'Open the latest retained request in this selected scope' : 'No recent request detail in the selected scope';
+      requestLink.addEventListener('click', function () {
+        if (representative) { window.dispatchEvent(new CustomEvent('reqover-open-request', { detail: representative })); }
+      }); name.append(requestLink);
       [r.requestCount.toLocaleString(), percent(r.requestCount, total), time(r.averageMillis), time(r.p95Millis), time(r.maximumMillis)].forEach(function (value) { tr.append(node('td', value)); });
       [r.clientErrorCount, r.serverErrorCount].forEach(function (value) { var cell = node('td', value.toLocaleString(), value ? 'api-error' : ''); cell.append(node('small', percent(value, r.knownStatusCount))); tr.append(cell); });
       byId('rows').append(tr);
@@ -89,17 +116,21 @@
     byId('select-page').checked = all; byId('select-page').disabled = !slice.length;
     byId('select-page').indeterminate = !all && slice.some(function (r) { return selected.has(r.endpoint); });
     byId('prev').disabled = page === 0; byId('next').disabled = (page + 1) * size >= itemCount;
+    byId('page-label').parentElement.hidden = mode === 'distribution';
     byId('page-label').textContent = (group ? group + ' / ' : '') + itemCount + (mode === 'groups' ? ' path groups' : ' matching APIs') + ' / page ' + (page + 1) + ' of ' + Math.max(1, Math.ceil(itemCount / size));
     byId('top').disabled = !visible.length;
     renderSelection();
   }
-  function resetPages() { page = 0; pages = { groups: 0, table: 0 }; }
+  function resetPages() { page = 0; pages = { distribution: 0, groups: 0, table: 0 }; }
+  function resetFilters() {
+    byId('search').value = ''; byId('status').value = 'all'; byId('min-count').value = '0'; byId('min-p95').value = '0';
+    group = ''; resetPages();
+  }
   ['search', 'status', 'min-count', 'min-p95'].forEach(function (id) { byId(id).addEventListener('input', function () { resetPages(); render(); }); });
   byId('depth').addEventListener('change', function () { depth = Number(byId('depth').value); group = ''; resetPages(); render(); });
   byId('group-clear').addEventListener('click', function () { group = ''; resetPages(); render(); });
   byId('reset').addEventListener('click', function () {
-    byId('search').value = ''; byId('status').value = 'all'; byId('min-count').value = '0'; byId('min-p95').value = '0';
-    group = ''; resetPages(); render();
+    resetFilters(); render();
   });
   document.querySelectorAll('[data-api-view]').forEach(function (b) { b.addEventListener('click', function () { switchMode(b.dataset.apiView); }); });
   document.querySelectorAll('[data-api-sort]').forEach(function (th) { th.querySelector('button').addEventListener('click', function () {
@@ -115,16 +146,17 @@
   byId('top').addEventListener('click', function () { visible.slice(0, 20).forEach(function (r) { selected.add(r.endpoint); }); render(); });
   byId('clear').addEventListener('click', function () { selected.clear(); render(); });
   byId('create').addEventListener('click', function () {
-    var sources = api.sources(selected, requests);
+    var sources = api.sources(selected, scopedRequests());
     var result = window.ReqoverCaseEditor.createMany(sources.requests);
     byId('export-status').textContent = result.added + ' new drafts / ' + result.reused + ' existing drafts reused / ' + sources.missing.length + ' selected APIs without recent detail.';
     if (sources.requests.length) { window.location.hash = 'test-case-drafts'; }
   });
   byId('export').addEventListener('click', function () {
     if (!selected.size) { return; }
-    var sources = api.sources(selected, requests);
+    var sources = api.sources(selected, scopedRequests());
     var bundle = { kind: 'reqover-http-test-draft-bundle', schemaVersion: 1, generatedAt: summary.generatedAt,
       state: 'review-required', replayable: false, sourceDetailLimit: 100,
+      scope: scope,
       selectedEndpoints: Array.from(selected), missingSourceEndpoints: sources.missing,
       drafts: sources.requests.map(function (r) { return window.ReqoverTestDrafts.create(r); }) };
     var url = URL.createObjectURL(new Blob([JSON.stringify(bundle, null, 2) + '\n'], { type: 'application/json' }));
@@ -132,5 +164,5 @@
     setTimeout(function () { URL.revokeObjectURL(url); }, 1000);
     byId('export-status').textContent = sources.requests.length + ' review-required drafts exported / ' + sources.missing.length + ' selected APIs without recent detail. No tests executed.';
   });
-  render();
+  renderTotals(); render();
 })();

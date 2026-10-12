@@ -75,6 +75,8 @@ Reqover records **the methods observed during each request's adapter scope, kept
 
 The [usability follow-up](docs/35_dashboard_usability_review.md) adds clearable filters,
 source availability and deduplicated draft creation; fresh browser visual QA is pending.
+The unreleased [scale views](docs/37_scale_views.md) connect retained time/interval
+distribution -> path groups -> API statistics -> matching request maps.
 
 Since 0.4.0 the report is an offline dashboard. Open it from the report endpoint,
 from the file the application exports on shutdown, or with `reqover render`.

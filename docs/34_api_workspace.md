@@ -92,5 +92,5 @@ legacy and no-script behaviors are separately regression-tested.
 - ISO timestamp fractions vary in length: compare actual instants and nanosecond
   fractions when choosing a representative, not lexicographic strings.
 
-Five-minute windows, heatmaps, persistent history, replay and external scenario
-formats are follow-up work; they are not implemented in this increment.
+Five-minute windows and the heatmap are now part of the unreleased [scale views](37_scale_views.md).
+Persistent history, replay and external scenario formats remain follow-up work.

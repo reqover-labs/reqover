@@ -6,6 +6,11 @@ All notable changes to Reqover are documented in this file.
 
 ### Added
 
+- Connected scale views: all-retained five-minute UTC time/interval distribution,
+  scoped group/API statistics and matching recent request-map navigation.
+- Bounded 256-window summaries with explicit gaps/omissions, interval-scoped draft sources
+  and time scope in draft bundles. No persistent history or replay.
+
 - API workspace usability: clearable group/filter context, source availability before actions,
   selection visible across views, remembered pagination, sticky table headings and exact API navigation.
 - Repeated test-draft creation reuses matching source observations and preserves existing edits.

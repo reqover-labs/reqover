@@ -121,6 +121,8 @@ public final class HtmlCoverageReportRenderer {
                   || active.tagName === 'SELECT' || active.isContentEditable);
                 if (editing) { return; }
                 var apiWorkspace = document.getElementById('api-workspace');
+                var apiToolbar = document.getElementById('api-toolbar');
+                if (apiWorkspace && !apiWorkspace.hidden && apiToolbar && apiToolbar.hidden) { return; }
                 var target = apiWorkspace && !apiWorkspace.hidden ? document.getElementById('api-search') : input;
                 if (!target || (target === input && box.hidden)) { return; }
                 event.preventDefault();

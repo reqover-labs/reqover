@@ -10,13 +10,21 @@ final class ApiWorkspaceHtmlRenderer {
                 <section class="section" id="api-workspace" hidden>
                   <div class="api-heading"><div><span class="api-eyebrow">RECORDED HTTP TRAFFIC</span><h2>API workspace</h2></div>
                     <div class="map-modes" role="group" aria-label="API workspace view">
+                      <button type="button" data-api-view="distribution" aria-pressed="false">Distribution</button>
                       <button type="button" data-api-view="groups" aria-pressed="true">Groups</button>
                       <button type="button" data-api-view="table" aria-pressed="false">API list</button>
                     </div>
                   </div>
                   <div id="api-totals" class="api-totals"></div>
-                  <p class="api-scope">All retained HTTP observations, not total production traffic or TPS. Path groups are not service dependencies.</p>
-                  <div class="api-toolbar">
+                  <p class="api-scope">Retained HTTP observations in the selected scope, not total production traffic or TPS. Path groups are not service dependencies.</p>
+                  <div class="api-time-context"><strong id="api-time-label">All recorded time</strong><button type="button" id="api-time-clear" hidden>All recorded time</button></div>
+                  <div id="api-distribution" hidden>
+                    <div class="api-heat-heading"><h3>Time and processing interval</h3><span>5-minute windows / UTC</span></div>
+                    <p id="api-time-count" class="api-scope"></p>
+                    <div class="api-heat-scroll" tabindex="0" role="region" aria-label="Recorded time distribution"><table class="api-heat-table" id="api-heatmap"></table></div>
+                    <p class="api-scope">Cell intensity: retained count. Red border: HTTP 5xx; amber border: HTTP 4xx. Gaps are compressed and labeled. Blank is no retained observation, not proof of no traffic. Not timed includes unfinished or negative intervals.</p>
+                  </div>
+                  <div class="api-toolbar" id="api-toolbar">
                     <label class="api-search">Search API<input id="api-search" type="search" placeholder="/orders or GET" autocomplete="off"></label>
                     <label>HTTP status<select id="api-status"><option value="all">All statuses</option><option value="5xx">Has 5xx</option><option value="4xx">Has 4xx</option></select></label>
                     <label>Minimum observations<input id="api-min-count" type="number" min="0" value="0"></label>
@@ -45,8 +53,9 @@ final class ApiWorkspaceHtmlRenderer {
                   <p id="api-empty" hidden>No APIs match these filters.</p>
                   <p id="api-export-status" role="status"></p>
                   <details class="api-measurement"><summary>Measurement and draft scope</summary>
+                    <p>Distribution includes all retained HTTP observations before the latest-100 detail cap. Only the latest 256 nonempty five-minute windows are displayed; omitted counts are explicit. Choosing a cell restricts API statistics and draft sources to its time and interval band.</p>
                     <p>Intervals are server-adapter processing time, not network latency. Unknown or unfinished statuses are not successes. A 4xx can be expected by a test.</p>
-                    <p>API statistics cover all retained observations. Draft sources are limited to the latest 100 HTTP details. Missing sources are listed in the bundle; no request input or assertion is invented. A draft is not replayable or automatically executed.</p>
+                    <p>API statistics follow the selected time/interval scope. Draft sources are limited to matching observations in the latest 100 HTTP details. Missing sources are listed in the bundle; no request input or assertion is invented. A draft is not replayable or automatically executed.</p>
                     <p>Group averages are weighted by timed samples. Group p95 is not calculated from API percentiles. Fewer than 20 timed samples is a caution, not a confidence threshold.</p>
                   </details>
                 </section>

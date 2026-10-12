@@ -38,6 +38,8 @@ Endpoint aggregates and the retained/detail-export windows are different scopes.
 
 ## Design and Evidence
 
+- [Unreleased connected scale views](37_scale_views.md): time distribution -> groups -> matching request details, with explicit retained-data bounds.
+
 - [Unreleased API workspace](34_api_workspace.md) and [implementation plan](33_api_workspace_plan.md): path groups, retained statistics and explicit test-target selection.
 
 - [Current 0.4.2 screenshot capture](32_current_screenshot_capture.md): real sample requests, default recording options and browser checks.

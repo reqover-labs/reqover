@@ -8,6 +8,8 @@ The starter already includes it. It depends on core, not Spring or a JSON librar
 Unreleased source: [API workspace](../docs/34_api_workspace.md) provides path groups,
 sortable retained statistics and selected representative-request draft bundles.
 It is not included in the published 0.4.2 library yet.
+The unreleased [scale views](../docs/37_scale_views.md) add full-retained time/interval
+distribution and time-scoped API statistics/draft sources.
 
 | Feature | Data and boundary |
 | --- | --- |

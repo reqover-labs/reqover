@@ -39,4 +39,6 @@ test('search shortcut targets the visible workspace and ignores hidden search co
   elements['api-workspace'].hidden = true; keydown({ key: '/', preventDefault() {} }); assert.equal(focused, 'report');
   focused = null; elements['reqover-filter-box'].hidden = true;
   keydown({ key: '/', preventDefault() {} }); assert.equal(focused, null);
+  elements['api-workspace'].hidden = false; elements['api-toolbar'] = { hidden: true };
+  keydown({ key: '/', preventDefault() {} }); assert.equal(focused, null);
 });

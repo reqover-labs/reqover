@@ -38,6 +38,8 @@ CLI `diff`는 코드 관계를, 대시보드 비교는 보관 HTTP 통계를 비
 
 ## 설계와 검증 근거
 
+- [미출시 규모별 보기 연결](37_scale_views.ko.md): 시간 분포 → 그룹 → 일치하는 요청 상세, 보관 범위·누락 명시.
+
 - [미출시 API workspace](34_api_workspace.ko.md), [개발 계획](33_api_workspace_plan.ko.md): 그룹 탐색·보관 통계·테스트 대상 선택.
 
 - [0.4.2 최신 화면 촬영](32_current_screenshot_capture.ko.md): 실제 예제 요청·기본 기록 옵션·브라우저 검증.

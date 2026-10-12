@@ -6,6 +6,29 @@ const row = (endpoint, count, time, errors = 0) => ({ endpoint, requestCount: co
   timedRequestCount: time === null ? 0 : count, averageMillis: time, p95Millis: time, maximumMillis: time,
   cumulativeMillis: time === null ? 0 : count * time, clientErrorCount: 0, serverErrorCount: errors });
 const rows = [row('GET /orders/{id}', 100, 10), row('POST /orders', 1, 1000, 1), row('GET /health', 2, null)];
+test('initial workspace view accounts for API count and observation volume', () => {
+  assert.equal(api.initialView(49, 999), 'groups');
+  assert.equal(api.initialView(50, 100), 'distribution');
+  assert.equal(api.initialView(1, 1000), 'distribution');
+});
+test('time selection restricts draft sources by half-open window and duration band', () => {
+  const scope = { startedAt: '2026-10-12T10:00:00Z', endedAt: '2026-10-12T10:05:00Z', band: 3 };
+  assert(api.matchesScope({ startedAt: scope.startedAt, duration: 1000 }, scope));
+  assert(!api.matchesScope({ startedAt: scope.endedAt, duration: 1000 }, scope));
+  assert(!api.matchesScope({ startedAt: scope.startedAt, duration: 2000 }, scope));
+  assert(!api.matchesScope({ startedAt: scope.startedAt, duration: null }, scope));
+  assert(api.matchesScope({ startedAt: scope.startedAt, duration: null }, { ...scope, band: 5 }));
+  assert(api.matchesScope({ startedAt: scope.startedAt, duration: 10 }, { ...scope, band: null }));
+});
+test('distribution inserts explicit gaps instead of pretending windows are consecutive', () => {
+  const windows = [{ startedAt: '2026-10-12T10:00:00Z', endedAt: '2026-10-12T10:05:00Z' },
+    { startedAt: '2026-10-12T10:20:00Z', endedAt: '2026-10-12T10:25:00Z' }];
+  const slots = api.timeSlots(windows);
+  assert.equal(slots.length, 3);
+  assert.equal(slots[1].gapSeconds, 900);
+  assert.equal(slots[0], windows[0]);
+  assert.equal(api.timeSlots([]).length, 0);
+});
 test('selection summary exposes missing sources and hidden selections before actions', () => {
   const selected = new Set(['GET /orders/{id}', 'POST /orders']);
   const state = api.selectionSummary(rows, selected, [rows[0]], [{ endpoint: 'GET /orders/{id}', requestId: 'r1', startedAt: '2026-10-12T00:00:00Z' }]);

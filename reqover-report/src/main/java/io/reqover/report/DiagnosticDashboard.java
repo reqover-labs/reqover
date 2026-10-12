@@ -116,6 +116,7 @@ final class DiagnosticDashboard {
         // JSON is inside a raw-text script element; HTML escaping would corrupt it.
         String json = scriptJson(CoverageReportJson.write(graph));
         return "<script type=\"application/json\" id=\"reqover-map-data\">" + json + "</script>\n"
+                + "<script type=\"application/json\" id=\"reqover-time-data\">" + scriptJson(TimeDistribution.json(report.requests())) + "</script>\n"
                 + "<template id=\"reqover-play-icon\">" + icon("play") + "</template>"
                 + "<template id=\"reqover-pause-icon\">" + icon("pause") + "</template>"
                 + "<template id=\"reqover-draft-icon\">" + icon("flask-conical") + "</template>"
@@ -124,6 +125,7 @@ final class DiagnosticDashboard {
                 + "<!-- Lucide / Feather icon licenses:\n" + asset("icons/LICENSE").replace("--", "- -") + "\n-->"
                 + "<script>" + SCRIPT + "</script>\n"
                 + "<script>" + asset("api-workspace.js") + "</script>\n"
+                + "<script>" + asset("time-distribution-view.js") + "</script>\n"
                 + "<script>" + asset("api-workspace-view.js") + "</script>\n";
     }
 

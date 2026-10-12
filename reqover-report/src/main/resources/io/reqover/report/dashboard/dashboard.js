@@ -332,6 +332,13 @@
     button.addEventListener('click', function () { choose(button.dataset.mapMode, button.dataset.mapMode === 'request' ? selectedRequest : selectedCode); });
   });
   selection.addEventListener('change', function () { choose(mode, Number(selection.value)); });
+  window.addEventListener('reqover-open-request', function (event) {
+    var target = event.detail;
+    if (!target) { return; }
+    var index = requests.findIndex(function (r) { return r.requestId === target.requestId && r.endpoint === target.endpoint && r.startedAt === target.startedAt; });
+    if (index < 0) { return; }
+    choose('request', index); window.location.hash = 'request-overview'; showView('request-overview');
+  });
   animation.addEventListener('click', function () { setAnimation(!stage.classList.contains('graph-running')); });
   motion.addEventListener('change', function () { setAnimation(!motion.matches); });
   document.getElementById('reqover-zoom-in').addEventListener('click', function () { zoom = Math.min(1.5, zoom + 0.15); scale(); });

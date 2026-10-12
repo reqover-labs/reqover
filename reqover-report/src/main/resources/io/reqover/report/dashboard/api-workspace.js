@@ -52,5 +52,26 @@
       hiddenCount: Array.from(selected).filter(function (name) { return !visibleNames.has(name); }).length,
       availableCount: source.requests.length, missingCount: source.missing.length };
   }
-  return { groupName: groupName, groups: groups, filter: filter, sources: sources, selectionSummary: selectionSummary };
+  function matchesScope(request, scope) {
+    if (!scope) { return true; }
+    var start = Date.parse(request.startedAt);
+    if (!(start >= Date.parse(scope.startedAt) && start < Date.parse(scope.endedAt))) { return false; }
+    if (scope.band === null) { return true; }
+    var duration = request.duration;
+    var band = !Number.isFinite(duration) || duration < 0 ? 5 : duration < 100 ? 0 : duration < 500 ? 1 : duration < 1000 ? 2 : duration < 2000 ? 3 : 4;
+    return band === scope.band;
+  }
+  function timeSlots(windows) {
+    var slots = [];
+    windows.forEach(function (window, index) {
+      if (index > 0) {
+        var gap = (Date.parse(window.startedAt) - Date.parse(windows[index - 1].endedAt)) / 1000;
+        if (gap > 0) { slots.push({ gapSeconds: gap }); }
+      }
+      slots.push(window);
+    });
+    return slots;
+  }
+  function initialView(apiCount, observationCount) { return apiCount >= 50 || observationCount >= 1000 ? 'distribution' : 'groups'; }
+  return { groupName: groupName, groups: groups, filter: filter, sources: sources, selectionSummary: selectionSummary, matchesScope: matchesScope, timeSlots: timeSlots, initialView: initialView };
 });

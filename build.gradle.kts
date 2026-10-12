@@ -27,7 +27,7 @@ import org.gradle.plugins.signing.SigningExtension
 
 plugins {
     `java-library`
-    id("org.cyclonedx.bom") version "3.4.1"
+    id("org.cyclonedx.bom") version "3.5.0"
 }
 
 allprojects {

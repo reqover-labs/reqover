@@ -4,6 +4,36 @@
 # Policy: SECURITY.md, "Dependency advisories".
 
 [[IgnoredVulns]]
+id = "GHSA-9qf2-26p9-2q2q" # CVE-2026-47892, WebFlux functional header predicate bypass
+ignoreUntil = 2026-11-12T00:00:00Z
+reason = """
+Reviewed 2026-10-12 against https://spring.io/security/cve-2026-47892/.
+Spring 6.2.19 has no usable OSS fix in the Boot 3.5 line: 6.2.20 is enterprise
+support only and the OSS fix is 7.0.9. Mixing Spring 7 into Boot 3.5 is not a
+compatible patch. The WebFlux sample uses the reactive Netty server, not
+DispatcherServlet; Reqover report routes are restricted to REACTIVE apps and
+do not use header predicates. Published adapters declare Spring compileOnly
+and do not ship Spring classes. This is a temporary sample/test risk exception,
+not a fix or a claim about consumer apps. Re-review by 2026-11-12; the source
+scope and SBOM version are guarded by scripts/test-osv-policy.py.
+"""
+
+[[IgnoredVulns]]
+id = "GHSA-j9f9-w8pj-32f8" # CVE-2026-47890, SSE view-fragment stream corruption
+ignoreUntil = 2026-11-12T00:00:00Z
+reason = """
+Reviewed 2026-10-12 against https://spring.io/security/cve-2026-47890/.
+Spring 6.2.19 has no usable OSS fix in the Boot 3.5 line: 6.2.20 is enterprise
+support only and the OSS fix is 7.0.9. Mixing Spring 7 into Boot 3.5 is not a
+compatible patch. The MVC/WebFlux samples and report routes do not render
+view fragments over SSE; they return JSON/plain text or complete static HTML.
+Published adapters declare Spring compileOnly and do not ship Spring classes.
+This is a temporary sample/test risk exception, not a fix or a claim about
+consumer apps. Re-review by 2026-11-12; the source scope and SBOM version are
+guarded by scripts/test-osv-policy.py.
+"""
+
+[[IgnoredVulns]]
 id = "GHSA-pc63-qcmh-9cmg" # CVE-2026-47884, spring-webmvc XsltView path limitation
 ignoreUntil = 2026-12-31T00:00:00Z
 reason = """

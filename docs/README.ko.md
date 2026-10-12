@@ -38,6 +38,14 @@ CLI `diff`는 코드 관계를, 대시보드 비교는 보관 HTTP 통계를 비
 
 ## 설계와 검증 근거
 
+- [PR 마무리 검증](40_finalization.ko.md): 회귀 검증·기한부 보안 예외·미완료 화면 검증 구분.
+
+- [미출시 재테스트 워크플로](39_retest_workflow.ko.md): 시나리오 저장·불러오기, 외부 계획, 제한된 로컬 실행, 결과/관측 이력.
+
+- [미출시 규모별 보기 연결](37_scale_views.ko.md): 시간 분포 → 그룹 → 일치하는 요청 상세, 보관 범위·누락 명시.
+
+- [미출시 API workspace](34_api_workspace.ko.md), [개발 계획](33_api_workspace_plan.ko.md): 그룹 탐색·보관 통계·테스트 대상 선택.
+
 - [0.4.2 최신 화면 촬영](32_current_screenshot_capture.ko.md): 실제 예제 요청·기본 기록 옵션·브라우저 검증.
 - [현재 아키텍처](02_architecture.ko.md), [버전·호환성 정책](20_versioning_and_compatibility.ko.md).
 - [선행 도구와 차이](19_prior_art.ko.md), [JaCoCo 연동 판단](14_jacoco_interop_decision.md).

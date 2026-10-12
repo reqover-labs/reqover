@@ -38,6 +38,14 @@ Endpoint aggregates and the retained/detail-export windows are different scopes.
 
 ## Design and Evidence
 
+- [PR finalization](40_finalization.md): regression evidence, expiring security exceptions and pending browser QA.
+
+- [Unreleased retest workflow](39_retest_workflow.md): scenario save/import, external plans, bounded local CLI checks, result/recording archives.
+
+- [Unreleased connected scale views](37_scale_views.md): time distribution -> groups -> matching request details, with explicit retained-data bounds.
+
+- [Unreleased API workspace](34_api_workspace.md) and [implementation plan](33_api_workspace_plan.md): path groups, retained statistics and explicit test-target selection.
+
 - [Current 0.4.2 screenshot capture](32_current_screenshot_capture.md): real sample requests, default recording options and browser checks.
 - [Current architecture](02_architecture.md) and [compatibility policy](20_versioning_and_compatibility.md).
 - [Prior art](19_prior_art.md) and [JaCoCo interoperability decision](14_jacoco_interop_decision.md).

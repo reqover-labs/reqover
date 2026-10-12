@@ -8,6 +8,12 @@ documented, expiring exception policy.
 
 ## Current Finding and Policy
 
+**October 12 follow-up:** the current scan adds two advisories on Spring 6.2.19.
+The [finalization record](40_finalization.md) and
+[security policy](../SECURITY.md#dependency-advisories) explain the checked sample
+preconditions and temporary November 12 exceptions. The earlier one-exception
+result below is historical, not the current advisory count.
+
 The [October 6 stack-tip scan](https://github.com/reqover-labs/reqover/actions/runs/37428486980/job/112154025632)
 and a fresh local OSV query of all 104 external Maven coordinates report one
 finding before the latest main synchronization: `org.springframework:spring-webmvc:6.2.19`,

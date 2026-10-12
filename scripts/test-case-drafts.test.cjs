@@ -30,6 +30,19 @@ const request = overrides => ({ requestId: 'req-1', unitType: 'http-request', en
 const reviewed = overrides => drafts.update(drafts.create(request()), {
   path: '/orders/42', expectedStatus: 200, maximumClientMillis: 1500, reviewed: true, ...overrides });
 
+test('batch creation reuses the same source and preserves reviewed edits', () => {
+  const edited = reviewed();
+  const original = [edited];
+  const result = drafts.addUnique(original, [request(), request({ requestId: 'req-2' })]);
+  assert.equal(result.added, 1);
+  assert.equal(result.reused, 1);
+  assert.equal(result.drafts[0], edited);
+  assert.equal(result.drafts[0].request.path, '/orders/42');
+  assert.equal(result.drafts[1].expected.statusCode, null);
+  assert.equal(original.length, 1);
+  assert.equal(drafts.addUnique([], [request(), request()]).drafts.length, 1);
+});
+
 test('keeps source observations separate from unset expectations and uncollected inputs', () => {
   const value = drafts.create(request({ authorization: 'do-not-copy', body: 'do-not-copy' }));
   assert.equal(value.kind, 'reqover-http-test-draft');

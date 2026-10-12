@@ -2,8 +2,13 @@
 
 # Reqover CLI
 
-이미 저장한 coverage 리포트를 읽는 오프라인 명령입니다. agent 연결, 앱 기동,
-HTTP 요청 전송이나 테스트 실행을 대신하지 않습니다.
+배포된 0.4.2 명령은 기존 coverage 리포트를 읽는 오프라인 도구입니다. agent 연결이나
+애플리케이션 기동을 대신하지 않습니다.
+
+미출시 소스에는 [시나리오 실행·이력](../docs/39_retest_workflow.ko.md)의 `run`, `runs`,
+`run-report`, `run-compare`, `recording-save`, `recordings`, `recording-report`를 추가했습니다.
+`run`만 HTTP를 전송하며 명시적 동의·literal loopback 대상 제한이 있습니다.
+이 브랜치에서 CLI를 빌드해야 하며 배포 JAR에는 아직 없는 명령입니다.
 
 [v0.4.2 릴리스](https://github.com/reqover-labs/reqover/releases/tag/v0.4.2)에서
 `reqover-cli-0.4.2.jar`를 받습니다. Maven Central 라이브러리가 아니며 JDK 17 이상이

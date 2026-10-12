@@ -4,6 +4,37 @@ All notable changes to Reqover are documented in this file.
 
 ## Unreleased
 
+### Security
+
+- Reviewed two additional Spring 6.2.19 advisories under the existing exception
+  policy, expiring November 12, 2026. Current samples do not use the affected
+  deployment/rendering paths; consumer applications must assess their own use.
+  No patched Spring claim, dependency inventory removal or disabled OSV gate.
+- Added offline checks for exception scope, expiry and fail-closed scan behavior.
+
+### Added
+
+- Scenario schema-1 save/import/re-review, Postman Collection 2.1 and disabled JMeter JMX export.
+- Explicitly consented loopback-only GET/HEAD CLI checks with bounded repeats/deadlines,
+  assertion results, static HTML reports and named local run/recording archives.
+- Scenarios and runs workspace with file-based history import/export, condition-aware
+  comparisons and private-output boundaries; existing Action artifact selection stays unchanged.
+
+- Connected scale views: all-retained five-minute UTC time/interval distribution,
+  scoped group/API statistics and matching recent request-map navigation.
+- Bounded 256-window summaries with explicit gaps/omissions, interval-scoped draft sources
+  and time scope in draft bundles. No automatic live collector history or original-request replay.
+
+- API workspace usability: clearable group/filter context, source availability before actions,
+  selection visible across views, remembered pagination, sticky table headings and exact API navigation.
+- Repeated test-draft creation reuses matching source observations and preserves existing edits.
+
+- Offline API workspace with adjustable path-group summaries, retained HTTP statistics,
+  sortable/filterable paginated API selection, and representative-request draft creation/export.
+- Explicit missing-source API lists when selected endpoints are outside the recent 100-detail window.
+  Existing collector, coverage JSON, CLI, Action and request/retest map contracts remain unchanged.
+- Dashboard brand spelling: ReqOver; artifact coordinates and package names stay unchanged.
+
 ## 0.4.2 — 2026-10-07
 
 Dashboard keyboard fix found during the functional-test dry run.

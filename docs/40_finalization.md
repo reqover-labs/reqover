@@ -39,7 +39,8 @@ are not proof that every consumer application is unexploitable.
 - Java 21 full build/SBOM regeneration: 90 executed tasks, 202 Java tests;
   zero failures/errors/skips. Existing Gradle deprecations are not hidden.
 - Node model/controller/generated-Java checks: 46 passed, not browser E2E.
-- Dependency policy: 7 passed after the missing-exception test failed first.
+- Dependency policy: 8 passed after the missing-exception and missing-release-gate
+  tests failed first. Both build and release verification require the same guard.
   Built published JARs contain no Spring classes/nested JARs; the reactive sample
   contains Netty and no servlet stack. Run these checks after building.
 - Regenerated SBOM matches the lock. OSV query: 104 coordinates, zero unexcepted

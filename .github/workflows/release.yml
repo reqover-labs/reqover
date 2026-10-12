@@ -35,6 +35,9 @@ jobs:
       - name: Build and test
         run: ./gradlew clean build --no-daemon --console=plain
 
+      - name: Verify dependency exception scope and fail-closed policy
+        run: python3 scripts/test-osv-policy.py
+
       - name: Generate CycloneDX SBOM
         if: matrix.java == 21
         run: |

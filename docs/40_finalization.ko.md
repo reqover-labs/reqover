@@ -40,7 +40,8 @@ Boot 3.5에 일부 Spring 7 JAR만 덮어쓰는 것은 안전한 패치로 취�
 - Java 21 전체 build/SBOM 재생성: 90개 task 실행, Java 202개 테스트,
   실패·오류·skip 0. 기존 Gradle deprecation 경고는 별도 정리 대상으로 남긴다.
 - Node 모델/controller/생성 Java 검증: 46개 통과. 실제 브라우저 E2E는 아님.
-- 보안 정책: 7개 통과. 수정 전 예외 정책 테스트의 실패를 확인하고 수정 후 통과.
+- 보안 정책: 8개 통과. 수정 전 예외 정책·릴리스 검사 누락 테스트의 실패를 확인하고
+  수정 후 통과. build/release 모두 같은 범위 검사를 실행한다.
   빌드된 published library JAR에 Spring 클래스·중첩 JAR가 없고,
   WebFlux 샘플에는 reactive Netty만 있으며 servlet stack이 없음을 검사.
 - SBOM lock은 재생성된 의존성 목록과 일치. 104개 좌표 OSV 재조회:

@@ -36,6 +36,15 @@ EXPECTED = {
 
 
 class AdvisoryPolicyTest(unittest.TestCase):
+    def test_build_and_release_verify_the_exception_scope_after_building(self):
+        for name in ("build.yml", "release.yml"):
+            workflow = (ROOT / ".github/workflows" / name).read_text()
+            verify_job = workflow.split("  osv:", 1)[0]
+            command = "run: python3 scripts/test-osv-policy.py"
+            self.assertIn(command, verify_job, name)
+            self.assertLess(verify_job.index("run: ./gradlew clean build"), verify_job.index(command))
+            self.assertIn("fail-on-vuln: true", workflow)
+
     def test_only_reviewed_advisories_have_dated_reasons(self):
         with (ROOT / "osv-scanner.toml").open("rb") as handle:
             entries = tomllib.load(handle)["IgnoredVulns"]

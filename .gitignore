@@ -35,6 +35,7 @@ Thumbs.db
 
 # Reqover generated artifacts
 coverage-buckets/
+.reqover/
 tmp/
 
 # 대회 공식 양식은 주최측 저작물이라 저장소에 두지 않는다.

@@ -10,6 +10,8 @@ sortable retained statistics and selected representative-request draft bundles.
 It is not included in the published 0.4.2 library yet.
 The unreleased [scale views](../docs/37_scale_views.md) add full-retained time/interval
 distribution and time-scoped API statistics/draft sources.
+Unreleased [scenario/result/archive models](../docs/39_retest_workflow.md) support
+the new workspace; HTTP execution remains in the CLI, not the report library.
 
 | Feature | Data and boundary |
 | --- | --- |

@@ -9,6 +9,8 @@ starter에 이미 포함됩니다. core에 의존하며 Spring이나 JSON 라이
 다중 선택·대표 요청 초안 묶음을 제공합니다. 배포된 0.4.2 라이브러리에는 아직 없습니다.
 미출시 [규모별 보기](../docs/37_scale_views.ko.md)는 보관 요청 전체의 시간 분포와
 선택 구간의 API 통계·초안 출처를 연결합니다.
+미출시 [시나리오·결과·archive 모델](../docs/39_retest_workflow.ko.md)은 새 workspace를
+지원하며, HTTP 실행은 report 라이브러리가 아니라 CLI에 둡니다.
 
 | 기능 | 데이터와 한계 |
 | --- | --- |

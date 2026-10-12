@@ -38,6 +38,8 @@ CLI `diff`는 코드 관계를, 대시보드 비교는 보관 HTTP 통계를 비
 
 ## 설계와 검증 근거
 
+- [미출시 재테스트 워크플로](39_retest_workflow.ko.md): 시나리오 저장·불러오기, 외부 계획, 제한된 로컬 실행, 결과/관측 이력.
+
 - [미출시 규모별 보기 연결](37_scale_views.ko.md): 시간 분포 → 그룹 → 일치하는 요청 상세, 보관 범위·누락 명시.
 
 - [미출시 API workspace](34_api_workspace.ko.md), [개발 계획](33_api_workspace_plan.ko.md): 그룹 탐색·보관 통계·테스트 대상 선택.

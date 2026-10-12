@@ -44,6 +44,8 @@
       list.append(button);
     });
     text('reqover-case-count', drafts.length + (drafts.length === 1 ? ' draft' : ' drafts'));
+    document.getElementById('reqover-case-remove').disabled = !drafts.length;
+    window.dispatchEvent(new Event('reqover-drafts-changed'));
   }
   function renderState() {
     var draft = drafts[active];
@@ -104,5 +106,15 @@
     text('reqover-case-message', result.added + ' new drafts / ' + result.reused + ' existing drafts reused. Existing edits preserved.');
     return { added: result.added, reused: result.reused };
   }
-  window.ReqoverCaseEditor = { create: function (request) { return createMany([request]); }, createMany: createMany };
+  document.getElementById('reqover-case-remove').addEventListener('click', function () {
+    if(active<0){return;}drafts.splice(active,1);
+    if(drafts.length){select(Math.min(active,drafts.length-1));}
+    else {active=-1;path.value='';status.value='';maximum.value='';review.checked=false;document.getElementById('reqover-case-empty').hidden=false;document.getElementById('reqover-case-workspace').hidden=true;renderList();}
+    text('reqover-case-message','Draft removed.');
+  });
+  window.ReqoverCaseEditor = { create: function (request) { return createMany([request]); }, createMany:createMany,
+    drafts:function(){return JSON.parse(JSON.stringify(drafts));},
+    importDrafts:function(incoming){var result=api.addDrafts(drafts,incoming);drafts=result.drafts;if(result.activeIndex>=0){select(result.activeIndex);}text('reqover-case-message',result.added+' imported cases; review required. Existing edits preserved.');return result;}
+  };
+  renderList();
 })();

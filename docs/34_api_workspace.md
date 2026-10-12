@@ -93,4 +93,5 @@ legacy and no-script behaviors are separately regression-tested.
   fractions when choosing a representative, not lexicographic strings.
 
 Five-minute windows and the heatmap are now part of the unreleased [scale views](37_scale_views.md).
-Persistent history, replay and external scenario formats remain follow-up work.
+The separate unreleased [retest workflow](39_retest_workflow.md) adds file history,
+external scenario formats and limited local execution. Faithful replay remains absent.

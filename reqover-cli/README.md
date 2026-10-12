@@ -2,8 +2,13 @@
 
 # Reqover CLI
 
-Offline commands over an existing coverage report. The CLI does not attach an
-agent, start an application, send HTTP requests or run tests.
+Published 0.4.2 commands operate offline over existing coverage reports. The CLI
+does not attach an agent or start an application.
+
+Unreleased source adds [scenario execution and history](../docs/39_retest_workflow.md):
+`run`, `runs`, `run-report`, `run-compare`, `recording-save`, `recordings`, and
+`recording-report`. Only `run` sends HTTP, with explicit consent and literal loopback
+target restrictions. Build this branch's CLI; these commands are not in the released JAR.
 
 Download `reqover-cli-0.4.2.jar` from the
 [v0.4.2 release](https://github.com/reqover-labs/reqover/releases/tag/v0.4.2).

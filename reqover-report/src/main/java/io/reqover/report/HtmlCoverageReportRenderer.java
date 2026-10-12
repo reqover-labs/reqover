@@ -447,6 +447,7 @@ public final class HtmlCoverageReportRenderer {
 
         html.append(DiagnosticDashboard.artifacts(report));
         html.append(ApiWorkspaceHtmlRenderer.section());
+        html.append(ScenarioWorkspaceHtmlRenderer.render());
         html.append(TestCaseDraftHtmlRenderer.render(report.requests().stream().anyMatch(RequestObservation::isHttp)));
         html.append(RecordingComparisonHtmlRenderer.render());
         html.append("<footer>Reqover records method-entry hits per observed request. "

@@ -88,7 +88,7 @@ final class RecordingComparisonHtmlRenderer {
                 + "<script>" + DiagnosticDashboard.asset("recording-comparison-view.js") + "</script>\n";
     }
 
-    private static String summaryJson(CoverageReport report) {
+    static String summaryJson(CoverageReport report) {
         Map<String, ArrayList<RequestObservation>> grouped = new TreeMap<>();
         report.requests().stream().filter(RequestObservation::isHttp).forEach(request ->
                 grouped.computeIfAbsent(request.endpoint(), ignored -> new ArrayList<>()).add(request));

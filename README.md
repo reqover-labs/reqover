@@ -77,6 +77,9 @@ The [usability follow-up](docs/35_dashboard_usability_review.md) adds clearable 
 source availability and deduplicated draft creation; fresh browser visual QA is pending.
 The unreleased [scale views](docs/37_scale_views.md) connect retained time/interval
 distribution -> path groups -> API statistics -> matching request maps.
+The unreleased [retest workflow](docs/39_retest_workflow.md) adds scenario files,
+Postman/JMeter export, explicitly confirmed local CLI checks, result reports and
+separate run/recording histories. It is not faithful replay or a load generator.
 
 Since 0.4.0 the report is an offline dashboard. Open it from the report endpoint,
 from the file the application exports on shutdown, or with `reqover render`.

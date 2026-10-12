@@ -288,7 +288,7 @@
   }
   var activeView = null;
   function showView(id) {
-    var allowed = ['request-overview', 'request-list', 'endpoint-code', 'code-endpoint', 'ci-report', 'test-case-drafts', 'recording-comparison', 'api-workspace'];
+    var allowed = ['request-overview', 'request-list', 'endpoint-code', 'code-endpoint', 'ci-report', 'test-case-drafts', 'recording-comparison', 'api-workspace', 'scenario-workspace'];
     if (!allowed.includes(id) || !document.getElementById(id)) { id = 'request-overview'; }
     var changed = activeView !== id;
     activeView = id;
@@ -299,9 +299,9 @@
     document.getElementById('reqover-view-title').textContent = {
       'request-overview': 'Validation overview', 'request-list': 'Observed requests',
       'endpoint-code': 'API to code', 'code-endpoint': 'Retest candidates', 'ci-report': 'CI artifacts', 'test-case-drafts': 'Test drafts',
-      'recording-comparison': 'Recording comparison', 'api-workspace': 'API workspace'
+      'recording-comparison': 'Recording comparison', 'api-workspace': 'API workspace', 'scenario-workspace':'Scenarios and runs'
     }[id];
-    document.getElementById('reqover-filter-box').hidden = ['ci-report', 'test-case-drafts', 'recording-comparison', 'api-workspace'].includes(id);
+    document.getElementById('reqover-filter-box').hidden = ['ci-report', 'test-case-drafts', 'recording-comparison', 'api-workspace', 'scenario-workspace'].includes(id);
     if (id === 'request-overview') { requestAnimationFrame(fit); }
     if (changed) { requestAnimationFrame(function () { window.scrollTo(0, 0); }); }
   }

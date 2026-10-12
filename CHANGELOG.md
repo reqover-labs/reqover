@@ -6,6 +6,12 @@ All notable changes to Reqover are documented in this file.
 
 ### Added
 
+- Scenario schema-1 save/import/re-review, Postman Collection 2.1 and disabled JMeter JMX export.
+- Explicitly consented loopback-only GET/HEAD CLI checks with bounded repeats/deadlines,
+  assertion results, static HTML reports and named local run/recording archives.
+- Scenarios and runs workspace with file-based history import/export, condition-aware
+  comparisons and private-output boundaries; existing Action artifact selection stays unchanged.
+
 - Connected scale views: all-retained five-minute UTC time/interval distribution,
   scoped group/API statistics and matching recent request-map navigation.
 - Bounded 256-window summaries with explicit gaps/omissions, interval-scoped draft sources

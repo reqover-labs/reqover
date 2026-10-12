@@ -34,7 +34,7 @@ final class DiagnosticDashboard {
 
     static String styles() {
         return STYLES + TestCaseDraftHtmlRenderer.styles() + RecordingComparisonHtmlRenderer.styles()
-                + asset("api-workspace.css");
+                + asset("api-workspace.css") + asset("scenario-workspace.css");
     }
 
     static String navigation(boolean hasRequests) {
@@ -44,6 +44,7 @@ final class DiagnosticDashboard {
                 .append("<span>ReqOver<small>Validation report</small></span></a>");
         nav(out, "request-overview", "layout-dashboard", "Overview");
         nav(out, "api-workspace", "network", "API workspace");
+        nav(out, "scenario-workspace", "flask-conical", "Scenarios and runs");
         if (hasRequests) {
             nav(out, "request-list", "clock", "Requests");
             nav(out, "test-case-drafts", "flask-conical", "Test drafts");
@@ -126,7 +127,12 @@ final class DiagnosticDashboard {
                 + "<script>" + SCRIPT + "</script>\n"
                 + "<script>" + asset("api-workspace.js") + "</script>\n"
                 + "<script>" + asset("time-distribution-view.js") + "</script>\n"
-                + "<script>" + asset("api-workspace-view.js") + "</script>\n";
+                + "<script>" + asset("api-workspace-view.js") + "</script>\n"
+                + "<script>" + asset("scenarios.js") + "</script>\n"
+                + "<script>" + asset("scenario-results.js") + "</script>\n"
+                + "<script>" + asset("scenario-workspace-view.js") + "</script>\n"
+                + "<script>" + asset("recording-history.js") + "</script>\n"
+                + "<script>" + asset("recording-history-view.js") + "</script>\n";
     }
 
     private static void nav(StringBuilder out, String id, String icon, String label) {

@@ -40,7 +40,9 @@ Draft sources still come from the latest 100 HTTP details and must match the cho
 time and band. A historical cell may have accurate counts but no matching recent
 detail; draft creation is disabled and missing source counts are displayed. Export
 bundles include the optional `scope` with start/end/band. Expectations, original input
-and credentials are not invented. There is no replay, persistence or production control.
+and credentials are not invented. Scale views do not execute or persist traffic;
+the separate [retest workflow](39_retest_workflow.md) provides file history and local checks.
+There is no faithful replay or production control.
 
 The embedded `reqover-time-data` is a separate HTML-only `reqover-time-distribution`
 schema-1 aggregate, not a change to canonical coverage JSON or CLI inputs.

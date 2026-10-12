@@ -38,6 +38,8 @@ Endpoint aggregates and the retained/detail-export windows are different scopes.
 
 ## Design and Evidence
 
+- [Unreleased retest workflow](39_retest_workflow.md): scenario save/import, external plans, bounded local CLI checks, result/recording archives.
+
 - [Unreleased connected scale views](37_scale_views.md): time distribution -> groups -> matching request details, with explicit retained-data bounds.
 
 - [Unreleased API workspace](34_api_workspace.md) and [implementation plan](33_api_workspace_plan.md): path groups, retained statistics and explicit test-target selection.

@@ -31,6 +31,17 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class DiagnosticDashboardTest {
     @Test
+    void providesSeparateApiWorkspaceWithBoundedDraftSources() {
+        String html = new HtmlCoverageReportRenderer().render(report(List.of(request("r1", "GET /orders/{id}"))));
+        assertTrue(html.contains("href=\"#api-workspace\""));
+        assertTrue(html.contains("id=\"api-workspace\" hidden"));
+        assertTrue(html.contains("id=\"api-select-page\""));
+        assertTrue(html.contains("id=\"api-export\""));
+        assertTrue(html.contains("reqover-http-test-draft-bundle"));
+        assertTrue(html.contains("Group p95 is not calculated from API percentiles"));
+    }
+
+    @Test
     void providesAnOfflineWorkspaceAndAccessibleControls() {
         String html = new HtmlCoverageReportRenderer().render(report(List.of(request("r1", "GET /orders/{id}"))));
         assertTrue(html.contains("class=\"dashboard-sidebar\""));

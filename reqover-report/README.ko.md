@@ -5,6 +5,9 @@
 Maven Central 라이브러리 `io.github.reqover-labs:reqover-report:0.4.2`입니다.
 starter에 이미 포함됩니다. core에 의존하며 Spring이나 JSON 라이브러리를 요구하지 않습니다.
 
+미출시 소스의 [API workspace](../docs/34_api_workspace.ko.md)는 경로 그룹·통계 정렬·
+다중 선택·대표 요청 초안 묶음을 제공합니다. 배포된 0.4.2 라이브러리에는 아직 없습니다.
+
 | 기능 | 데이터와 한계 |
 | --- | --- |
 | API별 코드·역조회 | 받아들인 이름의 전체 집계, 나머지 이름은 보관 snapshot 기준 |

@@ -1,0 +1,96 @@
+// SPDX-License-Identifier: Apache-2.0
+const assert = require('node:assert/strict');
+const fs = require('node:fs');
+const path = require('node:path');
+const { pathToFileURL } = require('node:url');
+const { chromium } = require('playwright');
+(async () => {
+  const [report, out = 'tmp/api-workspace-check'] = process.argv.slice(2);
+  assert(report, 'Usage: node scripts/verify-api-workspace.cjs 120-api-report.html [output-directory]');
+  fs.mkdirSync(out, { recursive: true });
+  const browser = await chromium.launch({ headless: true });
+  const errors = [], external = [];
+  try {
+    const page = await browser.newPage({ viewport: { width: 1440, height: 1000 }, colorScheme: 'light', deviceScaleFactor: 1 });
+    page.on('pageerror', e => errors.push(e.message));
+    page.on('request', r => { if (/^https?:/.test(r.url())) external.push(r.url()); });
+    await page.goto(pathToFileURL(path.resolve(report)).href + '#api-workspace');
+    await page.locator('#api-workspace').waitFor({ state: 'visible' });
+    assert.equal(await page.locator('#api-groups .api-group').count(), 6);
+    assert(await page.locator('#api-totals').innerText().then(t => t.includes('120') && t.includes('660')));
+    await page.evaluate(() => window.scrollTo(0, 0));
+    await page.screenshot({ path: path.join(out, 'groups.png') });
+    await page.locator('#api-depth').selectOption('2');
+    assert.equal(await page.locator('#api-groups .api-group').count(), 20);
+    await page.locator('#api-next').click();
+    assert(await page.locator('#api-page-label').innerText().then(t => t.includes('page 2 of 6')));
+    await page.locator('#api-depth').selectOption('1');
+    await page.locator('#api-groups .api-group').first().click();
+    assert.equal(await page.locator('#api-rows tr').count(), 20);
+    assert(await page.locator('#api-page-label').innerText().then(t => t.includes('20 matching APIs')));
+    await page.locator('[data-api-view="groups"]').click();
+    await page.locator('[data-api-view="table"]').click();
+    assert(await page.locator('#api-rows td').first().evaluate(e => e.getBoundingClientRect().width <= 65), 'Checkbox column must not inherit the legacy 40% column width');
+    assert(await page.locator('#api-page-label').innerText().then(t => t.includes('120 matching APIs')));
+    await page.locator('#api-top').click();
+    assert(await page.locator('#api-selection-count').innerText().then(t => t.includes('20 selected APIs')));
+    await page.evaluate(() => window.scrollTo(0, 0));
+    await page.screenshot({ path: path.join(out, 'selection.png') });
+    await page.locator('#api-next').click();
+    assert.equal(await page.locator('#api-rows input:checked').count(), 0);
+    await page.locator('#api-select-page').check();
+    assert(await page.locator('#api-selection-count').innerText().then(t => t.includes('40 selected APIs')));
+    await page.locator('#api-search').fill('no-match');
+    assert(await page.locator('#api-empty').isVisible());
+    assert(await page.locator('#api-selection-scope').innerText().then(t => t.includes('40 outside')));
+    await page.locator('#api-search').fill('');
+    await page.locator('#api-clear').click();
+    for (let i = 0; i < 6; i++) {
+      await page.locator('#api-select-page').check();
+      if (i < 5) { await page.locator('#api-next').click(); }
+    }
+    assert(await page.locator('#api-selection-count').innerText().then(t => t.includes('120 selected APIs')));
+    assert(await page.locator('#api-selection-scope').innerText().then(t => t.includes('100.0%')));
+    const download = page.waitForEvent('download');
+    await page.locator('#api-export').click();
+    const file = await download; await file.saveAs(path.join(out, file.suggestedFilename()));
+    const bundle = JSON.parse(fs.readFileSync(path.join(out, file.suggestedFilename()), 'utf8'));
+    assert.equal(bundle.kind, 'reqover-http-test-draft-bundle');
+    assert.equal(bundle.selectedEndpoints.length, 120);
+    assert.equal(bundle.drafts.length + bundle.missingSourceEndpoints.length, 120);
+    assert(bundle.missingSourceEndpoints.length > 0);
+    assert(bundle.drafts.every(d => !d.replayable && !d.reviewed && d.request.path === '' && d.expected.statusCode === null));
+    await page.locator('#api-status').selectOption('5xx');
+    assert(await page.locator('#api-rows tr').count() > 0);
+    const before = await page.locator('#api-rows').innerText();
+    await page.locator('[data-api-sort="p95Millis"] button').click();
+    assert.notEqual(before, await page.locator('#api-rows').innerText());
+    await page.locator('#api-status').selectOption('all');
+    await page.screenshot({ path: path.join(out, 'table.png') });
+    for (const width of [1920, 1280, 760, 390]) {
+      await page.setViewportSize({ width, height: 900 });
+      const geometry = await page.evaluate(() => ({ width: document.documentElement.clientWidth, scroll: document.documentElement.scrollWidth }));
+      assert(geometry.scroll <= geometry.width, JSON.stringify(geometry));
+    }
+    await page.screenshot({ path: path.join(out, 'mobile.png') });
+    await page.emulateMedia({ colorScheme: 'dark' });
+    await page.setViewportSize({ width: 1440, height: 1000 });
+    await page.screenshot({ path: path.join(out, 'dark.png') });
+    await page.locator('#api-create').click();
+    await page.locator('#test-case-drafts').waitFor({ state: 'visible' });
+    assert.equal(await page.locator('#reqover-case-list button').count(), bundle.drafts.length);
+    assert.equal(await page.locator('#reqover-case-expected-status').inputValue(), '');
+    assert(await page.locator('#reqover-case-junit').isDisabled());
+    await page.locator('.dashboard-link[href="#api-workspace"]').click();
+    await page.locator('.api-endpoint').first().click();
+    await page.locator('#endpoint-code').waitFor({ state: 'visible' });
+    assert.equal(await page.locator('article.endpoint:visible').count(), 1);
+    const fallback = await browser.newPage({ javaScriptEnabled: false });
+    await fallback.goto(pathToFileURL(path.resolve(report)).href);
+    assert(await fallback.locator('#api-workspace').isHidden());
+    assert(await fallback.locator('.dashboard-link[href="#api-workspace"]').isHidden());
+    assert.deepEqual(errors, []); assert.deepEqual(external, []);
+    console.log(JSON.stringify({ APIs: 120, observations: 660, selected: 120, exportedDrafts: bundle.drafts.length,
+      missingSources: bundle.missingSourceEndpoints.length, viewports: [1920,1280,760,390], pageErrors: errors, externalRequests: 0 }));
+  } finally { await browser.close(); }
+})().catch(e => { console.error(e); process.exit(1); });

@@ -33,15 +33,17 @@ final class DiagnosticDashboard {
     }
 
     static String styles() {
-        return STYLES + TestCaseDraftHtmlRenderer.styles() + RecordingComparisonHtmlRenderer.styles();
+        return STYLES + TestCaseDraftHtmlRenderer.styles() + RecordingComparisonHtmlRenderer.styles()
+                + asset("api-workspace.css");
     }
 
     static String navigation(boolean hasRequests) {
         StringBuilder out = new StringBuilder("<nav class=\"dashboard-sidebar\" aria-label=\"Report sections\">");
         out.append("<a class=\"dashboard-brand\" href=\"#request-overview\">")
                 .append(asset("reqover-mark.svg").replace("<svg ", "<svg aria-hidden=\"true\" "))
-                .append("<span>Reqover<small>Validation report</small></span></a>");
+                .append("<span>ReqOver<small>Validation report</small></span></a>");
         nav(out, "request-overview", "layout-dashboard", "Overview");
+        nav(out, "api-workspace", "network", "API workspace");
         if (hasRequests) {
             nav(out, "request-list", "clock", "Requests");
             nav(out, "test-case-drafts", "flask-conical", "Test drafts");
@@ -120,7 +122,9 @@ final class DiagnosticDashboard {
                 + TestCaseDraftHtmlRenderer.script()
                 + RecordingComparisonHtmlRenderer.script(report)
                 + "<!-- Lucide / Feather icon licenses:\n" + asset("icons/LICENSE").replace("--", "- -") + "\n-->"
-                + "<script>" + SCRIPT + "</script>\n";
+                + "<script>" + SCRIPT + "</script>\n"
+                + "<script>" + asset("api-workspace.js") + "</script>\n"
+                + "<script>" + asset("api-workspace-view.js") + "</script>\n";
     }
 
     private static void nav(StringBuilder out, String id, String icon, String label) {

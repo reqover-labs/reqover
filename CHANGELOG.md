@@ -4,6 +4,14 @@ All notable changes to Reqover are documented in this file.
 
 ## Unreleased
 
+### Added
+
+- Offline API workspace with adjustable path-group summaries, retained HTTP statistics,
+  sortable/filterable paginated API selection, and representative-request draft creation/export.
+- Explicit missing-source API lists when selected endpoints are outside the recent 100-detail window.
+  Existing collector, coverage JSON, CLI, Action and request/retest map contracts remain unchanged.
+- Dashboard brand spelling: ReqOver; artifact coordinates and package names stay unchanged.
+
 ## 0.4.2 — 2026-10-07
 
 Dashboard keyboard fix found during the functional-test dry run.

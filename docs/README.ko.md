@@ -12,6 +12,8 @@ Java 패키지는 `io.reqover.*` 그대로입니다. 루트 빠른 시작은 릴
 
 미출시 PR #53의 최신 변경은 [워크스페이스 사용성 보완](41_workspace_followup.ko.md)에 기록합니다.
 후속 [스크롤·시나리오 CI](44_ci_retest.ko.md)와 [출시 준비](43_release_readiness.ko.md)도 참고하세요.
+최신 [화면 검증 인계·수동 체크리스트](45_browser_validation_handoff.ko.md)는 접근 제한 판단,
+재실행한 자동 검사와 아직 수행하지 못한 8개 화면 검증 흐름을 구분합니다.
 
 | 하고 싶은 일 | 안내 |
 | --- | --- |

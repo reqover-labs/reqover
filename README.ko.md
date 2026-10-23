@@ -88,6 +88,10 @@ API 통계 → 같은 범위의 요청 관계도로 연결합니다.
 테스트 앱에서 실행하는 [retest Action](.github/actions/retest/README.ko.md)을 추가했습니다.
 실행 결과는 Job Summary와 선택적 JSON/HTML artifact로 확인합니다.
 
+[화면 검증 인계·수동 체크리스트](docs/45_browser_validation_handoff.ko.md)에 접근 제한 판단과
+8개 검증 흐름을 정리했습니다. Java 104개·Node 48개를 재검사했으며, 실제 클릭·모바일·
+다운로드는 미검증 상태입니다. 차단된 페이지는 재시도하거나 우회하지 않았습니다.
+
 [마무리 검증 기록](docs/40_finalization.ko.md)에서 자동 회귀 검사와 아직 남은 실제
 브라우저 화면 검증을 구분합니다. Spring 보안 공지는 [기한부 예외](SECURITY.md#dependency-advisories)로
 관리하며, 라이브러리 패치 완료나 알려진 취약점 0건을 의미하지 않습니다.

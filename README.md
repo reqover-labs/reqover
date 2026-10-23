@@ -89,6 +89,11 @@ The [scrolling and CI follow-up](docs/44_ci_retest.md) adds theme-aware scrollba
 a short-window sidebar and a [saved-scenario Action](.github/actions/retest/README.md)
 with owned-app startup/cleanup, Job Summary and opt-in JSON/HTML artifacts.
 
+The [browser validation handoff](docs/45_browser_validation_handoff.md) records the
+access restriction and eight manual verification flows. Java 104 and Node 48 tests
+were rerun; actual clicks, mobile layouts and downloads remain unverified. The
+blocked page was neither retried nor accessed through a workaround.
+
 [Finalization status](docs/40_finalization.md): automated regression and dependency
 policy checks are separate from the still-pending rendered browser QA. Spring
 advisories have [explicit expiring exceptions](SECURITY.md#dependency-advisories),

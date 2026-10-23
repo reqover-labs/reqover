@@ -7,6 +7,8 @@ See also [scrolling and saved-scenario CI](44_ci_retest.md) and the [release che
 The latest [rendered browser review](46_rendered_browser_review.md) records eight
 UI flows, actual downloads, a stale-feedback fix and the remaining visual limits.
 The [earlier restricted handoff](45_browser_validation_handoff.md) remains historical evidence.
+The [control design follow-up](47_control_design_consistency.md) records shared file
+pickers/forms/buttons, scenario panel layout and the multiline SVG fix.
 
 Current usage is based on **0.4.2**. Libraries are on Maven Central under
 `io.github.reqover-labs`; agent and CLI executables are in the

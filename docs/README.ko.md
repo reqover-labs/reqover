@@ -15,6 +15,8 @@ Java 패키지는 `io.reqover.*` 그대로입니다. 루트 빠른 시작은 릴
 최신 [실제 브라우저 검수](46_rendered_browser_review.ko.md)는 8개 흐름·다운로드 확인,
 이전 작업 메시지 수정과 남은 시각 검수 한계를 기록합니다.
 [이전 접근 제한 인계](45_browser_validation_handoff.ko.md)는 당시 기록으로 유지합니다.
+[컨트롤 디자인 통일](47_control_design_consistency.ko.md)은 공통 파일 선택·폼·버튼,
+시나리오 패널 배치와 SVG 아이콘 수정의 실제 검수 결과를 기록합니다.
 
 | 하고 싶은 일 | 안내 |
 | --- | --- |

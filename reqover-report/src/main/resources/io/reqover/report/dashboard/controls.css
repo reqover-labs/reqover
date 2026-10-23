@@ -1,0 +1,162 @@
+/* Copyright 2026 Reqover contributors. SPDX-License-Identifier: Apache-2.0 */
+/* Shared control sizes and states. Loaded after component styles. */
+:root {
+  --control-height: 44px;
+  --control-radius: 8px;
+  --control-gap: 12px;
+}
+
+.case-command, .scenario-toolbar button, .file-picker,
+.api-commands button, .api-context button, .api-time-context button,
+.api-pagination button, .comparison-tools .icon-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: var(--control-height);
+  max-width: 100%;
+  padding: 10px 14px;
+  border: 1px solid var(--rule-strong);
+  border-radius: var(--control-radius);
+  background: var(--bg);
+  color: var(--ink);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 550;
+  line-height: 1.35;
+  text-align: center;
+  text-decoration: none;
+  overflow-wrap: anywhere;
+}
+.case-command:hover:not(:disabled), .scenario-toolbar button:hover:not(:disabled),
+.file-picker:hover, .api-commands button:hover:not(:disabled),
+.api-context button:hover:not(:disabled), .api-pagination button:hover:not(:disabled) {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+}
+.case-command:disabled, .scenario-toolbar button:disabled,
+.api-commands button:disabled, .api-pagination button:disabled {
+  opacity: .55;
+  cursor: not-allowed;
+}
+#scenario-save, #api-create, #reqover-case-junit {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--bg);
+}
+#scenario-save:hover:not(:disabled), #api-create:hover:not(:disabled), #reqover-case-junit:hover:not(:disabled) {
+  background: var(--accent);
+  filter: brightness(.94);
+}
+#scenario-save:disabled, #api-create:disabled, #reqover-case-junit:disabled {
+  background: var(--bg-soft);
+  border-color: var(--rule-strong);
+  color: var(--ink-2);
+  opacity: .65;
+}
+#api-export { background: var(--bg); color: var(--ink); border-color: var(--rule-strong); }
+.icon-button { width: 36px; height: 36px; flex-basis: 36px; border-radius: 6px; }
+.comparison-tools .icon-button { width: var(--control-height); height: var(--control-height); flex-basis: var(--control-height); padding: 10px; }
+
+.file-picker { position: relative; cursor: pointer; flex: 0 1 auto; }
+.file-picker > .ui-icon, .file-picker > span { pointer-events: none; }
+.file-picker input[type="file"] {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  max-width: none;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  opacity: 0;
+  cursor: pointer;
+  font-size: 16px;
+}
+.file-picker:focus-within { outline: 2px solid var(--accent); outline-offset: 3px; }
+
+.scenario-fields input, .scenario-fields select, .scenario-toolbar input[type="search"],
+.case-inputs input, .api-toolbar input, .api-toolbar select,
+.comparison-filter input, .comparison-filter select, .request-tools input, .request-tools select {
+  min-width: 0;
+  min-height: var(--control-height);
+  height: var(--control-height);
+  padding: 10px 12px;
+  border: 1px solid var(--rule-strong);
+  border-radius: var(--control-radius);
+  background: var(--bg);
+  color: var(--ink);
+  font: inherit;
+  font-size: 13px;
+}
+.scenario-fields label, .scenario-toolbar label:not(.file-picker), .case-inputs label,
+.api-toolbar label, .request-tools label { gap: 8px; font-size: 12px; color: var(--ink-2); }
+.scenario-fields input:focus-visible, .scenario-toolbar input:focus-visible,
+.case-inputs input:focus-visible, .api-toolbar input:focus-visible,
+.comparison-filter input:focus-visible, .request-tools input:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+.scenario-fields select, .api-toolbar select, .request-tools select { cursor: pointer; }
+.scenario-toolbar, .case-actions, .api-commands, .comparison-tools { gap: var(--control-gap); }
+.scenario-toolbar { align-items: end; margin: 20px 0; }
+.scenario-toolbar .scenario-search { flex: 1 1 240px; max-width: 360px; margin-left: auto; }
+.scenario-toolbar .file-picker { flex-direction: row; color: var(--ink); font-size: 13px; }
+
+.workspace-panel { min-width: 0; margin-top: 20px; padding: 22px; border: 1px solid var(--rule); border-radius: 12px; background: var(--bg); }
+.panel-heading h3 { margin: 0; font-size: 16px; font-weight: 650; }
+.panel-heading p { margin: 6px 0 0; font-size: 13px; line-height: 1.65; color: var(--ink-2); }
+.workspace-panel .scenario-fields { margin: 20px 0; }
+.workspace-panel .scenario-toolbar { margin: 18px 0 0; }
+.scenario-ready-bar { margin: 18px 0 0; padding: 12px 14px; border-radius: var(--control-radius); background: var(--bg-soft); color: var(--ink-2); font-size: 12px; line-height: 1.65; overflow-wrap: anywhere; }
+.scenario-history-heading { margin-top: 24px; align-items: baseline; flex-wrap: wrap; }
+.scenario-history-heading h3 { margin: 0; }
+.scenario-fields { gap: 20px; }
+.scenario-scroll, .comparison-scroll, .api-table-scroll { border: 1px solid var(--rule); border-radius: var(--control-radius); }
+.scenario-table button, .api-request-link { min-height: 36px; padding: 7px 10px; border-radius: 6px; font-size: 12px; color: var(--ink); }
+.scenario-table button:hover, .api-request-link:hover:not(:disabled) { border-color: var(--accent); background: var(--accent-soft); }
+
+.map-modes { width: fit-content; max-width: 100%; gap: 4px; padding: 4px; border-radius: 10px; flex-wrap: wrap; }
+.map-modes button { min-height: var(--control-height); padding: 10px 12px; border-radius: 7px; line-height: 1.35; }
+.map-modes button[aria-pressed="true"] { box-shadow: inset 0 0 0 1px var(--rule); }
+.case-list button { color: var(--ink); }
+.case-review { min-height: var(--control-height); line-height: 1.6; }
+.case-review input { width: 18px; height: 18px; }
+#reqover-case-remove { color: var(--danger); }
+
+#scenario-message:empty, #recording-message:empty, .case-problems:empty { display: none; }
+#scenario-message:not(:empty), #recording-message:not(:empty), #reqover-case-message:not(:empty) {
+  margin: 18px 0;
+  padding: 12px 14px;
+  border: 1px solid var(--rule);
+  border-radius: var(--control-radius);
+  background: var(--bg);
+  color: var(--ink-2);
+  font-size: 12px;
+  line-height: 1.65;
+  overflow-wrap: anywhere;
+}
+#scenario-validation:not(:empty), .comparison-context { border-radius: var(--control-radius); padding: 12px 14px; font-size: 12px; line-height: 1.65; }
+#scenario-validation:not(:empty) { margin: 16px 0 0; background: var(--warning-soft); color: var(--warning); }
+.comparison-error { padding: 12px 14px; border-radius: var(--control-radius); background: var(--danger-soft); }
+
+@media (max-width: 600px) {
+  .workspace-panel { padding: 16px; }
+  .scenario-fields { gap: 16px; }
+  .scenario-fields label { flex-basis: 100%; }
+  .scenario-toolbar, .comparison-tools { align-items: stretch; }
+  .scenario-toolbar > button, .scenario-toolbar > .file-picker,
+  .comparison-tools > .file-picker, .comparison-tools > .case-command { flex: 1 1 100%; width: 100%; }
+  .scenario-toolbar .scenario-search { flex-basis: 100%; max-width: none; margin-left: 0; }
+  .api-commands { gap: 8px; }
+  .api-commands button { flex: 1 1 130px; }
+  .map-modes { gap: 2px; padding: 3px; }
+  .map-modes button { padding-inline: 9px; }
+  .scenario-table button, .api-request-link { min-height: var(--control-height); }
+}
+@media (forced-colors: active) {
+  .file-picker { border-color: ButtonText; }
+  .file-picker input[type="file"] { forced-color-adjust: none; }
+  #scenario-save, #api-create, #reqover-case-junit { border-color: ButtonText; }
+}
+@media print { .workspace-panel { break-inside: avoid; } }

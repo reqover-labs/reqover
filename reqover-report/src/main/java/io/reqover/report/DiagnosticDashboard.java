@@ -34,7 +34,7 @@ final class DiagnosticDashboard {
 
     static String styles() {
         return STYLES + TestCaseDraftHtmlRenderer.styles() + RecordingComparisonHtmlRenderer.styles()
-                + asset("api-workspace.css") + asset("scenario-workspace.css");
+                + asset("api-workspace.css") + asset("scenario-workspace.css") + asset("controls.css");
     }
 
     static String navigation(boolean hasRequests) {
@@ -145,13 +145,21 @@ final class DiagnosticDashboard {
                 .replace("\u2028", "\\u2028").replace("\u2029", "\\u2029");
     }
 
+    /** Call sites supply fixed UI IDs and labels, never recording data. */
+    static String filePicker(String id, String label, boolean multiple) {
+        return "<label class=\"file-picker\" for=\"" + id + "\">" + icon("upload")
+                + "<span>" + label + "</span><input type=\"file\" id=\"" + id
+                + "\" aria-label=\"" + label + "\" accept=\".json,application/json\""
+                + (multiple ? " multiple" : "") + "></label>";
+    }
+
     private static String control(String id, String name, String label) {
         return "<button type=\"button\" class=\"icon-button\" id=\"" + id
                 + "\" aria-label=\"" + label + "\" title=\"" + label + "\">" + icon(name) + "</button>";
     }
 
     static String icon(String name) {
-        return asset("icons/" + name + ".svg").replace("<svg ", "<svg class=\"ui-icon\" aria-hidden=\"true\" ");
+        return asset("icons/" + name + ".svg").replaceFirst("<svg\\s", "<svg class=\"ui-icon\" aria-hidden=\"true\" ");
     }
 
     static String asset(String name) {

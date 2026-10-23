@@ -92,9 +92,14 @@ with owned-app startup/cleanup, Job Summary and opt-in JSON/HTML artifacts.
 
 After the user lifted the earlier retry prohibition, direct in-app browser access
 succeeded. Review found and fixed stale Scenario/Run history messages appearing
-in another subview. Java 104 and Node 48 tests passed after the fix. Real mobile
+in another subview. Real mobile
 devices and exhaustive visual combinations remain outside this review.
 The [earlier handoff](docs/45_browser_validation_handoff.md) is retained as history.
+
+The [control design follow-up](docs/47_control_design_consistency.md) unifies file
+pickers, buttons, inputs and focus states, and separates scenario and export panels.
+Java 106 and Node 48 tests passed; all four file inputs and light/dark/narrow layouts
+were exercised in the rendered browser.
 
 [Finalization status](docs/40_finalization.md): automated regression and dependency
 policy checks are separate from the [rendered review and its limits](docs/46_rendered_browser_review.md). Spring

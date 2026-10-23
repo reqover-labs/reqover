@@ -36,11 +36,7 @@ final class RecordingComparisonHtmlRenderer {
                 <section class="section" id="recording-comparison" hidden>
                   <h2 class="diagnostics-title">Recording comparison</h2>
                   <div class="comparison-tools">
-                    <label class="case-command" for="reqover-baseline-file">
-                """ + DiagnosticDashboard.icon("upload") + """
-                      <span>Import baseline JSON</span>
-                      <input id="reqover-baseline-file" type="file" accept=".json,application/json" class="sr-only">
-                    </label>
+                """ + DiagnosticDashboard.filePicker("reqover-baseline-file", "Import baseline JSON", false) + """
                     <button type="button" class="case-command" id="reqover-comparison-export">
                 """ + DiagnosticDashboard.icon("download") + """
                       <span>Export current summary</span></button>

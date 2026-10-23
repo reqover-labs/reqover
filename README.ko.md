@@ -92,8 +92,12 @@ API 통계 → 같은 범위의 요청 관계도로 연결합니다.
 
 사용자가 이전 재시도 금지를 해제한 뒤 내부 브라우저에서 직접 접속이 성공했습니다.
 검수 중 다른 하위 보기에 남는 Scenario/실행 이력 작업 메시지를 수정했고,
-수정 후 Java 104개·Node 48개가 통과했습니다. 실제 모바일 기기와 모든 시각 조합의
+실제 모바일 기기와 모든 시각 조합의
 검수까지 완료한 것은 아닙니다. [이전 인계 기록](docs/45_browser_validation_handoff.ko.md)은 이력으로 유지합니다.
+
+[컨트롤 디자인 통일](docs/47_control_design_consistency.ko.md)로 파일 선택·버튼·입력·초점의
+공통 규격과 시나리오/내보내기 패널 배치를 정리했습니다. 최신 Java 106개·Node 48개가
+통과했고, 네 파일 입력과 라이트/다크·좁은 화면을 실제 브라우저에서 확인했습니다.
 
 [마무리 검증 기록](docs/40_finalization.ko.md)의 자동 회귀 검사와
 [최신 화면 검수 범위·한계](docs/46_rendered_browser_review.ko.md)를 구분합니다. Spring 보안 공지는 [기한부 예외](SECURITY.md#dependency-advisories)로

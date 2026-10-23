@@ -10,6 +10,14 @@ Java 패키지는 `io.reqover.*` 그대로입니다. 루트 빠른 시작은 릴
 
 ## 먼저 읽을 문서
 
+미출시 PR #53의 최신 변경은 [워크스페이스 사용성 보완](41_workspace_followup.ko.md)에 기록합니다.
+후속 [스크롤·시나리오 CI](44_ci_retest.ko.md)와 [출시 준비](43_release_readiness.ko.md)도 참고하세요.
+최신 [실제 브라우저 검수](46_rendered_browser_review.ko.md)는 8개 흐름·다운로드 확인,
+이전 작업 메시지 수정과 남은 시각 검수 한계를 기록합니다.
+[이전 접근 제한 인계](45_browser_validation_handoff.ko.md)는 당시 기록으로 유지합니다.
+[컨트롤 디자인 통일](47_control_design_consistency.ko.md)은 공통 파일 선택·폼·버튼,
+시나리오 패널 배치와 SVG 아이콘 수정의 실제 검수 결과를 기록합니다.
+
 | 하고 싶은 일 | 안내 |
 | --- | --- |
 | Spring Boot 앱에 설치하기 | [연동과 설정](17_integration_guide.ko.md) |
@@ -37,6 +45,14 @@ CLI `diff`는 코드 관계를, 대시보드 비교는 보관 HTTP 통계를 비
 | [Examples](../examples/README.ko.md) | 로컬 데모와 합성 지연·실패 요청 |
 
 ## 설계와 검증 근거
+
+- [PR 마무리 검증](40_finalization.ko.md): 회귀 검증·기한부 보안 예외·미완료 화면 검증 구분.
+
+- [미출시 재테스트 워크플로](39_retest_workflow.ko.md): 시나리오 저장·불러오기, 외부 계획, 제한된 로컬 실행, 결과/관측 이력.
+
+- [미출시 규모별 보기 연결](37_scale_views.ko.md): 시간 분포 → 그룹 → 일치하는 요청 상세, 보관 범위·누락 명시.
+
+- [미출시 API workspace](34_api_workspace.ko.md), [개발 계획](33_api_workspace_plan.ko.md): 그룹 탐색·보관 통계·테스트 대상 선택.
 
 - [0.4.2 최신 화면 촬영](32_current_screenshot_capture.ko.md): 실제 예제 요청·기본 기록 옵션·브라우저 검증.
 - [현재 아키텍처](02_architecture.ko.md), [버전·호환성 정책](20_versioning_and_compatibility.ko.md).

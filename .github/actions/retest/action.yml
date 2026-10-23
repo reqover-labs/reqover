@@ -1,0 +1,90 @@
+name: Reqover saved scenario checks
+description: Start an owned loopback JVM, check a reviewed scenario and publish results. Requires Java 17+, Python 3.9+ and Bash.
+inputs:
+  cli-jar:
+    description: Source-built CLI with the unreleased run commands.
+    required: true
+  app-jar:
+    description: Disposable test application JAR; accepts Spring server.address and server.port options.
+    required: true
+  scenario:
+    description: Reviewed Reqover scenario schema-1 JSON.
+    required: true
+  confirm-local:
+    description: Set true to confirm this disposable loopback application may receive GET/HEAD requests.
+    default: 'false'
+  port:
+    description: Free loopback port for this job.
+    default: '18082'
+  ready-path:
+    description: Local path that returns HTTP 200 when the application is ready. Redirects are refused.
+    default: /reqover/report
+  repeat:
+    description: Sequential repetitions, 1-10.
+    default: '1'
+  baseline:
+    description: Optional explicit previous run-result JSON. Different conditions remain labelled in the comparison.
+    default: ''
+  upload-artifact:
+    description: Opt in after reviewing the recorded paths and metadata for sharing.
+    default: 'false'
+  artifact-name:
+    description: Unique name for each invocation or matrix job.
+    default: reqover-retest
+outputs:
+  outcome:
+    description: PASS, TEST_FAILED or an input/startup/execution error state.
+    value: ${{ steps.execute.outputs.outcome }}
+  directory:
+    description: Directory holding summary and available result files on this runner.
+    value: ${{ steps.execute.outputs.directory }}
+  artifact-url:
+    description: Uploaded artifact URL when opted in.
+    value: ${{ steps.upload.outputs.artifact-url }}
+runs:
+  using: composite
+  steps:
+    - name: Start application and check saved scenario
+      id: execute
+      continue-on-error: true
+      shell: bash
+      env:
+        CLI_JAR: ${{ inputs.cli-jar }}
+        APP_JAR: ${{ inputs.app-jar }}
+        SCENARIO: ${{ inputs.scenario }}
+        CONFIRM_LOCAL: ${{ inputs.confirm-local }}
+        PORT: ${{ inputs.port }}
+        READY_PATH: ${{ inputs.ready-path }}
+        REPEAT: ${{ inputs.repeat }}
+        BASELINE: ${{ inputs.baseline }}
+      run: |
+        set -euo pipefail
+        args=(--cli "$CLI_JAR" --app-jar "$APP_JAR" --scenario "$SCENARIO" --port "$PORT" --ready-path "$READY_PATH" --repeat "$REPEAT")
+        if [ "$CONFIRM_LOCAL" = true ]; then args+=(--confirm-local); fi
+        if [ -n "$BASELINE" ]; then args+=(--baseline "$BASELINE"); fi
+        python3 "$GITHUB_ACTION_PATH/../../../scripts/run-retest-ci.py" "${args[@]}"
+    - name: Upload reviewed result artifacts even on test failure
+      id: upload
+      if: ${{ always() && inputs.upload-artifact == 'true' && steps.execute.outputs.directory != '' }}
+      uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+      with:
+        name: ${{ inputs.artifact-name }}
+        path: |
+          ${{ steps.execute.outputs.directory }}/summary.json
+          ${{ steps.execute.outputs.directory }}/summary.md
+          ${{ steps.execute.outputs.directory }}/result.json
+          ${{ steps.execute.outputs.directory }}/result.html
+          ${{ steps.execute.outputs.directory }}/comparison.html
+        if-no-files-found: error
+        retention-days: 7
+    - name: Apply test result gate
+      if: ${{ always() }}
+      shell: bash
+      env:
+        RESULT_CODE: ${{ steps.execute.outputs.exit-code || '2' }}
+      run: |
+        case "$RESULT_CODE" in
+          0) exit 0 ;;
+          1) echo '::error::Scenario assertions failed or planned attempts were not completed.'; exit 1 ;;
+          *) echo '::error::Scenario input, application startup or execution setup failed.'; exit 2 ;;
+        esac

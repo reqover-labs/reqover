@@ -31,6 +31,55 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class DiagnosticDashboardTest {
     @Test
+    void appliesSharedSizingAndDecorativeSemanticsToMultilineSvgIcons() {
+        for (String name : List.of("upload", "download", "x", "network")) {
+            String icon = DiagnosticDashboard.icon(name);
+            assertTrue(icon.startsWith("<svg class=\"ui-icon\" aria-hidden=\"true\" "),
+                    "Multiline SVG roots must receive the shared icon class: " + name);
+        }
+    }
+
+    @Test
+    void keepsAccessibleNativeFileInputsAndTheirImportContractsInSharedControls() {
+        String html = new HtmlCoverageReportRenderer().render(ReportFixtures.twoEndpointReport());
+        Map<String, String> imports = Map.of(
+                "scenario-import", "Import scenario",
+                "scenario-runs-import", "Import runs / history",
+                "recording-import", "Import recording / catalog",
+                "reqover-baseline-file", "Import baseline JSON");
+        imports.forEach((id, label) -> {
+            var input = Pattern.compile("<input\\b[^>]*\\bid=\"" + id + "\"[^>]*>").matcher(html);
+            assertTrue(input.find(), "Keep the native input bound to the existing controller: " + id);
+            String tag = input.group();
+            assertTrue(tag.contains("type=\"file\""));
+            assertTrue(tag.contains("accept=\".json,application/json\""));
+            assertTrue(tag.contains("aria-label=\"" + label + "\""), "Name the focusable input itself");
+            assertFalse(tag.contains("sr-only"), "File picker focus must cover its visible control");
+            assertFalse(tag.contains("tabindex=\"-1\""));
+            assertTrue(html.contains("class=\"file-picker\" for=\"" + id + "\""));
+            assertEquals(id.equals("scenario-runs-import") || id.equals("recording-import"),
+                    Pattern.compile("\\bmultiple\\b").matcher(tag).find());
+        });
+    }
+
+    @Test
+    void providesSeparateApiWorkspaceWithBoundedDraftSources() {
+        String html = new HtmlCoverageReportRenderer().render(report(List.of(request("r1", "GET /orders/{id}"))));
+        assertTrue(html.contains("href=\"#api-workspace\""));
+        assertTrue(html.contains("id=\"api-workspace\" hidden"));
+        assertTrue(html.contains("id=\"api-select-page\""));
+        assertTrue(html.contains("id=\"api-export\""));
+        assertTrue(html.contains("id=\"api-reset\""));
+        assertTrue(html.contains("id=\"api-group-clear\""));
+        assertTrue(html.contains("id=\"api-source-count\""));
+        assertTrue(html.contains("id=\"api-heatmap\""));
+        assertTrue(html.contains("data-api-view=\"distribution\""));
+        assertTrue(html.contains("id=\"reqover-case-message\""));
+        assertTrue(html.contains("reqover-http-test-draft-bundle"));
+        assertTrue(html.contains("Group p95 is not calculated from API percentiles"));
+    }
+
+    @Test
     void providesAnOfflineWorkspaceAndAccessibleControls() {
         String html = new HtmlCoverageReportRenderer().render(report(List.of(request("r1", "GET /orders/{id}"))));
         assertTrue(html.contains("class=\"dashboard-sidebar\""));
@@ -83,6 +132,9 @@ class DiagnosticDashboardTest {
         assertEquals(100, retained.size());
         assertEquals("r149", Json.string(Json.object(retained.get(0), "request"), "requestId"));
         assertEquals("r50", Json.string(Json.object(retained.get(99), "request"), "requestId"));
+        var match = Pattern.compile("<script type=\"application/json\" id=\"reqover-time-data\">(.*?)</script>", Pattern.DOTALL).matcher(new HtmlCoverageReportRenderer().render(report(requests)));
+        assertTrue(match.find());
+        assertEquals(150, Json.integer(Json.object(Json.parse(match.group(1)), "distribution"), "displayedCount"));
     }
 
     @Test

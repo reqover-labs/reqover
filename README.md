@@ -71,6 +71,41 @@ Reqover records **the methods observed during each request's adapter scope, kept
 
 ## Slow and failing requests, before you deploy
 
+> **Unreleased source development:** [API workspace](docs/34_api_workspace.md) adds path-group summaries, sortable/filterable API statistics, persistent-in-page checkbox selection, and representative-request draft bundles. Published 0.4.2 artifacts do not include it yet; existing request and retest maps remain unchanged.
+
+The [usability follow-up](docs/35_dashboard_usability_review.md) adds clearable filters,
+source availability and deduplicated draft creation.
+The unreleased [scale views](docs/37_scale_views.md) connect retained time/interval
+distribution -> path groups -> API statistics -> matching request maps.
+The unreleased [retest workflow](docs/39_retest_workflow.md) adds scenario files,
+Postman/JMeter export, explicitly confirmed local CLI checks, result reports and
+separate run/recording histories. It is not faithful replay or a load generator.
+
+The [workspace follow-up](docs/41_workspace_followup.md) fixes exact API links,
+history selection preservation, self-comparison guards and empty/invalid states.
+The [rendered browser review](docs/46_rendered_browser_review.md) covers synthetic
+scale fixtures, narrow viewports, light/dark themes, keyboard use and actual downloads.
+
+The [scrolling and CI follow-up](docs/44_ci_retest.md) adds theme-aware scrollbars,
+a short-window sidebar and a [saved-scenario Action](.github/actions/retest/README.md)
+with owned-app startup/cleanup, Job Summary and opt-in JSON/HTML artifacts.
+
+After the user lifted the earlier retry prohibition, direct in-app browser access
+succeeded. Review found and fixed stale Scenario/Run history messages appearing
+in another subview. Real mobile
+devices and exhaustive visual combinations remain outside this review.
+The [earlier handoff](docs/45_browser_validation_handoff.md) is retained as history.
+
+The [control design follow-up](docs/47_control_design_consistency.md) unifies file
+pickers, buttons, inputs and focus states, and separates scenario and export panels.
+Java 106 and Node 48 tests passed; all four file inputs and light/dark/narrow layouts
+were exercised in the rendered browser.
+
+[Finalization status](docs/40_finalization.md): automated regression and dependency
+policy checks are separate from the [rendered review and its limits](docs/46_rendered_browser_review.md). Spring
+advisories have [explicit expiring exceptions](SECURITY.md#dependency-advisories),
+not a patched dependency or a zero-advisory guarantee.
+
 Since 0.4.0 the report is an offline dashboard. Open it from the report endpoint,
 from the file the application exports on shutdown, or with `reqover render`.
 

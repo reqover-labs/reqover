@@ -27,6 +27,9 @@ import io.reqover.report.ImpactReport;
 import io.reqover.report.ImpactReportRenderer;
 import io.reqover.report.ReportDiff;
 import io.reqover.report.ReportDiffRenderer;
+import io.reqover.report.TestScenario;
+import io.reqover.report.ScenarioRun;
+import io.reqover.report.RecordingArchive;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -41,8 +44,9 @@ import java.util.List;
 /**
  * Command line front end for reports that were written to disk.
  *
- * <p>Everything here reads a report produced by a running application; the CLI
- * never instruments anything itself. Its reason to exist is CI: turning a
+ * <p>Coverage commands read reports; explicitly confirmed scenario commands
+ * perform bounded local checks. The CLI never instruments anything itself.
+ * Its CI role is turning a
  * recorded report plus a list of changed files into a reviewable answer, and
  * into an exit code a pipeline can gate on.
  */
@@ -72,6 +76,13 @@ public final class ReqoverCli {
                 case "render" -> render(args, out);
                 case "diff" -> diff(args, out);
                 case "impact" -> impact(args, out, stdin);
+                case "run" -> runScenario(args,out);
+                case "runs" -> runs(args,out);
+                case "run-report" -> runReport(args,out);
+                case "run-compare" -> runCompare(args,out);
+                case "recording-save" -> recordingSave(args,out);
+                case "recordings" -> recordings(args,out);
+                case "recording-report" -> recordingReport(args,out);
                 case "help", "--help", "-h" -> {
                     printUsage(out);
                     yield EXIT_OK;
@@ -98,6 +109,61 @@ public final class ReqoverCli {
         String html = new HtmlCoverageReportRenderer().render(report);
         emit(arguments.optional("out", null), html, out);
         return EXIT_OK;
+    }
+
+    private static String readRunInput(String file) {
+        try { if(Files.size(Path.of(file))>1_048_576)throw new CliException("scenario/run input exceeds 1 MiB"); }
+        catch(IOException e){throw new CliException("cannot read "+file,e);}
+        return readFile(Path.of(file));
+    }
+    private static int runScenario(String[] args,PrintStream out) {
+        var options=CliArguments.parse(args,1,List.of("scenario","base-url","history-dir","repeat"),List.of("confirm-local"));
+        if(!options.flag("confirm-local"))throw new CliException("--confirm-local is required; use a disposable local target");
+        var scenario=TestScenario.read(readRunInput(options.require("scenario")));
+        var origin=java.net.URI.create(options.require("base-url"));
+        int repeat=Integer.parseInt(options.optional("repeat","1"));
+        LocalScenarioRunner.validate(scenario,origin,repeat,true);
+        Path directory=Path.of(options.optional("history-dir",".reqover/runs"));
+        try {
+            Files.createDirectories(directory);
+            Path probe=Files.createTempFile(directory,".reqover-write-check-",".tmp");Files.delete(probe);
+            var result=LocalScenarioRunner.run(scenario,origin,repeat,true);
+            Path saved=RunHistory.save(directory,result);
+            out.println("Saved "+saved);out.println(result.passedCount()+" passed / "+(result.attempts().size()-result.passedCount())+" failed / "+(result.plannedAttempts()-result.attempts().size())+" not run");
+            return result.passedCount()==result.plannedAttempts()?EXIT_OK:EXIT_GATE_FAILED;
+        } catch(IOException e){throw new CliException("cannot write run history; a partial result file may exist",e);}
+    }
+    private static int runs(String[] args,PrintStream out) {
+        var options=CliArguments.parse(args,1,List.of("history-dir","out"),List.of());
+        try { emit(options.optional("out",null),RunHistory.list(Path.of(options.optional("history-dir",".reqover/runs"))),out);return EXIT_OK; }
+        catch(IOException e){throw new CliException("cannot read run history",e);}
+    }
+    private static int runReport(String[] args,PrintStream out) {
+        var options=CliArguments.parse(args,1,List.of("result","out"),List.of());
+        emit(options.optional("out",null),ScenarioRun.read(readRunInput(options.require("result"))).html(),out);return EXIT_OK;
+    }
+    private static int runCompare(String[] args,PrintStream out) {
+        var options=CliArguments.parse(args,1,List.of("baseline","current","out"),List.of());
+        emit(options.optional("out",null),ScenarioRun.compare(ScenarioRun.read(readRunInput(options.require("baseline"))),ScenarioRun.read(readRunInput(options.require("current")))),out);return EXIT_OK;
+    }
+    private static int recordingSave(String[] args,PrintStream out) {
+        var options=CliArguments.parse(args,1,List.of("report","name","environment","revision","history-dir"),List.of());
+        String file=options.require("report");
+        try {if(Files.size(Path.of(file))>10485760)throw new CliException("Recording input exceeds 10 MiB");
+            var entry=RecordingArchive.create(readFile(Path.of(file)),options.require("name"),options.optional("environment",""),options.optional("revision",""));
+            out.println("Saved "+RecordingHistory.save(Path.of(options.optional("history-dir",".reqover/recordings")),entry));return EXIT_OK;
+        } catch(IOException e){throw new CliException("Cannot save recording archive; a partial file may exist",e);}
+    }
+    private static int recordings(String[] args,PrintStream out) {
+        var options=CliArguments.parse(args,1,List.of("history-dir","out"),List.of());
+        try {emit(options.optional("out",null),RecordingHistory.list(Path.of(options.optional("history-dir",".reqover/recordings"))),out);return EXIT_OK;}
+        catch(IOException e){throw new CliException("Cannot read recording history",e);}
+    }
+    private static int recordingReport(String[] args,PrintStream out) {
+        var options=CliArguments.parse(args,1,List.of("entry","out"),List.of());String file=options.require("entry");
+        try {if(Files.size(Path.of(file))>20971520)throw new CliException("Recording archive exceeds 20 MiB");}
+        catch(IOException e){throw new CliException("Cannot read recording archive",e);}
+        emit(options.optional("out",null),RecordingArchive.read(readFile(Path.of(file))).html(),out);return EXIT_OK;
     }
 
     private static int diff(String[] args, PrintStream out) {
@@ -225,6 +291,15 @@ public final class ReqoverCli {
                 reqover — read a recorded Reqover report
 
                 Usage:
+                  reqover recording-save --report <coverage.json> --name <label>
+                              [--environment local] [--revision <git SHA>] [--history-dir .reqover/recordings]
+                  reqover recordings [--history-dir .reqover/recordings] [--out catalog.json]
+                  reqover recording-report --entry <recording.json> [--out recording.html]
+                  reqover run --scenario <scenario.json> --base-url <http://127.0.0.1:port>
+                              --confirm-local [--repeat 1-10] [--history-dir .reqover/runs]
+                  reqover runs [--history-dir .reqover/runs] [--out history.json]
+                  reqover run-report --result <run.json> [--out run.html]
+                  reqover run-compare --baseline <run.json> --current <run.json> [--out compare.html]
                   reqover render  --report <report.json> [--out <report.html>]
                   reqover diff    --baseline <a.json> --current <b.json>
                                   [--format text|markdown] [--out <file>] [--fail-on-change]
@@ -243,7 +318,7 @@ public final class ReqoverCli {
                     | reqover impact --report build/reqover-report.json \\
                         --changed-files - --format markdown
 
-                Exit codes: 0 success · 1 a --fail-on-* gate tripped · 2 bad usage or input.
+                Exit codes: 0 success · 1 a --fail-on-* gate tripped or local checks failed/incomplete · 2 bad usage or input.
                 """);
     }
 }

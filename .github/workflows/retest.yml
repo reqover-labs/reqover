@@ -1,0 +1,47 @@
+name: saved scenario checks
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: retest-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  saved-scenarios:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-java@de7274f081f381c8f8158605e0321c36c376e2e6 # v6.0.1
+        with:
+          distribution: temurin
+          java-version: '21'
+      - uses: gradle/actions/setup-gradle@3f5f9adaf7d9fecd50b5935e54106014257a94e6 # v6.4.0
+      - name: Build source CLI and disposable sample
+        run: ./gradlew :reqover-cli:shadowJar :examples:mvc-sample:bootJar --no-daemon --console=plain
+      - name: Resolve source artifact paths
+        id: jars
+        run: |
+          version="$(./gradlew properties -q --no-daemon --console=plain | sed -n 's/^version: //p')"
+          test -n "$version"
+          echo "cli=reqover-cli/build/libs/reqover-cli-${version}.jar" >> "$GITHUB_OUTPUT"
+          echo "app=examples/mvc-sample/build/libs/mvc-sample-${version}.jar" >> "$GITHUB_OUTPUT"
+      - name: Check runner failure modes and cleanup
+        env:
+          CLI: ${{ steps.jars.outputs.cli }}
+          APP: ${{ steps.jars.outputs.app }}
+        run: python3 scripts/test-retest-ci.py --cli "$CLI" --app "$APP"
+      - name: Execute the saved scenario
+        uses: ./.github/actions/retest
+        with:
+          cli-jar: ${{ steps.jars.outputs.cli }}
+          app-jar: ${{ steps.jars.outputs.app }}
+          scenario: .github/scenarios/mvc-smoke.json
+          confirm-local: 'true'
+          upload-artifact: 'true'
+          artifact-name: mvc-scenario-results

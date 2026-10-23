@@ -27,6 +27,16 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 
 class TestCaseDraftHtmlTest {
+    @Test void providesScenarioAndHistoryWorkspaceEvenWithoutRecordedRequests() {
+        String html=new HtmlCoverageReportRenderer().render(ReportFixtures.twoEndpointReport());
+        assertTrue(html.contains("href=\"#scenario-workspace\""));
+        assertTrue(html.contains("id=\"scenario-import\""));
+        assertTrue(html.contains("id=\"scenario-runs-import\""));
+        assertTrue(html.contains("id=\"scenario-validation\""));
+        assertTrue(html.contains("root.ReqoverScenarios"));
+        assertTrue(html.contains("root.ReqoverScenarioResults"));
+        assertTrue(html.contains("id=\"reqover-case-path\""));
+    }
     @Test
     void embedsAnOfflineReviewEditorAndGeneratorBeforeDashboardInitialization() {
         CoverageReport report = new CoverageReport(Instant.EPOCH, 1, List.of(), List.of(), List.of(

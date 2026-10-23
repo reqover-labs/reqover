@@ -71,6 +71,38 @@ Reqover는 **어댑터가 관측하는 요청 구간에서 실행된 메서드�
 
 ## 배포 전에 느린 요청과 실패한 요청 찾기
 
+> **미출시 소스 개발:** [API workspace](docs/34_api_workspace.ko.md)에 경로 그룹 요약, 정렬·필터·페이지 탐색, 체크박스 선택 유지와 대표 요청 기반 초안 묶음을 추가했습니다. 배포된 0.4.2에는 아직 없으며 기존 요청·재테스트 관계도는 유지합니다.
+
+[사용성 후속 보완](docs/35_dashboard_usability_review.ko.md)으로 필터 해제·초안 출처 안내·
+중복 생성 방지를 추가했습니다.
+미출시 [규모별 보기](docs/37_scale_views.ko.md)는 시간·처리 구간 분포 → 경로 그룹 →
+API 통계 → 같은 범위의 요청 관계도로 연결합니다.
+미출시 [재테스트 워크플로](docs/39_retest_workflow.ko.md)에 시나리오 파일·Postman/JMeter
+내보내기·동의한 로컬 CLI 실행·결과 리포트·실행/관측 이력을 추가했습니다.
+원래 트래픽을 그대로 재현하거나 동시 부하를 생성하는 기능은 아닙니다.
+
+[선택·비교 사용성 보완](docs/41_workspace_followup.ko.md)은 정확한 API 링크, 이력 선택 유지,
+동일 기록 비교 방지와 빈 상태·시나리오 오류 표시를 다룹니다.
+[실제 브라우저 검수](docs/46_rendered_browser_review.ko.md)에서 합성 규모별 기록·좁은 창·
+라이트/다크·키보드·실제 다운로드를 확인했습니다.
+
+[사이드 스크롤·시나리오 CI](docs/44_ci_retest.ko.md)에 메뉴/스크롤 보완과 저장 시나리오를
+테스트 앱에서 실행하는 [retest Action](.github/actions/retest/README.ko.md)을 추가했습니다.
+실행 결과는 Job Summary와 선택적 JSON/HTML artifact로 확인합니다.
+
+사용자가 이전 재시도 금지를 해제한 뒤 내부 브라우저에서 직접 접속이 성공했습니다.
+검수 중 다른 하위 보기에 남는 Scenario/실행 이력 작업 메시지를 수정했고,
+실제 모바일 기기와 모든 시각 조합의
+검수까지 완료한 것은 아닙니다. [이전 인계 기록](docs/45_browser_validation_handoff.ko.md)은 이력으로 유지합니다.
+
+[컨트롤 디자인 통일](docs/47_control_design_consistency.ko.md)로 파일 선택·버튼·입력·초점의
+공통 규격과 시나리오/내보내기 패널 배치를 정리했습니다. 최신 Java 106개·Node 48개가
+통과했고, 네 파일 입력과 라이트/다크·좁은 화면을 실제 브라우저에서 확인했습니다.
+
+[마무리 검증 기록](docs/40_finalization.ko.md)의 자동 회귀 검사와
+[최신 화면 검수 범위·한계](docs/46_rendered_browser_review.ko.md)를 구분합니다. Spring 보안 공지는 [기한부 예외](SECURITY.md#dependency-advisories)로
+관리하며, 라이브러리 패치 완료나 알려진 취약점 0건을 의미하지 않습니다.
+
 0.4.0부터 리포트는 서버 없이 열리는 대시보드입니다. 리포트 엔드포인트, 종료 시 내보낸
 파일, `reqover render` 중 어느 쪽으로든 열 수 있습니다.
 

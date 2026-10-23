@@ -2,6 +2,14 @@
 
 # Documentation
 
+The latest unreleased PR #53 changes are tracked in the [workspace follow-up](41_workspace_followup.md).
+See also [scrolling and saved-scenario CI](44_ci_retest.md) and the [release checklist](43_release_readiness.ko.md).
+The latest [rendered browser review](46_rendered_browser_review.md) records eight
+UI flows, actual downloads, a stale-feedback fix and the remaining visual limits.
+The [earlier restricted handoff](45_browser_validation_handoff.md) remains historical evidence.
+The [control design follow-up](47_control_design_consistency.md) records shared file
+pickers/forms/buttons, scenario panel layout and the multiline SVG fix.
+
 Current usage is based on **0.4.2**. Libraries are on Maven Central under
 `io.github.reqover-labs`; agent and CLI executables are in the
 [GitHub release](https://github.com/reqover-labs/reqover/releases/tag/v0.4.2).
@@ -37,6 +45,14 @@ Endpoint aggregates and the retained/detail-export windows are different scopes.
 | [Examples](../examples/README.md) | Loopback demos and synthetic failure/slow requests |
 
 ## Design and Evidence
+
+- [PR finalization](40_finalization.md): regression evidence, expiring security exceptions and pending browser QA.
+
+- [Unreleased retest workflow](39_retest_workflow.md): scenario save/import, external plans, bounded local CLI checks, result/recording archives.
+
+- [Unreleased connected scale views](37_scale_views.md): time distribution -> groups -> matching request details, with explicit retained-data bounds.
+
+- [Unreleased API workspace](34_api_workspace.md) and [implementation plan](33_api_workspace_plan.md): path groups, retained statistics and explicit test-target selection.
 
 - [Current 0.4.2 screenshot capture](32_current_screenshot_capture.md): real sample requests, default recording options and browser checks.
 - [Current architecture](02_architecture.md) and [compatibility policy](20_versioning_and_compatibility.md).

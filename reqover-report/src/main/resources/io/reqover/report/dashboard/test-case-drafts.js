@@ -136,5 +136,17 @@
     return source.join('\n');
   }
 
-  return { create: create, update: update, problems: problems, junit: junit };
+  function addDrafts(existing, incoming) {
+    var next = existing.slice(), added = 0, reused = 0, activeIndex = -1;
+    function identity(source) { return JSON.stringify([source.endpoint, source.requestId, source.startedAt]); }
+    var indices = new Map(next.map(function (draft, index) { return [identity(draft.source), index]; }));
+    incoming.forEach(function (draft) {
+      var key = identity(draft.source);
+      if (indices.has(key)) { activeIndex = indices.get(key); reused++; }
+      else { activeIndex = next.length; next.push(draft); indices.set(key, activeIndex); added++; }
+    });
+    return { drafts: next, activeIndex: activeIndex, added: added, reused: reused };
+  }
+  function addUnique(existing, requests) { return addDrafts(existing, requests.map(create)); }
+  return { create: create, update: update, problems: problems, junit: junit, addUnique: addUnique, addDrafts:addDrafts, validPath: validPath };
 });

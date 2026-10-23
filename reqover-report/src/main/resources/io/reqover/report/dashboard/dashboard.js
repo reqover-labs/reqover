@@ -141,8 +141,7 @@
     var a = el('a', 'inspector-endpoint', endpoint);
     a.href = '#endpoint-code';
     a.addEventListener('click', function () {
-      search.value = endpoint;
-      search.dispatchEvent(new Event('input'));
+      window.ReqoverFilter.selectEndpoint(endpoint);
       showView('endpoint-code');
     });
     return a;

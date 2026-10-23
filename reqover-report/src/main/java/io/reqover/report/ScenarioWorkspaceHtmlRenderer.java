@@ -24,6 +24,7 @@ final class ScenarioWorkspaceHtmlRenderer {
                     <button type="button" id="scenario-command">Download local run command</button>
                   </div>
                   <p id="scenario-count" class="graph-legend" role="status"></p>
+                  <p id="scenario-validation" class="case-problems" role="status"></p>
                   </div>
                   <div id="scenario-runs-panel" hidden>
                   <div class="scenario-history-heading"><h3>Loaded run history</h3><span id="scenario-history-count"></span></div>

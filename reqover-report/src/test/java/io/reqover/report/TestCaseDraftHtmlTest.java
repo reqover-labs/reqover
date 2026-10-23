@@ -32,6 +32,7 @@ class TestCaseDraftHtmlTest {
         assertTrue(html.contains("href=\"#scenario-workspace\""));
         assertTrue(html.contains("id=\"scenario-import\""));
         assertTrue(html.contains("id=\"scenario-runs-import\""));
+        assertTrue(html.contains("id=\"scenario-validation\""));
         assertTrue(html.contains("root.ReqoverScenarios"));
         assertTrue(html.contains("root.ReqoverScenarioResults"));
         assertTrue(html.contains("id=\"reqover-case-path\""));

@@ -3,7 +3,7 @@
   'use strict';
   if(!document.getElementById('scenario-workspace')){return;}
   const scenarios=window.ReqoverScenarios,results=window.ReqoverScenarioResults;
-  let runs=[];
+  let runs=[],historyInitialized=false;
   const byId=id=>document.getElementById('scenario-'+id);
   const el=(tag,text)=>{const node=document.createElement(tag);if(text!==undefined)node.textContent=String(text);return node;};
   const time=value=>value===null?'Not measured':value.toFixed(2)+' ms';
@@ -21,7 +21,8 @@
     const ready=values.filter(d=>window.ReqoverTestDrafts.problems(d).length===0).length;
     byId('count').textContent=values.length+' cases / '+ready+' reviewed and executable / '+(values.length-ready)+' require review or removal';
     byId('review').disabled=!values.length;
-    let valid=false,saveable=false;try{const saved=scenario();saveable=true;scenarios.runnable(saved);valid=true;}catch(_){}
+    let valid=false,saveable=false,problem='';try{const saved=scenario();saveable=true;scenarios.runnable(saved);valid=true;}catch(error){problem=error.message;}
+    byId('validation').textContent=values.length?problem:'No test cases loaded.';
     byId('save').disabled=!saveable;
     ['postman','jmeter','command'].forEach(id=>byId(id).disabled=!valid);
   }
@@ -42,11 +43,15 @@
   function renderHistory(){
     const currentId=byId('current').value,baselineId=byId('baseline').value;
     ['current','baseline'].forEach(id=>{byId(id).replaceChildren(el('option','Not selected'));byId(id).firstChild.value='';runs.forEach(run=>{const option=el('option',run.scenario.name+' / '+run.startedAt+' / '+run.scenario.revision);option.value=run.runId;byId(id).append(option);});});
-    byId('current').value=runs.some(r=>r.runId===currentId)?currentId:runs[0]?.runId||'';
-    byId('baseline').value=runs.some(r=>r.runId===baselineId)?baselineId:runs[1]?.runId||'';
+    const defaults=!historyInitialized&&runs.length>0;
+    byId('current').value=defaults?runs[0].runId:runs.some(r=>r.runId===currentId)?currentId:'';
+    byId('baseline').value=defaults?(runs[1]?.runId||''):runs.some(r=>r.runId===baselineId)?baselineId:'';
+    if(defaults)historyInitialized=true;
     byId('history-count').textContent=runs.length+' loaded runs / maximum 20';byId('history-save').disabled=!runs.length;
-    byId('history-rows').replaceChildren();const query=byId('history-filter').value.toLowerCase();
-    runs.filter(run=>[run.scenario.name,run.scenario.environment,run.scenario.revision,run.runId,run.origin].join(' ').toLowerCase().includes(query)).forEach(run=>{
+    byId('history-rows').replaceChildren();const query=byId('history-filter').value.trim().toLowerCase();
+    const visible=runs.filter(run=>[run.scenario.name,run.scenario.environment,run.scenario.revision,run.runId,run.origin].join(' ').toLowerCase().includes(query));
+    if(!visible.length){const row=el('tr'),cell=el('td',runs.length?'No runs match this search.':'No runs loaded.');cell.setAttribute('colspan','5');row.append(cell);byId('history-rows').append(row);}
+    visible.forEach(run=>{
       const s=results.summary(run),row=el('tr'),name=el('td',run.scenario.name);name.append(el('small',run.scenario.environment+' / '+run.scenario.revision));row.append(name,el('td',run.startedAt),el('td',s.passed+' / '+s.failed+' / '+s.notRun),el('td',time(s.averageMillis)+' / '+time(s.p95Millis)));
       const actions=el('td'),current=el('button','Current'),remove=el('button','Remove loaded run');current.type=remove.type='button';
       current.addEventListener('click',()=>{byId('current').value=run.runId;renderResults();});
@@ -56,11 +61,13 @@
   }
   function renderResults(){
     byId('run-summary').replaceChildren();byId('comparison-warnings').replaceChildren();byId('comparison-rows').replaceChildren();byId('attempt-rows').replaceChildren();
-    const current=runs.find(r=>r.runId===byId('current').value),baseline=runs.find(r=>r.runId===byId('baseline').value);
-    if(!current){byId('attempt-count').textContent='No run selected.';return;}
+    const current=runs.find(r=>r.runId===byId('current').value),selectedBaseline=runs.find(r=>r.runId===byId('baseline').value);
+    if(!current){byId('attempt-count').textContent=runs.length?'Select a current run.':'No runs loaded.';return;}
+    const sameRun=selectedBaseline?.runId===current.runId,baseline=sameRun?null:selectedBaseline;
     const s=results.summary(current);
     [['Passed',s.passed],['Failed assertions',s.failed],['Not run',s.notRun],['Client p95',time(s.p95Millis)]].forEach(pair=>{const metric=el('div');metric.append(el('span',pair[0]),el('strong',pair[1]));byId('run-summary').append(metric);});
     const warnings=baseline?results.compare(baseline,current).warnings:['Imported files are not authenticated execution evidence. Client attempt time is not server adapter time.'];
+    if(sameRun)warnings.push('Select a different run as baseline; the current run cannot be compared with itself.');
     warnings.forEach(w=>byId('comparison-warnings').append(el('li',w)));
     if(baseline){const b=results.summary(baseline);[['Attempts',b.attempts,s.attempts],['Passed',b.passed,s.passed],['Failed assertions',b.failed,s.failed],['Client average',time(b.averageMillis),time(s.averageMillis)],['Client p95',time(b.p95Millis),time(s.p95Millis)]].forEach(values=>{const row=el('tr');values.forEach(v=>row.append(el('td',v)));byId('comparison-rows').append(row);});}
     byId('attempt-count').textContent=Math.min(100,current.attempts.length)+' of '+current.attempts.length+' attempt details / '+current.completion;

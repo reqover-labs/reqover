@@ -6,6 +6,19 @@ const fs = require('node:fs');
 const vm = require('node:vm');
 const source = fs.readFileSync('reqover-report/src/main/java/io/reqover/report/HtmlCoverageReportRenderer.java', 'utf8');
 const script = source.match(/private static final String FILTER_SCRIPT = """([\s\S]*?)""";/)[1].replace('<script>', '').replace('</script>', '');
+
+test('map inspector endpoint links use exact API selection', () => {
+  const dashboard = fs.readFileSync('reqover-report/src/main/resources/io/reqover/report/dashboard/dashboard.js', 'utf8');
+  const linkFunction = dashboard.slice(dashboard.indexOf('  function endpointLink('), dashboard.indexOf('  function inspectEndpoint('));
+  let handler, selected, view;
+  const context = { el: () => ({ addEventListener: (_, listener) => { handler = listener; } }),
+    window: { ReqoverFilter: { selectEndpoint: endpoint => { selected = endpoint; } } },
+    showView: value => { view = value; }, search: { dispatchEvent() {} }, Event: class {} };
+  vm.runInNewContext(linkFunction + '; endpointLink("GET /orders/1");', context);
+  handler();
+  assert.equal(selected, 'GET /orders/1');
+  assert.equal(view, 'endpoint-code');
+});
 test('API navigation is exact while manual search remains a substring filter', () => {
   const listeners = {};
   const input = { value: '', addEventListener: (name, handler) => { listeners[name] = handler; } };

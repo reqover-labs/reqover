@@ -2,6 +2,9 @@
 
 # PR #53 browser validation handoff
 
+> Historical record at `7f4762b`. The user subsequently lifted the retry prohibition,
+> and direct access succeeded. See [review 46](46_rendered_browser_review.md) for current evidence and limits.
+
 October 23, 2026 (KST). Target: unreleased `codex/api-group-workspace`, `d8d7a6d`.
 This follow-up changes documentation only; rendered UI validation is still pending.
 

@@ -74,7 +74,7 @@ Reqover records **the methods observed during each request's adapter scope, kept
 > **Unreleased source development:** [API workspace](docs/34_api_workspace.md) adds path-group summaries, sortable/filterable API statistics, persistent-in-page checkbox selection, and representative-request draft bundles. Published 0.4.2 artifacts do not include it yet; existing request and retest maps remain unchanged.
 
 The [usability follow-up](docs/35_dashboard_usability_review.md) adds clearable filters,
-source availability and deduplicated draft creation; fresh browser visual QA is pending.
+source availability and deduplicated draft creation.
 The unreleased [scale views](docs/37_scale_views.md) connect retained time/interval
 distribution -> path groups -> API statistics -> matching request maps.
 The unreleased [retest workflow](docs/39_retest_workflow.md) adds scenario files,
@@ -83,19 +83,21 @@ separate run/recording histories. It is not faithful replay or a load generator.
 
 The [workspace follow-up](docs/41_workspace_followup.md) fixes exact API links,
 history selection preservation, self-comparison guards and empty/invalid states.
-Fresh rendered-browser verification remains pending.
+The [rendered browser review](docs/46_rendered_browser_review.md) covers synthetic
+scale fixtures, narrow viewports, light/dark themes, keyboard use and actual downloads.
 
 The [scrolling and CI follow-up](docs/44_ci_retest.md) adds theme-aware scrollbars,
 a short-window sidebar and a [saved-scenario Action](.github/actions/retest/README.md)
 with owned-app startup/cleanup, Job Summary and opt-in JSON/HTML artifacts.
 
-The [browser validation handoff](docs/45_browser_validation_handoff.md) records the
-access restriction and eight manual verification flows. Java 104 and Node 48 tests
-were rerun; actual clicks, mobile layouts and downloads remain unverified. The
-blocked page was neither retried nor accessed through a workaround.
+After the user lifted the earlier retry prohibition, direct in-app browser access
+succeeded. Review found and fixed stale Scenario/Run history messages appearing
+in another subview. Java 104 and Node 48 tests passed after the fix. Real mobile
+devices and exhaustive visual combinations remain outside this review.
+The [earlier handoff](docs/45_browser_validation_handoff.md) is retained as history.
 
 [Finalization status](docs/40_finalization.md): automated regression and dependency
-policy checks are separate from the still-pending rendered browser QA. Spring
+policy checks are separate from the [rendered review and its limits](docs/46_rendered_browser_review.md). Spring
 advisories have [explicit expiring exceptions](SECURITY.md#dependency-advisories),
 not a patched dependency or a zero-advisory guarantee.
 

@@ -25,8 +25,11 @@ test('scenario workspace saves, imports review-required cases and preserves stat
   assert(get('scenario-validation').textContent.length>0,'Imported cases expose their review requirement');
   get('scenario-import').files=[{size:100,text:async()=>'{}'}];await get('scenario-import').fire('change');
   assert.equal(drafts.length,2);assert(get('scenario-message').textContent.includes('Import failed'));
+  tabs[0].fire('click');
+  assert.match(get('scenario-message').textContent,/Import failed/,'Reselecting the active view retains its actionable error');
   assert.equal(anchors[0].download,'reqover-scenario.json');
   tabs[1].fire('click');assert.equal(get('scenario-runs-panel').hidden,false);assert.equal(get('scenario-cases-panel').hidden,true);
+  assert.equal(get('scenario-message').textContent,'','Scenario import errors must not appear in run history');
   const recorded={kind:'reqover-scenario-run',schemaVersion:1,runId:'00000000-0000-0000-0000-000000000001',fingerprint:'a'.repeat(64),origin:'http://127.0.0.1:8080',startedAt:'2026-10-12T00:00:00Z',endedAt:'2026-10-12T00:00:01Z',plannedAttempts:1,completion:'COMPLETE',scenario:saved,attempts:[{caseId:'case-1',actualStatus:200,elapsedMillis:12,outcome:'PASS'}]};
   get('scenario-runs-import').files=[{size:1000,text:async()=>JSON.stringify(recorded)}];await get('scenario-runs-import').fire('change');
   assert(get('scenario-history-count').textContent.includes('1 loaded'));
@@ -48,4 +51,12 @@ test('scenario workspace saves, imports review-required cases and preserves stat
   get('scenario-runs-import').files=[{size:10,text:async()=>'{}'}];await get('scenario-runs-import').fire('change');
   assert(get('scenario-history-count').textContent.includes('2 loaded'));assert(get('scenario-message').textContent.includes('existing history preserved'));
   get('scenario-history-save').fire('click');assert.equal(anchors.at(-1).download,'reqover-history.json');
+  tabs[1].fire('click');
+  assert.match(get('scenario-message').textContent,/existing history preserved/,'Reselecting run history retains its import error');
+  tabs[2].fire('click');
+  assert.equal(get('scenario-message').textContent,'','Run history feedback must not appear in recordings');
+  assert.equal(get('scenario-current').value,recorded.runId,'Changing views preserves comparison choices');
+  assert.equal(get('scenario-baseline').value,recorded.runId);
+  tabs[1].fire('click');
+  assert(get('scenario-history-count').textContent.includes('2 loaded'),'Changing views preserves loaded history');
 });

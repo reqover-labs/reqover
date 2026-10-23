@@ -3,12 +3,13 @@
   'use strict';
   if(!document.getElementById('scenario-workspace')){return;}
   const scenarios=window.ReqoverScenarios,results=window.ReqoverScenarioResults;
-  let runs=[],historyInitialized=false;
+  let runs=[],historyInitialized=false,activeView='cases';
   const byId=id=>document.getElementById('scenario-'+id);
   const el=(tag,text)=>{const node=document.createElement(tag);if(text!==undefined)node.textContent=String(text);return node;};
   const time=value=>value===null?'Not measured':value.toFixed(2)+' ms';
   function message(value){byId('message').textContent=value;}
   document.querySelectorAll('[data-scenario-view]').forEach(button=>button.addEventListener('click',()=>{
+    if(activeView!==button.dataset.scenarioView){message('');activeView=button.dataset.scenarioView;}
     ['cases','runs','recordings'].forEach(view=>byId(view+'-panel').hidden=view!==button.dataset.scenarioView);
     document.querySelectorAll('[data-scenario-view]').forEach(b=>b.setAttribute('aria-pressed',String(b===button)));
   }));

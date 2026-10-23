@@ -84,6 +84,10 @@ API 통계 → 같은 범위의 요청 관계도로 연결합니다.
 [선택·비교 사용성 보완](docs/41_workspace_followup.ko.md)은 정확한 API 링크, 이력 선택 유지,
 동일 기록 비교 방지와 빈 상태·시나리오 오류 표시를 다룹니다. 최신 실제 화면 검증은 진행 전입니다.
 
+[사이드 스크롤·시나리오 CI](docs/44_ci_retest.ko.md)에 메뉴/스크롤 보완과 저장 시나리오를
+테스트 앱에서 실행하는 [retest Action](.github/actions/retest/README.ko.md)을 추가했습니다.
+실행 결과는 Job Summary와 선택적 JSON/HTML artifact로 확인합니다.
+
 [마무리 검증 기록](docs/40_finalization.ko.md)에서 자동 회귀 검사와 아직 남은 실제
 브라우저 화면 검증을 구분합니다. Spring 보안 공지는 [기한부 예외](SECURITY.md#dependency-advisories)로
 관리하며, 라이브러리 패치 완료나 알려진 취약점 0건을 의미하지 않습니다.

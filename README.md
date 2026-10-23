@@ -85,6 +85,10 @@ The [workspace follow-up](docs/41_workspace_followup.md) fixes exact API links,
 history selection preservation, self-comparison guards and empty/invalid states.
 Fresh rendered-browser verification remains pending.
 
+The [scrolling and CI follow-up](docs/44_ci_retest.md) adds theme-aware scrollbars,
+a short-window sidebar and a [saved-scenario Action](.github/actions/retest/README.md)
+with owned-app startup/cleanup, Job Summary and opt-in JSON/HTML artifacts.
+
 [Finalization status](docs/40_finalization.md): automated regression and dependency
 policy checks are separate from the still-pending rendered browser QA. Spring
 advisories have [explicit expiring exceptions](SECURITY.md#dependency-advisories),

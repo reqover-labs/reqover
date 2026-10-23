@@ -1,0 +1,13 @@
+{
+  "kind": "reqover-test-scenario",
+  "schemaVersion": 1,
+  "name": "Disposable MVC smoke checks",
+  "environment": "ci-loopback",
+  "revision": "example",
+  "savedAt": "2026-10-23T00:00:00Z",
+  "cases": [
+    {"id": "order-lookup", "method": "GET", "path": "/auto/orders/42", "expectedStatus": 200, "maximumClientMillis": 5000, "reviewed": true},
+    {"id": "short-delay", "method": "GET", "path": "/auto/diagnostics/delay/120", "expectedStatus": 200, "maximumClientMillis": 5000, "reviewed": true},
+    {"id": "expected-failure", "method": "GET", "path": "/auto/diagnostics/failure", "expectedStatus": 503, "maximumClientMillis": 5000, "reviewed": true}
+  ]
+}

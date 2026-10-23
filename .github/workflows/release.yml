@@ -38,6 +38,13 @@ jobs:
       - name: Verify dependency exception scope and fail-closed policy
         run: python3 scripts/test-osv-policy.py
 
+      - name: Verify dashboard models and saved-scenario runner
+        run: |
+          node --test scripts/*.test.cjs
+          version="$(./gradlew properties -q --no-daemon --console=plain | sed -n 's/^version: //p')"
+          test -n "$version"
+          python3 scripts/test-retest-ci.py --cli "reqover-cli/build/libs/reqover-cli-${version}.jar" --app "examples/mvc-sample/build/libs/mvc-sample-${version}.jar"
+
       - name: Generate CycloneDX SBOM
         if: matrix.java == 21
         run: |

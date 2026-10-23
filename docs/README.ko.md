@@ -11,6 +11,7 @@ Java 패키지는 `io.reqover.*` 그대로입니다. 루트 빠른 시작은 릴
 ## 먼저 읽을 문서
 
 미출시 PR #53의 최신 변경은 [워크스페이스 사용성 보완](41_workspace_followup.ko.md)에 기록합니다.
+후속 [스크롤·시나리오 CI](44_ci_retest.ko.md)와 [출시 준비](43_release_readiness.ko.md)도 참고하세요.
 
 | 하고 싶은 일 | 안내 |
 | --- | --- |

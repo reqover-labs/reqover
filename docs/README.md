@@ -3,6 +3,7 @@
 # Documentation
 
 The latest unreleased PR #53 changes are tracked in the [workspace follow-up](41_workspace_followup.md).
+See also [scrolling and saved-scenario CI](44_ci_retest.md) and the [release checklist](43_release_readiness.ko.md).
 
 Current usage is based on **0.4.2**. Libraries are on Maven Central under
 `io.github.reqover-labs`; agent and CLI executables are in the

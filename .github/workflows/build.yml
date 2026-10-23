@@ -45,7 +45,7 @@ jobs:
         run: python3 scripts/test-osv-policy.py
 
       - name: Test offline case generation and generated Java
-        run: node --test scripts/test-case-drafts.test.cjs scripts/recording-comparison.test.cjs scripts/api-workspace.test.cjs scripts/dashboard-navigation.test.cjs scripts/scale-views.test.cjs scripts/scenarios.test.cjs scripts/scenario-results.test.cjs scripts/scenario-workspace.test.cjs scripts/recording-history.test.cjs
+        run: node --test scripts/*.test.cjs
 
       - name: Generate CycloneDX SBOM
         if: matrix.java == 21

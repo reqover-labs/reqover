@@ -23,24 +23,35 @@
   --danger-soft: #fff0ef;
   --warning: #98600b;
   --warning-soft: #fff6e4;
+  --scroll-thumb: #becbc5;
+  --scroll-thumb-hover: #879e92;
 }
 @media (prefers-color-scheme: dark) {
   :root { --accent: #70d7ab; --accent-soft: #162c24; --danger: #ff8e8b; --danger-soft: #342021; --warning: #e8bd63; --warning-soft: #30291b; }
+  :root { --scroll-thumb: #496257; --scroll-thumb-hover: #759788; }
 }
 html { scroll-behavior: smooth; }
+* { scrollbar-width: thin; scrollbar-color: var(--scroll-thumb) transparent; }
+*::-webkit-scrollbar { width: 8px; height: 8px; }
+*::-webkit-scrollbar-track { background: transparent; }
+*::-webkit-scrollbar-thumb { background: var(--scroll-thumb); border: 2px solid var(--bg); border-radius: 8px; }
+*::-webkit-scrollbar-thumb:hover { background: var(--scroll-thumb-hover); }
+*::-webkit-scrollbar-corner { background: transparent; }
 body { background: var(--bg-soft); }
 .ui-icon { width: 18px; height: 18px; flex: 0 0 18px; }
 button, select { font: inherit; color: var(--ink); }
 button { cursor: pointer; }
 button:focus-visible, a:focus-visible, select:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
-.dashboard-sidebar { position: fixed; inset: 0 auto 0 0; width: 210px; padding: 22px 14px; display: flex; flex-direction: column; gap: 5px; background: var(--bg); border-right: 1px solid var(--rule); z-index: 4; }
+.dashboard-sidebar { position: fixed; inset: 0 auto 0 0; width: 210px; padding: 22px 14px; display: flex; flex-direction: column; gap: 5px; background: var(--bg); border-right: 1px solid var(--rule); z-index: 4; overflow-y: auto; overscroll-behavior: contain; scrollbar-gutter: stable; }
 .dashboard-sidebar a { color: var(--ink-2); text-decoration: none; }
 .dashboard-brand { display: flex; align-items: center; gap: 9px; padding: 0 9px 30px; font-size: 21px; font-weight: 700; }
 .dashboard-brand svg { width: 34px; height: 34px; flex: 0 0 34px; }
 .dashboard-brand small { display: block; font-size: 11px; color: var(--ink-3); font-weight: 400; margin-top: 1px; }
-.dashboard-link { display: flex; align-items: center; gap: 10px; padding: 11px; border-radius: 5px; font-size: 13px; }
+.dashboard-link { position: relative; display: flex; align-items: center; gap: 10px; padding: 11px; border-radius: 7px; font-size: 13px; min-height: 44px; flex-shrink: 0; transition: background-color 120ms ease, color 120ms ease; overflow-wrap: anywhere; }
 .dashboard-link:hover { background: var(--bg-soft); }
 .dashboard-link[aria-current="page"] { background: var(--accent-soft); color: var(--accent); font-weight: 650; }
+.dashboard-link[aria-current="page"]::before { content: ''; position: absolute; left: 0; top: 12px; bottom: 12px; width: 3px; background: var(--accent); border-radius: 3px; }
+.dashboard-brand, .sidebar-meta { flex-shrink: 0; }
 .sidebar-meta { margin-top: auto; padding: 12px 9px; color: var(--ink-2); font-size: 11px; }
 .sidebar-meta small { display: block; margin-top: 6px; color: var(--ink-3); }
 .record-dot { display: inline-block; width: 6px; height: 6px; background: var(--accent); border-radius: 50%; margin-right: 7px; }
@@ -138,7 +149,7 @@ main.wrap { max-width: none; margin-left: 210px; padding: 0 28px; }
   .attention-list { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 @media (max-width: 760px) {
-  .dashboard-sidebar { position: static; width: auto; flex-direction: row; flex-wrap: wrap; gap: 3px; padding: 12px 14px; border-right: 0; border-bottom: 1px solid var(--rule); }
+  .dashboard-sidebar { position: static; width: auto; flex-direction: row; flex-wrap: wrap; gap: 3px; padding: 12px 14px; border-right: 0; border-bottom: 1px solid var(--rule); overflow: visible; scrollbar-gutter: auto; }
   .dashboard-brand { flex: 1 0 100%; padding: 0 4px 8px; font-size: 20px; }
   .dashboard-brand small { display: inline; margin-left: 10px; }
   .dashboard-link { font-size: 11px; padding: 7px 8px; gap: 5px; }
@@ -164,7 +175,9 @@ main.wrap { max-width: none; margin-left: 210px; padding: 0 28px; }
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
   .graph-running .graph-edge.association { animation: none; }
+  .dashboard-link { transition: none; }
 }
+@media (forced-colors: active) { * { scrollbar-color: auto; } .dashboard-link[aria-current="page"] { outline: 1px solid Highlight; } }
 @media print {
   .dashboard-sidebar, .workspace-tools, #reqover-attention { display: none; }
   main.wrap, .topbar { margin-left: 0; }
